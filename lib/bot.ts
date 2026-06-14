@@ -108,7 +108,7 @@ bot.command("linksite", async (ctx) => {
     return;
   }
   const { code } = await createLinkCode(p.id, ctx.from!.id);
-  const url = (await getSetting("site_url")) ?? "https://rxteam.vercel.app";
+  const url = (await getSetting("site_url")) ?? "https://www.rxteam.pl";
   await ctx.reply(tr(lang, "linksite_msg", { code, min: 15, url }));
 });
 

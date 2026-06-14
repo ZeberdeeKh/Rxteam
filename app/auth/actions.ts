@@ -12,7 +12,7 @@ function siteOrigin(): string {
   return (
     process.env.NEXT_PUBLIC_SITE_URL ??
     h.get("origin") ??
-    `https://${h.get("host") ?? "rxteam.vercel.app"}`
+    `https://${h.get("host") ?? "www.rxteam.pl"}`
   );
 }
 
