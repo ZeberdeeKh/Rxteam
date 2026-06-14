@@ -289,11 +289,15 @@ const S: Record<string, Dict> = {
     en: "No games played yet. Be the first!",
     uk: "Ще ніхто не зіграв жодної гри. Стань першим!",
   },
-  top_line: { pl: "{place} {who} — {games}", en: "{place} {who} — {games}", uk: "{place} {who} — {games}" },
+  top_line: {
+    pl: "{place} {who} — {earned} ⭐ ({games} gier)",
+    en: "{place} {who} — {earned} ⭐ ({games} games)",
+    uk: "{place} {who} — {earned} ⭐ ({games} ігор)",
+  },
   top_me: {
-    pl: "📊 Twoje miejsce: {place} ({games} gier)",
-    en: "📊 Your place: {place} ({games} games)",
-    uk: "📊 Твоє місце: {place} ({games} ігор)",
+    pl: "📊 Twoje miejsce: {place} · {earned} ⭐ ({games} gier)",
+    en: "📊 Your place: {place} · {earned} ⭐ ({games} games)",
+    uk: "📊 Твоє місце: {place} · {earned} ⭐ ({games} ігор)",
   },
 
   // ручний чек-ін адміном (/markcheckin)

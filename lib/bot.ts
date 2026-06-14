@@ -94,13 +94,20 @@ bot.command("top", async (ctx) => {
           tr(lang, "top_line", {
             place: medals[i] ?? `${i + 1}.`,
             who: pl.callsign ?? pl.name ?? "—",
+            earned: pl.points_earned ?? 0,
             games: pl.games_played ?? 0,
           }),
         )
         .join("\n");
   }
-  const myPlace = await getPlayerRank(p.games_played ?? 0);
-  msg += "\n\n" + tr(lang, "top_me", { place: myPlace, games: p.games_played ?? 0 });
+  const myPlace = await getPlayerRank(p.points_earned ?? 0);
+  msg +=
+    "\n\n" +
+    tr(lang, "top_me", {
+      place: myPlace,
+      earned: p.points_earned ?? 0,
+      games: p.games_played ?? 0,
+    });
   await ctx.reply(msg);
 });
 

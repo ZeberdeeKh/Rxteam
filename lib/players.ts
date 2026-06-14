@@ -68,23 +68,24 @@ export async function getPlayerByTg(tgUserId: number) {
   return data;
 }
 
-// Топ гравців за к-стю зіграних ігор (для /top).
+// Топ гравців за «зароблено всього» (бали); к-сть ігор — поряд як статистика.
 export async function getTopPlayers(limit = 10) {
   const { data } = await supabase
     .from("players")
-    .select("id, callsign, name, games_played")
-    .gt("games_played", 0)
+    .select("id, callsign, name, games_played, points_earned")
+    .or("points_earned.gt.0,games_played.gt.0")
+    .order("points_earned", { ascending: false })
     .order("games_played", { ascending: false })
     .order("id", { ascending: true })
     .limit(limit);
   return data ?? [];
 }
 
-// Місце гравця в рейтингу: к-сть гравців із більшою к-стю ігор + 1 (нічиї ділять місце).
-export async function getPlayerRank(gamesPlayed: number): Promise<number> {
+// Місце гравця в рейтингу: к-сть гравців із більшим «зароблено» + 1 (нічиї ділять місце).
+export async function getPlayerRank(pointsEarned: number): Promise<number> {
   const { count } = await supabase
     .from("players")
     .select("*", { count: "exact", head: true })
-    .gt("games_played", gamesPlayed);
+    .gt("points_earned", pointsEarned);
   return (count ?? 0) + 1;
 }
