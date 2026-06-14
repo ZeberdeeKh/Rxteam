@@ -15,9 +15,14 @@ const S: Record<string, Dict> = {
     uk: "✅ Мову встановлено: українська.",
   },
   profile: {
-    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nRozegrane gry: {games}",
-    en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nGames played: {games}",
-    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nЗіграно ігор: {games}",
+    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nStopień: {rank}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
+    en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nRank: {rank}\nGames played: {games}\n⭐ Earned: {earned}\n💰 Balance: {balance}\n🎯 Reliability: {reliability}",
+    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nЗвання: {rank}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
+  },
+  no_patch_label: {
+    pl: "brak (potrzebny patch)",
+    en: "none (patch needed)",
+    uk: "немає (потрібен патч)",
   },
   callsign_unset: {
     pl: "nie ustawiony (podasz przy pierwszej rejestracji)",

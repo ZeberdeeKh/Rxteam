@@ -54,11 +54,17 @@ bot.command("profile", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
   const lang = p.lang as Lang;
+  const rel = await getReliability(p.id);
+  const rankStr = p.has_patch ? (p.rank ?? "Recruit") : tr(lang, "no_patch_label");
   let msg = tr(lang, "profile", {
     name: p.name ?? "—",
     callsign: p.callsign ?? tr(lang, "callsign_unset"),
     tg: p.tg_username ? "@" + p.tg_username : "—",
+    rank: rankStr,
     games: p.games_played ?? 0,
+    earned: p.points_earned ?? 0,
+    balance: p.points_balance ?? 0,
+    reliability: rel.pct === null ? "—" : `${rel.pct}%`,
   });
   if (p.is_master) msg += "\n" + tr(lang, "badge_master");
   else if (p.is_admin) msg += "\n" + tr(lang, "badge_admin");
