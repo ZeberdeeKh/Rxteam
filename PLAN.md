@@ -172,7 +172,8 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
 - ✅ **1. Анти-бот шилд** + онбординг-FAQ (тримовна капча через `user_chat_id`)
 - ✅ **2. Ядро** — гравці + мова `/lang`, `/profile` `/rules` `/admin`, локації (`/addlocation` `/locations`, координати текстом), ігри `/newgame` з багатим двомовним PL/UA анонсом у топік, реєстрація (позивний + оренда + транспорт) через діп-лінк картку, гео-чек-ін `/checkin` → `games_played +1`.
   - ✅ **2.4:** `/top` (рейтинг за к-стю ігор, топ-10 + моє місце), авто-позначка неявки (cron `/api/cron/noshow` — штраф балами відкладено на Етап 3), ручний чек-ін адміном `/markcheckin` (право `checkin`). Без нових полів БД.
-- ⬜ **3. Економіка** — бали (зароблено/баланс), патч (заявка→підтвердж.→видача, 85% без патча), звання Recruit→Scout→Squad Leader→Team Leader (купуються за бали), ачівки, reliability %, магазин балів
+- 🟡 **3. Економіка** — ГОТОВО: бали (зароблено/баланс, `point_log`, ×0.85 без патча), штраф −5 за неявку в cron; патч `/patch` (заявка→підтвердж.→видача на грі, право `patch`); звання `/rank` Recruit→Scout→Squad Leader→Team Leader (купівля за баланс, лише з патчем); ачівки First Contact / 10·25·50 Deployments / Dawn Patrol (+бали за tier); reliability % у `/profile`; `/top` за «зароблено». Міграція `etap3.sql`.
+  - ⬜ **Лишилось:** магазин балів (механіка є — `point_log`+баланс; перелік бонусів пізніше); ачівки **Recruiter** (з реф. → Етап 4) і **Iron Discipline** (сезон/квартал → Етап 5).
 - ⬜ **4. Реферали** — лінки, знижка на ту саму гру (1→−50%, 2+→безкошт, з 1-ї гри новачка), підтвердження адміном з фото
 - ⬜ **5. Решта** — список водіїв (carpool), лист очікування (опц. ліміт), нагадування (−день / −2год), голосування за локацію (−14 днів), лотерея надійних (квартал), «У цифрах», мультимова сайту
 - ⬜ **6. Сайт** (rxteam.pl) — Supabase Auth (email), кабінет+історія, рейтинг, календар, самочек-ін для не-TG, магазин, адмінка/налаштування (блоки анонсу, ціни, бали, ролі)
@@ -185,10 +186,10 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
 - **Supabase:** ref `svmsabjrswrxgcwwbgla` (eu-west-1). Секрети — у Vercel env + локальний `.env` (gitignored).
 - **Стек:** Next.js 14, grammY (webhook), @supabase/supabase-js (secret key, лише сервер), luxon (Europe/Warsaw).
 - **Модулі:** `lib/bot.ts` (хендлери), `lib/i18n.ts` (тримовні стек-тексти капчі/FAQ + анонс), `lib/strings.ts` (`tr(lang,key)` — мова гравця, варіант A), `lib/players.ts`, `lib/settings.ts`, `lib/state.ts` (стан діалогів у `user_states`), `lib/games.ts` (час/вікна/анонс/haversine).
-- **Команди:** /start (+deep-link `g<id>`), /lang, /profile, /rules, /top, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /markcheckin (адмін, право checkin), /cancel. Меню — через Bot API `setMyCommands`.
+- **Команди:** /start (+deep-link `g<id>`), /lang, /profile, /rules, /top, /patch, /rank, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /markcheckin (адмін, право checkin), /cancel. Меню — через Bot API `setMyCommands`.
 - **Cron:** `…/api/cron/cleanup` (заявки-капчі, 03:00) + `…/api/cron/noshow` (неявки, 22:00) — обидва в `vercel.json`, захищені `CRON_SECRET`.
 - **Майстер-адмін:** бутстрап за username (`master_username`=`delltex`).
-- **Міграції (виконані в Supabase SQL Editor):** `supabase/schema.sql`, `etap2.sql`, `etap2b.sql`.
+- **Міграції (виконані в Supabase SQL Editor):** `supabase/schema.sql`, `etap2.sql`, `etap2b.sql`, `etap3.sql`.
 
 **Дев-цикл:** правки в `lib/` → `npx tsc --noEmit` → commit → `git push` (деплой сам ~1 хв). Меню/опис бота — через Bot API. Нові поля → окрема `supabase/etapX.sql` (організатор виконує в SQL Editor).
 
