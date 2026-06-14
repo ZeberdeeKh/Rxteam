@@ -1,0 +1,15 @@
+{"commands":[
+  {"command":"start","description":"Start / Старт"},
+  {"command":"top","description":"Ranking / Рейтинг"},
+  {"command":"checkin","description":"Check-in"},
+  {"command":"drivers","description":"Kierowcy / Водії"},
+  {"command":"myride","description":"Moja podwózka / Моя підвозка"},
+  {"command":"profile","description":"Profil / Профіль"},
+  {"command":"rank","description":"Stopień / Звання"},
+  {"command":"patch","description":"Patch / Патч"},
+  {"command":"ref","description":"Polecenia / Реферали"},
+  {"command":"linksite","description":"Połącz ze stroną / Привʼязати сайт"},
+  {"command":"stats","description":"W liczbach / У цифрах"},
+  {"command":"rules","description":"Zasady / Правила"},
+  {"command":"lang","description":"Język / Мова"}
+]}
