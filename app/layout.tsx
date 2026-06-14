@@ -4,6 +4,7 @@ import "./globals.css";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-player";
+import { isAdmin } from "@/lib/admin";
 import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 
@@ -14,7 +15,9 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
-  const loggedIn = (await getSessionContext()).state !== "anon";
+  const ctx = await getSessionContext();
+  const loggedIn = ctx.state !== "anon";
+  const admin = ctx.state === "linked" && isAdmin(ctx.player);
 
   return (
     <html lang={lang}>
@@ -40,6 +43,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <Link href="/cabinet" className="text-neutral-700 hover:text-brand">
                     {st(lang, "nav_cabinet")}
                   </Link>
+                  {admin && (
+                    <Link href="/admin" className="font-medium text-brand hover:text-brand-dark">
+                      {st(lang, "nav_admin")}
+                    </Link>
+                  )}
                   <form action={signOut}>
                     <button type="submit" className="text-neutral-700 hover:text-brand">
                       {st(lang, "nav_logout")}

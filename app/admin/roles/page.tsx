@@ -1,0 +1,72 @@
+import { getServerLang } from "@/lib/server-lang";
+import { st } from "@/lib/site-i18n";
+import { requireMaster, ALL_PERMS } from "@/lib/admin";
+import { listPlayers } from "@/lib/admin-data";
+import { saveRoles } from "@/app/admin/actions";
+
+export const dynamic = "force-dynamic";
+
+export default async function AdminRoles({
+  searchParams,
+}: {
+  searchParams: { saved?: string; err?: string };
+}) {
+  await requireMaster();
+  const lang = getServerLang();
+  const players = await listPlayers();
+
+  return (
+    <div className="space-y-5">
+      <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "adm_roles_title")}</h1>
+      {searchParams.saved && (
+        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, "adm_saved")}</p>
+      )}
+
+      <div className="space-y-3">
+        {players.map((p) => (
+          <form
+            key={p.id}
+            action={saveRoles}
+            className="rounded-lg border border-neutral-200 bg-white p-4"
+          >
+            <input type="hidden" name="playerId" value={p.id} />
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <span className="font-semibold text-neutral-900">
+                {p.callsign ?? p.name ?? `#${p.id}`}
+                {p.tg_username && <span className="ml-2 text-xs text-neutral-400">@{p.tg_username}</span>}
+              </span>
+              {p.is_master && (
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs text-brand-dark">
+                  {st(lang, "adm_master")}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {ALL_PERMS.map((perm) => (
+                <label key={perm} className="flex items-center gap-1 text-sm text-neutral-700">
+                  <input
+                    type="checkbox"
+                    name="perms"
+                    value={perm}
+                    defaultChecked={Array.isArray(p.admin_perms) && p.admin_perms.includes(perm)}
+                    disabled={p.is_master}
+                    className="h-4 w-4 accent-brand"
+                  />
+                  {perm}
+                </label>
+              ))}
+              {!p.is_master && (
+                <button
+                  type="submit"
+                  className="ml-auto rounded-md bg-brand px-3 py-1 text-xs font-medium text-white hover:bg-brand-dark"
+                >
+                  {st(lang, "adm_btn_save_roles")}
+                </button>
+              )}
+            </div>
+          </form>
+        ))}
+      </div>
+    </div>
+  );
+}

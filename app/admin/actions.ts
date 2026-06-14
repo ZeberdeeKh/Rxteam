@@ -1,0 +1,208 @@
+"use server";
+
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
+import { supabase } from "@/lib/supabase";
+import { setSetting } from "@/lib/settings";
+import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
+import { TOGGLE_KEYS, VALUE_KEYS } from "@/lib/admin-settings";
+import { makeUtc, computeWindows } from "@/lib/games";
+import { performCheckin } from "@/lib/checkins";
+import { setCallsignForPlayer } from "@/lib/site-player";
+
+// ── Налаштування (майстер) ──
+export async function saveSettings(formData: FormData) {
+  await requireMaster();
+  for (const key of TOGGLE_KEYS) {
+    await setSetting(key, formData.get(key) === "on" ? "true" : "false");
+  }
+  for (const key of VALUE_KEYS) {
+    const v = formData.get(key);
+    if (v !== null) await setSetting(key, String(v));
+  }
+  revalidatePath("/admin/settings");
+  redirect("/admin/settings?saved=1");
+}
+
+// ── Ігри (право games) ──
+export async function createGame(formData: FormData) {
+  await requirePerm("games");
+  const locationId = Number(formData.get("locationId"));
+  const date = String(formData.get("date") ?? "");
+  const gather = String(formData.get("gather") ?? "");
+  const start = String(formData.get("start") ?? "");
+  if (!Number.isFinite(locationId) || !date || !gather || !start) {
+    redirect("/admin/games?err=fields");
+  }
+  const capRaw = Number(formData.get("capacity"));
+  const capacity = Number.isFinite(capRaw) && capRaw > 0 ? capRaw : null;
+
+  const gatherUtc = makeUtc(date, gather);
+  const startUtc = makeUtc(date, start);
+  const w = computeWindows(gatherUtc, startUtc);
+
+  await supabase.from("games").insert({
+    location_id: locationId,
+    title: String(formData.get("title") ?? "").trim() || null,
+    scenario_pl: String(formData.get("scenario_pl") ?? "").trim() || null,
+    scenario_uk: String(formData.get("scenario_uk") ?? "").trim() || null,
+    gather_at: gatherUtc,
+    start_at: startUtc,
+    reg_closes_at: w.reg_closes_at,
+    cancel_deadline: w.cancel_deadline,
+    checkin_from: w.checkin_from,
+    checkin_to: w.checkin_to,
+    capacity,
+    status: "announced",
+  });
+  revalidatePath("/admin/games");
+  redirect("/admin/games?created=1");
+}
+
+export async function cancelGame(formData: FormData) {
+  await requirePerm("games");
+  const gameId = Number(formData.get("gameId"));
+  if (Number.isFinite(gameId)) {
+    await supabase.from("games").update({ status: "cancelled" }).eq("id", gameId);
+    revalidatePath("/admin/games");
+  }
+  redirect("/admin/games?cancelled=1");
+}
+
+// ── Реєстрації / чек-іни наживо (право checkin) ──
+export async function manualCheckin(formData: FormData) {
+  await requirePerm("checkin");
+  const gameId = Number(formData.get("gameId"));
+  const playerId = Number(formData.get("playerId"));
+  if (!Number.isFinite(gameId) || !Number.isFinite(playerId)) redirect("/admin/games");
+
+  const { data: existing } = await supabase
+    .from("checkins")
+    .select("id")
+    .eq("game_id", gameId)
+    .eq("player_id", playerId)
+    .maybeSingle();
+  if (!existing) {
+    const { data: target } = await supabase
+      .from("players")
+      .select("id, callsign, name, games_played, has_patch")
+      .eq("id", playerId)
+      .single();
+    if (target) {
+      await performCheckin({
+        player: target,
+        gameId,
+        source: "manual",
+        isManual: true,
+        earlyMinutes: null,
+      });
+    }
+  }
+  revalidatePath(`/admin/games/${gameId}`);
+  redirect(`/admin/games/${gameId}?checked=1`);
+}
+
+export async function markNoShow(formData: FormData) {
+  await requirePerm("checkin");
+  const gameId = Number(formData.get("gameId"));
+  const playerId = Number(formData.get("playerId"));
+  if (Number.isFinite(gameId) && Number.isFinite(playerId)) {
+    await supabase
+      .from("registrations")
+      .update({ status: "no_show" })
+      .eq("game_id", gameId)
+      .eq("player_id", playerId);
+    revalidatePath(`/admin/games/${gameId}`);
+  }
+  redirect(`/admin/games/${gameId}?noshow=1`);
+}
+
+// ── Гравці (право players) ──
+export async function adjustPoints(formData: FormData) {
+  await requirePerm("players");
+  const playerId = Number(formData.get("playerId"));
+  const delta = Number(formData.get("delta"));
+  if (!Number.isFinite(playerId) || !Number.isFinite(delta) || delta === 0) {
+    redirect("/admin/players?err=fields");
+  }
+  // Пряма корекція (без множника 0.85): earned лише вгору, balance не нижче 0.
+  await supabase.from("point_log").insert({ player_id: playerId, delta, reason: "manual" });
+  const { data: p } = await supabase
+    .from("players")
+    .select("points_earned, points_balance")
+    .eq("id", playerId)
+    .single();
+  await supabase
+    .from("players")
+    .update({
+      points_earned: (p?.points_earned ?? 0) + (delta > 0 ? delta : 0),
+      points_balance: Math.max(0, (p?.points_balance ?? 0) + delta),
+    })
+    .eq("id", playerId);
+  revalidatePath("/admin/players");
+  redirect("/admin/players?adjusted=1");
+}
+
+export async function setPlayerCallsign(formData: FormData) {
+  await requirePerm("players");
+  const playerId = Number(formData.get("playerId"));
+  const res = await setCallsignForPlayer(playerId, String(formData.get("callsign") ?? ""));
+  revalidatePath("/admin/players");
+  redirect(`/admin/players?${res.ok ? "callsign=1" : `err=callsign_${res.reason}`}`);
+}
+
+export async function togglePatch(formData: FormData) {
+  await requirePerm("players");
+  const playerId = Number(formData.get("playerId"));
+  const { data: p } = await supabase
+    .from("players")
+    .select("has_patch, rank")
+    .eq("id", playerId)
+    .single();
+  const next = !p?.has_patch;
+  const patch: Record<string, unknown> = { has_patch: next };
+  if (next && !p?.rank) patch.rank = "Recruit"; // вхідне звання з патчем
+  await supabase.from("players").update(patch).eq("id", playerId);
+  revalidatePath("/admin/players");
+  redirect("/admin/players?patch=1");
+}
+
+// ── Реферали (право referrals) ──
+export async function setReferralStatus(formData: FormData) {
+  await requirePerm("referrals");
+  const refId = Number(formData.get("refId"));
+  const status = String(formData.get("status") ?? "");
+  if (Number.isFinite(refId) && (status === "confirmed" || status === "rejected")) {
+    await supabase
+      .from("referrals")
+      .update({
+        status,
+        confirmed_at: status === "confirmed" ? new Date().toISOString() : null,
+      })
+      .eq("id", refId);
+    revalidatePath("/admin/referrals");
+  }
+  redirect("/admin/referrals?saved=1");
+}
+
+// ── Ролі адмінів (майстер) ──
+export async function saveRoles(formData: FormData) {
+  await requireMaster();
+  const playerId = Number(formData.get("playerId"));
+  if (!Number.isFinite(playerId)) redirect("/admin/roles");
+
+  const { data: target } = await supabase
+    .from("players")
+    .select("is_master")
+    .eq("id", playerId)
+    .single();
+  if (target?.is_master) redirect("/admin/roles?err=master"); // майстра не чіпаємо
+
+  const perms = formData.getAll("perms").map(String).filter((p) => ALL_PERMS.includes(p as any));
+  await supabase
+    .from("players")
+    .update({ is_admin: perms.length > 0, admin_perms: perms })
+    .eq("id", playerId);
+  revalidatePath("/admin/roles");
+  redirect("/admin/roles?saved=1");
+}

@@ -12,8 +12,7 @@ import {
   setCallsignForPlayer,
 } from "@/lib/site-player";
 import { registeredCount, distanceMeters } from "@/lib/games";
-import { awardPoints, getPointValue, grantCheckinAchievements } from "@/lib/economy";
-import { confirmReferralCore } from "@/lib/referrals";
+import { performCheckin } from "@/lib/checkins";
 
 export type LinkState = { error?: string };
 
@@ -165,32 +164,22 @@ export async function webCheckin(formData: FormData) {
     .maybeSingle();
   if (existing) back("?err=checkin_already");
 
-  await supabase
-    .from("checkins")
-    .insert({ game_id: gameId, player_id: player.id, lat, lng, distance_m: dist, source: "web" });
-  const gamesPlayedAfter = (player.games_played ?? 0) + 1;
-  await supabase.from("players").update({ games_played: gamesPlayedAfter }).eq("id", player.id);
-  await awardPoints({
-    playerId: player.id,
-    reason: "attend",
-    baseDelta: await getPointValue("pts_attend", 10),
-    gameId,
-    hasPatch: !!player.has_patch,
-  });
   const earlyMin = Math.floor((now - new Date(game!.checkin_from).getTime()) / 60000);
-  await grantCheckinAchievements({
-    playerId: player.id,
+  await performCheckin({
+    player: {
+      id: player.id,
+      games_played: player.games_played,
+      has_patch: player.has_patch,
+      callsign: player.callsign,
+      name: player.name,
+    },
     gameId,
-    gamesPlayedAfter,
-    hasPatch: !!player.has_patch,
+    lat,
+    lng,
+    distanceM: dist,
+    source: "web",
     earlyMinutes: earlyMin,
   });
-  // Авто-зарахування реферала (бот пришле інвайтеру нотифікацію окремо при його активності).
-  await confirmReferralCore(
-    { id: player.id, callsign: player.callsign, name: player.name },
-    gameId,
-    gamesPlayedAfter,
-  );
 
   revalidatePath("/cabinet");
   back("?checkin=1");

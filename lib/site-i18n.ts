@@ -403,6 +403,93 @@ const SITE: Record<string, Dict> = {
     uk: "Магазин тимчасово вимкнено.",
   },
   shop_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
+
+  // ── 6.4 Адмінка ──
+  nav_admin: { pl: "Panel", en: "Admin", uk: "Адмінка" },
+  adm_title: { pl: "Panel administracyjny", en: "Admin panel", uk: "Панель адміністратора" },
+  adm_back: { pl: "← Panel", en: "← Admin", uk: "← Панель" },
+  adm_saved: { pl: "✅ Zapisano.", en: "✅ Saved.", uk: "✅ Збережено." },
+  adm_done: { pl: "✅ Gotowe.", en: "✅ Done.", uk: "✅ Готово." },
+  adm_err_fields: { pl: "Uzupełnij pola.", en: "Fill in the fields.", uk: "Заповни поля." },
+
+  adm_nav_settings: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
+  adm_nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
+  adm_nav_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
+  adm_nav_referrals: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },
+  adm_nav_rental: { pl: "Wynajem", en: "Rental", uk: "Оренда" },
+  adm_nav_joins: { pl: "Wnioski (grupa)", en: "Join requests", uk: "Заявки в групу" },
+  adm_nav_roles: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
+
+  adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
+  adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
+
+  adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
+  adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },
+  adm_no_locations: {
+    pl: "Najpierw dodaj lokalizację w bocie (/addlocation).",
+    en: "Add a location in the bot first (/addlocation).",
+    uk: "Спершу додай локацію в боті (/addlocation).",
+  },
+  adm_f_location: { pl: "Lokalizacja", en: "Location", uk: "Локація" },
+  adm_f_title: { pl: "Nazwa", en: "Title", uk: "Назва" },
+  adm_f_date: { pl: "Data", en: "Date", uk: "Дата" },
+  adm_f_gather: { pl: "Zbiórka (HH:MM)", en: "Gather (HH:MM)", uk: "Збір (HH:MM)" },
+  adm_f_start: { pl: "Start (HH:MM)", en: "Start (HH:MM)", uk: "Старт (HH:MM)" },
+  adm_f_capacity: { pl: "Limit miejsc (0 = brak)", en: "Capacity (0 = none)", uk: "Ліміт (0 = без)" },
+  adm_f_scenario_pl: { pl: "Scenariusz (PL)", en: "Scenario (PL)", uk: "Сценарій (PL)" },
+  adm_f_scenario_uk: { pl: "Scenariusz (UA)", en: "Scenario (UA)", uk: "Сценарій (UA)" },
+  adm_btn_create: { pl: "Utwórz", en: "Create", uk: "Створити" },
+  adm_btn_cancel_game: { pl: "Odwołaj", en: "Cancel", uk: "Скасувати" },
+  adm_open: { pl: "Otwórz", en: "Open", uk: "Відкрити" },
+  adm_col_status: { pl: "Status", en: "Status", uk: "Статус" },
+  adm_col_reg: { pl: "Zapisani", en: "Registered", uk: "Записані" },
+  adm_col_checkins: { pl: "Check-iny", en: "Check-ins", uk: "Чек-іни" },
+
+  adm_game_regs: { pl: "Zapisani gracze", en: "Registered players", uk: "Записані гравці" },
+  adm_no_regs: { pl: "Brak zapisanych.", en: "No registrations.", uk: "Немає записаних." },
+  adm_btn_checkin: { pl: "Check-in", en: "Check in", uk: "Чек-ін" },
+  adm_btn_noshow: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },
+  adm_checked: { pl: "✅ obecny", en: "✅ present", uk: "✅ присутній" },
+  adm_rental_flag: { pl: "🔫 wynajem", en: "🔫 rental", uk: "🔫 оренда" },
+
+  adm_players_title: { pl: "Gracze", en: "Players", uk: "Гравці" },
+  adm_balance: { pl: "Saldo", en: "Balance", uk: "Баланс" },
+  adm_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
+  adm_games_n: { pl: "Gry", en: "Games", uk: "Ігри" },
+  adm_btn_adjust: { pl: "Koryguj", en: "Adjust", uk: "Корекція" },
+  adm_delta_ph: { pl: "±punkty", en: "±points", uk: "±бали" },
+  adm_btn_patch: { pl: "Patch ↔", en: "Patch ↔", uk: "Patch ↔" },
+  adm_btn_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
+
+  adm_referrals_title: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },
+  adm_inviter: { pl: "Zapraszający", en: "Inviter", uk: "Запросив" },
+  adm_invited: { pl: "Nowy", en: "Newcomer", uk: "Новачок" },
+  adm_btn_confirm: { pl: "Potwierdź", en: "Confirm", uk: "Підтвердити" },
+  adm_btn_reject: { pl: "Odrzuć", en: "Reject", uk: "Відхилити" },
+  adm_empty: { pl: "Brak danych.", en: "No data.", uk: "Немає даних." },
+
+  adm_rental_title: { pl: "Zgłoszenia wynajmu", en: "Rental requests", uk: "Заявки на оренду" },
+  adm_rental_note: {
+    pl: "Lista podglądowa. Status (zajęty/opłacony) prowadź poza systemem.",
+    en: "Read-only list. Track status (occupied/paid) outside the system.",
+    uk: "Список лише для перегляду. Статус (зайнято/оплачено) веди поза системою.",
+  },
+
+  adm_joins_title: { pl: "Wnioski do grupy (shield)", en: "Group join requests", uk: "Заявки в групу" },
+  adm_joins_note: {
+    pl: "Decyzje podejmuje bot automatycznie (captcha). Tu podgląd ostatnich.",
+    en: "Decisions are automatic (captcha). Recent attempts shown here.",
+    uk: "Рішення приймає бот автоматично (капча). Тут перегляд останніх.",
+  },
+
+  adm_roles_title: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
+  adm_master: { pl: "Master", en: "Master", uk: "Майстер" },
+  adm_btn_save_roles: { pl: "Zapisz role", en: "Save roles", uk: "Зберегти ролі" },
+
+  adm_export: { pl: "Eksport CSV", en: "CSV export", uk: "Експорт CSV" },
+  adm_export_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
+  adm_export_regs: { pl: "Rejestracje", en: "Registrations", uk: "Реєстрації" },
+  adm_export_checkins: { pl: "Check-iny", en: "Check-ins", uk: "Чек-іни" },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {
