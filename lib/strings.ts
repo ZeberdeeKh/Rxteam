@@ -453,6 +453,23 @@ const S: Record<string, Dict> = {
     en: "🏅 Achievement unlocked: {title} (+{points} pts)",
     uk: "🏅 Ачівку відкрито: {title} (+{points} б.)",
   },
+
+  // реферали — /ref
+  ref_off: {
+    pl: "Program poleceń jest teraz wyłączony.",
+    en: "The referral program is currently disabled.",
+    uk: "Реферальна програма зараз вимкнена.",
+  },
+  ref_need_play: {
+    pl: "Najpierw rozegraj choć jedną grę (check-in) — wtedy będziesz mógł zapraszać znajomych.",
+    en: "Play at least one game (check in) first — then you can invite friends.",
+    uk: "Спершу зіграй хоча б одну гру (чек-ін) — тоді зможеш запрошувати друзів.",
+  },
+  ref_link: {
+    pl: "🎟 Twój link polecający:\n{link}\n\nZapraszaj znajomych. Gdy nowicjusz zrobi pierwszy check-in — dostajesz +{pts} pkt i zniżkę na tę grę (1 znajomy −50%, 2+ za darmo).\nPotwierdzonych znajomych: {confirmed}",
+    en: "🎟 Your referral link:\n{link}\n\nInvite friends. When a newcomer does their first check-in — you get +{pts} pts and a discount for that game (1 friend −50%, 2+ free).\nConfirmed friends: {confirmed}",
+    uk: "🎟 Твоє реф-посилання:\n{link}\n\nЗапрошуй друзів. Коли новачок зробить перший чек-ін — тобі +{pts} балів і знижка на ту гру (1 друг −50%, 2+ безкоштовно).\nПідтверджених друзів: {confirmed}",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {

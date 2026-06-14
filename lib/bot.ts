@@ -9,6 +9,7 @@ import {
   getTopPlayers,
   getPlayerRank,
   getAdminsWithPerm,
+  getPlayerByTg,
 } from "./players";
 import {
   awardPoints,
@@ -58,6 +59,7 @@ async function sendAchievements(chatId: number | null, lang: Lang, granted: Gran
 
 bot.command("start", async (ctx) => {
   if (ctx.chat.type !== "private") return;
+  const existedBefore = await getPlayerByTg(ctx.from!.id); // null → новачок
   const p = await ensurePlayer(ctx.from!);
   const payload = typeof ctx.match === "string" ? ctx.match : "";
   const m = payload.match(/^g(\d+)$/);
@@ -65,8 +67,55 @@ bot.command("start", async (ctx) => {
     await showGameCard(ctx, p, Number(m[1]));
     return;
   }
+  const r = payload.match(/^ref(\d+)$/);
+  if (r) {
+    await bindReferral(p, Number(r[1]), !existedBefore);
+  }
   await ctx.reply(tr(p.lang as Lang, "start"));
 });
+
+bot.command("ref", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("referrals"))) {
+    await ctx.reply(tr(lang, "ref_off"));
+    return;
+  }
+  if ((p.games_played ?? 0) < 1) {
+    await ctx.reply(tr(lang, "ref_need_play"));
+    return;
+  }
+  const link = `https://t.me/${ctx.me.username}?start=ref${p.id}`;
+  const { count } = await supabase
+    .from("referrals")
+    .select("*", { count: "exact", head: true })
+    .eq("inviter_id", p.id)
+    .eq("status", "confirmed");
+  const pts = await getPointValue("pts_friend", 10);
+  await ctx.reply(tr(lang, "ref_link", { link, pts, confirmed: count ?? 0 }));
+});
+
+// Прив'язує новачка до інвайтера (лише якщо це справді нова людина).
+async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean) {
+  if (!isNewcomer || inviterId === invited.id) return;
+  if (!(await featureEnabled("referrals"))) return;
+  const { data: existing } = await supabase
+    .from("referrals")
+    .select("id")
+    .eq("invited_id", invited.id)
+    .maybeSingle();
+  if (existing) return; // вже прив'язаний
+  const { data: inviter } = await supabase
+    .from("players")
+    .select("id, games_played")
+    .eq("id", inviterId)
+    .maybeSingle();
+  if (!inviter || (inviter.games_played ?? 0) < 1) return; // запрошувати може лише той, хто грав
+  await supabase
+    .from("referrals")
+    .insert({ inviter_id: inviterId, invited_id: invited.id, status: "pending" });
+}
 
 bot.command("lang", async (ctx) => {
   if (ctx.chat.type !== "private") return;
