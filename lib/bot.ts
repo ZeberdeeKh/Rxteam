@@ -21,6 +21,11 @@ export const bot = new Bot(process.env.BOT_TOKEN!);
 
 const REG_BTN = "✅ Записатись / Sign up";
 
+// Право «чек-ін»: майстер або адмін із перміссією checkin.
+function canCheckin(p: any): boolean {
+  return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes("checkin"));
+}
+
 // ─────────────────────────────── Команди ───────────────────────────────
 
 bot.command("start", async (ctx) => {
@@ -226,6 +231,100 @@ bot.callbackQuery(/^checkin:(\d+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const p = await ensurePlayer(ctx.from);
   await promptCheckin(ctx, p.lang as Lang, Number(ctx.match[1]));
+});
+
+// ── Ручний чек-ін адміном (право checkin): відмітити гравця без геолокації ──
+bot.command("markcheckin", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!canCheckin(p)) {
+    await ctx.reply(tr(lang, "mc_no_perm"));
+    return;
+  }
+  const { data: games } = await supabase
+    .from("games")
+    .select("id, title, start_at")
+    .order("start_at", { ascending: false })
+    .limit(8);
+  if (!games?.length) {
+    await ctx.reply(tr(lang, "mc_no_games"));
+    return;
+  }
+  const kb = new InlineKeyboard();
+  games.forEach((g) =>
+    kb.text(`${g.title ?? "#" + g.id} — ${formatWhen(g.start_at)}`, `acheckin:${g.id}`).row(),
+  );
+  await ctx.reply(tr(lang, "mc_pick_game"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^acheckin:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (!canCheckin(p)) return;
+  const gameId = Number(ctx.match[1]);
+  const { data: regs } = await supabase
+    .from("registrations")
+    .select("player_id, status, players(id, callsign, name)")
+    .eq("game_id", gameId)
+    .in("status", ["registered", "no_show"]);
+  const { data: checked } = await supabase
+    .from("checkins")
+    .select("player_id")
+    .eq("game_id", gameId);
+  const checkedSet = new Set((checked ?? []).map((c) => c.player_id));
+  const avail = (regs ?? []).filter((r) => !checkedSet.has(r.player_id));
+  if (!avail.length) {
+    await ctx.editMessageText(tr(lang, "mc_no_players"));
+    return;
+  }
+  const kb = new InlineKeyboard();
+  avail.forEach((r) => {
+    const pl = (r as any).players;
+    const who = pl?.callsign ?? pl?.name ?? `#${r.player_id}`;
+    kb.text(who, `acheckp:${gameId}:${r.player_id}`).row();
+  });
+  await ctx.editMessageText(tr(lang, "mc_pick_player"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (!canCheckin(p)) return;
+  const gameId = Number(ctx.match[1]);
+  const playerId = Number(ctx.match[2]);
+  const { data: target } = await supabase
+    .from("players")
+    .select("id, callsign, name, games_played")
+    .eq("id", playerId)
+    .single();
+  const who = target?.callsign ?? target?.name ?? `#${playerId}`;
+  const { data: existing } = await supabase
+    .from("checkins")
+    .select("id")
+    .eq("game_id", gameId)
+    .eq("player_id", playerId)
+    .maybeSingle();
+  if (existing) {
+    await ctx.editMessageText(tr(lang, "mc_already", { who }));
+    return;
+  }
+  await supabase
+    .from("checkins")
+    .insert({ game_id: gameId, player_id: playerId, is_manual: true, source: "manual" });
+  await supabase
+    .from("players")
+    .update({ games_played: (target?.games_played ?? 0) + 1 })
+    .eq("id", playerId);
+  // Якщо гравця вже позначили як неявку — повертаємо в registered.
+  await supabase
+    .from("registrations")
+    .update({ status: "registered" })
+    .eq("game_id", gameId)
+    .eq("player_id", playerId);
+  await ctx.editMessageText(tr(lang, "mc_done", { who }));
 });
 
 // ───────────────────────────── Callback queries ─────────────────────────────
