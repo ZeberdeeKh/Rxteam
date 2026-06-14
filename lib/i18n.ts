@@ -1,45 +1,49 @@
 export type Lang = "pl" | "en" | "uk";
 
-// Вибір мови за language_code користувача Telegram. RU не підтримуємо → ru мапимо на uk.
-export function pickLang(code?: string): Lang {
-  if (!code) return "en";
-  const c = code.toLowerCase();
-  if (c.startsWith("pl")) return "pl";
-  if (c.startsWith("uk") || c.startsWith("ru")) return "uk";
-  return "en";
+const FLAG: Record<Lang, string> = { pl: "🇵🇱", en: "🇬🇧", uk: "🇺🇦" };
+const ORDER: Lang[] = ["pl", "en", "uk"];
+
+// Збирає тримовний блок (PL / EN / UA) — одне повідомлення для всіх.
+function tri(map: Record<Lang, string>): string {
+  return ORDER.map((l) => `${FLAG[l]} ${map[l]}`).join("\n");
 }
 
-export const t = {
-  captcha: {
-    pl: (a: number, b: number) =>
-      `Witaj w RX Team! 🪖\nAby potwierdzić, że nie jesteś botem, rozwiąż: ${a} + ${b} = ?`,
-    en: (a: number, b: number) =>
-      `Welcome to RX Team! 🪖\nTo confirm you're not a bot, solve: ${a} + ${b} = ?`,
-    uk: (a: number, b: number) =>
-      `Вітаємо в RX Team! 🪖\nЩоб підтвердити, що ти не бот, розв'яжи: ${a} + ${b} = ?`,
-  } as Record<Lang, (a: number, b: number) => string>,
-
-  correct: {
-    pl: "✅ Dziękujemy! Twoja prośba o dołączenie została zatwierdzona.",
-    en: "✅ Thanks! Your join request has been approved.",
-    uk: "✅ Дякуємо! Твою заявку на вступ підтверджено.",
-  } as Record<Lang, string>,
-
-  wrong: {
-    pl: "❌ Niepoprawna odpowiedź. Możesz ponownie wysłać prośbę o dołączenie.",
-    en: "❌ Wrong answer. You can request to join again.",
-    uk: "❌ Невірна відповідь. Можеш подати заявку на вступ ще раз.",
-  } as Record<Lang, string>,
-
-  expired: {
-    pl: "⏳ Czas minął. Wyślij prośbę o dołączenie ponownie.",
-    en: "⏳ Time's up. Please request to join again.",
-    uk: "⏳ Час вийшов. Подай заявку на вступ ще раз.",
-  } as Record<Lang, string>,
+const captchaPrompt: Record<Lang, string> = {
+  pl: "Witaj w RX Team! Aby potwierdzić, że nie jesteś botem, rozwiąż zadanie:",
+  en: "Welcome to RX Team! To confirm you're not a bot, solve:",
+  uk: "Вітаємо в RX Team! Щоб підтвердити, що ти не бот, розв'яжи:",
 };
 
+export function captchaText(a: number, b: number): string {
+  return `🪖\n${tri(captchaPrompt)}\n\n${a} + ${b} = ?`;
+}
+
+export const correctText =
+  "✅\n" +
+  tri({
+    pl: "Dziękujemy! Twoja prośba o dołączenie została zatwierdzona.",
+    en: "Thanks! Your join request has been approved.",
+    uk: "Дякуємо! Твою заявку на вступ підтверджено.",
+  });
+
+export const wrongText =
+  "❌\n" +
+  tri({
+    pl: "Niepoprawna odpowiedź. Możesz ponownie wysłać prośbę o dołączenie.",
+    en: "Wrong answer. You can request to join again.",
+    uk: "Невірна відповідь. Можеш подати заявку на вступ ще раз.",
+  });
+
+export const expiredText =
+  "⏳\n" +
+  tri({
+    pl: "Czas minął. Wyślij prośbę o dołączenie ponownie.",
+    en: "Time's up. Please request to join again.",
+    uk: "Час вийшов. Подай заявку на вступ ще раз.",
+  });
+
 // ЧЕРНЕТКА онбордингу — доопрацюємо з організатором (ліміти FPS/джоулів заповнить адмін).
-export const faq: Record<Lang, string> = {
+const faq: Record<Lang, string> = {
   pl: `🎯 RX Team — info dla nowych
 
 🔫 Limity mocy (J/FPS): [do uzupełnienia przez organizatora]
@@ -76,3 +80,8 @@ export const faq: Record<Lang, string> = {
 
 ℹ️ Реєстрація на гру і чек-ін — через меню бота. Питання — пиши організаторам. Гарної гри!`,
 };
+
+// Онбординг — три мови підряд, розділені лінією.
+export const faqText = ORDER.map((l) => `${FLAG[l]}\n${faq[l]}`).join(
+  "\n\n━━━━━━━━━━\n\n",
+);

@@ -1,6 +1,6 @@
 import { Bot, InlineKeyboard } from "grammy";
 import { supabase } from "./supabase";
-import { pickLang, t, faq, type Lang } from "./i18n";
+import { captchaText, correctText, wrongText, expiredText, faqText } from "./i18n";
 import { makeChallenge } from "./captcha";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
@@ -16,7 +16,7 @@ async function featureEnabled(key: string): Promise<boolean> {
   return String(data.value) !== "false";
 }
 
-// ── Анти-бот шилд: заявка на вступ → капча в особисті ──
+// ── Анти-бот шилд: заявка на вступ → тримовна капча в особисті ──
 bot.on("chat_join_request", async (ctx) => {
   const req = ctx.chatJoinRequest;
 
@@ -30,7 +30,6 @@ bot.on("chat_join_request", async (ctx) => {
     return;
   }
 
-  const lang = pickLang(req.from.language_code);
   const { a, b, answer, options } = makeChallenge();
   const expiresAt = new Date(Date.now() + 4 * 60 * 1000).toISOString();
 
@@ -40,7 +39,6 @@ bot.on("chat_join_request", async (ctx) => {
       user_id: req.from.id,
       user_chat_id: req.user_chat_id,
       answer,
-      lang,
       status: "pending",
       expires_at: expiresAt,
     },
@@ -52,7 +50,7 @@ bot.on("chat_join_request", async (ctx) => {
 
   try {
     // user_chat_id дозволяє написати користувачу до обробки заявки (вікно ~5 хв).
-    await ctx.api.sendMessage(req.user_chat_id, t.captcha[lang](a, b), { reply_markup: kb });
+    await ctx.api.sendMessage(req.user_chat_id, captchaText(a, b), { reply_markup: kb });
   } catch (e) {
     console.error("captcha DM failed (user privacy?)", e);
   }
@@ -76,12 +74,11 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
     await ctx.answerCallbackQuery();
     return;
   }
-  const lang = ch.lang as Lang;
 
   // протерміновано
   if (new Date(ch.expires_at).getTime() < Date.now()) {
     await supabase.from("join_challenges").update({ status: "expired" }).eq("id", ch.id);
-    await ctx.editMessageText(t.expired[lang]);
+    await ctx.editMessageText(expiredText);
     try {
       await ctx.api.declineChatJoinRequest(ch.chat_id, userId);
     } catch {}
@@ -96,11 +93,11 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
       console.error("approve failed", e);
     }
     await supabase.from("join_challenges").update({ status: "passed" }).eq("id", ch.id);
-    await ctx.editMessageText(t.correct[lang]);
+    await ctx.editMessageText(correctText);
 
     if (await featureEnabled("onboarding_faq")) {
       try {
-        await ctx.api.sendMessage(ch.user_chat_id, faq[lang]);
+        await ctx.api.sendMessage(ch.user_chat_id, faqText);
       } catch {}
     }
   } else {
@@ -108,7 +105,7 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
       await ctx.api.declineChatJoinRequest(ch.chat_id, userId);
     } catch {}
     await supabase.from("join_challenges").update({ status: "failed" }).eq("id", ch.id);
-    await ctx.editMessageText(t.wrong[lang]);
+    await ctx.editMessageText(wrongText);
   }
 
   await ctx.answerCallbackQuery();
