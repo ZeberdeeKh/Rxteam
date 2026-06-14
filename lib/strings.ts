@@ -211,9 +211,9 @@ const S: Record<string, Dict> = {
   btn_transport_own: { pl: "🚗 Własnym autem", en: "🚗 My own ride", uk: "🚗 Своїм ходом" },
   btn_transport_need: { pl: "🙋 Potrzebuję transportu", en: "🙋 Need a ride", uk: "🙋 Потрібен транспорт" },
   transport_need_noted: {
-    pl: "Zapisane. Lista kierowców pojawi się wkrótce.",
-    en: "Noted. Driver list coming soon.",
-    uk: "Записано. Список водіїв з'явиться в боті незабаром.",
+    pl: "Zapisane. Lista kierowców — /drivers.",
+    en: "Noted. Driver list — /drivers.",
+    uk: "Записано. Список водіїв — /drivers.",
   },
   reg_from_q: {
     pl: "Skąd jedziesz? (dzielnica/miejsce)",
@@ -481,6 +481,39 @@ const S: Record<string, Dict> = {
     pl: "🎟 Twój znajomy {who} zrobił pierwszy check-in! +{pts} pkt. Zniżka na «{title}»: {discount}.",
     en: "🎟 Your friend {who} did their first check-in! +{pts} pts. Discount for «{title}»: {discount}.",
     uk: "🎟 Твій друг {who} зробив перший чек-ін! +{pts} балів. Знижка на «{title}»: {discount}.",
+  },
+
+  // carpool — /drivers (пасажир) і /myride (водій)
+  drivers_none_games: {
+    pl: "Nie masz aktywnych zapisów na grę.",
+    en: "You have no active game sign-ups.",
+    uk: "Немає активних реєстрацій на гру.",
+  },
+  drivers_pick_game: { pl: "Wybierz grę:", en: "Pick a game:", uk: "Обери гру:" },
+  drivers_title: {
+    pl: "🚗 Kierowcy na «{title}»:",
+    en: "🚗 Drivers for «{title}»:",
+    uk: "🚗 Водії на «{title}»:",
+  },
+  drivers_empty: {
+    pl: "Na razie nikt nie oferuje miejsc na tę grę.",
+    en: "No one is offering seats for this game yet.",
+    uk: "Поки що ніхто не пропонує місця на цю гру.",
+  },
+  drivers_line: {
+    pl: "🚗 {who} — {from} · {seats} miejsc → {contact}",
+    en: "🚗 {who} — {from} · {seats} seats → {contact}",
+    uk: "🚗 {who} — {from} · {seats} місць → {contact}",
+  },
+  drivers_line_closed: {
+    pl: "🚗 {who} — {from} · (komplet)",
+    en: "🚗 {who} — {from} · (full)",
+    uk: "🚗 {who} — {from} · (набір закрито)",
+  },
+  drivers_contact_none: {
+    pl: "napisz w grupie",
+    en: "write in the group",
+    uk: "напиши в групі",
   },
 };
 

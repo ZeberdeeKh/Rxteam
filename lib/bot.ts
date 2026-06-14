@@ -97,6 +97,73 @@ bot.command("ref", async (ctx) => {
   await ctx.reply(tr(lang, "ref_link", { link, pts, confirmed: count ?? 0 }));
 });
 
+// ─────────────────────────── Carpool: водії ───────────────────────────
+
+bot.command("drivers", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const games = await myUpcomingGames(p.id);
+  if (!games.length) {
+    await ctx.reply(tr(lang, "drivers_none_games"));
+    return;
+  }
+  if (games.length === 1) {
+    await showDrivers(ctx, lang, games[0].id, games[0].title);
+    return;
+  }
+  const kb = new InlineKeyboard();
+  games.forEach((g) =>
+    kb.text(`${g.title ?? "#" + g.id} — ${formatWhen(g.start_at)}`, `drivers:${g.id}`).row(),
+  );
+  await ctx.reply(tr(lang, "drivers_pick_game"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^drivers:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const gameId = Number(ctx.match[1]);
+  const { data: game } = await supabase.from("games").select("title").eq("id", gameId).single();
+  await showDrivers(ctx, p.lang as Lang, gameId, game?.title ?? null);
+});
+
+// Ігри, на які гравець зараз записаний (не давніші за ~3 год тому).
+async function myUpcomingGames(playerId: number) {
+  const { data: regs } = await supabase
+    .from("registrations")
+    .select("games(id, title, start_at)")
+    .eq("player_id", playerId)
+    .eq("status", "registered");
+  const cutoff = Date.now() - 3 * 3600 * 1000;
+  return (regs ?? [])
+    .map((r) => (r as any).games)
+    .filter((g) => g && new Date(g.start_at).getTime() > cutoff)
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+}
+
+async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: string | null) {
+  const { data: drivers } = await supabase
+    .from("registrations")
+    .select("from_place, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .eq("game_id", gameId)
+    .eq("status", "registered")
+    .eq("transport", "own");
+  const offering = (drivers ?? []).filter((d) => (d.free_seats ?? 0) > 0);
+  if (!offering.length) {
+    await ctx.reply(tr(lang, "drivers_empty"));
+    return;
+  }
+  const lines = offering.map((d) => {
+    const pl = (d as any).players;
+    const who = pl?.callsign ?? pl?.name ?? "?";
+    const from = d.from_place ?? "—";
+    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from });
+    const contact = pl?.tg_username ? "@" + pl.tg_username : tr(lang, "drivers_contact_none");
+    return tr(lang, "drivers_line", { who, from, seats: d.free_seats ?? 0, contact });
+  });
+  await ctx.reply(tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"));
+}
+
 // Прив'язує новачка до інвайтера (лише якщо це справді нова людина).
 async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean) {
   if (!isNewcomer || inviterId === invited.id) return;
