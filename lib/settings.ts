@@ -16,3 +16,10 @@ export async function featureEnabled(key: string): Promise<boolean> {
   const v = await getSetting(`feature_${key}`);
   return v === null ? true : v !== "false";
 }
+
+export async function getAllSettings(): Promise<Record<string, string>> {
+  const { data } = await supabase.from("settings").select("key,value");
+  const map: Record<string, string> = {};
+  for (const row of data ?? []) map[row.key as string] = (row.value as string) ?? "";
+  return map;
+}

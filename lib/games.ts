@@ -3,34 +3,50 @@ import { supabase } from "./supabase";
 
 const ZONE = "Europe/Warsaw";
 
-// Парсинг введеної адміном дати/часу (локальний час Вроцлава) → DateTime.
-export function parseDateTime(input: string): DateTime | null {
-  const formats = ["dd.MM.yyyy HH:mm", "dd.MM HH:mm", "yyyy-MM-dd HH:mm"];
-  for (const f of formats) {
+// Дата без часу → "yyyy-MM-dd" (час Вроцлава).
+export function parseDateOnly(input: string): string | null {
+  const fmts = ["dd.MM.yyyy", "dd.MM", "yyyy-MM-dd"];
+  for (const f of fmts) {
     let dt = DateTime.fromFormat(input.trim(), f, { zone: ZONE });
     if (dt.isValid) {
-      // якщо рік не вказано і дата вже минула — наступний рік
-      if (!f.includes("yyyy") && dt < DateTime.now().setZone(ZONE)) dt = dt.plus({ years: 1 });
-      return dt;
+      if (!f.includes("yyyy") && dt.endOf("day") < DateTime.now().setZone(ZONE)) {
+        dt = dt.plus({ years: 1 });
+      }
+      return dt.toFormat("yyyy-MM-dd");
     }
   }
   return null;
 }
 
-// Вікна гри від старту (UTC ISO на вході).
-export function computeWindows(startUtcIso: string) {
-  const start = DateTime.fromISO(startUtcIso, { zone: "utc" });
+export function validTime(input: string): string | null {
+  const dt = DateTime.fromFormat(input.trim(), "HH:mm", { zone: ZONE });
+  return dt.isValid ? dt.toFormat("HH:mm") : null;
+}
+
+export function makeUtc(dateYmd: string, time: string): string {
+  return DateTime.fromFormat(`${dateYmd} ${time}`, "yyyy-MM-dd HH:mm", { zone: ZONE })
+    .toUTC()
+    .toISO()!;
+}
+
+// Вікна від часу збору (gather) і старту.
+export function computeWindows(gatherUtcIso: string, startUtcIso: string) {
+  const g = DateTime.fromISO(gatherUtcIso, { zone: "utc" });
+  const s = DateTime.fromISO(startUtcIso, { zone: "utc" });
   return {
-    reg_closes_at: start.minus({ hours: 9 }).toISO()!,
-    cancel_deadline: start.minus({ hours: 24 }).toISO()!,
-    checkin_from: start.minus({ hours: 1 }).toISO()!,
-    checkin_to: start.plus({ hours: 1 }).toISO()!,
+    reg_closes_at: g.minus({ hours: 9 }).toISO()!,
+    cancel_deadline: g.minus({ hours: 24 }).toISO()!,
+    checkin_from: g.minus({ minutes: 30 }).toISO()!,
+    checkin_to: s.plus({ minutes: 60 }).toISO()!,
   };
 }
 
-// UTC ISO → "dd.MM HH:mm" у часі Вроцлава.
-export function formatWhen(startUtcIso: string): string {
-  return DateTime.fromISO(startUtcIso, { zone: "utc" }).setZone(ZONE).toFormat("dd.MM HH:mm");
+export function formatTime(utcIso: string): string {
+  return DateTime.fromISO(utcIso, { zone: "utc" }).setZone(ZONE).toFormat("HH:mm");
+}
+
+export function formatWhen(utcIso: string): string {
+  return DateTime.fromISO(utcIso, { zone: "utc" }).setZone(ZONE).toFormat("dd.MM HH:mm");
 }
 
 export async function registeredCount(gameId: number): Promise<number> {
@@ -42,24 +58,54 @@ export async function registeredCount(gameId: number): Promise<number> {
   return count ?? 0;
 }
 
-// Текст анонсу в групу (тримовний — це публічний пост).
-export function announcementText(opts: {
-  locationName: string;
+const LABELS = {
+  pl: { flag: "🇵🇱", loc: "Lokalizacja", gather: "Zbiórka", start: "Start gry", qo: "„", qc: "”" },
+  uk: { flag: "🇺🇦", loc: "Локація", gather: "Збір", start: "Початок гри", qo: "«", qc: "»" },
+};
+
+export type GameForAnnounce = {
+  title: string | null;
+  lat: number;
+  lng: number;
   mapUrl: string | null;
-  startUtcIso: string;
+  gatherUtc: string;
+  startUtc: string;
+  scenarioPl: string | null;
+  scenarioUk: string | null;
   count: number;
   capacity: number | null;
-}): string {
-  const cap = opts.capacity ? `/${opts.capacity}` : "";
-  const map = opts.mapUrl ? ` — ${opts.mapUrl}` : "";
-  return [
-    `🎯 ASG — ${opts.locationName}`,
-    `📅 ${formatWhen(opts.startUtcIso)} (Wrocław)`,
-    `📍 ${opts.locationName}${map}`,
-    `👥 ${opts.count}${cap}`,
-    ``,
-    `🇵🇱 Zapisz się przyciskiem niżej`,
-    `🇬🇧 Sign up with the button below`,
-    `🇺🇦 Записуйся кнопкою нижче`,
-  ].join("\n");
+};
+
+// Будує двомовний (PL+UA) анонс у форматі RX Team зі статичних блоків (settings).
+export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>): string {
+  const block = (lang: "pl" | "uk", scenario: string | null) => {
+    const L = LABELS[lang];
+    const date = DateTime.fromISO(g.gatherUtc, { zone: "utc" })
+      .setZone(ZONE)
+      .setLocale(lang)
+      .toFormat("dd.MM.yyyy (cccc)");
+    const parts = [
+      `${L.flag} ${L.qo}${g.title ?? "ASG"}${L.qc} | ${date}`,
+      ``,
+      `📍 ${L.loc}: (${g.lat}, ${g.lng})`,
+      `🕣 ${L.gather}: ${formatTime(g.gatherUtc)}`,
+      `🎯 ${L.start}: ${formatTime(g.startUtc)}`,
+    ];
+    if (scenario) parts.push("", scenario);
+    for (const key of [
+      `ann_coffee_${lang}`,
+      `ann_rental_${lang}`,
+      `ann_transport_${lang}`,
+      `ann_limits_${lang}`,
+      `ann_disclaimer_${lang}`,
+    ]) {
+      if (s[key]) parts.push("", s[key]);
+    }
+    return parts.join("\n");
+  };
+
+  const cap = g.capacity ? `/${g.capacity}` : "";
+  const head = `👥 ${g.count}${cap}`;
+  const map = g.mapUrl ? `\n\n${g.mapUrl}` : "";
+  return `${head}\n\n${block("pl", g.scenarioPl)}\n\n———————————————\n\n${block("uk", g.scenarioUk)}${map}`;
 }

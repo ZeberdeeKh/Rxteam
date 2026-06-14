@@ -2,14 +2,16 @@ import { Bot, InlineKeyboard, type Context } from "grammy";
 import { supabase } from "./supabase";
 import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
 import { makeChallenge } from "./captcha";
-import { featureEnabled, setSetting, getSetting } from "./settings";
+import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
 import { ensurePlayer, setPlayerLang } from "./players";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
 import {
-  parseDateTime,
+  parseDateOnly,
+  validTime,
+  makeUtc,
   computeWindows,
-  announcementText,
+  buildAnnouncement,
   registeredCount,
   formatWhen,
 } from "./games";
@@ -188,8 +190,8 @@ bot.callbackQuery(/^gameloc:(\d+)$/, async (ctx) => {
   const { state, data } = await getState(ctx.from.id);
   if (state !== "game_loc") return;
   const p = await ensurePlayer(ctx.from);
-  await setState(ctx.from.id, "game_when", { ...data, locationId: locId });
-  await ctx.editMessageText(tr(p.lang as Lang, "gamenew_when"));
+  await setState(ctx.from.id, "game_date", { ...data, locationId: locId });
+  await ctx.editMessageText(tr(p.lang as Lang, "gamenew_date"));
 });
 
 bot.callbackQuery(/^gamecap:(\d+)$/, async (ctx) => {
@@ -412,13 +414,48 @@ bot.on("message:text", async (ctx) => {
   }
 
   // ── створення гри ──
-  if (state === "game_when") {
-    const dt = parseDateTime(text);
-    if (!dt) {
-      await ctx.reply(tr(lang, "gamenew_bad_when"));
+  if (state === "game_date") {
+    const date = parseDateOnly(text);
+    if (!date) {
+      await ctx.reply(tr(lang, "gamenew_bad_date"));
       return;
     }
-    await setState(ctx.from!.id, "game_cap", { ...data, startISO: dt.toUTC().toISO() });
+    await setState(ctx.from!.id, "game_gather", { ...data, date });
+    await ctx.reply(tr(lang, "gamenew_gather"));
+    return;
+  }
+  if (state === "game_gather") {
+    const t = validTime(text);
+    if (!t) {
+      await ctx.reply(tr(lang, "gamenew_bad_time"));
+      return;
+    }
+    await setState(ctx.from!.id, "game_start", { ...data, gather: t });
+    await ctx.reply(tr(lang, "gamenew_start"));
+    return;
+  }
+  if (state === "game_start") {
+    const t = validTime(text);
+    if (!t) {
+      await ctx.reply(tr(lang, "gamenew_bad_time"));
+      return;
+    }
+    await setState(ctx.from!.id, "game_title", { ...data, start: t });
+    await ctx.reply(tr(lang, "gamenew_title"));
+    return;
+  }
+  if (state === "game_title") {
+    await setState(ctx.from!.id, "game_scn_pl", { ...data, title: text });
+    await ctx.reply(tr(lang, "gamenew_scn_pl"));
+    return;
+  }
+  if (state === "game_scn_pl") {
+    await setState(ctx.from!.id, "game_scn_uk", { ...data, scenarioPl: text });
+    await ctx.reply(tr(lang, "gamenew_scn_uk"));
+    return;
+  }
+  if (state === "game_scn_uk") {
+    await setState(ctx.from!.id, "game_cap", { ...data, scenarioUk: text });
     const kb = new InlineKeyboard().text(tr(lang, "gamenew_nolimit"), "gamecap:0");
     await ctx.reply(tr(lang, "gamenew_cap"), { reply_markup: kb });
     return;
@@ -473,8 +510,9 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
     return;
   }
   const threadId = await getSetting("announce_thread_id");
-  const startISO: string = data.startISO;
-  const w = computeWindows(startISO);
+  const gatherUtc = makeUtc(data.date, data.gather);
+  const startUtc = makeUtc(data.date, data.start);
+  const w = computeWindows(gatherUtc, startUtc);
   const capacity: number | null = data.capacity ?? null;
 
   const { data: loc } = await supabase
@@ -487,7 +525,11 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
     .from("games")
     .insert({
       location_id: data.locationId,
-      start_at: startISO,
+      title: data.title,
+      scenario_pl: data.scenarioPl,
+      scenario_uk: data.scenarioUk,
+      gather_at: gatherUtc,
+      start_at: startUtc,
       reg_closes_at: w.reg_closes_at,
       cancel_deadline: w.cancel_deadline,
       checkin_from: w.checkin_from,
@@ -498,33 +540,48 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
     .select("*")
     .single();
 
-  const botU = ctx.me.username;
-  const text = announcementText({
-    locationName: loc!.name,
-    mapUrl: loc!.map_url,
-    startUtcIso: startISO,
-    count: 0,
-    capacity,
-  });
-  const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${botU}?start=g${game!.id}`);
-  const msg = await ctx.api.sendMessage(Number(chatId), text, {
-    reply_markup: kb,
-    ...(threadId ? { message_thread_id: Number(threadId) } : {}),
-  });
-  await supabase
-    .from("games")
-    .update({
-      announce_chat_id: Number(chatId),
-      announce_thread_id: threadId ? Number(threadId) : null,
-      announce_message_id: msg.message_id,
-    })
-    .eq("id", game!.id);
+  const settings = await getAllSettings();
+  const text = buildAnnouncement(
+    {
+      title: data.title,
+      lat: loc!.lat,
+      lng: loc!.lng,
+      mapUrl: loc!.map_url,
+      gatherUtc,
+      startUtc,
+      scenarioPl: data.scenarioPl,
+      scenarioUk: data.scenarioUk,
+      count: 0,
+      capacity,
+    },
+    settings,
+  );
+  const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${ctx.me.username}?start=g${game!.id}`);
 
   await clearState(ctx.from!.id);
+  try {
+    const msg = await ctx.api.sendMessage(Number(chatId), text, {
+      reply_markup: kb,
+      ...(threadId ? { message_thread_id: Number(threadId) } : {}),
+    });
+    await supabase
+      .from("games")
+      .update({
+        announce_chat_id: Number(chatId),
+        announce_thread_id: threadId ? Number(threadId) : null,
+        announce_message_id: msg.message_id,
+      })
+      .eq("id", game!.id);
+  } catch (e) {
+    console.error("announcement post failed", e);
+    await ctx.reply("⚠️ Гру створено, але анонс не запостився (можливо, текст задовгий або немає прав у топіку).");
+    return;
+  }
+
   await ctx.reply(
     tr(lang, "gamenew_done", {
       id: game!.id,
-      when: formatWhen(startISO),
+      when: formatWhen(gatherUtc),
       regclose: formatWhen(w.reg_closes_at),
     }),
   );
@@ -539,14 +596,26 @@ async function updateAnnouncement(gameId: number) {
   if (!game?.announce_chat_id || !game.announce_message_id) return;
   const loc = (game as any).locations;
   const count = await registeredCount(gameId);
-  const text = announcementText({
-    locationName: loc.name,
-    mapUrl: loc.map_url,
-    startUtcIso: game.start_at,
-    count,
-    capacity: game.capacity,
-  });
-  const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${bot.botInfo.username}?start=g${gameId}`);
+  const settings = await getAllSettings();
+  const text = buildAnnouncement(
+    {
+      title: game.title,
+      lat: loc.lat,
+      lng: loc.lng,
+      mapUrl: loc.map_url,
+      gatherUtc: game.gather_at ?? game.start_at,
+      startUtc: game.start_at,
+      scenarioPl: game.scenario_pl,
+      scenarioUk: game.scenario_uk,
+      count,
+      capacity: game.capacity,
+    },
+    settings,
+  );
+  const kb = new InlineKeyboard().url(
+    REG_BTN,
+    `https://t.me/${bot.botInfo.username}?start=g${gameId}`,
+  );
   try {
     await bot.api.editMessageText(game.announce_chat_id, game.announce_message_id, text, {
       reply_markup: kb,
@@ -579,7 +648,12 @@ async function showGameCard(ctx: Context, p: any, gameId: number) {
   if (reg?.status === "registered") kb.text(tr(lang, "btn_leave"), `unreg:${gameId}`);
   else kb.text(tr(lang, "btn_register"), `reg:${gameId}`);
   await ctx.reply(
-    tr(lang, "game_card", { loc: loc.name, when: formatWhen(game.start_at), count }),
+    tr(lang, "game_card", {
+      title: game.title ?? "ASG",
+      when: formatWhen(game.gather_at ?? game.start_at),
+      loc: loc?.name ?? "—",
+      count,
+    }),
     { reply_markup: kb },
   );
 }
@@ -598,7 +672,7 @@ async function finalizeRegistration(ctx: Context, p: any, gameId: number) {
   await ctx.reply(
     tr(p.lang as Lang, "reg_done", {
       loc: loc?.name ?? "",
-      when: game ? formatWhen(game.start_at) : "",
+      when: game ? formatWhen(game.gather_at ?? game.start_at) : "",
     }),
   );
 }

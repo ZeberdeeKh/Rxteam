@@ -92,15 +92,45 @@ const S: Record<string, Dict> = {
     uk: "⚠️ Спершу встанови топік анонсів: /sethere у групі.",
   },
   gamenew_pick_loc: { pl: "Wybierz lokację:", en: "Pick a location:", uk: "Обери локацію:" },
-  gamenew_when: {
-    pl: "Podaj datę i godzinę (DD.MM GG:MM, np. 21.06 09:00):",
-    en: "Enter date & time (DD.MM HH:MM, e.g. 21.06 09:00):",
-    uk: "Введи дату і час (ДД.ММ ГГ:ХХ, напр. 21.06 09:00):",
+  gamenew_date: {
+    pl: "Data gry (DD.MM lub DD.MM.RRRR):",
+    en: "Game date (DD.MM or DD.MM.YYYY):",
+    uk: "Дата гри (ДД.ММ або ДД.ММ.РРРР):",
   },
-  gamenew_bad_when: {
-    pl: "Nie rozumiem daty. Format: 21.06 09:00",
-    en: "Can't parse the date. Format: 21.06 09:00",
-    uk: "Не розумію дату. Формат: 21.06 09:00",
+  gamenew_bad_date: {
+    pl: "Nie rozumiem daty. Format: 21.06 lub 21.06.2026",
+    en: "Can't parse the date. Format: 21.06 or 21.06.2026",
+    uk: "Не розумію дату. Формат: 21.06 або 21.06.2026",
+  },
+  gamenew_gather: {
+    pl: "Godzina zbiórki (GG:MM, np. 09:00):",
+    en: "Gathering time (HH:MM, e.g. 09:00):",
+    uk: "Час збору (ГГ:ХХ, напр. 09:00):",
+  },
+  gamenew_start: {
+    pl: "Godzina startu gry (GG:MM, np. 10:00):",
+    en: "Game start time (HH:MM, e.g. 10:00):",
+    uk: "Час старту гри (ГГ:ХХ, напр. 10:00):",
+  },
+  gamenew_bad_time: {
+    pl: "Nie rozumiem godziny. Format: 09:00",
+    en: "Can't parse the time. Format: 09:00",
+    uk: "Не розумію час. Формат: 09:00",
+  },
+  gamenew_title: {
+    pl: "Nazwa gry (łacinką, np. Fabryka cukru):",
+    en: "Game title (Latin, e.g. Fabryka cukru):",
+    uk: "Назва гри (латиницею, напр. Fabryka cukru):",
+  },
+  gamenew_scn_pl: {
+    pl: "Opis/scenariusz PL:",
+    en: "Description/scenario PL:",
+    uk: "Опис/сценарій PL:",
+  },
+  gamenew_scn_uk: {
+    pl: "Opis/scenariusz UA:",
+    en: "Description/scenario UA:",
+    uk: "Опис/сценарій UA:",
   },
   gamenew_cap: {
     pl: "Limit uczestników? Wpisz liczbę lub naciśnij przycisk:",
@@ -116,9 +146,9 @@ const S: Record<string, Dict> = {
 
   // картка гри + реєстрація
   game_card: {
-    pl: "🎯 {loc}\n📅 {when} (Wrocław)\n👥 Zapisani: {count}",
-    en: "🎯 {loc}\n📅 {when} (Wrocław)\n👥 Registered: {count}",
-    uk: "🎯 {loc}\n📅 {when} (Вроцлав)\n👥 Записані: {count}",
+    pl: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Zapisani: {count}",
+    en: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Registered: {count}",
+    uk: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Записані: {count}",
   },
   btn_register: { pl: "✅ Zapisz się", en: "✅ Sign up", uk: "✅ Записатись" },
   btn_leave: { pl: "❌ Wypisz się", en: "❌ Leave", uk: "❌ Відписатись" },
