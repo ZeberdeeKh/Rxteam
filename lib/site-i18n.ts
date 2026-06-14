@@ -355,6 +355,54 @@ const SITE: Record<string, Dict> = {
   reason_rank_purchase: { pl: "Zakup stopnia", en: "Rank purchase", uk: "Купівля звання" },
   reason_purchase: { pl: "Zakup w sklepie", en: "Shop purchase", uk: "Купівля в магазині" },
   reason_manual: { pl: "Korekta admina", en: "Admin adjustment", uk: "Корекція адміна" },
+
+  // ── 6.3 Магазин ──
+  nav_shop: { pl: "Sklep", en: "Shop", uk: "Магазин" },
+  shop_title: { pl: "Sklep za punkty", en: "Points shop", uk: "Магазин за бали" },
+  shop_intro: {
+    pl: "Wymieniaj punkty z salda na bonusy.",
+    en: "Spend your balance points on perks.",
+    uk: "Витрачай бали з балансу на бонуси.",
+  },
+  shop_balance: { pl: "Twoje saldo", en: "Your balance", uk: "Твій баланс" },
+  shop_cost: { pl: "Koszt", en: "Cost", uk: "Ціна" },
+  shop_buy: { pl: "Kup", en: "Buy", uk: "Купити" },
+  shop_empty: {
+    pl: "Sklep jest pusty. Wkrótce dodamy bonusy.",
+    en: "The shop is empty. Perks coming soon.",
+    uk: "Магазин порожній. Незабаром додамо бонуси.",
+  },
+  shop_need_login: {
+    pl: "Zaloguj się, aby kupować za punkty.",
+    en: "Log in to spend points.",
+    uk: "Увійди, щоб купувати за бали.",
+  },
+  shop_disabled: {
+    pl: "Sklep jest tymczasowo wyłączony.",
+    en: "The shop is temporarily disabled.",
+    uk: "Магазин тимчасово вимкнено.",
+  },
+  shop_bought_ok: {
+    pl: "✅ Zakup udany! Bonus wyda organizator.",
+    en: "✅ Purchase complete! The organizer will hand out the perk.",
+    uk: "✅ Покупку оформлено! Бонус видасть організатор.",
+  },
+  shop_err_balance: {
+    pl: "Za mało punktów na saldzie.",
+    en: "Not enough points on your balance.",
+    uk: "Недостатньо балів на балансі.",
+  },
+  shop_err_inactive: {
+    pl: "Ten produkt jest niedostępny.",
+    en: "This item is unavailable.",
+    uk: "Цей товар недоступний.",
+  },
+  shop_err_disabled: {
+    pl: "Sklep jest tymczasowo wyłączony.",
+    en: "The shop is temporarily disabled.",
+    uk: "Магазин тимчасово вимкнено.",
+  },
+  shop_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {

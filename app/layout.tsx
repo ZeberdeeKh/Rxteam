@@ -34,6 +34,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </Link>
               {loggedIn ? (
                 <>
+                  <Link href="/shop" className="text-neutral-700 hover:text-brand">
+                    {st(lang, "nav_shop")}
+                  </Link>
                   <Link href="/cabinet" className="text-neutral-700 hover:text-brand">
                     {st(lang, "nav_cabinet")}
                   </Link>

@@ -217,6 +217,31 @@ export type PlayerAch = {
   title_uk: string | null;
 };
 
+export type ShopItem = {
+  id: number;
+  title_pl: string | null;
+  title_en: string | null;
+  title_uk: string | null;
+  desc_pl: string | null;
+  desc_en: string | null;
+  desc_uk: string | null;
+  cost: number;
+  active: boolean;
+  sort: number;
+};
+
+// Товари магазину (6.3). activeOnly=true для вітрини, false для адмінки.
+export async function getShopItems(activeOnly = true): Promise<ShopItem[]> {
+  let q = supabase
+    .from("shop_items")
+    .select("id, title_pl, title_en, title_uk, desc_pl, desc_en, desc_uk, cost, active, sort")
+    .order("sort", { ascending: true })
+    .order("id", { ascending: true });
+  if (activeOnly) q = q.eq("active", true);
+  const { data } = await q;
+  return (data ?? []) as ShopItem[];
+}
+
 // Здобуті ачівки гравця (з назвами).
 export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
   const { data } = await supabase
