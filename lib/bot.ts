@@ -1,6 +1,6 @@
 import { Bot, InlineKeyboard } from "grammy";
 import { supabase } from "./supabase";
-import { captchaText, correctText, wrongText, expiredText, faqText } from "./i18n";
+import { captchaText, correctText, wrongText, expiredText, faqText, startText } from "./i18n";
 import { makeChallenge } from "./captcha";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
@@ -15,6 +15,11 @@ async function featureEnabled(key: string): Promise<boolean> {
   if (!data) return true;
   return String(data.value) !== "false";
 }
+
+// ── /start у приватному чаті ──
+bot.command("start", async (ctx) => {
+  await ctx.reply(startText);
+});
 
 // ── Анти-бот шилд: заявка на вступ → тримовна капча в особисті ──
 bot.on("chat_join_request", async (ctx) => {
