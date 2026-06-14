@@ -48,9 +48,14 @@ const S: Record<string, Dict> = {
     uk: "📍 Введи назву локації:",
   },
   loc_ask_pin: {
-    pl: "Teraz wyślij punkt na mapie (📎 → Lokalizacja):",
-    en: "Now send a map point (📎 → Location):",
-    uk: "Тепер надішли точку на карті (📎 → Локація):",
+    pl: "Wyślij punkt na mapie (📎 → Lokalizacja) albo wpisz współrzędne: 51.1523, 16.7717",
+    en: "Send a map point (📎 → Location) or type coordinates: 51.1523, 16.7717",
+    uk: "Надішли точку на карті (📎 → Локація) або впиши координати: 51.1523, 16.7717",
+  },
+  loc_bad_pin: {
+    pl: "Nie rozumiem. Wyślij lokalizację lub wpisz: 51.1523, 16.7717",
+    en: "Didn't get that. Send a location or type: 51.1523, 16.7717",
+    uk: "Не зрозумів. Надішли локацію або впиши: 51.1523, 16.7717",
   },
   loc_ask_radius: {
     pl: "Promień strefy check-inu w metrach (wybierz lub wpisz):",

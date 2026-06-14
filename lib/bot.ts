@@ -384,6 +384,22 @@ bot.on("message:text", async (ctx) => {
     await ctx.reply(tr(lang, "loc_ask_pin"));
     return;
   }
+  if (state === "loc_pin") {
+    const m = text.match(/(-?\d+(?:[.,]\d+)?)\s*[,;\s]\s*(-?\d+(?:[.,]\d+)?)/);
+    const lat = m ? parseFloat(m[1].replace(",", ".")) : NaN;
+    const lng = m ? parseFloat(m[2].replace(",", ".")) : NaN;
+    if (!m || isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      await ctx.reply(tr(lang, "loc_bad_pin"));
+      return;
+    }
+    await setState(ctx.from!.id, "loc_radius", { ...data, lat, lng });
+    const kb = new InlineKeyboard()
+      .text("200 м", "locrad:200")
+      .text("300 м", "locrad:300")
+      .text("500 м", "locrad:500");
+    await ctx.reply(tr(lang, "loc_ask_radius"), { reply_markup: kb });
+    return;
+  }
   if (state === "loc_radius") {
     const radius = parseInt(text, 10);
     if (!radius || radius < 20 || radius > 5000) {
