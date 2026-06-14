@@ -1,31 +1,101 @@
 import { Bot, InlineKeyboard } from "grammy";
 import { supabase } from "./supabase";
-import { captchaText, correctText, wrongText, expiredText, faqText, startText } from "./i18n";
+import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
 import { makeChallenge } from "./captcha";
+import { featureEnabled, setSetting } from "./settings";
+import { ensurePlayer, setPlayerLang } from "./players";
+import { tr } from "./strings";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
-// Перемикач функції з таблиці settings (за замовчуванням — увімкнено).
-async function featureEnabled(key: string): Promise<boolean> {
-  const { data } = await supabase
-    .from("settings")
-    .select("value")
-    .eq("key", `feature_${key}`)
-    .maybeSingle();
-  if (!data) return true;
-  return String(data.value) !== "false";
-}
-
-// ── /start у приватному чаті ──
+// ── /start ──
 bot.command("start", async (ctx) => {
-  await ctx.reply(startText);
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  await ctx.reply(tr(p.lang as Lang, "start"));
+});
+
+// ── /lang — перемкнути мову ──
+bot.command("lang", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const kb = new InlineKeyboard()
+    .text("🇵🇱 Polski", "lang:pl")
+    .text("🇬🇧 English", "lang:en")
+    .text("🇺🇦 Українська", "lang:uk");
+  await ctx.reply("🇵🇱 Wybierz język\n🇬🇧 Choose language\n🇺🇦 Обери мову", { reply_markup: kb });
+});
+
+bot.callbackQuery(/^lang:(pl|en|uk)$/, async (ctx) => {
+  const lang = ctx.match[1] as Lang;
+  await ensurePlayer(ctx.from);
+  await setPlayerLang(ctx.from.id, lang);
+  await ctx.editMessageText(tr(lang, "lang_set"));
+  await ctx.answerCallbackQuery();
+});
+
+// ── /profile ──
+bot.command("profile", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  let msg = tr(lang, "profile", {
+    name: p.name ?? "—",
+    callsign: p.callsign ?? tr(lang, "callsign_unset"),
+    tg: p.tg_username ? "@" + p.tg_username : "—",
+    games: p.games_played ?? 0,
+  });
+  if (p.is_master) msg += "\n" + tr(lang, "badge_master");
+  else if (p.is_admin) msg += "\n" + tr(lang, "badge_admin");
+  await ctx.reply(msg);
+});
+
+// ── /rules — правила мовою гравця ──
+bot.command("rules", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  await ctx.reply(faq[p.lang as Lang]);
+});
+
+// ── /admin — статус прав ──
+bot.command("admin", async (ctx) => {
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!p.is_admin) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  const perms = p.is_master
+    ? "master"
+    : p.admin_perms?.length
+      ? p.admin_perms.join(", ")
+      : "—";
+  await ctx.reply(tr(lang, "admin_panel", { perms }));
+});
+
+// ── /sethere — зафіксувати топік для анонсів (адмін, у групі) ──
+bot.command("sethere", async (ctx) => {
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!p.is_admin) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  if (ctx.chat.type === "private") {
+    await ctx.reply(tr(lang, "sethere_group_only"));
+    return;
+  }
+  await setSetting("announce_chat_id", String(ctx.chat.id));
+  await setSetting(
+    "announce_thread_id",
+    ctx.message?.message_thread_id ? String(ctx.message.message_thread_id) : "",
+  );
+  await ctx.reply(tr(lang, "sethere_ok"));
 });
 
 // ── Анти-бот шилд: заявка на вступ → тримовна капча в особисті ──
 bot.on("chat_join_request", async (ctx) => {
   const req = ctx.chatJoinRequest;
 
-  // Якщо шилд вимкнено — просто пропускаємо.
   if (!(await featureEnabled("shield"))) {
     try {
       await ctx.api.approveChatJoinRequest(req.chat.id, req.from.id);
@@ -54,7 +124,6 @@ bot.on("chat_join_request", async (ctx) => {
   options.forEach((o) => kb.text(String(o), `cap:${o}`));
 
   try {
-    // user_chat_id дозволяє написати користувачу до обробки заявки (вікно ~5 хв).
     await ctx.api.sendMessage(req.user_chat_id, captchaText(a, b), { reply_markup: kb });
   } catch (e) {
     console.error("captcha DM failed (user privacy?)", e);
@@ -80,7 +149,6 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
     return;
   }
 
-  // протерміновано
   if (new Date(ch.expires_at).getTime() < Date.now()) {
     await supabase.from("join_challenges").update({ status: "expired" }).eq("id", ch.id);
     await ctx.editMessageText(expiredText);
@@ -100,9 +168,11 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
     await supabase.from("join_challenges").update({ status: "passed" }).eq("id", ch.id);
     await ctx.editMessageText(correctText);
 
+    // Створюємо профіль гравця + онбординг його мовою.
+    const p = await ensurePlayer(ctx.from);
     if (await featureEnabled("onboarding_faq")) {
       try {
-        await ctx.api.sendMessage(ch.user_chat_id, faqText);
+        await ctx.api.sendMessage(ch.user_chat_id, faq[p.lang as Lang]);
       } catch {}
     }
   } else {

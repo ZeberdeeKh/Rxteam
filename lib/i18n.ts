@@ -1,5 +1,14 @@
 export type Lang = "pl" | "en" | "uk";
 
+// Вибір мови за language_code Telegram. RU не підтримуємо → ru мапимо на uk.
+export function pickLang(code?: string): Lang {
+  if (!code) return "uk";
+  const c = code.toLowerCase();
+  if (c.startsWith("pl")) return "pl";
+  if (c.startsWith("en")) return "en";
+  return "uk"; // uk, ru та інші → українська
+}
+
 const FLAG: Record<Lang, string> = { pl: "🇵🇱", en: "🇬🇧", uk: "🇺🇦" };
 const ORDER: Lang[] = ["pl", "en", "uk"];
 
@@ -42,17 +51,8 @@ export const expiredText =
     uk: "Час вийшов. Подай заявку на вступ ще раз.",
   });
 
-// Привітання на /start (тримовне).
-export const startText =
-  "🪖 RX Team Bot\n\n" +
-  tri({
-    pl: "Cześć, operatorze! Wkrótce zapiszesz się tu na grę, zrobisz check-in i sprawdzisz swój stopień. Bądź w gotowości!",
-    en: "Hey, operator! Soon you'll sign up for games here, check in and track your rank. Stay ready!",
-    uk: "Привіт, бійцю! Скоро тут реєструватимешся на гру, робитимеш чек-ін і дивитимешся своє звання. Будь напоготові!",
-  });
-
 // ЧЕРНЕТКА онбордингу — доопрацюємо з організатором (ліміти FPS/джоулів заповнить адмін).
-const faq: Record<Lang, string> = {
+export const faq: Record<Lang, string> = {
   pl: `🎯 RX Team — info dla nowych
 
 🔫 Limity mocy (J/FPS): [do uzupełnienia przez organizatora]
