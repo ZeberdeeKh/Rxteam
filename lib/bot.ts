@@ -236,7 +236,44 @@ bot.callbackQuery(/^reg:(\d+)$/, async (ctx) => {
     await ctx.reply(tr(lang, "ask_callsign"));
     return;
   }
-  await finalizeRegistration(ctx, p, gameId);
+  await startRegFlow(ctx, lang, gameId);
+});
+
+bot.callbackQuery(/^regrent:(yes|no)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_rental") return;
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  await setState(ctx.from.id, "reg_transport", { ...data, needsRental: ctx.match[1] === "yes" });
+  const kb = new InlineKeyboard()
+    .text(tr(lang, "btn_transport_own"), "regtr:own")
+    .row()
+    .text(tr(lang, "btn_transport_need"), "regtr:need");
+  await ctx.editMessageText(tr(lang, "reg_transport_q"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^regtr:(own|need)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_transport") return;
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (ctx.match[1] === "need") {
+    await ctx.editMessageText(tr(lang, "transport_need_noted"));
+    await finalizeReg(ctx, p, { ...data, transport: "need" });
+    return;
+  }
+  await setState(ctx.from.id, "reg_from", { ...data, transport: "own" });
+  await ctx.editMessageText(tr(lang, "reg_from_q"));
+});
+
+bot.callbackQuery(/^regseats:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_seats") return;
+  const p = await ensurePlayer(ctx.from);
+  await finalizeReg(ctx, p, { ...data, freeSeats: Number(ctx.match[1]) });
 });
 
 bot.callbackQuery(/^unreg:(\d+)$/, async (ctx) => {
@@ -483,8 +520,26 @@ bot.on("message:text", async (ctx) => {
       return;
     }
     await supabase.from("players").update({ callsign }).eq("id", p.id);
-    await clearState(ctx.from!.id);
-    await finalizeRegistration(ctx, { ...p, callsign }, data.gameId);
+    await startRegFlow(ctx, lang, data.gameId);
+    return;
+  }
+  if (state === "reg_from") {
+    await setState(ctx.from!.id, "reg_seats", { ...data, fromPlace: text });
+    const kb = new InlineKeyboard()
+      .text("0", "regseats:0")
+      .text("1", "regseats:1")
+      .text("2", "regseats:2")
+      .text("3", "regseats:3");
+    await ctx.reply(tr(lang, "reg_seats_q"), { reply_markup: kb });
+    return;
+  }
+  if (state === "reg_seats") {
+    const seats = parseInt(text, 10);
+    if (isNaN(seats) || seats < 0 || seats > 20) {
+      await ctx.reply(tr(lang, "reg_seats_q"));
+      return;
+    }
+    await finalizeReg(ctx, p, { ...data, freeSeats: seats });
     return;
   }
 });
@@ -658,10 +713,30 @@ async function showGameCard(ctx: Context, p: any, gameId: number) {
   );
 }
 
-async function finalizeRegistration(ctx: Context, p: any, gameId: number) {
-  await supabase
-    .from("registrations")
-    .upsert({ game_id: gameId, player_id: p.id, status: "registered" }, { onConflict: "game_id,player_id" });
+async function startRegFlow(ctx: Context, lang: Lang, gameId: number) {
+  await setState(ctx.from!.id, "reg_rental", { gameId });
+  const kb = new InlineKeyboard()
+    .text(tr(lang, "btn_yes"), "regrent:yes")
+    .text(tr(lang, "btn_no"), "regrent:no");
+  await ctx.reply(tr(lang, "reg_rental_q"), { reply_markup: kb });
+}
+
+async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
+  const gameId = data.gameId;
+  await supabase.from("registrations").upsert(
+    {
+      game_id: gameId,
+      player_id: p.id,
+      status: "registered",
+      needs_rental: !!data.needsRental,
+      transport: data.transport ?? null,
+      from_place: data.fromPlace ?? null,
+      free_seats: data.freeSeats ?? null,
+      seats_closed: false,
+    },
+    { onConflict: "game_id,player_id" },
+  );
+  await clearState(ctx.from!.id);
   await updateAnnouncement(gameId);
   const { data: game } = await supabase
     .from("games")
@@ -675,4 +750,27 @@ async function finalizeRegistration(ctx: Context, p: any, gameId: number) {
       when: game ? formatWhen(game.gather_at ?? game.start_at) : "",
     }),
   );
+  if (data.needsRental) {
+    await ctx.reply(tr(p.lang as Lang, "rental_noted"));
+    await notifyAdminsRental(p, game);
+  }
+}
+
+async function notifyAdminsRental(p: any, game: any) {
+  const { data: admins } = await supabase
+    .from("players")
+    .select("tg_user_id, lang")
+    .eq("is_admin", true);
+  const when = game ? formatWhen(game.gather_at ?? game.start_at) : "";
+  for (const a of admins ?? []) {
+    if (!a.tg_user_id) continue;
+    const text = tr((a.lang as Lang) ?? "uk", "admin_rental_notify", {
+      callsign: p.callsign ?? p.name ?? "?",
+      title: game?.title ?? "ASG",
+      when,
+    });
+    try {
+      await bot.api.sendMessage(a.tg_user_id, text);
+    } catch {}
+  }
 }

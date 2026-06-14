@@ -189,6 +189,47 @@ const S: Record<string, Dict> = {
     en: "You can leave up to 24h before start. Now a no-show = minus points.",
     uk: "Відписатись можна не пізніше ніж за 24 год до старту. Зараз неявка = мінус бали.",
   },
+
+  // оренда + транспорт у реєстрації
+  reg_rental_q: {
+    pl: "Potrzebujesz wypożyczyć zestaw sprzętu?",
+    en: "Do you need to rent a gear set?",
+    uk: "Потрібна оренда комплекту спорядження?",
+  },
+  btn_yes: { pl: "Tak", en: "Yes", uk: "Так" },
+  btn_no: { pl: "Nie", en: "No", uk: "Ні" },
+  reg_transport_q: {
+    pl: "Jak dojeżdżasz na grę?",
+    en: "How are you getting to the game?",
+    uk: "Як добираєшся на гру?",
+  },
+  btn_transport_own: { pl: "🚗 Własnym autem", en: "🚗 My own ride", uk: "🚗 Своїм ходом" },
+  btn_transport_need: { pl: "🙋 Potrzebuję transportu", en: "🙋 Need a ride", uk: "🙋 Потрібен транспорт" },
+  transport_need_noted: {
+    pl: "Zapisane. Lista kierowców pojawi się wkrótce.",
+    en: "Noted. Driver list coming soon.",
+    uk: "Записано. Список водіїв з'явиться в боті незабаром.",
+  },
+  reg_from_q: {
+    pl: "Skąd jedziesz? (dzielnica/miejsce)",
+    en: "Where are you coming from? (district/place)",
+    uk: "Звідки їдеш? (район/місце)",
+  },
+  reg_seats_q: {
+    pl: "Ile wolnych miejsc możesz zabrać?",
+    en: "How many free seats can you offer?",
+    uk: "Скільки вільних місць можеш узяти?",
+  },
+  rental_noted: {
+    pl: "🔫 Zaznaczyłeś wynajem — admin napisze do Ciebie ws. zestawu.",
+    en: "🔫 Rental noted — an admin will message you about the set.",
+    uk: "🔫 Оренду відмічено — адмін напише тобі щодо комплекту.",
+  },
+  admin_rental_notify: {
+    pl: "🔫 {callsign} zapisał się z WYNAJMEM na «{title}» ({when}). Napisz ws. zestawu.",
+    en: "🔫 {callsign} signed up with RENTAL for «{title}» ({when}). Message them about the set.",
+    uk: "🔫 {callsign} записався з ОРЕНДОЮ на «{title}» ({when}). Напиши щодо комплекту.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
