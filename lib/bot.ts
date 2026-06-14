@@ -23,7 +23,8 @@ import {
   type GrantedAch,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
-import { tr, POLL_QUESTION, pollWinnerText } from "./strings";
+import { tr, POLL_QUESTION, pollWinnerText, lotteryWinnerText } from "./strings";
+import { currentQuarter, prevQuarter } from "./season";
 import {
   parseDateOnly,
   validTime,
@@ -163,6 +164,136 @@ async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: stri
   });
   await ctx.reply(tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"));
 }
+
+// ─────────────────── Лотерея надійних + «У цифрах» ───────────────────
+
+// Гравці з чек-іном і 0 неявок за квартал [start,end). Повертає повні рядки.
+async function eligibleReliable(startIso: string, endIso: string) {
+  const { data: games } = await supabase
+    .from("games")
+    .select("id")
+    .gte("start_at", startIso)
+    .lt("start_at", endIso);
+  const gameIds = (games ?? []).map((g) => g.id);
+  if (!gameIds.length) return [];
+  const { data: checks } = await supabase
+    .from("checkins")
+    .select("player_id")
+    .in("game_id", gameIds);
+  const { data: ns } = await supabase
+    .from("registrations")
+    .select("player_id")
+    .eq("status", "no_show")
+    .in("game_id", gameIds);
+  const noShow = new Set((ns ?? []).map((r) => r.player_id));
+  const attended = [...new Set((checks ?? []).map((c) => c.player_id))].filter(
+    (id) => !noShow.has(id),
+  );
+  if (!attended.length) return [];
+  const { data: players } = await supabase
+    .from("players")
+    .select("id, callsign, name, lang, tg_user_id, has_patch")
+    .in("id", attended);
+  return players ?? [];
+}
+
+bot.command("lottery", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!hasPerm(p, "games")) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  if (!(await featureEnabled("lottery"))) {
+    await ctx.reply(tr(lang, "lottery_off"));
+    return;
+  }
+  const q = prevQuarter();
+  const { data: prev } = await supabase
+    .from("season_runs")
+    .select("winner_id")
+    .eq("quarter", q.label)
+    .maybeSingle();
+  if (prev) {
+    const { data: w } = prev.winner_id
+      ? await supabase.from("players").select("callsign, name").eq("id", prev.winner_id).single()
+      : { data: null };
+    await ctx.reply(tr(lang, "lottery_already", { q: q.label, who: w?.callsign ?? w?.name ?? "—" }));
+    return;
+  }
+
+  const eligible = await eligibleReliable(q.start.toISO()!, q.end.toISO()!);
+  // Ачівка Iron Discipline усім, хто без неявок за квартал.
+  for (const e of eligible) {
+    const ach = await grantAchievement(e.id, "iron_discipline", null, !!e.has_patch);
+    if (ach) await sendAchievements(e.tg_user_id, (e.lang as Lang) ?? "uk", [ach]);
+  }
+  if (!eligible.length) {
+    await supabase.from("season_runs").insert({ quarter: q.label, winner_id: null, eligible_count: 0 });
+    await ctx.reply(tr(lang, "lottery_no_eligible", { q: q.label }));
+    return;
+  }
+  const winner = eligible[Math.floor(Math.random() * eligible.length)];
+  await supabase
+    .from("season_runs")
+    .insert({ quarter: q.label, winner_id: winner.id, eligible_count: eligible.length });
+  const who = winner.callsign ?? winner.name ?? "—";
+
+  const chatId = await getSetting("announce_chat_id");
+  if (chatId) {
+    const threadId = await getSetting("announce_thread_id");
+    try {
+      await ctx.api.sendMessage(Number(chatId), lotteryWinnerText(q.label, who, eligible.length), {
+        ...(threadId ? { message_thread_id: Number(threadId) } : {}),
+      });
+    } catch (e) {
+      console.error("lottery post failed", e);
+    }
+  }
+  await ctx.reply(tr(lang, "lottery_done_admin", { q: q.label, n: eligible.length, who }));
+});
+
+bot.command("stats", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const q = currentQuarter();
+  const sIso = q.start.toISO()!;
+  const eIso = q.end.toISO()!;
+  const { data: games } = await supabase
+    .from("games")
+    .select("id")
+    .gte("start_at", sIso)
+    .lt("start_at", eIso);
+  const gameIds = (games ?? []).map((g) => g.id);
+  const { data: checks } = gameIds.length
+    ? await supabase.from("checkins").select("player_id").in("game_id", gameIds)
+    : { data: [] };
+  const { count: noshows } = gameIds.length
+    ? await supabase
+        .from("registrations")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "no_show")
+        .in("game_id", gameIds)
+    : { count: 0 };
+  const { count: newcomers } = await supabase
+    .from("players")
+    .select("*", { count: "exact", head: true })
+    .gte("created_at", sIso)
+    .lt("created_at", eIso);
+  const uniquePlayers = new Set((checks ?? []).map((c) => c.player_id)).size;
+  await ctx.reply(
+    tr(lang, "stats", {
+      q: q.label,
+      games: gameIds.length,
+      checkins: (checks ?? []).length,
+      players: uniquePlayers,
+      newcomers: newcomers ?? 0,
+      noshows: noshows ?? 0,
+    }),
+  );
+});
 
 // ─────────────────────── Голосування за локацію ───────────────────────
 

@@ -570,7 +570,41 @@ const S: Record<string, Dict> = {
     uk: "Немає відкритого опитування.",
   },
   poll_closed_admin: { pl: "Głosowanie zamknięte.", en: "Poll closed.", uk: "Опитування закрито." },
+
+  // лотерея надійних — /lottery
+  lottery_off: {
+    pl: "Loteria jest teraz wyłączona.",
+    en: "The lottery is currently disabled.",
+    uk: "Лотерея зараз вимкнена.",
+  },
+  lottery_already: {
+    pl: "Loteria za {q} już przeprowadzona. Zwycięzca: {who}.",
+    en: "Lottery for {q} already done. Winner: {who}.",
+    uk: "Лотерею за {q} вже проведено. Переможець: {who}.",
+  },
+  lottery_no_eligible: {
+    pl: "Za {q} nie ma graczy z check-inem i 0 nieobecności.",
+    en: "For {q} there are no players with a check-in and 0 no-shows.",
+    uk: "За {q} немає гравців із чек-іном і 0 неявок.",
+  },
+  lottery_done_admin: {
+    pl: "✅ Loteria za {q}: uczestników {n}, zwycięzca {who}.",
+    en: "✅ Lottery for {q}: {n} eligible, winner {who}.",
+    uk: "✅ Лотерея за {q}: учасників {n}, переможець {who}.",
+  },
+
+  // «У цифрах» — /stats
+  stats: {
+    pl: "📊 W liczbach — {q}\nGry: {games}\nCheck-iny: {checkins}\nGracze: {players}\nNowicjusze: {newcomers}\nNieobecności: {noshows}",
+    en: "📊 In numbers — {q}\nGames: {games}\nCheck-ins: {checkins}\nPlayers: {players}\nNewcomers: {newcomers}\nNo-shows: {noshows}",
+    uk: "📊 У цифрах — {q}\nІгор: {games}\nЧек-інів: {checkins}\nГравців: {players}\nНовачків: {newcomers}\nНеявок: {noshows}",
+  },
 };
+
+// Двомовний (PL/UA) пост переможця лотереї у топік.
+export function lotteryWinnerText(label: string, who: string, n: number): string {
+  return `🎉 Loteria niezawodnych ${label}: zwycięzca ${who} (z ${n})! / Лотерея надійних ${label}: переможець ${who} (з ${n})!`;
+}
 
 // Двомовний (PL/UA) текст для постів у групу — питання опитування і результат.
 export const POLL_QUESTION = "📊 Gdzie gramy następnym razem? / Де граємо наступного разу?";
