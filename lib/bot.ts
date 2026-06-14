@@ -1587,6 +1587,9 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
     await ctx.reply(tr(p.lang as Lang, "rental_noted"));
     await notifyAdminsRental(p, game);
   }
+  if (data.transport === "own") {
+    await ctx.reply(tr(p.lang as Lang, "myride_hint"));
+  }
 }
 
 async function notifyAdminsRental(p: any, game: any) {

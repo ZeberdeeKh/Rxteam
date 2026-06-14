@@ -530,6 +530,11 @@ const S: Record<string, Dict> = {
   myride_status_closed: { pl: "komplet 🔴", en: "full 🔴", uk: "закрито 🔴" },
   btn_ride_close: { pl: "🔴 Zamknij nabór", en: "🔴 Close seats", uk: "🔴 Закрити набір" },
   btn_ride_open: { pl: "🟢 Otwórz nabór", en: "🟢 Open seats", uk: "🟢 Відкрити набір" },
+  myride_hint: {
+    pl: "🚗 Zapisano jako kierowca. Zarządzaj miejscami: /myride",
+    en: "🚗 Signed up as a driver. Manage seats: /myride",
+    uk: "🚗 Записано як водія. Керуй місцями: /myride",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
