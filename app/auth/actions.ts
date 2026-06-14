@@ -1,8 +1,9 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase-server";
+import { createClient, isAuthConfigured } from "@/lib/supabase-server";
+import { TG_SESSION_COOKIE } from "@/lib/tg-session";
 
 export type AuthState = { error?: string };
 
@@ -45,7 +46,13 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
 }
 
 export async function signOut() {
-  const supabase = createClient();
-  await supabase.auth.signOut();
+  if (isAuthConfigured()) {
+    try {
+      await createClient().auth.signOut();
+    } catch {
+      /* ignore */
+    }
+  }
+  cookies().delete(TG_SESSION_COOKIE); // власна TG-сесія
   redirect("/");
 }

@@ -3,7 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
-import { getAuthUser } from "@/lib/supabase-server";
+import { getSessionContext } from "@/lib/session-player";
 import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
-  const user = await getAuthUser();
+  const loggedIn = (await getSessionContext()).state !== "anon";
 
   return (
     <html lang={lang}>
@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/ranking" className="text-neutral-700 hover:text-brand">
                 {st(lang, "nav_ranking")}
               </Link>
-              {user ? (
+              {loggedIn ? (
                 <>
                   <Link href="/cabinet" className="text-neutral-700 hover:text-brand">
                     {st(lang, "nav_cabinet")}

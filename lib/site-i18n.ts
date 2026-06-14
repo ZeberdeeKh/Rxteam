@@ -87,6 +87,17 @@ const SITE: Record<string, Dict> = {
     en: "Couldn't confirm the link (expired or invalid).",
     uk: "Не вдалося підтвердити посилання (прострочене або недійсне).",
   },
+  auth_or: { pl: "albo", en: "or", uk: "або" },
+  auth_tg_hint: {
+    pl: "Masz konto w bocie? Zaloguj się jednym kliknięciem:",
+    en: "Have a bot account? Log in with one click:",
+    uk: "Є акаунт у боті? Увійди в один клік:",
+  },
+  auth_err_tg: {
+    pl: "Logowanie przez Telegram nie powiodło się. Spróbuj ponownie.",
+    en: "Telegram login failed. Please try again.",
+    uk: "Вхід через Telegram не вдався. Спробуй ще раз.",
+  },
   auth_err_generic: {
     pl: "Coś poszło nie tak. Spróbuj ponownie.",
     en: "Something went wrong. Try again.",
