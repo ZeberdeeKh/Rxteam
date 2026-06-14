@@ -332,6 +332,83 @@ const S: Record<string, Dict> = {
     en: "{who} is already checked in for this game.",
     uk: "{who} вже має чек-ін на цій грі.",
   },
+
+  // патч (членство) — /patch
+  patch_off: {
+    pl: "Funkcja patcha jest teraz wyłączona.",
+    en: "The patch feature is currently disabled.",
+    uk: "Функція патча зараз вимкнена.",
+  },
+  patch_intro: {
+    pl: "🎖 Patch RX Team = członkostwo.\nZ patchem: 100% punktów i możliwość kupowania stopni (Recruit → Scout → Squad Leader → Team Leader).\nBez patcha punkty naliczają się o 15% mniej i stopni kupić nie można.\nPatch jest płatny i wydawany na grze.",
+    en: "🎖 RX Team patch = membership.\nWith the patch: 100% of points and you can buy ranks (Recruit → Scout → Squad Leader → Team Leader).\nWithout it points accrue 15% lower and ranks are locked.\nThe patch is paid and handed to you at a game.",
+    uk: "🎖 Патч RX Team = членство.\nЗ патчем: 100% балів і можна купувати звання (Recruit → Scout → Squad Leader → Team Leader).\nБез патча бали капають на 15% менше, а звання купити не можна.\nПатч платний, видається на грі.",
+  },
+  patch_price_line: { pl: "Cena: {price} zł", en: "Price: {price} zł", uk: "Ціна: {price} zł" },
+  btn_patch_request: {
+    pl: "🎖 Złóż prośbę o patch",
+    en: "🎖 Request the patch",
+    uk: "🎖 Подати заявку на патч",
+  },
+  patch_status_have: {
+    pl: "✅ Masz już patch. Witaj w RX Team!",
+    en: "✅ You already have the patch. Welcome to RX Team!",
+    uk: "✅ У тебе вже є патч. Вітаємо в RX Team!",
+  },
+  patch_pending: {
+    pl: "⏳ Twoja prośba o patch czeka na decyzję admina.",
+    en: "⏳ Your patch request is awaiting an admin's decision.",
+    uk: "⏳ Твоя заявка на патч очікує рішення адміна.",
+  },
+  patch_approved_waiting: {
+    pl: "✅ Prośba zatwierdzona — odbierzesz patch na najbliższej grze.",
+    en: "✅ Request approved — you'll get the patch at the next game.",
+    uk: "✅ Заявку схвалено — отримаєш патч на найближчій грі.",
+  },
+  patch_request_sent: {
+    pl: "📨 Prośba o patch wysłana. Admin skontaktuje się i wyda patch na grze.",
+    en: "📨 Patch request sent. An admin will reach out and hand you the patch at a game.",
+    uk: "📨 Заявку на патч надіслано. Адмін зв'яжеться і видасть патч на грі.",
+  },
+  patch_admin_notify: {
+    pl: "🎖 {who} prosi o patch. Zatwierdzić?",
+    en: "🎖 {who} requests the patch. Approve?",
+    uk: "🎖 {who} просить патч. Підтвердити?",
+  },
+  patch_already_handled: {
+    pl: "Ta prośba została już obsłużona.",
+    en: "This request has already been handled.",
+    uk: "Цю заявку вже оброблено.",
+  },
+  patch_admin_approved: {
+    pl: "✅ {who}: zatwierdzono. Po wydaniu patcha na grze naciśnij przycisk:",
+    en: "✅ {who}: approved. Once you hand the patch at a game, tap:",
+    uk: "✅ {who}: підтверджено. Після видачі патча на грі натисни:",
+  },
+  patch_admin_handed: {
+    pl: "🎖 {who}: patch wydany, stopień Recruit.",
+    en: "🎖 {who}: patch handed, rank Recruit.",
+    uk: "🎖 {who}: патч видано, звання Recruit.",
+  },
+  patch_admin_rejected: { pl: "❌ {who}: odrzucono.", en: "❌ {who}: rejected.", uk: "❌ {who}: відхилено." },
+  btn_approve: { pl: "✅ Zatwierdź", en: "✅ Approve", uk: "✅ Підтвердити" },
+  btn_reject: { pl: "❌ Odrzuć", en: "❌ Reject", uk: "❌ Відхилити" },
+  btn_handed: { pl: "🎖 Wydano na grze", en: "🎖 Handed at game", uk: "🎖 Видано на грі" },
+  patch_you_approved: {
+    pl: "✅ Twoja prośba o patch zatwierdzona — odbierzesz go na najbliższej grze.",
+    en: "✅ Your patch request was approved — you'll get it at the next game.",
+    uk: "✅ Твою заявку на патч схвалено — отримаєш його на найближчій грі.",
+  },
+  patch_you_rejected: {
+    pl: "❌ Twoja prośba o patch została odrzucona. Napisz do admina po szczegóły.",
+    en: "❌ Your patch request was rejected. Message an admin for details.",
+    uk: "❌ Твою заявку на патч відхилено. Напиши адміну за деталями.",
+  },
+  patch_you_handed: {
+    pl: "🎖 Patch wydany! Witaj w RX Team. Stopień: Recruit. Od teraz 100% punktów. Stopnie kupisz przez /rank.",
+    en: "🎖 Patch handed! Welcome to RX Team. Rank: Recruit. 100% points from now on. Buy ranks via /rank.",
+    uk: "🎖 Патч видано! Вітаємо в RX Team. Звання: Recruit. Відтепер 100% балів. Звання купуються через /rank.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {

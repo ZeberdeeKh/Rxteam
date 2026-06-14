@@ -3,7 +3,13 @@ import { supabase } from "./supabase";
 import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
 import { makeChallenge } from "./captcha";
 import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
-import { ensurePlayer, setPlayerLang, getTopPlayers, getPlayerRank } from "./players";
+import {
+  ensurePlayer,
+  setPlayerLang,
+  getTopPlayers,
+  getPlayerRank,
+  getAdminsWithPerm,
+} from "./players";
 import { awardPoints, getPointValue, getReliability } from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
@@ -22,10 +28,11 @@ export const bot = new Bot(process.env.BOT_TOKEN!);
 
 const REG_BTN = "✅ Записатись / Sign up";
 
-// Право «чек-ін»: майстер або адмін із перміссією checkin.
-function canCheckin(p: any): boolean {
-  return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes("checkin"));
+// Право адміна (майстер має всі права).
+function hasPerm(p: any, perm: string): boolean {
+  return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes(perm));
 }
+const canCheckin = (p: any) => hasPerm(p, "checkin");
 
 // ─────────────────────────────── Команди ───────────────────────────────
 
@@ -345,6 +352,174 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     .eq("game_id", gameId)
     .eq("player_id", playerId);
   await ctx.editMessageText(tr(lang, "mc_done", { who }));
+});
+
+// ─────────────────────────── Патч (членство) ───────────────────────────
+
+bot.command("patch", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("patch"))) {
+    await ctx.reply(tr(lang, "patch_off"));
+    return;
+  }
+  if (p.has_patch) {
+    await ctx.reply(tr(lang, "patch_status_have"));
+    return;
+  }
+  const { data: open } = await supabase
+    .from("patch_requests")
+    .select("status")
+    .eq("player_id", p.id)
+    .in("status", ["requested", "approved"])
+    .order("id", { ascending: false })
+    .maybeSingle();
+  if (open?.status === "requested") {
+    await ctx.reply(tr(lang, "patch_pending"));
+    return;
+  }
+  if (open?.status === "approved") {
+    await ctx.reply(tr(lang, "patch_approved_waiting"));
+    return;
+  }
+  const price = await getSetting("patch_price_zl");
+  let msg = tr(lang, "patch_intro");
+  if (price) msg += "\n" + tr(lang, "patch_price_line", { price });
+  const kb = new InlineKeyboard().text(tr(lang, "btn_patch_request"), "patchreq");
+  await ctx.reply(msg, { reply_markup: kb });
+});
+
+bot.callbackQuery("patchreq", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (p.has_patch) {
+    await ctx.editMessageText(tr(lang, "patch_status_have"));
+    return;
+  }
+  const { data: open } = await supabase
+    .from("patch_requests")
+    .select("id, status")
+    .eq("player_id", p.id)
+    .in("status", ["requested", "approved"])
+    .maybeSingle();
+  if (open) {
+    await ctx.editMessageText(
+      open.status === "approved" ? tr(lang, "patch_approved_waiting") : tr(lang, "patch_pending"),
+    );
+    return;
+  }
+  const { data: reqRow } = await supabase
+    .from("patch_requests")
+    .insert({ player_id: p.id, status: "requested" })
+    .select("id")
+    .single();
+  await ctx.editMessageText(tr(lang, "patch_request_sent"));
+
+  const who = p.callsign ?? p.name ?? "?";
+  const admins = await getAdminsWithPerm("patch");
+  for (const a of admins) {
+    if (!a.tg_user_id) continue;
+    const al = (a.lang as Lang) ?? "uk";
+    const kb = new InlineKeyboard()
+      .text(tr(al, "btn_approve"), `patchok:${reqRow!.id}`)
+      .text(tr(al, "btn_reject"), `patchno:${reqRow!.id}`);
+    try {
+      await bot.api.sendMessage(a.tg_user_id, tr(al, "patch_admin_notify", { who }), {
+        reply_markup: kb,
+      });
+    } catch {}
+  }
+});
+
+async function loadPatchReq(id: number) {
+  const { data } = await supabase
+    .from("patch_requests")
+    .select("id, status, player_id, players(id, callsign, name, lang, tg_user_id, rank)")
+    .eq("id", id)
+    .single();
+  return data;
+}
+
+bot.callbackQuery(/^patchok:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const admin = await ensurePlayer(ctx.from);
+  const al = admin.lang as Lang;
+  if (!hasPerm(admin, "patch")) return;
+  const req = await loadPatchReq(Number(ctx.match[1]));
+  if (!req) return;
+  if (req.status !== "requested") {
+    await ctx.editMessageText(tr(al, "patch_already_handled"));
+    return;
+  }
+  await supabase
+    .from("patch_requests")
+    .update({ status: "approved", decided_by: admin.id, decided_at: new Date().toISOString() })
+    .eq("id", req.id);
+  const target = (req as any).players;
+  const who = target?.callsign ?? target?.name ?? "?";
+  const kb = new InlineKeyboard().text(tr(al, "btn_handed"), `patchhand:${req.id}`);
+  await ctx.editMessageText(tr(al, "patch_admin_approved", { who }), { reply_markup: kb });
+  if (target?.tg_user_id) {
+    try {
+      await bot.api.sendMessage(target.tg_user_id, tr((target.lang as Lang) ?? "uk", "patch_you_approved"));
+    } catch {}
+  }
+});
+
+bot.callbackQuery(/^patchno:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const admin = await ensurePlayer(ctx.from);
+  const al = admin.lang as Lang;
+  if (!hasPerm(admin, "patch")) return;
+  const req = await loadPatchReq(Number(ctx.match[1]));
+  if (!req) return;
+  if (req.status !== "requested") {
+    await ctx.editMessageText(tr(al, "patch_already_handled"));
+    return;
+  }
+  await supabase
+    .from("patch_requests")
+    .update({ status: "rejected", decided_by: admin.id, decided_at: new Date().toISOString() })
+    .eq("id", req.id);
+  const target = (req as any).players;
+  const who = target?.callsign ?? target?.name ?? "?";
+  await ctx.editMessageText(tr(al, "patch_admin_rejected", { who }));
+  if (target?.tg_user_id) {
+    try {
+      await bot.api.sendMessage(target.tg_user_id, tr((target.lang as Lang) ?? "uk", "patch_you_rejected"));
+    } catch {}
+  }
+});
+
+bot.callbackQuery(/^patchhand:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const admin = await ensurePlayer(ctx.from);
+  const al = admin.lang as Lang;
+  if (!hasPerm(admin, "patch")) return;
+  const req = await loadPatchReq(Number(ctx.match[1]));
+  if (!req) return;
+  if (req.status !== "approved") {
+    await ctx.editMessageText(tr(al, "patch_already_handled"));
+    return;
+  }
+  const target = (req as any).players;
+  await supabase
+    .from("patch_requests")
+    .update({ status: "handed", decided_by: admin.id, decided_at: new Date().toISOString() })
+    .eq("id", req.id);
+  await supabase
+    .from("players")
+    .update({ has_patch: true, rank: target?.rank ?? "Recruit" })
+    .eq("id", req.player_id);
+  const who = target?.callsign ?? target?.name ?? "?";
+  await ctx.editMessageText(tr(al, "patch_admin_handed", { who }));
+  if (target?.tg_user_id) {
+    try {
+      await bot.api.sendMessage(target.tg_user_id, tr((target.lang as Lang) ?? "uk", "patch_you_handed"));
+    } catch {}
+  }
 });
 
 // ───────────────────────────── Callback queries ─────────────────────────────

@@ -81,6 +81,15 @@ export async function getTopPlayers(limit = 10) {
   return data ?? [];
 }
 
+// Адміни з конкретним правом (майстер має всі права).
+export async function getAdminsWithPerm(perm: string) {
+  const { data } = await supabase
+    .from("players")
+    .select("id, tg_user_id, lang, is_master, admin_perms")
+    .or(`is_master.eq.true,admin_perms.cs.{${perm}}`);
+  return data ?? [];
+}
+
 // Місце гравця в рейтингу: к-сть гравців із більшим «зароблено» + 1 (нічиї ділять місце).
 export async function getPlayerRank(pointsEarned: number): Promise<number> {
   const { count } = await supabase
