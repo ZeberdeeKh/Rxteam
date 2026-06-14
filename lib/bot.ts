@@ -1,4 +1,4 @@
-import { Bot, InlineKeyboard, type Context } from "grammy";
+import { Bot, InlineKeyboard, Keyboard, type Context } from "grammy";
 import { supabase } from "./supabase";
 import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
 import { makeChallenge } from "./captcha";
@@ -14,6 +14,7 @@ import {
   buildAnnouncement,
   registeredCount,
   formatWhen,
+  distanceMeters,
 } from "./games";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
@@ -159,6 +160,45 @@ bot.command("newgame", async (ctx) => {
   });
   await setState(ctx.from!.id, "game_loc", {});
   await ctx.reply(tr(lang, "gamenew_pick_loc"), { reply_markup: kb });
+});
+
+bot.command("checkin", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const { data: regs } = await supabase
+    .from("registrations")
+    .select("game_id, games(*)")
+    .eq("player_id", p.id)
+    .eq("status", "registered");
+  const now = Date.now();
+  const active = (regs ?? [])
+    .map((r) => (r as any).games)
+    .filter(
+      (g) =>
+        g &&
+        g.checkin_from &&
+        g.checkin_to &&
+        new Date(g.checkin_from).getTime() <= now &&
+        now <= new Date(g.checkin_to).getTime(),
+    );
+  if (!active.length) {
+    await ctx.reply(tr(lang, "checkin_none"));
+    return;
+  }
+  if (active.length === 1) {
+    await promptCheckin(ctx, lang, active[0].id);
+    return;
+  }
+  const kb = new InlineKeyboard();
+  active.forEach((g) => kb.text(g.title ?? `#${g.id}`, `checkin:${g.id}`).row());
+  await ctx.reply(tr(lang, "checkin_pick"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^checkin:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  await promptCheckin(ctx, p.lang as Lang, Number(ctx.match[1]));
 });
 
 // ───────────────────────────── Callback queries ─────────────────────────────
@@ -397,15 +437,21 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
 bot.on("message:location", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const { state, data } = await getState(ctx.from!.id);
-  if (state !== "loc_pin") return;
+  if (state !== "loc_pin" && state !== "checkin") return;
   const p = await ensurePlayer(ctx.from!);
   const loc = ctx.message.location;
-  await setState(ctx.from!.id, "loc_radius", { ...data, lat: loc.latitude, lng: loc.longitude });
-  const kb = new InlineKeyboard()
-    .text("200 м", "locrad:200")
-    .text("300 м", "locrad:300")
-    .text("500 м", "locrad:500");
-  await ctx.reply(tr(p.lang as Lang, "loc_ask_radius"), { reply_markup: kb });
+
+  if (state === "loc_pin") {
+    await setState(ctx.from!.id, "loc_radius", { ...data, lat: loc.latitude, lng: loc.longitude });
+    const kb = new InlineKeyboard()
+      .text("200 м", "locrad:200")
+      .text("300 м", "locrad:300")
+      .text("500 м", "locrad:500");
+    await ctx.reply(tr(p.lang as Lang, "loc_ask_radius"), { reply_markup: kb });
+    return;
+  }
+
+  await handleCheckin(ctx, p, data.gameId, loc.latitude, loc.longitude);
 });
 
 bot.on("message:text", async (ctx) => {
@@ -555,6 +601,59 @@ async function finalizeLocation(tgId: number, data: Record<string, any>, radius:
     map_url: `https://maps.google.com/?q=${data.lat},${data.lng}`,
   });
   await clearState(tgId);
+}
+
+async function promptCheckin(ctx: Context, lang: Lang, gameId: number) {
+  await setState(ctx.from!.id, "checkin", { gameId });
+  const kb = new Keyboard().requestLocation(tr(lang, "checkin_btn")).resized().oneTime();
+  await ctx.reply(tr(lang, "checkin_prompt"), { reply_markup: kb });
+}
+
+async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, lng: number) {
+  const lang = p.lang as Lang;
+  const { data: game } = await supabase
+    .from("games")
+    .select("*, locations(*)")
+    .eq("id", gameId)
+    .single();
+  const now = Date.now();
+  if (
+    !game ||
+    !game.checkin_from ||
+    !game.checkin_to ||
+    now < new Date(game.checkin_from).getTime() ||
+    now > new Date(game.checkin_to).getTime()
+  ) {
+    await clearState(ctx.from!.id);
+    await ctx.reply(tr(lang, "checkin_window_closed"), { reply_markup: { remove_keyboard: true } });
+    return;
+  }
+  const gl = (game as any).locations;
+  const dist = Math.round(distanceMeters(lat, lng, gl.lat, gl.lng));
+  if (dist > gl.radius_m) {
+    await ctx.reply(tr(lang, "checkin_too_far", { dist, radius: gl.radius_m }));
+    return; // лишаємо стан — можна спробувати ще раз
+  }
+  const { data: existing } = await supabase
+    .from("checkins")
+    .select("id")
+    .eq("game_id", gameId)
+    .eq("player_id", p.id)
+    .maybeSingle();
+  if (existing) {
+    await clearState(ctx.from!.id);
+    await ctx.reply(tr(lang, "checkin_already"), { reply_markup: { remove_keyboard: true } });
+    return;
+  }
+  await supabase
+    .from("checkins")
+    .insert({ game_id: gameId, player_id: p.id, lat, lng, distance_m: dist, source: "tg" });
+  await supabase
+    .from("players")
+    .update({ games_played: (p.games_played ?? 0) + 1 })
+    .eq("id", p.id);
+  await clearState(ctx.from!.id);
+  await ctx.reply(tr(lang, "checkin_done"), { reply_markup: { remove_keyboard: true } });
 }
 
 async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>) {

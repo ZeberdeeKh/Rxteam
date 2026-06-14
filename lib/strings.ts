@@ -230,6 +230,48 @@ const S: Record<string, Dict> = {
     en: "🔫 {callsign} signed up with RENTAL for «{title}» ({when}). Message them about the set.",
     uk: "🔫 {callsign} записався з ОРЕНДОЮ на «{title}» ({when}). Напиши щодо комплекту.",
   },
+
+  // чек-ін
+  checkin_none: {
+    pl: "Teraz nie ma gry do check-inu. Check-in otwiera się 30 min przed zbiórką (tylko dla zapisanych).",
+    en: "No game to check in right now. Check-in opens 30 min before gathering (registered only).",
+    uk: "Зараз немає гри для чек-іну. Чек-ін відкривається за 30 хв до збору (тільки для записаних).",
+  },
+  checkin_pick: {
+    pl: "Wybierz grę do check-inu:",
+    en: "Pick a game to check in:",
+    uk: "Обери гру для чек-іну:",
+  },
+  checkin_prompt: {
+    pl: "Naciśnij przycisk, aby udostępnić lokalizację do check-inu:",
+    en: "Tap the button to share your location for check-in:",
+    uk: "Натисни кнопку, щоб поділитися локацією для чек-іну:",
+  },
+  checkin_btn: {
+    pl: "📍 Udostępnij lokalizację",
+    en: "📍 Share location",
+    uk: "📍 Поділитися локацією",
+  },
+  checkin_too_far: {
+    pl: "❌ Jesteś {dist} m od strefy gry (trzeba ≤ {radius} m). Podejdź bliżej i udostępnij lokalizację ponownie.",
+    en: "❌ You're {dist} m from the game zone (need ≤ {radius} m). Get closer and share location again.",
+    uk: "❌ Ти за {dist} м від зони гри (треба ≤ {radius} м). Підійди ближче і поділись локацією ще раз.",
+  },
+  checkin_window_closed: {
+    pl: "Check-in jest teraz niedostępny (poza oknem czasowym).",
+    en: "Check-in is not available now (outside the time window).",
+    uk: "Чек-ін зараз недоступний (поза вікном часу).",
+  },
+  checkin_done: {
+    pl: "✅ Check-in zaliczony! Gra policzona (+1).",
+    en: "✅ Check-in confirmed! Game counted (+1).",
+    uk: "✅ Чек-ін зараховано! Гру зараховано (+1).",
+  },
+  checkin_already: {
+    pl: "Już się zameldowałeś na tej grze.",
+    en: "You've already checked in for this game.",
+    uk: "Ти вже відмітився на цій грі.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
