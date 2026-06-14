@@ -4,18 +4,21 @@ import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from
 import { makeChallenge } from "./captcha";
 import { featureEnabled, setSetting } from "./settings";
 import { ensurePlayer, setPlayerLang } from "./players";
+import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
-// ── /start ──
+// ─────────────────────────────── Команди ───────────────────────────────
+
+// /start
 bot.command("start", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
   await ctx.reply(tr(p.lang as Lang, "start"));
 });
 
-// ── /lang — перемкнути мову ──
+// /lang — перемкнути мову
 bot.command("lang", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const kb = new InlineKeyboard()
@@ -25,15 +28,7 @@ bot.command("lang", async (ctx) => {
   await ctx.reply("🇵🇱 Wybierz język\n🇬🇧 Choose language\n🇺🇦 Обери мову", { reply_markup: kb });
 });
 
-bot.callbackQuery(/^lang:(pl|en|uk)$/, async (ctx) => {
-  const lang = ctx.match[1] as Lang;
-  await ensurePlayer(ctx.from);
-  await setPlayerLang(ctx.from.id, lang);
-  await ctx.editMessageText(tr(lang, "lang_set"));
-  await ctx.answerCallbackQuery();
-});
-
-// ── /profile ──
+// /profile
 bot.command("profile", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
@@ -49,14 +44,14 @@ bot.command("profile", async (ctx) => {
   await ctx.reply(msg);
 });
 
-// ── /rules — правила мовою гравця ──
+// /rules
 bot.command("rules", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
   await ctx.reply(faq[p.lang as Lang]);
 });
 
-// ── /admin — статус прав ──
+// /admin
 bot.command("admin", async (ctx) => {
   const p = await ensurePlayer(ctx.from!);
   const lang = p.lang as Lang;
@@ -64,25 +59,27 @@ bot.command("admin", async (ctx) => {
     await ctx.reply(tr(lang, "not_admin"));
     return;
   }
-  const perms = p.is_master
-    ? "master"
-    : p.admin_perms?.length
-      ? p.admin_perms.join(", ")
-      : "—";
+  const perms = p.is_master ? "master" : p.admin_perms?.length ? p.admin_perms.join(", ") : "—";
   await ctx.reply(tr(lang, "admin_panel", { perms }));
 });
 
-// ── /sethere — зафіксувати топік для анонсів (адмін групи) ──
+// /cancel — скинути поточний діалог
+bot.command("cancel", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  await clearState(ctx.from!.id);
+  const p = await ensurePlayer(ctx.from!);
+  await ctx.reply(tr(p.lang as Lang, "cancelled"));
+});
+
+// /sethere — зафіксувати топік для анонсів (адмін групи)
 bot.command("sethere", async (ctx) => {
   if (ctx.chat.type === "private") {
     await ctx.reply("Виконай цю команду в групі, у топіку «Анонси».");
     return;
   }
-
-  // Перевірка прав через Telegram (працює і для анонімних адмінів — від імені групи).
   let isChatAdmin = false;
   if (ctx.senderChat?.id === ctx.chat.id) {
-    isChatAdmin = true;
+    isChatAdmin = true; // анонімний адмін / від імені групи
   } else if (ctx.from) {
     try {
       const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
@@ -91,12 +88,10 @@ bot.command("sethere", async (ctx) => {
       console.error("getChatMember failed", e);
     }
   }
-
   if (!isChatAdmin) {
     await ctx.reply("⛔ Лише для адмінів групи.");
     return;
   }
-
   await setSetting("announce_chat_id", String(ctx.chat.id));
   await setSetting(
     "announce_thread_id",
@@ -105,7 +100,64 @@ bot.command("sethere", async (ctx) => {
   await ctx.reply("✅ Топік для анонсів збережено. Сюди йтимуть анонси ігор.");
 });
 
-// ── Анти-бот шилд: заявка на вступ → тримовна капча в особисті ──
+// /addlocation — додати полігон (адмін, у приваті)
+bot.command("addlocation", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!p.is_admin) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  await setState(ctx.from!.id, "loc_name", {});
+  await ctx.reply(tr(lang, "loc_ask_name"));
+});
+
+// /locations — список полігонів (адмін)
+bot.command("locations", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!p.is_admin) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  const { data } = await supabase.from("locations").select("*").order("id");
+  if (!data?.length) {
+    await ctx.reply(tr(lang, "locations_empty"));
+    return;
+  }
+  const list = data.map((l) => `#${l.id} — ${l.name} (${l.radius_m} м)`).join("\n");
+  await ctx.reply(tr(lang, "locations_title") + "\n" + list);
+});
+
+// ───────────────────────────── Callback queries ─────────────────────────────
+
+// Перемикання мови
+bot.callbackQuery(/^lang:(pl|en|uk)$/, async (ctx) => {
+  const lang = ctx.match[1] as Lang;
+  await ensurePlayer(ctx.from);
+  await setPlayerLang(ctx.from.id, lang);
+  await ctx.editMessageText(tr(lang, "lang_set"));
+  await ctx.answerCallbackQuery();
+});
+
+// Радіус локації кнопкою
+bot.callbackQuery(/^locrad:(\d+)$/, async (ctx) => {
+  const radius = Number(ctx.match[1]);
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "loc_radius") {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  const p = await ensurePlayer(ctx.from);
+  await finalizeLocation(ctx.from.id, data, radius);
+  await ctx.editMessageText(tr(p.lang as Lang, "loc_saved", { name: data.name, radius }));
+  await ctx.answerCallbackQuery();
+});
+
+// ─────────────────────────────── Анти-бот шилд ───────────────────────────────
+
 bot.on("chat_join_request", async (ctx) => {
   const req = ctx.chatJoinRequest;
 
@@ -143,7 +195,7 @@ bot.on("chat_join_request", async (ctx) => {
   }
 });
 
-// ── Відповідь на капчу ──
+// Відповідь на капчу
 bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
   const chosen = Number(ctx.match[1]);
   const userId = ctx.from.id;
@@ -181,7 +233,6 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
     await supabase.from("join_challenges").update({ status: "passed" }).eq("id", ch.id);
     await ctx.editMessageText(correctText);
 
-    // Створюємо профіль гравця + онбординг його мовою.
     const p = await ensurePlayer(ctx.from);
     if (await featureEnabled("onboarding_faq")) {
       try {
@@ -198,3 +249,61 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
 
   await ctx.answerCallbackQuery();
 });
+
+// ─────────────────────── Диспетчер покрокових діалогів ───────────────────────
+
+// Локація на карті — крок loc_pin
+bot.on("message:location", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const { state, data } = await getState(ctx.from!.id);
+  if (state !== "loc_pin") return;
+  const p = await ensurePlayer(ctx.from!);
+  const loc = ctx.message.location;
+  await setState(ctx.from!.id, "loc_radius", { ...data, lat: loc.latitude, lng: loc.longitude });
+  const kb = new InlineKeyboard()
+    .text("200 м", "locrad:200")
+    .text("300 м", "locrad:300")
+    .text("500 м", "locrad:500");
+  await ctx.reply(tr(p.lang as Lang, "loc_ask_radius"), { reply_markup: kb });
+});
+
+// Текстовий ввід у діалозі
+bot.on("message:text", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const text = ctx.message.text.trim();
+  if (text.startsWith("/")) return; // невідомі команди ігноруємо
+  const { state, data } = await getState(ctx.from!.id);
+  if (!state) return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+
+  if (state === "loc_name") {
+    await setState(ctx.from!.id, "loc_pin", { ...data, name: text });
+    await ctx.reply(tr(lang, "loc_ask_pin"));
+    return;
+  }
+
+  if (state === "loc_radius") {
+    const radius = parseInt(text, 10);
+    if (!radius || radius < 20 || radius > 5000) {
+      await ctx.reply(tr(lang, "loc_bad_radius"));
+      return;
+    }
+    await finalizeLocation(ctx.from!.id, data, radius);
+    await ctx.reply(tr(lang, "loc_saved", { name: data.name, radius }));
+    return;
+  }
+});
+
+// ─────────────────────────────── Хелпери ───────────────────────────────
+
+async function finalizeLocation(tgId: number, data: Record<string, any>, radius: number) {
+  await supabase.from("locations").insert({
+    name: data.name,
+    lat: data.lat,
+    lng: data.lng,
+    radius_m: radius,
+    map_url: `https://maps.google.com/?q=${data.lat},${data.lng}`,
+  });
+  await clearState(tgId);
+}

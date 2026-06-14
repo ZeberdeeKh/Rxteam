@@ -42,6 +42,38 @@ const S: Record<string, Dict> = {
     en: "✅ Announcements topic saved.",
     uk: "✅ Топік для анонсів збережено.",
   },
+  loc_ask_name: {
+    pl: "📍 Podaj nazwę lokacji:",
+    en: "📍 Enter the location name:",
+    uk: "📍 Введи назву локації:",
+  },
+  loc_ask_pin: {
+    pl: "Teraz wyślij punkt na mapie (📎 → Lokalizacja):",
+    en: "Now send a map point (📎 → Location):",
+    uk: "Тепер надішли точку на карті (📎 → Локація):",
+  },
+  loc_ask_radius: {
+    pl: "Promień strefy check-inu w metrach (wybierz lub wpisz):",
+    en: "Check-in radius in meters (pick or type):",
+    uk: "Радіус зони чек-іну в метрах (обери або впиши):",
+  },
+  loc_bad_radius: {
+    pl: "Podaj liczbę w metrach (np. 300).",
+    en: "Enter a number in meters (e.g. 300).",
+    uk: "Введи число в метрах (напр. 300).",
+  },
+  loc_saved: {
+    pl: "✅ Lokacja «{name}» zapisana (promień {radius} m).",
+    en: "✅ Location «{name}» saved (radius {radius} m).",
+    uk: "✅ Локацію «{name}» збережено (радіус {radius} м).",
+  },
+  locations_title: { pl: "📍 Lokacje:", en: "📍 Locations:", uk: "📍 Локації:" },
+  locations_empty: {
+    pl: "Brak lokacji. Dodaj: /addlocation",
+    en: "No locations yet. Add one: /addlocation",
+    uk: "Локацій ще немає. Додай: /addlocation",
+  },
+  cancelled: { pl: "Anulowano.", en: "Cancelled.", uk: "Скасовано." },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
