@@ -1,0 +1,20 @@
+node_modules/
+.next/
+out/
+dist/
+.vercel
+*.log
+.DS_Store
+
+# secrets — NEVER commit
+.env
+.env*.local
+!.env.example
+
+# RX Team design/media materials (local only — kept on disk, out of the code repo)
+/Northern Ridge/
+/Видос/
+/Футболка/
+/патч*.pdf
+/патч*.psd
+/Робоча*
