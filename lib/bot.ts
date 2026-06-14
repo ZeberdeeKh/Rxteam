@@ -19,6 +19,7 @@ import {
   RANK_COST_KEY,
   RANK_COST_FALLBACK,
   grantCheckinAchievements,
+  grantAchievement,
   type GrantedAch,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
@@ -115,6 +116,62 @@ async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean
   await supabase
     .from("referrals")
     .insert({ inviter_id: inviterId, invited_id: invited.id, status: "pending" });
+}
+
+// Авто-зарахування реферала на ПЕРШОМУ чек-іні новачка: +бали інвайтеру, ачівка Recruiter, знижка.
+async function confirmReferral(invited: any, gameId: number, gamesPlayedAfter: number) {
+  if (gamesPlayedAfter !== 1) return; // лише перша гра новачка
+  if (!(await featureEnabled("referrals"))) return;
+  const { data: ref } = await supabase
+    .from("referrals")
+    .select("id, inviter_id")
+    .eq("invited_id", invited.id)
+    .eq("status", "pending")
+    .maybeSingle();
+  if (!ref) return;
+  await supabase
+    .from("referrals")
+    .update({ status: "confirmed", game_id: gameId, confirmed_at: new Date().toISOString() })
+    .eq("id", ref.id);
+
+  const { data: inviter } = await supabase
+    .from("players")
+    .select("id, callsign, name, lang, tg_user_id, has_patch")
+    .eq("id", ref.inviter_id)
+    .single();
+  if (!inviter) return;
+  const ilang = (inviter.lang as Lang) ?? "uk";
+
+  const pts = await awardPoints({
+    playerId: inviter.id,
+    reason: "friend",
+    baseDelta: await getPointValue("pts_friend", 10),
+    gameId,
+    meta: `invited:${invited.id}`,
+    hasPatch: !!inviter.has_patch,
+  });
+  const ach = await grantAchievement(inviter.id, "recruiter", gameId, !!inviter.has_patch);
+
+  // Знижка на цю гру: 1 друг → −50%, 2+ → безкоштовно.
+  const { count } = await supabase
+    .from("referrals")
+    .select("*", { count: "exact", head: true })
+    .eq("inviter_id", inviter.id)
+    .eq("game_id", gameId)
+    .eq("status", "confirmed");
+  const discount = (count ?? 0) >= 2 ? tr(ilang, "ref_disc_free") : tr(ilang, "ref_disc_half");
+
+  const who = invited.callsign ?? invited.name ?? "?";
+  const { data: game } = await supabase.from("games").select("title").eq("id", gameId).single();
+  if (inviter.tg_user_id) {
+    try {
+      await bot.api.sendMessage(
+        inviter.tg_user_id,
+        tr(ilang, "ref_bonus_inviter", { who, pts, title: game?.title ?? "ASG", discount }),
+      );
+    } catch {}
+    if (ach) await sendAchievements(inviter.tg_user_id, ilang, [ach]);
+  }
 }
 
 bot.command("lang", async (ctx) => {
@@ -430,6 +487,7 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     earlyMinutes: null,
   });
   await sendAchievements(target?.tg_user_id ?? null, (target?.lang as Lang) ?? "uk", granted);
+  if (target) await confirmReferral(target, gameId, (target.games_played ?? 0) + 1);
 });
 
 // ─────────────────────────── Патч (членство) ───────────────────────────
@@ -1141,6 +1199,7 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
     earlyMinutes: earlyMin,
   });
   await sendAchievements(p.tg_user_id, lang, granted);
+  await confirmReferral(p, gameId, (p.games_played ?? 0) + 1);
 }
 
 async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>) {

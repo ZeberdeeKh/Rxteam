@@ -470,6 +470,13 @@ const S: Record<string, Dict> = {
     en: "🎟 Your referral link:\n{link}\n\nInvite friends. When a newcomer does their first check-in — you get +{pts} pts and a discount for that game (1 friend −50%, 2+ free).\nConfirmed friends: {confirmed}",
     uk: "🎟 Твоє реф-посилання:\n{link}\n\nЗапрошуй друзів. Коли новачок зробить перший чек-ін — тобі +{pts} балів і знижка на ту гру (1 друг −50%, 2+ безкоштовно).\nПідтверджених друзів: {confirmed}",
   },
+  ref_disc_half: { pl: "−50% składki", en: "−50% off", uk: "−50% складки" },
+  ref_disc_free: { pl: "za darmo", en: "free", uk: "безкоштовно" },
+  ref_bonus_inviter: {
+    pl: "🎟 Twój znajomy {who} zrobił pierwszy check-in! +{pts} pkt. Zniżka na «{title}»: {discount}.",
+    en: "🎟 Your friend {who} did their first check-in! +{pts} pts. Discount for «{title}»: {discount}.",
+    uk: "🎟 Твій друг {who} зробив перший чек-ін! +{pts} балів. Знижка на «{title}»: {discount}.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
