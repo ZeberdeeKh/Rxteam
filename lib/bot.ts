@@ -164,6 +164,118 @@ async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: stri
   await ctx.reply(tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"));
 }
 
+// ─────────────────────── Carpool: керування водія ───────────────────────
+
+bot.command("myride", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const games = await myDriverGames(p.id);
+  if (!games.length) {
+    await ctx.reply(tr(lang, "myride_none"));
+    return;
+  }
+  if (games.length === 1) {
+    const { text, kb } = await renderRide(p.id, games[0].id, lang);
+    await ctx.reply(text, { reply_markup: kb });
+    return;
+  }
+  const kb = new InlineKeyboard();
+  games.forEach((g) =>
+    kb.text(`${g.title ?? "#" + g.id} — ${formatWhen(g.start_at)}`, `ride:${g.id}`).row(),
+  );
+  await ctx.reply(tr(lang, "myride_pick"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^ride:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const { text, kb } = await renderRide(p.id, Number(ctx.match[1]), p.lang as Lang);
+  await ctx.editMessageText(text, { reply_markup: kb });
+});
+
+bot.callbackQuery(/^rideseat:(\d+):(-?\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const gameId = Number(ctx.match[1]);
+  const delta = Number(ctx.match[2]);
+  const { data: reg } = await supabase
+    .from("registrations")
+    .select("free_seats")
+    .eq("game_id", gameId)
+    .eq("player_id", p.id)
+    .maybeSingle();
+  const seats = Math.max(0, Math.min(20, (reg?.free_seats ?? 0) + delta));
+  await supabase
+    .from("registrations")
+    .update({ free_seats: seats })
+    .eq("game_id", gameId)
+    .eq("player_id", p.id);
+  const { text, kb } = await renderRide(p.id, gameId, p.lang as Lang);
+  await ctx.editMessageText(text, { reply_markup: kb });
+});
+
+bot.callbackQuery(/^rideclose:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const gameId = Number(ctx.match[1]);
+  const { data: reg } = await supabase
+    .from("registrations")
+    .select("seats_closed")
+    .eq("game_id", gameId)
+    .eq("player_id", p.id)
+    .maybeSingle();
+  await supabase
+    .from("registrations")
+    .update({ seats_closed: !reg?.seats_closed })
+    .eq("game_id", gameId)
+    .eq("player_id", p.id);
+  const { text, kb } = await renderRide(p.id, gameId, p.lang as Lang);
+  await ctx.editMessageText(text, { reply_markup: kb });
+});
+
+bot.callbackQuery("noop", (ctx) => ctx.answerCallbackQuery());
+
+// Ігри, де гравець записаний водієм («своїм ходом»).
+async function myDriverGames(playerId: number) {
+  const { data: regs } = await supabase
+    .from("registrations")
+    .select("games(id, title, start_at)")
+    .eq("player_id", playerId)
+    .eq("status", "registered")
+    .eq("transport", "own");
+  const cutoff = Date.now() - 3 * 3600 * 1000;
+  return (regs ?? [])
+    .map((r) => (r as any).games)
+    .filter((g) => g && new Date(g.start_at).getTime() > cutoff)
+    .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
+}
+
+async function renderRide(playerId: number, gameId: number, lang: Lang) {
+  const { data: reg } = await supabase
+    .from("registrations")
+    .select("from_place, free_seats, seats_closed")
+    .eq("game_id", gameId)
+    .eq("player_id", playerId)
+    .maybeSingle();
+  const { data: game } = await supabase.from("games").select("title").eq("id", gameId).single();
+  const seats = reg?.free_seats ?? 0;
+  const closed = !!reg?.seats_closed;
+  const text = tr(lang, "myride_panel", {
+    title: game?.title ?? "ASG",
+    from: reg?.from_place ?? "—",
+    seats,
+    status: tr(lang, closed ? "myride_status_closed" : "myride_status_open"),
+  });
+  const kb = new InlineKeyboard()
+    .text("➖", `rideseat:${gameId}:-1`)
+    .text(String(seats), "noop")
+    .text("➕", `rideseat:${gameId}:1`)
+    .row()
+    .text(tr(lang, closed ? "btn_ride_open" : "btn_ride_close"), `rideclose:${gameId}`);
+  return { text, kb };
+}
+
 // Прив'язує новачка до інвайтера (лише якщо це справді нова людина).
 async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean) {
   if (!isNewcomer || inviterId === invited.id) return;

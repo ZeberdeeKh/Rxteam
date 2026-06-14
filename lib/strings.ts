@@ -515,6 +515,21 @@ const S: Record<string, Dict> = {
     en: "write in the group",
     uk: "напиши в групі",
   },
+  myride_none: {
+    pl: "Nie jesteś kierowcą na żadnej grze (zapis „własnym autem”).",
+    en: "You're not a driver for any game (signed up as „my own ride”).",
+    uk: "Ти не водій на жодній грі (реєстрація «своїм ходом»).",
+  },
+  myride_pick: { pl: "Wybierz grę:", en: "Pick a game:", uk: "Обери гру:" },
+  myride_panel: {
+    pl: "🚗 «{title}»\nSkąd: {from}\nWolne miejsca: {seats}\nStatus: {status}",
+    en: "🚗 «{title}»\nFrom: {from}\nFree seats: {seats}\nStatus: {status}",
+    uk: "🚗 «{title}»\nЗвідки: {from}\nВільних місць: {seats}\nСтатус: {status}",
+  },
+  myride_status_open: { pl: "otwarty 🟢", en: "open 🟢", uk: "відкрито 🟢" },
+  myride_status_closed: { pl: "komplet 🔴", en: "full 🔴", uk: "закрито 🔴" },
+  btn_ride_close: { pl: "🔴 Zamknij nabór", en: "🔴 Close seats", uk: "🔴 Закрити набір" },
+  btn_ride_open: { pl: "🟢 Otwórz nabór", en: "🟢 Open seats", uk: "🟢 Відкрити набір" },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
