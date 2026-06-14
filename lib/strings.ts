@@ -472,6 +472,11 @@ const S: Record<string, Dict> = {
   },
   ref_disc_half: { pl: "−50% składki", en: "−50% off", uk: "−50% складки" },
   ref_disc_free: { pl: "za darmo", en: "free", uk: "безкоштовно" },
+  ref_card_discount: {
+    pl: "🎟 Twoja zniżka na tę grę: {discount}",
+    en: "🎟 Your discount for this game: {discount}",
+    uk: "🎟 Твоя знижка на цю гру: {discount}",
+  },
   ref_bonus_inviter: {
     pl: "🎟 Twój znajomy {who} zrobił pierwszy check-in! +{pts} pkt. Zniżka na «{title}»: {discount}.",
     en: "🎟 Your friend {who} did their first check-in! +{pts} pts. Discount for «{title}»: {discount}.",

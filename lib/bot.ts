@@ -1347,15 +1347,24 @@ async function showGameCard(ctx: Context, p: any, gameId: number) {
   const kb = new InlineKeyboard();
   if (reg?.status === "registered") kb.text(tr(lang, "btn_leave"), `unreg:${gameId}`);
   else kb.text(tr(lang, "btn_register"), `reg:${gameId}`);
-  await ctx.reply(
-    tr(lang, "game_card", {
-      title: game.title ?? "ASG",
-      when: formatWhen(game.gather_at ?? game.start_at),
-      loc: loc?.name ?? "—",
-      count,
-    }),
-    { reply_markup: kb },
-  );
+  let msg = tr(lang, "game_card", {
+    title: game.title ?? "ASG",
+    when: formatWhen(game.gather_at ?? game.start_at),
+    loc: loc?.name ?? "—",
+    count,
+  });
+  // Знижка за приведених новачків на цю гру (інфо «при оплаті»).
+  const { count: refCount } = await supabase
+    .from("referrals")
+    .select("*", { count: "exact", head: true })
+    .eq("inviter_id", p.id)
+    .eq("game_id", gameId)
+    .eq("status", "confirmed");
+  if ((refCount ?? 0) > 0) {
+    const discount = (refCount ?? 0) >= 2 ? tr(lang, "ref_disc_free") : tr(lang, "ref_disc_half");
+    msg += "\n" + tr(lang, "ref_card_discount", { discount });
+  }
+  await ctx.reply(msg, { reply_markup: kb });
 }
 
 async function startRegFlow(ctx: Context, lang: Lang, gameId: number) {
