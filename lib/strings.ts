@@ -535,6 +535,18 @@ const S: Record<string, Dict> = {
     en: "🚗 Signed up as a driver. Manage seats: /myride",
     uk: "🚗 Записано як водія. Керуй місцями: /myride",
   },
+
+  // нагадування
+  remind_day: {
+    pl: "🔔 Przypomnienie: jutro gra «{title}» — {when}. Do zobaczenia!",
+    en: "🔔 Reminder: tomorrow's game «{title}» — {when}. See you!",
+    uk: "🔔 Нагадування: завтра гра «{title}» — {when}. До зустрічі!",
+  },
+  remind_2h: {
+    pl: "⏰ Już niedługo! Start «{title}» o {when}. Pamiętaj o check-inie.",
+    en: "⏰ Soon! «{title}» starts at {when}. Don't forget to check in.",
+    uk: "⏰ Зовсім скоро! Старт «{title}» о {when}. Не забудь про чек-ін.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
