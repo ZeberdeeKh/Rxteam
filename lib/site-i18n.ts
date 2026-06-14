@@ -144,6 +144,71 @@ const SITE: Record<string, Dict> = {
   prof_balance: { pl: "Saldo", en: "Balance", uk: "Баланс" },
   prof_games: { pl: "Rozegrane gry", en: "Games played", uk: "Зіграно ігор" },
   prof_no_rank: { pl: "brak (potrzebny patch)", en: "none (patch needed)", uk: "немає (потрібен патч)" },
+
+  // ── 6.1 Лендінг ──
+  home_hero_sub: {
+    pl: "Społeczność ASG we Wrocławiu. Gry, ranking i Twój profil w jednym miejscu.",
+    en: "An ASG community in Wrocław. Games, ranking and your profile in one place.",
+    uk: "Спільнота ASG у Вроцлаві. Ігри, рейтинг і твій профіль в одному місці.",
+  },
+  home_cta_games: { pl: "Zobacz gry", en: "See games", uk: "Переглянути ігри" },
+  home_cta_ranking: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
+  home_next_title: { pl: "Najbliższa gra", en: "Next game", uk: "Найближча гра" },
+  home_next_none: {
+    pl: "Brak zaplanowanych gier. Zajrzyj wkrótce. 🪖",
+    en: "No games scheduled yet. Check back soon. 🪖",
+    uk: "Поки що немає запланованих ігор. Зазирни пізніше. 🪖",
+  },
+  home_skladka_title: { pl: "Składka", en: "Voluntary contribution (składka)", uk: "Внесок (składka)" },
+  // Текст складки — PL дослівно (§15 PLAN.md). Однаковий для всіх мов інтерфейсу.
+  home_skladka_body: {
+    pl: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
+    en: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
+    uk: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
+  },
+
+  // ── 6.1 Ігри ──
+  games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
+  games_next_heading: { pl: "Najbliższa gra", en: "Next game", uk: "Найближча гра" },
+  games_upcoming_heading: { pl: "Nadchodzące gry", en: "Upcoming games", uk: "Майбутні ігри" },
+  games_past_heading: { pl: "Minione gry", en: "Past games", uk: "Минулі ігри" },
+  games_none_upcoming: {
+    pl: "Brak nadchodzących gier.",
+    en: "No upcoming games.",
+    uk: "Немає майбутніх ігор.",
+  },
+  games_none_past: { pl: "Brak minionych gier.", en: "No past games.", uk: "Немає минулих ігор." },
+  games_label_when: { pl: "Termin", en: "When", uk: "Коли" },
+  games_label_where: { pl: "Lokalizacja", en: "Location", uk: "Локація" },
+  games_label_signed: { pl: "Zapisani", en: "Signed up", uk: "Записані" },
+  games_count: { pl: "{n} zapisanych", en: "{n} signed up", uk: "{n} записаних" },
+  games_count_cap: { pl: "{n}/{cap} zapisanych", en: "{n}/{cap} signed up", uk: "{n}/{cap} записаних" },
+  games_map: { pl: "Mapa", en: "Map", uk: "Карта" },
+  games_tbd_loc: { pl: "Lokalizacja w trakcie ustalania", en: "Location TBD", uk: "Локація уточнюється" },
+
+  // ── 6.1 Рейтинг ──
+  ranking_title: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
+  ranking_intro: {
+    pl: "Najlepsi gracze według „zarobione łącznie”.",
+    en: "Top players by total points earned.",
+    uk: "Найкращі гравці за «зароблено всього».",
+  },
+  ranking_col_pos: { pl: "#", en: "#", uk: "#" },
+  ranking_col_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
+  ranking_col_rank: { pl: "Stopień", en: "Rank", uk: "Звання" },
+  ranking_col_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
+  ranking_col_games: { pl: "Gry", en: "Games", uk: "Ігри" },
+  ranking_empty: {
+    pl: "Brak danych do rankingu.",
+    en: "No ranking data yet.",
+    uk: "Поки що немає даних для рейтингу.",
+  },
+  ranking_note_top: {
+    pl: "Pokazujemy najlepszą dziesiątkę.",
+    en: "Showing the top 10.",
+    uk: "Показуємо найкращу десятку.",
+  },
+  ranking_anon: { pl: "Gracz", en: "Player", uk: "Гравець" },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {

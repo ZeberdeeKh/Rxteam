@@ -49,6 +49,14 @@ export function formatWhen(utcIso: string): string {
   return DateTime.fromISO(utcIso, { zone: "utc" }).setZone(ZONE).toFormat("dd.MM HH:mm");
 }
 
+// Локалізована дата для сайту: «ndz, 21.06.2026, 09:00» (час Вроцлава).
+export function formatGameWhen(utcIso: string, locale: string): string {
+  return DateTime.fromISO(utcIso, { zone: "utc" })
+    .setZone(ZONE)
+    .setLocale(locale)
+    .toFormat("ccc, dd.MM.yyyy, HH:mm");
+}
+
 // Відстань між двома точками в метрах (haversine).
 export function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000;
