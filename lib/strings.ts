@@ -446,6 +446,13 @@ const S: Record<string, Dict> = {
     en: "🎉 Congrats! New rank: {rank}. 💰 Balance: {balance} pts",
     uk: "🎉 Вітаємо! Нове звання: {rank}. 💰 Баланс: {balance} б.",
   },
+
+  // ачівки
+  ach_unlocked: {
+    pl: "🏅 Osiągnięcie odblokowane: {title} (+{points} pkt)",
+    en: "🏅 Achievement unlocked: {title} (+{points} pts)",
+    uk: "🏅 Ачівку відкрито: {title} (+{points} б.)",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {

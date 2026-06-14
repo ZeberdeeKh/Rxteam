@@ -17,6 +17,8 @@ import {
   nextRank,
   RANK_COST_KEY,
   RANK_COST_FALLBACK,
+  grantCheckinAchievements,
+  type GrantedAch,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
@@ -40,6 +42,17 @@ function hasPerm(p: any, perm: string): boolean {
   return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes(perm));
 }
 const canCheckin = (p: any) => hasPerm(p, "checkin");
+
+// Надсилає гравцю повідомлення про відкриті ачівки (мовою гравця).
+async function sendAchievements(chatId: number | null, lang: Lang, granted: GrantedAch[]) {
+  if (!chatId) return;
+  for (const g of granted) {
+    const title = lang === "pl" ? g.title_pl : lang === "en" ? g.title_en : g.title_uk;
+    try {
+      await bot.api.sendMessage(chatId, tr(lang, "ach_unlocked", { title: title ?? g.code, points: g.points }));
+    } catch {}
+  }
+}
 
 // ─────────────────────────────── Команди ───────────────────────────────
 
@@ -325,7 +338,7 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
   const playerId = Number(ctx.match[2]);
   const { data: target } = await supabase
     .from("players")
-    .select("id, callsign, name, games_played")
+    .select("id, callsign, name, games_played, has_patch, tg_user_id, lang")
     .eq("id", playerId)
     .single();
   const who = target?.callsign ?? target?.name ?? `#${playerId}`;
@@ -351,6 +364,7 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     reason: "attend",
     baseDelta: await getPointValue("pts_attend", 10),
     gameId,
+    hasPatch: !!target?.has_patch,
   });
   // Якщо гравця вже позначили як неявку — повертаємо в registered.
   await supabase
@@ -359,6 +373,14 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     .eq("game_id", gameId)
     .eq("player_id", playerId);
   await ctx.editMessageText(tr(lang, "mc_done", { who }));
+  const granted = await grantCheckinAchievements({
+    playerId,
+    gameId,
+    gamesPlayedAfter: (target?.games_played ?? 0) + 1,
+    hasPatch: !!target?.has_patch,
+    earlyMinutes: null,
+  });
+  await sendAchievements(target?.tg_user_id ?? null, (target?.lang as Lang) ?? "uk", granted);
 });
 
 // ─────────────────────────── Патч (членство) ───────────────────────────
@@ -1053,6 +1075,15 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
   });
   await clearState(ctx.from!.id);
   await ctx.reply(tr(lang, "checkin_done"), { reply_markup: { remove_keyboard: true } });
+  const earlyMin = Math.floor((now - new Date(game.checkin_from).getTime()) / 60000);
+  const granted = await grantCheckinAchievements({
+    playerId: p.id,
+    gameId,
+    gamesPlayedAfter: (p.games_played ?? 0) + 1,
+    hasPatch: !!p.has_patch,
+    earlyMinutes: earlyMin,
+  });
+  await sendAchievements(p.tg_user_id, lang, granted);
 }
 
 async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>) {
