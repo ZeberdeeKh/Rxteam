@@ -170,8 +170,8 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
 
 - ✅ **0. Фундамент** — Next.js 14 + grammY + Supabase, webhook на Vercel, env, схема, feature-flags
 - ✅ **1. Анти-бот шилд** + онбординг-FAQ (тримовна капча через `user_chat_id`)
-- 🟡 **2. Ядро** — ГОТОВО: гравці + мова `/lang`, `/profile` `/rules` `/admin`, локації (`/addlocation` `/locations`, координати текстом), ігри `/newgame` з багатим двомовним PL/UA анонсом у топік, реєстрація (позивний + оренда + транспорт) через діп-лінк картку, гео-чек-ін `/checkin` → `games_played +1`.
-  - ⬜ **Лишилось 2.4:** `/top` (рейтинг за к-стю ігор), авто-позначка неявки (cron), ручний чек-ін адміном.
+- ✅ **2. Ядро** — гравці + мова `/lang`, `/profile` `/rules` `/admin`, локації (`/addlocation` `/locations`, координати текстом), ігри `/newgame` з багатим двомовним PL/UA анонсом у топік, реєстрація (позивний + оренда + транспорт) через діп-лінк картку, гео-чек-ін `/checkin` → `games_played +1`.
+  - ✅ **2.4:** `/top` (рейтинг за к-стю ігор, топ-10 + моє місце), авто-позначка неявки (cron `/api/cron/noshow` — штраф балами відкладено на Етап 3), ручний чек-ін адміном `/markcheckin` (право `checkin`). Без нових полів БД.
 - ⬜ **3. Економіка** — бали (зароблено/баланс), патч (заявка→підтвердж.→видача, 85% без патча), звання Recruit→Scout→Squad Leader→Team Leader (купуються за бали), ачівки, reliability %, магазин балів
 - ⬜ **4. Реферали** — лінки, знижка на ту саму гру (1→−50%, 2+→безкошт, з 1-ї гри новачка), підтвердження адміном з фото
 - ⬜ **5. Решта** — список водіїв (carpool), лист очікування (опц. ліміт), нагадування (−день / −2год), голосування за локацію (−14 днів), лотерея надійних (квартал), «У цифрах», мультимова сайту
@@ -181,11 +181,12 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
 ## 20. Поточний стан / інфраструктура / дев-процес
 
 - **Код:** `C:\BeckUp\RXTeam\Project_RX` · **Репо:** github.com/ZeberdeeKh/Rxteam (`main`)
-- **Деплой:** Vercel, авто на кожен push у `main` → **rxteam.vercel.app**, webhook `…/api/bot`. Cron `…/api/cron/cleanup` (vercel.json, раз/день).
+- **Деплой:** Vercel, авто на кожен push у `main` → **rxteam.vercel.app**, webhook `…/api/bot`. Crons у vercel.json (`cleanup`, `noshow`).
 - **Supabase:** ref `svmsabjrswrxgcwwbgla` (eu-west-1). Секрети — у Vercel env + локальний `.env` (gitignored).
 - **Стек:** Next.js 14, grammY (webhook), @supabase/supabase-js (secret key, лише сервер), luxon (Europe/Warsaw).
 - **Модулі:** `lib/bot.ts` (хендлери), `lib/i18n.ts` (тримовні стек-тексти капчі/FAQ + анонс), `lib/strings.ts` (`tr(lang,key)` — мова гравця, варіант A), `lib/players.ts`, `lib/settings.ts`, `lib/state.ts` (стан діалогів у `user_states`), `lib/games.ts` (час/вікна/анонс/haversine).
-- **Команди:** /start (+deep-link `g<id>`), /lang, /profile, /rules, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /cancel. Меню — через Bot API `setMyCommands`.
+- **Команди:** /start (+deep-link `g<id>`), /lang, /profile, /rules, /top, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /markcheckin (адмін, право checkin), /cancel. Меню — через Bot API `setMyCommands`.
+- **Cron:** `…/api/cron/cleanup` (заявки-капчі, 03:00) + `…/api/cron/noshow` (неявки, 22:00) — обидва в `vercel.json`, захищені `CRON_SECRET`.
 - **Майстер-адмін:** бутстрап за username (`master_username`=`delltex`).
 - **Міграції (виконані в Supabase SQL Editor):** `supabase/schema.sql`, `etap2.sql`, `etap2b.sql`.
 
