@@ -3,6 +3,8 @@ import Link from "next/link";
 import "./globals.css";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
+import { getAuthUser } from "@/lib/supabase-server";
+import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 
 export const metadata: Metadata = {
@@ -10,8 +12,9 @@ export const metadata: Metadata = {
   description: "ASG / Airsoft community — Wrocław",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
+  const user = await getAuthUser();
 
   return (
     <html lang={lang}>
@@ -29,9 +32,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/ranking" className="text-neutral-700 hover:text-brand">
                 {st(lang, "nav_ranking")}
               </Link>
-              <Link href="/login" className="text-neutral-700 hover:text-brand">
-                {st(lang, "nav_login")}
-              </Link>
+              {user ? (
+                <>
+                  <Link href="/cabinet" className="text-neutral-700 hover:text-brand">
+                    {st(lang, "nav_cabinet")}
+                  </Link>
+                  <form action={signOut}>
+                    <button type="submit" className="text-neutral-700 hover:text-brand">
+                      {st(lang, "nav_logout")}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" className="text-neutral-700 hover:text-brand">
+                    {st(lang, "nav_login")}
+                  </Link>
+                  <Link href="/register" className="text-neutral-700 hover:text-brand">
+                    {st(lang, "nav_register")}
+                  </Link>
+                </>
+              )}
               <LangSwitcher current={lang} />
             </nav>
           </div>

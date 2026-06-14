@@ -44,6 +44,55 @@ const SITE: Record<string, Dict> = {
   },
 
   lang_switch: { pl: "Język", en: "Language", uk: "Мова" },
+
+  // ── Auth ──
+  auth_email: { pl: "E-mail", en: "E-mail", uk: "E-mail" },
+  auth_password: { pl: "Hasło", en: "Password", uk: "Пароль" },
+  auth_login_title: { pl: "Logowanie", en: "Log in", uk: "Вхід" },
+  auth_register_title: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
+  auth_login_btn: { pl: "Zaloguj się", en: "Log in", uk: "Увійти" },
+  auth_register_btn: { pl: "Załóż konto", en: "Create account", uk: "Створити акаунт" },
+  auth_to_register: {
+    pl: "Nie masz konta? Zarejestruj się",
+    en: "No account? Sign up",
+    uk: "Немає акаунта? Зареєструйся",
+  },
+  auth_to_login: {
+    pl: "Masz już konto? Zaloguj się",
+    en: "Already have an account? Log in",
+    uk: "Уже є акаунт? Увійди",
+  },
+  auth_min_pass: {
+    pl: "Min. 8 znaków.",
+    en: "Min. 8 characters.",
+    uk: "Мін. 8 символів.",
+  },
+  auth_check_email_title: {
+    pl: "Sprawdź skrzynkę",
+    en: "Check your inbox",
+    uk: "Перевір пошту",
+  },
+  auth_check_email_body: {
+    pl: "Wysłaliśmy link potwierdzający na Twój e-mail. Kliknij go, aby aktywować konto.",
+    en: "We sent a confirmation link to your e-mail. Click it to activate your account.",
+    uk: "Ми надіслали лист із підтвердженням на твій e-mail. Перейди за посиланням, щоб активувати акаунт.",
+  },
+  auth_confirmed: {
+    pl: "✅ E-mail potwierdzony. Jesteś zalogowany.",
+    en: "✅ E-mail confirmed. You're logged in.",
+    uk: "✅ E-mail підтверджено. Ти увійшов.",
+  },
+  auth_confirm_failed: {
+    pl: "Nie udało się potwierdzić linku (wygasł lub jest nieprawidłowy).",
+    en: "Couldn't confirm the link (expired or invalid).",
+    uk: "Не вдалося підтвердити посилання (прострочене або недійсне).",
+  },
+  auth_err_generic: {
+    pl: "Coś poszło nie tak. Spróbuj ponownie.",
+    en: "Something went wrong. Try again.",
+    uk: "Щось пішло не так. Спробуй ще раз.",
+  },
+  cabinet_title: { pl: "Mój profil", en: "My profile", uk: "Кабінет" },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {
