@@ -74,6 +74,86 @@ const S: Record<string, Dict> = {
     uk: "Локацій ще немає. Додай: /addlocation",
   },
   cancelled: { pl: "Anulowano.", en: "Cancelled.", uk: "Скасовано." },
+
+  // створення гри
+  gamenew_no_loc: {
+    pl: "Najpierw dodaj lokację: /addlocation",
+    en: "Add a location first: /addlocation",
+    uk: "Спершу додай локацію: /addlocation",
+  },
+  gamenew_no_topic: {
+    pl: "⚠️ Najpierw ustaw temat ogłoszeń: /sethere w grupie.",
+    en: "⚠️ Set the announcements topic first: /sethere in the group.",
+    uk: "⚠️ Спершу встанови топік анонсів: /sethere у групі.",
+  },
+  gamenew_pick_loc: { pl: "Wybierz lokację:", en: "Pick a location:", uk: "Обери локацію:" },
+  gamenew_when: {
+    pl: "Podaj datę i godzinę (DD.MM GG:MM, np. 21.06 09:00):",
+    en: "Enter date & time (DD.MM HH:MM, e.g. 21.06 09:00):",
+    uk: "Введи дату і час (ДД.ММ ГГ:ХХ, напр. 21.06 09:00):",
+  },
+  gamenew_bad_when: {
+    pl: "Nie rozumiem daty. Format: 21.06 09:00",
+    en: "Can't parse the date. Format: 21.06 09:00",
+    uk: "Не розумію дату. Формат: 21.06 09:00",
+  },
+  gamenew_cap: {
+    pl: "Limit uczestników? Wpisz liczbę lub naciśnij przycisk:",
+    en: "Participant limit? Type a number or tap the button:",
+    uk: "Ліміт учасників? Впиши число або натисни кнопку:",
+  },
+  gamenew_nolimit: { pl: "Bez limitu", en: "No limit", uk: "Без ліміту" },
+  gamenew_done: {
+    pl: "✅ Gra #{id} utworzona, ogłoszenie opublikowane.\n📅 {when}\nRejestracja do {regclose}.",
+    en: "✅ Game #{id} created, announcement posted.\n📅 {when}\nRegistration until {regclose}.",
+    uk: "✅ Гру #{id} створено, анонс опубліковано.\n📅 {when}\nРеєстрація до {regclose}.",
+  },
+
+  // картка гри + реєстрація
+  game_card: {
+    pl: "🎯 {loc}\n📅 {when} (Wrocław)\n👥 Zapisani: {count}",
+    en: "🎯 {loc}\n📅 {when} (Wrocław)\n👥 Registered: {count}",
+    uk: "🎯 {loc}\n📅 {when} (Вроцлав)\n👥 Записані: {count}",
+  },
+  btn_register: { pl: "✅ Zapisz się", en: "✅ Sign up", uk: "✅ Записатись" },
+  btn_leave: { pl: "❌ Wypisz się", en: "❌ Leave", uk: "❌ Відписатись" },
+  game_not_found: { pl: "Gra nie znaleziona.", en: "Game not found.", uk: "Гру не знайдено." },
+  reg_closed: {
+    pl: "Rejestracja zamknięta (mniej niż 9 godz. do startu).",
+    en: "Registration closed (less than 9h before start).",
+    uk: "Реєстрацію закрито (менше 9 год до старту).",
+  },
+  already_reg: {
+    pl: "Już jesteś zapisany.",
+    en: "You're already signed up.",
+    uk: "Ти вже записаний.",
+  },
+  game_full: { pl: "Brak miejsc.", en: "No spots left.", uk: "Місць немає." },
+  ask_callsign: {
+    pl: "Podaj swój pseudonim (callsign) — ustawiasz go raz:",
+    en: "Enter your callsign — set once:",
+    uk: "Впиши свій позивний (callsign) — встановлюється один раз:",
+  },
+  callsign_taken: {
+    pl: "Ten pseudonim jest zajęty, podaj inny:",
+    en: "That callsign is taken, try another:",
+    uk: "Цей позивний зайнятий, впиши інший:",
+  },
+  reg_done: {
+    pl: "✅ Zapisano: {loc}, {when}.",
+    en: "✅ Signed up: {loc}, {when}.",
+    uk: "✅ Записано: {loc}, {when}.",
+  },
+  unreg_done: {
+    pl: "Wypisano. Do zobaczenia następnym razem!",
+    en: "You've left the game.",
+    uk: "Тебе відписано.",
+  },
+  cancel_locked: {
+    pl: "Wypisać można najpóźniej 24 godz. przed startem. Teraz nieobecność = minus punkty.",
+    en: "You can leave up to 24h before start. Now a no-show = minus points.",
+    uk: "Відписатись можна не пізніше ніж за 24 год до старту. Зараз неявка = мінус бали.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {

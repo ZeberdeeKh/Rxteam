@@ -1,0 +1,19 @@
+;; ============================================================
+;; BIND zone file для rxteam.pl  →  Vercel (проєкт rxteam)
+;; Імпорт: Cloudflare Dashboard → DNS → Records →
+;;         Import and Export → Import DNS records → обрати цей файл
+;;
+;; TTL 1 = "Auto" у Cloudflare.
+;; УВАГА: BIND-формат НЕ зберігає статус Proxy.
+;; Після імпорту перевір, що обидва записи = "DNS only"
+;; (СІРА хмарка, не оранжева) — інакше Vercel дасть Invalid Configuration.
+;; ============================================================
+
+$ORIGIN rxteam.pl.
+$TTL 1
+
+;; --- Корінь rxteam.pl → Vercel (CNAME flattening, віддає 308-редірект на www) ---
+@        1   IN   CNAME   94d53c0422742413.vercel-dns-017.com.
+
+;; --- www.rxteam.pl → Vercel Production ---
+www      1   IN   CNAME   94d53c0422742413.vercel-dns-017.com.
