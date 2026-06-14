@@ -5,9 +5,14 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+  // Якщо публічні env не задані — пропускаємо без сесії, не валимо сайт у 500.
+  if (!url || !key) return response;
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    url,
+    key,
     {
       cookies: {
         getAll() {
@@ -26,8 +31,13 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // getUser() тригерить ротацію токена за потреби.
-  await supabase.auth.getUser();
+  // getUser() тригерить ротацію токена за потреби. Помилку мережі/Supabase
+  // глушимо — оновлення сесії не повинно валити сайт.
+  try {
+    await supabase.auth.getUser();
+  } catch {
+    /* ignore */
+  }
 
   return response;
 }

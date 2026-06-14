@@ -4,6 +4,10 @@ import { cookies } from "next/headers";
 // Серверний auth-клієнт: читає/оновлює сесію через cookies запиту.
 // Використовувати в серверкомпонентах, route handlers, server actions.
 // Для привілейованих записів (обхід RLS) — окремий lib/supabase.ts (secret key).
+export function isAuthConfigured(): boolean {
+  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+}
+
 export function createClient() {
   const cookieStore = cookies();
   return createServerClient(
@@ -29,11 +33,16 @@ export function createClient() {
   );
 }
 
-// Поточний авторизований auth-user (або null).
+// Поточний авторизований auth-user (або null). Стійко до відсутніх env / помилок.
 export async function getAuthUser() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user;
+  if (!isAuthConfigured()) return null;
+  try {
+    const supabase = createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user;
+  } catch {
+    return null;
+  }
 }
