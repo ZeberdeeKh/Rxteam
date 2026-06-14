@@ -124,3 +124,114 @@ export async function getRanking(limit = 10): Promise<RankingRow[]> {
     .limit(limit);
   return (data ?? []) as RankingRow[];
 }
+
+// ─────────────────────────────── Кабінет (6.2) ───────────────────────────────
+
+export type CabinetGame = SiteGame & {
+  regStatus: "registered" | "cancelled" | "no_show" | null;
+  checkedIn: boolean;
+  canRegister: boolean;
+  canUnregister: boolean;
+  checkinOpen: boolean;
+};
+
+// Ігри для кабінету: усі анонсовані, чиє вікно чек-іну ще не закрите (checkin_to >= now),
+// з прапорцями стану конкретного гравця (рег/чек-ін/можна записатись/відписатись/чек-інитись).
+export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> {
+  const now = Date.now();
+  const nowIso = new Date(now).toISOString();
+  const { data } = await supabase
+    .from("games")
+    .select(`${GAME_COLS}, reg_closes_at, cancel_deadline, checkin_from, checkin_to`)
+    .eq("status", "announced")
+    .gte("checkin_to", nowIso)
+    .order("start_at", { ascending: true })
+    .limit(30);
+  const rows = data ?? [];
+  if (!rows.length) return [];
+
+  const ids = rows.map((r) => r.id as number);
+  const [counts, regsRes, checksRes] = await Promise.all([
+    countsFor(ids),
+    supabase.from("registrations").select("game_id, status").eq("player_id", playerId).in("game_id", ids),
+    supabase.from("checkins").select("game_id").eq("player_id", playerId).in("game_id", ids),
+  ]);
+  const regMap = new Map<number, string>();
+  for (const r of regsRes.data ?? []) regMap.set(r.game_id as number, r.status as string);
+  const checkedSet = new Set((checksRes.data ?? []).map((c) => c.game_id as number));
+
+  const ms = (iso: string | null) => (iso ? new Date(iso).getTime() : null);
+
+  return rows.map((r) => {
+    const count = counts.get(r.id as number) ?? 0;
+    const regStatus = (regMap.get(r.id as number) ?? null) as CabinetGame["regStatus"];
+    const checkedIn = checkedSet.has(r.id as number);
+    const regCloses = ms((r as any).reg_closes_at);
+    const cancelDl = ms((r as any).cancel_deadline);
+    const cFrom = ms((r as any).checkin_from);
+    const cTo = ms((r as any).checkin_to);
+    const capacityFull = r.capacity != null && count >= r.capacity;
+
+    return {
+      ...toSiteGame(r, count),
+      regStatus,
+      checkedIn,
+      canRegister:
+        regStatus !== "registered" && (regCloses === null || regCloses > now) && !capacityFull,
+      canUnregister: regStatus === "registered" && (cancelDl === null || cancelDl > now),
+      checkinOpen:
+        !checkedIn &&
+        (regStatus === "registered" || regStatus === "no_show") &&
+        cFrom !== null &&
+        cTo !== null &&
+        cFrom <= now &&
+        now <= cTo,
+    };
+  });
+}
+
+export type PointLogRow = {
+  delta: number;
+  reason: string;
+  meta: string | null;
+  game_id: number | null;
+  created_at: string;
+};
+
+// Останні рухи балів гравця (журнал point_log).
+export async function getPointLog(playerId: number, limit = 25): Promise<PointLogRow[]> {
+  const { data } = await supabase
+    .from("point_log")
+    .select("delta, reason, meta, game_id, created_at")
+    .eq("player_id", playerId)
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as PointLogRow[];
+}
+
+export type PlayerAch = {
+  code: string;
+  created_at: string;
+  title_pl: string | null;
+  title_en: string | null;
+  title_uk: string | null;
+};
+
+// Здобуті ачівки гравця (з назвами).
+export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
+  const { data } = await supabase
+    .from("player_achievements")
+    .select("code, created_at, achievements(title_pl, title_en, title_uk)")
+    .eq("player_id", playerId)
+    .order("created_at", { ascending: false });
+  return (data ?? []).map((r: any) => {
+    const a = Array.isArray(r.achievements) ? r.achievements[0] : r.achievements;
+    return {
+      code: r.code,
+      created_at: r.created_at,
+      title_pl: a?.title_pl ?? null,
+      title_en: a?.title_en ?? null,
+      title_uk: a?.title_uk ?? null,
+    };
+  });
+}

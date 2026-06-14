@@ -209,6 +209,152 @@ const SITE: Record<string, Dict> = {
     uk: "Показуємо найкращу десятку.",
   },
   ranking_anon: { pl: "Gracz", en: "Player", uk: "Гравець" },
+
+  // ── 6.2 Кабінет: банери ──
+  cab_welcome: {
+    pl: "✅ Profil utworzony. Ustaw pseudonim, aby zapisać się na grę.",
+    en: "✅ Profile created. Set a callsign to sign up for a game.",
+    uk: "✅ Профіль створено. Вкажи позивний, щоб записатися на гру.",
+  },
+  cab_callsign_saved: { pl: "✅ Pseudonim zapisany.", en: "✅ Callsign saved.", uk: "✅ Позивний збережено." },
+  cab_reg_ok: { pl: "✅ Zapisano na grę.", en: "✅ Signed up.", uk: "✅ Записано на гру." },
+  cab_unreg_ok: { pl: "✅ Wypisano z gry.", en: "✅ Cancelled.", uk: "✅ Відписано." },
+  cab_checkin_ok: { pl: "✅ Check-in zaliczony!", en: "✅ Checked in!", uk: "✅ Чек-ін зараховано!" },
+
+  // ── 6.2 Кабінет: помилки ──
+  err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
+  err_game_not_found: { pl: "Nie znaleziono gry.", en: "Game not found.", uk: "Гру не знайдено." },
+  err_reg_closed: {
+    pl: "Rejestracja na tę grę jest już zamknięta.",
+    en: "Registration for this game is closed.",
+    uk: "Реєстрацію на цю гру закрито.",
+  },
+  err_game_full: { pl: "Brak wolnych miejsc.", en: "No spots left.", uk: "Немає вільних місць." },
+  err_need_callsign: {
+    pl: "Najpierw ustaw pseudonim.",
+    en: "Set a callsign first.",
+    uk: "Спершу вкажи позивний.",
+  },
+  err_cancel_locked: {
+    pl: "Za późno na anulowanie (mniej niż 24 godz. — to zobowiązanie).",
+    en: "Too late to cancel (under 24 h — it's a commitment).",
+    uk: "Запізно для скасування (менше 24 год — це зобов'язання).",
+  },
+  err_checkin_window: {
+    pl: "Check-in jest możliwy tylko w oknie czasowym gry.",
+    en: "Check-in is only possible within the game's time window.",
+    uk: "Чек-ін можливий лише у часовому вікні гри.",
+  },
+  err_not_registered: {
+    pl: "Najpierw zapisz się na grę.",
+    en: "Sign up for the game first.",
+    uk: "Спершу запишись на гру.",
+  },
+  err_too_far: {
+    pl: "Jesteś za daleko od miejsca gry.",
+    en: "You're too far from the game location.",
+    uk: "Ти задалеко від місця гри.",
+  },
+  err_checkin_already: {
+    pl: "Już zaliczono check-in.",
+    en: "Already checked in.",
+    uk: "Чек-ін уже зараховано.",
+  },
+  err_geo: {
+    pl: "Nie udało się ustalić lokalizacji.",
+    en: "Couldn't get your location.",
+    uk: "Не вдалося визначити геолокацію.",
+  },
+  err_callsign_empty: {
+    pl: "Pseudonim: 2–32 znaki.",
+    en: "Callsign: 2–32 characters.",
+    uk: "Позивний: 2–32 символи.",
+  },
+  err_callsign_taken: {
+    pl: "Ten pseudonim jest już zajęty.",
+    en: "That callsign is already taken.",
+    uk: "Цей позивний уже зайнятий.",
+  },
+
+  // ── 6.2 Standalone / позивний ──
+  standalone_title: { pl: "Graj bez Telegrama", en: "Play without Telegram", uk: "Грати без Telegram" },
+  standalone_intro: {
+    pl: "Nie chcesz łączyć Telegrama? Załóż profil gracza na samym e-mailu.",
+    en: "Don't want to link Telegram? Create a player profile with just e-mail.",
+    uk: "Не хочеш прив'язувати Telegram? Створи профіль гравця лише на e-mail.",
+  },
+  standalone_btn: { pl: "Utwórz profil gracza", en: "Create player profile", uk: "Створити профіль гравця" },
+  or_divider: { pl: "albo", en: "or", uk: "або" },
+  callsign_title: { pl: "Twój pseudonim", en: "Your callsign", uk: "Твій позивний" },
+  callsign_intro: {
+    pl: "Wybierz unikalny pseudonim — będzie widoczny w rankingu i na grach.",
+    en: "Pick a unique callsign — shown in the ranking and at games.",
+    uk: "Обери унікальний позивний — він буде в рейтингу й на іграх.",
+  },
+  callsign_ph: { pl: "np. Ghost", en: "e.g. Ghost", uk: "напр. Ghost" },
+  callsign_btn: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
+
+  // ── 6.2 Профіль ──
+  prof_section: { pl: "Profil", en: "Profile", uk: "Профіль" },
+  prof_reliability: { pl: "Niezawodność", en: "Reliability", uk: "Надійність" },
+
+  // ── 6.2 Ачівки ──
+  ach_title: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" },
+  ach_empty: { pl: "Brak osiągnięć.", en: "No achievements yet.", uk: "Поки що немає ачівок." },
+
+  // ── 6.2 Мої ігри ──
+  mygames_title: { pl: "Moje gry", en: "My games", uk: "Мої ігри" },
+  mygames_empty: {
+    pl: "Brak nadchodzących gier.",
+    en: "No upcoming games.",
+    uk: "Немає майбутніх ігор.",
+  },
+  regst_registered: { pl: "Zapisany", en: "Signed up", uk: "Записаний" },
+  regst_cancelled: { pl: "Wypisany", en: "Cancelled", uk: "Відписаний" },
+  regst_no_show: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },
+  game_checked_in: { pl: "✅ Check-in zaliczony", en: "✅ Checked in", uk: "✅ Чек-ін є" },
+  reg_locked_info: {
+    pl: "Rejestracja zamknięta",
+    en: "Registration closed",
+    uk: "Реєстрацію закрито",
+  },
+  cancel_locked_info: {
+    pl: "Anulowanie niedostępne (zobowiązanie)",
+    en: "Cancellation locked (commitment)",
+    uk: "Скасування недоступне (зобов'язання)",
+  },
+  btn_register: { pl: "Zapisz się", en: "Sign up", uk: "Записатися" },
+  btn_unregister: { pl: "Wypisz się", en: "Cancel", uk: "Відписатися" },
+  web_checkin_btn: { pl: "Check-in (lokalizacja)", en: "Check in (location)", uk: "Чек-ін (геолокація)" },
+  checkin_locating: { pl: "Ustalam lokalizację…", en: "Locating…", uk: "Визначаю геолокацію…" },
+  checkin_geo_err: {
+    pl: "Brak dostępu do lokalizacji.",
+    en: "Location access denied.",
+    uk: "Немає доступу до геолокації.",
+  },
+
+  // ── 6.2 Форма запису ──
+  reg_rental_q: {
+    pl: "Potrzebuję wypożyczenia sprzętu",
+    en: "I need rental gear",
+    uk: "Потрібна оренда спорядження",
+  },
+  reg_transport_q: { pl: "Transport", en: "Transport", uk: "Транспорт" },
+  reg_transport_own: { pl: "Własnym transportem", en: "My own transport", uk: "Своїм ходом" },
+  reg_transport_need: { pl: "Potrzebuję podwózki", en: "I need a ride", uk: "Потребую підвезти" },
+  reg_from_ph: { pl: "Skąd jedziesz?", en: "Where from?", uk: "Звідки їдеш?" },
+  reg_seats_ph: { pl: "Wolne miejsca w aucie", en: "Free seats in car", uk: "Вільних місць в авто" },
+
+  // ── 6.2 Історія балів ──
+  hist_title: { pl: "Historia punktów", en: "Points history", uk: "Історія балів" },
+  hist_empty: { pl: "Brak historii.", en: "No history yet.", uk: "Поки що порожньо." },
+  reason_attend: { pl: "Obecność na grze", en: "Game attendance", uk: "Явка на гру" },
+  reason_noshow: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },
+  reason_friend: { pl: "Przyprowadzony znajomy", en: "Referred friend", uk: "Приведений друг" },
+  reason_achievement: { pl: "Osiągnięcie", en: "Achievement", uk: "Ачівка" },
+  reason_rank_purchase: { pl: "Zakup stopnia", en: "Rank purchase", uk: "Купівля звання" },
+  reason_purchase: { pl: "Zakup w sklepie", en: "Shop purchase", uk: "Купівля в магазині" },
+  reason_manual: { pl: "Korekta admina", en: "Admin adjustment", uk: "Корекція адміна" },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {

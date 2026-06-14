@@ -26,6 +26,7 @@ import { getState, setState, clearState } from "./state";
 import { tr, POLL_QUESTION, pollWinnerText, lotteryWinnerText } from "./strings";
 import { currentQuarter, prevQuarter } from "./season";
 import { createLinkCode } from "./identities";
+import { confirmReferralCore } from "./referrals";
 import {
   parseDateOnly,
   validTime,
@@ -533,59 +534,28 @@ async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean
     .insert({ inviter_id: inviterId, invited_id: invited.id, status: "pending" });
 }
 
-// Авто-зарахування реферала на ПЕРШОМУ чек-іні новачка: +бали інвайтеру, ачівка Recruiter, знижка.
+// Авто-зарахування реферала на ПЕРШОМУ чек-іні новачка (ядро — lib/referrals.ts),
+// тут лише Telegram-нотифікація інвайтеру.
 async function confirmReferral(invited: any, gameId: number, gamesPlayedAfter: number) {
-  if (gamesPlayedAfter !== 1) return; // лише перша гра новачка
-  if (!(await featureEnabled("referrals"))) return;
-  const { data: ref } = await supabase
-    .from("referrals")
-    .select("id, inviter_id")
-    .eq("invited_id", invited.id)
-    .eq("status", "pending")
-    .maybeSingle();
-  if (!ref) return;
-  await supabase
-    .from("referrals")
-    .update({ status: "confirmed", game_id: gameId, confirmed_at: new Date().toISOString() })
-    .eq("id", ref.id);
-
-  const { data: inviter } = await supabase
-    .from("players")
-    .select("id, callsign, name, lang, tg_user_id, has_patch")
-    .eq("id", ref.inviter_id)
-    .single();
-  if (!inviter) return;
-  const ilang = (inviter.lang as Lang) ?? "uk";
-
-  const pts = await awardPoints({
-    playerId: inviter.id,
-    reason: "friend",
-    baseDelta: await getPointValue("pts_friend", 10),
-    gameId,
-    meta: `invited:${invited.id}`,
-    hasPatch: !!inviter.has_patch,
-  });
-  const ach = await grantAchievement(inviter.id, "recruiter", gameId, !!inviter.has_patch);
-
+  const res = await confirmReferralCore(invited, gameId, gamesPlayedAfter);
+  if (!res) return;
+  const ilang = (res.inviter.lang as Lang) ?? "uk";
   // Знижка на цю гру: 1 друг → −50%, 2+ → безкоштовно.
-  const { count } = await supabase
-    .from("referrals")
-    .select("*", { count: "exact", head: true })
-    .eq("inviter_id", inviter.id)
-    .eq("game_id", gameId)
-    .eq("status", "confirmed");
-  const discount = (count ?? 0) >= 2 ? tr(ilang, "ref_disc_free") : tr(ilang, "ref_disc_half");
-
-  const who = invited.callsign ?? invited.name ?? "?";
-  const { data: game } = await supabase.from("games").select("title").eq("id", gameId).single();
-  if (inviter.tg_user_id) {
+  const discount =
+    res.confirmedCount >= 2 ? tr(ilang, "ref_disc_free") : tr(ilang, "ref_disc_half");
+  if (res.inviter.tg_user_id) {
     try {
       await bot.api.sendMessage(
-        inviter.tg_user_id,
-        tr(ilang, "ref_bonus_inviter", { who, pts, title: game?.title ?? "ASG", discount }),
+        res.inviter.tg_user_id,
+        tr(ilang, "ref_bonus_inviter", {
+          who: res.invitedWho,
+          pts: res.pts,
+          title: res.gameTitle ?? "ASG",
+          discount,
+        }),
       );
     } catch {}
-    if (ach) await sendAchievements(inviter.tg_user_id, ilang, [ach]);
+    if (res.ach) await sendAchievements(res.inviter.tg_user_id, ilang, [res.ach]);
   }
 }
 
