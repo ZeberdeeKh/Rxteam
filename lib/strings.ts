@@ -547,7 +547,36 @@ const S: Record<string, Dict> = {
     en: "⏰ Soon! «{title}» starts at {when}. Don't forget to check in.",
     uk: "⏰ Зовсім скоро! Старт «{title}» о {when}. Не забудь про чек-ін.",
   },
+
+  // голосування за локацію — /poll, /pollclose
+  poll_off: {
+    pl: "Głosowanie jest teraz wyłączone.",
+    en: "Voting is currently disabled.",
+    uk: "Голосування зараз вимкнене.",
+  },
+  poll_need_loc: {
+    pl: "Potrzebne min. 2 lokacje (/addlocation).",
+    en: "Need at least 2 locations (/addlocation).",
+    uk: "Потрібно щонайменше 2 локації (/addlocation).",
+  },
+  poll_posted: {
+    pl: "✅ Głosowanie opublikowane w temacie. Zamknięcie: /pollclose",
+    en: "✅ Poll posted in the topic. Close it: /pollclose",
+    uk: "✅ Опитування опубліковано в топіку. Закрити: /pollclose",
+  },
+  poll_none_open: {
+    pl: "Brak otwartego głosowania.",
+    en: "No open poll.",
+    uk: "Немає відкритого опитування.",
+  },
+  poll_closed_admin: { pl: "Głosowanie zamknięte.", en: "Poll closed.", uk: "Опитування закрито." },
 };
+
+// Двомовний (PL/UA) текст для постів у групу — питання опитування і результат.
+export const POLL_QUESTION = "📊 Gdzie gramy następnym razem? / Де граємо наступного разу?";
+export function pollWinnerText(loc: string, votes: number): string {
+  return `🏁 Zwycięzca głosowania: ${loc} (${votes}) / Переможець голосування: ${loc} (${votes})`;
+}
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
   let s = (S[key] && (S[key][lang] ?? S[key].en)) ?? key;

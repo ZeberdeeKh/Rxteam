@@ -23,7 +23,7 @@ import {
   type GrantedAch,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
-import { tr } from "./strings";
+import { tr, POLL_QUESTION, pollWinnerText } from "./strings";
 import {
   parseDateOnly,
   validTime,
@@ -163,6 +163,97 @@ async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: stri
   });
   await ctx.reply(tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"));
 }
+
+// ─────────────────────── Голосування за локацію ───────────────────────
+
+bot.command("poll", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!hasPerm(p, "games")) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  if (!(await featureEnabled("voting"))) {
+    await ctx.reply(tr(lang, "poll_off"));
+    return;
+  }
+  const chatId = await getSetting("announce_chat_id");
+  if (!chatId) {
+    await ctx.reply(tr(lang, "gamenew_no_topic"));
+    return;
+  }
+  const { data: locs } = await supabase.from("locations").select("id, name").order("id");
+  if (!locs || locs.length < 2) {
+    await ctx.reply(tr(lang, "poll_need_loc"));
+    return;
+  }
+  const picked = locs.slice(0, 10); // Telegram-poll: максимум 10 опцій
+  const options = picked.map((l) => l.name.slice(0, 100));
+  const threadId = await getSetting("announce_thread_id");
+  const msg = await ctx.api.sendPoll(Number(chatId), POLL_QUESTION, options, {
+    is_anonymous: true,
+    ...(threadId ? { message_thread_id: Number(threadId) } : {}),
+  });
+  await supabase.from("polls").insert({
+    tg_poll_id: msg.poll.id,
+    chat_id: Number(chatId),
+    message_id: msg.message_id,
+    thread_id: threadId ? Number(threadId) : null,
+    location_ids: picked.map((l) => l.id),
+    status: "open",
+  });
+  await ctx.reply(tr(lang, "poll_posted"));
+});
+
+bot.command("pollclose", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!hasPerm(p, "games")) {
+    await ctx.reply(tr(lang, "not_admin"));
+    return;
+  }
+  const { data: poll } = await supabase
+    .from("polls")
+    .select("*")
+    .eq("status", "open")
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!poll) {
+    await ctx.reply(tr(lang, "poll_none_open"));
+    return;
+  }
+  let winnerIdx = 0;
+  let winnerVotes = 0;
+  try {
+    const stopped = await ctx.api.stopPoll(poll.chat_id, poll.message_id);
+    stopped.options.forEach((o, i) => {
+      if (o.voter_count > winnerVotes) {
+        winnerVotes = o.voter_count;
+        winnerIdx = i;
+      }
+    });
+  } catch (e) {
+    console.error("stopPoll failed", e);
+  }
+  await supabase
+    .from("polls")
+    .update({ status: "closed", closed_at: new Date().toISOString() })
+    .eq("id", poll.id);
+
+  const locId = (poll.location_ids as number[])[winnerIdx];
+  const { data: loc } = await supabase.from("locations").select("name").eq("id", locId).single();
+  try {
+    await ctx.api.sendMessage(poll.chat_id, pollWinnerText(loc?.name ?? "—", winnerVotes), {
+      ...(poll.thread_id ? { message_thread_id: poll.thread_id } : {}),
+    });
+  } catch (e) {
+    console.error("winner post failed", e);
+  }
+  await ctx.reply(tr(lang, "poll_closed_admin"));
+});
 
 // ─────────────────────── Carpool: керування водія ───────────────────────
 
