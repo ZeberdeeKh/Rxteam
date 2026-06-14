@@ -178,7 +178,8 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
   - ⬜ **Лишилось:** показ знижки/реф-статусу на адмін-екрані чек-іну (зробимо разом з адмін-UI).
 - 🟡 **5. Решта** — ГОТОВО: carpool — `/drivers` (пасажир бачить водіїв: звідки/місця/контакт) і `/myride` (водій керує місцями ➖/➕, відкриває/закриває набір), підказка водієві після реєстрації; нагадування `/api/cron/reminders` (−день о 18:00 / −2год, ідемпотентно, прапорці в `games`, `etap5.sql`).
   - ⚙️ **Запуск reminders:** зовнішній пінгер **cron-job.org** кожні 15 хв (GET + `Authorization: Bearer <CRON_SECRET>`) — Vercel Hobby крон лише раз/добу й уже зайнятий (`cleanup`+`noshow`).
-  - ⬜ **Лишилось:** голосування за локацію (−14 днів), лотерея надійних (квартал) + ачівка Iron Discipline, «У цифрах», лист очікування (опц.), мультимова сайту
+  - ✅ **Голосування за локацію:** `/poll` (адмін, право games) → нативний Telegram-poll зі списком локацій у топік; `/pollclose` → закриває й оголошує переможця. Таблиця `polls` (`etap5b.sql`).
+  - ⬜ **Лишилось:** лотерея надійних (квартал) + ачівка Iron Discipline, «У цифрах», лист очікування (опц.), мультимова сайту
 - ⬜ **6. Сайт** (rxteam.pl) — Supabase Auth (email), кабінет+історія, рейтинг, календар, самочек-ін для не-TG, магазин, адмінка/налаштування (блоки анонсу, ціни, бали, ролі)
 - ⬜ **7. Стиль** — фінальний дизайн із Google AI Studio
 
@@ -189,10 +190,10 @@ Telegram-бот + сайт (**rxteam.pl**) для організації airsoft
 - **Supabase:** ref `svmsabjrswrxgcwwbgla` (eu-west-1). Секрети — у Vercel env + локальний `.env` (gitignored).
 - **Стек:** Next.js 14, grammY (webhook), @supabase/supabase-js (secret key, лише сервер), luxon (Europe/Warsaw).
 - **Модулі:** `lib/bot.ts` (хендлери), `lib/i18n.ts` (тримовні стек-тексти капчі/FAQ + анонс), `lib/strings.ts` (`tr(lang,key)` — мова гравця, варіант A), `lib/players.ts`, `lib/settings.ts`, `lib/state.ts` (стан діалогів у `user_states`), `lib/games.ts` (час/вікна/анонс/haversine).
-- **Команди:** /start (+deep-link `g<id>`, `ref<id>`), /lang, /profile, /rules, /top, /patch, /rank, /ref, /drivers, /myride, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /markcheckin (адмін, право checkin), /cancel. Меню — через Bot API `setMyCommands`.
+- **Команди:** /start (+deep-link `g<id>`, `ref<id>`), /lang, /profile, /rules, /top, /patch, /rank, /ref, /drivers, /myride, /admin, /sethere, /addlocation, /locations, /newgame, /checkin, /markcheckin (адмін, право checkin), /poll /pollclose (адмін, право games), /cancel. Меню — через Bot API `setMyCommands`.
 - **Cron:** `…/api/cron/cleanup` (заявки-капчі, 03:00) + `…/api/cron/noshow` (неявки, 22:00) у `vercel.json`; `…/api/cron/reminders` (нагадування, кожні 15 хв) — зовнішній пінгер **cron-job.org**. Усі захищені `CRON_SECRET`.
 - **Майстер-адмін:** бутстрап за username (`master_username`=`delltex`).
-- **Міграції (виконані в Supabase SQL Editor):** `supabase/schema.sql`, `etap2.sql`, `etap2b.sql`, `etap3.sql`, `etap4.sql`.
+- **Міграції (виконані в Supabase SQL Editor):** `supabase/schema.sql`, `etap2.sql`, `etap2b.sql`, `etap3.sql`, `etap4.sql`, `etap5.sql`, `etap5b.sql`.
 
 **Дев-цикл:** правки в `lib/` → `npx tsc --noEmit` → commit → `git push` (деплой сам ~1 хв). Меню/опис бота — через Bot API. Нові поля → окрема `supabase/etapX.sql` (організатор виконує в SQL Editor).
 
