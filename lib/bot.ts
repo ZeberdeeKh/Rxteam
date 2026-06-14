@@ -462,13 +462,21 @@ bot.callbackQuery("patchreq", async (ctx) => {
   }
 });
 
+// Окремий запит гравця замість вкладеного embed: patch_requests має ДВА FK на players
+// (player_id і decided_by), тож "players(...)" неоднозначний і запит падає.
 async function loadPatchReq(id: number) {
-  const { data } = await supabase
+  const { data: req } = await supabase
     .from("patch_requests")
-    .select("id, status, player_id, players(id, callsign, name, lang, tg_user_id, rank)")
+    .select("id, status, player_id")
     .eq("id", id)
     .single();
-  return data;
+  if (!req) return null;
+  const { data: player } = await supabase
+    .from("players")
+    .select("id, callsign, name, lang, tg_user_id, rank")
+    .eq("id", req.player_id)
+    .single();
+  return { ...req, players: player };
 }
 
 bot.callbackQuery(/^patchok:(\d+)$/, async (ctx) => {
