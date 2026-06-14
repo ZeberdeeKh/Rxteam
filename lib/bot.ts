@@ -4,6 +4,7 @@ import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from
 import { makeChallenge } from "./captcha";
 import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
 import { ensurePlayer, setPlayerLang, getTopPlayers, getPlayerRank } from "./players";
+import { awardPoints, getPointValue, getReliability } from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
 import {
@@ -318,6 +319,12 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     .from("players")
     .update({ games_played: (target?.games_played ?? 0) + 1 })
     .eq("id", playerId);
+  await awardPoints({
+    playerId,
+    reason: "attend",
+    baseDelta: await getPointValue("pts_attend", 10),
+    gameId,
+  });
   // Якщо гравця вже позначили як неявку — повертаємо в registered.
   await supabase
     .from("registrations")
@@ -778,6 +785,13 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
     .from("players")
     .update({ games_played: (p.games_played ?? 0) + 1 })
     .eq("id", p.id);
+  await awardPoints({
+    playerId: p.id,
+    reason: "attend",
+    baseDelta: await getPointValue("pts_attend", 10),
+    gameId,
+    hasPatch: !!p.has_patch,
+  });
   await clearState(ctx.from!.id);
   await ctx.reply(tr(lang, "checkin_done"), { reply_markup: { remove_keyboard: true } });
 }
