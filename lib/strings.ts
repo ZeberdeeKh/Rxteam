@@ -593,6 +593,18 @@ const S: Record<string, Dict> = {
     uk: "✅ Лотерея за {q}: учасників {n}, переможець {who}.",
   },
 
+  // прив'язка сайту — /linksite
+  linksite_off: {
+    pl: "Łączenie konta ze stroną jest teraz wyłączone.",
+    en: "Linking your account to the site is currently disabled.",
+    uk: "Прив'язка акаунта до сайту зараз вимкнена.",
+  },
+  linksite_msg: {
+    pl: "🔗 Połącz konto ze stroną\nTwój kod: {code}\nWażny {min} min.\n\nWejdź na {url}, zaloguj się e-mailem i wpisz ten kod w profilu — historia będzie wspólna.",
+    en: "🔗 Link your account to the site\nYour code: {code}\nValid for {min} min.\n\nGo to {url}, log in with e-mail and enter this code in your profile — your history will be shared.",
+    uk: "🔗 Прив'яжи акаунт до сайту\nТвій код: {code}\nДіє {min} хв.\n\nЗайди на {url}, увійди через e-mail і впиши цей код у кабінеті — історія буде спільна.",
+  },
+
   // «У цифрах» — /stats
   stats: {
     pl: "📊 W liczbach — {q}\nGry: {games}\nCheck-iny: {checkins}\nGracze: {players}\nNowicjusze: {newcomers}\nNieobecności: {noshows}",

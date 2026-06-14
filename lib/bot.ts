@@ -25,6 +25,7 @@ import {
 import { getState, setState, clearState } from "./state";
 import { tr, POLL_QUESTION, pollWinnerText, lotteryWinnerText } from "./strings";
 import { currentQuarter, prevQuarter } from "./season";
+import { createLinkCode } from "./identities";
 import {
   parseDateOnly,
   validTime,
@@ -96,6 +97,19 @@ bot.command("ref", async (ctx) => {
     .eq("status", "confirmed");
   const pts = await getPointValue("pts_friend", 10);
   await ctx.reply(tr(lang, "ref_link", { link, pts, confirmed: count ?? 0 }));
+});
+
+bot.command("linksite", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("site_link"))) {
+    await ctx.reply(tr(lang, "linksite_off"));
+    return;
+  }
+  const { code } = await createLinkCode(p.id, ctx.from!.id);
+  const url = (await getSetting("site_url")) ?? "https://rxteam.vercel.app";
+  await ctx.reply(tr(lang, "linksite_msg", { code, min: 15, url }));
 });
 
 // ─────────────────────────── Carpool: водії ───────────────────────────

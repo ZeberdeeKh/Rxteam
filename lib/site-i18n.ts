@@ -93,6 +93,46 @@ const SITE: Record<string, Dict> = {
     uk: "Щось пішло не так. Спробуй ще раз.",
   },
   cabinet_title: { pl: "Mój profil", en: "My profile", uk: "Кабінет" },
+
+  // ── Лінк Telegram ──
+  link_title: { pl: "Połącz z Telegramem", en: "Link Telegram", uk: "Прив'язати Telegram" },
+  link_intro: {
+    pl: "Masz już profil w bocie? Połącz go, aby mieć wspólną historię, punkty i stopień.",
+    en: "Already have a profile in the bot? Link it to share history, points and rank.",
+    uk: "Уже маєш профіль у боті? Прив'яжи його, щоб історія, бали й звання були спільні.",
+  },
+  link_how: {
+    pl: "W bocie wpisz /linksite, skopiuj kod i wklej go poniżej (ważny 15 min).",
+    en: "In the bot type /linksite, copy the code and paste it below (valid 15 min).",
+    uk: "У боті введи /linksite, скопіюй код і встав його нижче (діє 15 хв).",
+  },
+  link_code_label: { pl: "Kod łączący", en: "Link code", uk: "Код прив'язки" },
+  link_btn: { pl: "Połącz", en: "Link", uk: "Прив'язати" },
+  link_ok: {
+    pl: "✅ Połączono z Telegramem.",
+    en: "✅ Linked to Telegram.",
+    uk: "✅ Прив'язано до Telegram.",
+  },
+  link_err_not_found: {
+    pl: "Nieprawidłowy kod.",
+    en: "Invalid code.",
+    uk: "Невірний код.",
+  },
+  link_err_expired: { pl: "Kod wygasł. Wygeneruj nowy w bocie.", en: "Code expired. Generate a new one in the bot.", uk: "Код прострочено. Згенеруй новий у боті." },
+  link_err_used: { pl: "Kod już użyty.", en: "Code already used.", uk: "Код уже використано." },
+  link_err_taken: {
+    pl: "To konto jest już połączone z innym profilem.",
+    en: "This account is already linked to another profile.",
+    uk: "Цей акаунт уже прив'язаний до іншого профілю.",
+  },
+
+  // ── Профіль (мінімум для 6.0) ──
+  prof_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
+  prof_rank: { pl: "Stopień", en: "Rank", uk: "Звання" },
+  prof_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
+  prof_balance: { pl: "Saldo", en: "Balance", uk: "Баланс" },
+  prof_games: { pl: "Rozegrane gry", en: "Games played", uk: "Зіграно ігор" },
+  prof_no_rank: { pl: "brak (potrzebny patch)", en: "none (patch needed)", uk: "немає (потрібен патч)" },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {
