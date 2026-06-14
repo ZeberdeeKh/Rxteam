@@ -10,7 +10,14 @@ import {
   getPlayerRank,
   getAdminsWithPerm,
 } from "./players";
-import { awardPoints, getPointValue, getReliability } from "./economy";
+import {
+  awardPoints,
+  getPointValue,
+  getReliability,
+  nextRank,
+  RANK_COST_KEY,
+  RANK_COST_FALLBACK,
+} from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
 import {
@@ -520,6 +527,70 @@ bot.callbackQuery(/^patchhand:(\d+)$/, async (ctx) => {
       await bot.api.sendMessage(target.tg_user_id, tr((target.lang as Lang) ?? "uk", "patch_you_handed"));
     } catch {}
   }
+});
+
+// ─────────────────────────────── Звання ───────────────────────────────
+
+bot.command("rank", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("economy"))) {
+    await ctx.reply(tr(lang, "econ_off"));
+    return;
+  }
+  const balance = p.points_balance ?? 0;
+  if (!p.has_patch) {
+    await ctx.reply(tr(lang, "rank_need_patch", { balance }));
+    return;
+  }
+  const current = p.rank ?? "Recruit";
+  const next = nextRank(current);
+  if (!next) {
+    await ctx.reply(tr(lang, "rank_max", { rank: current, balance }));
+    return;
+  }
+  const cost = await getPointValue(RANK_COST_KEY[next], RANK_COST_FALLBACK[next]);
+  let msg = tr(lang, "rank_with_next", { rank: current, balance, next, cost });
+  if (balance >= cost) {
+    const kb = new InlineKeyboard().text(tr(lang, "btn_buy_rank", { next, cost }), "buyrank");
+    await ctx.reply(msg, { reply_markup: kb });
+  } else {
+    msg += "\n" + tr(lang, "rank_not_enough", { need: cost - balance, next });
+    await ctx.reply(msg);
+  }
+});
+
+bot.callbackQuery("buyrank", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("economy"))) {
+    await ctx.editMessageText(tr(lang, "econ_off"));
+    return;
+  }
+  const balance = p.points_balance ?? 0;
+  if (!p.has_patch) {
+    await ctx.editMessageText(tr(lang, "rank_need_patch", { balance }));
+    return;
+  }
+  const current = p.rank ?? "Recruit";
+  const next = nextRank(current);
+  if (!next) {
+    await ctx.editMessageText(tr(lang, "rank_max", { rank: current, balance }));
+    return;
+  }
+  const cost = await getPointValue(RANK_COST_KEY[next], RANK_COST_FALLBACK[next]);
+  if (balance < cost) {
+    await ctx.editMessageText(tr(lang, "rank_not_enough", { need: cost - balance, next }));
+    return;
+  }
+  const newBalance = balance - cost;
+  await supabase
+    .from("point_log")
+    .insert({ player_id: p.id, delta: -cost, reason: "rank_purchase", meta: next });
+  await supabase.from("players").update({ points_balance: newBalance, rank: next }).eq("id", p.id);
+  await ctx.editMessageText(tr(lang, "rank_bought", { rank: next, balance: newBalance }));
 });
 
 // ───────────────────────────── Callback queries ─────────────────────────────

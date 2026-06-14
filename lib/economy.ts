@@ -12,6 +12,13 @@ export const RANK_COST_KEY: Record<string, string> = {
   "Team Leader": "rank_cost_team",
 };
 
+// Запасні вартості (якщо settings порожні).
+export const RANK_COST_FALLBACK: Record<string, number> = {
+  Scout: 100,
+  "Squad Leader": 250,
+  "Team Leader": 500,
+};
+
 // Числове значення з settings зі знаком; fallback якщо не задано/невалідне.
 export async function getPointValue(key: string, fallback: number): Promise<number> {
   const v = await getSetting(key);

@@ -409,6 +409,43 @@ const S: Record<string, Dict> = {
     en: "🎖 Patch handed! Welcome to RX Team. Rank: Recruit. 100% points from now on. Buy ranks via /rank.",
     uk: "🎖 Патч видано! Вітаємо в RX Team. Звання: Recruit. Відтепер 100% балів. Звання купуються через /rank.",
   },
+
+  // звання — /rank
+  econ_off: {
+    pl: "Ekonomia jest teraz wyłączona.",
+    en: "The economy is currently disabled.",
+    uk: "Економіка зараз вимкнена.",
+  },
+  rank_with_next: {
+    pl: "🎖 Stopień: {rank}\n💰 Saldo: {balance} pkt\nNastępny: {next} — koszt {cost} pkt",
+    en: "🎖 Rank: {rank}\n💰 Balance: {balance} pts\nNext: {next} — cost {cost} pts",
+    uk: "🎖 Звання: {rank}\n💰 Баланс: {balance} б.\nНаступне: {next} — ціна {cost} б.",
+  },
+  rank_max: {
+    pl: "🎖 Stopień: {rank} — maksymalny. 💰 Saldo: {balance} pkt",
+    en: "🎖 Rank: {rank} — top rank. 💰 Balance: {balance} pts",
+    uk: "🎖 Звання: {rank} — максимальне. 💰 Баланс: {balance} б.",
+  },
+  rank_need_patch: {
+    pl: "🎖 Stopień: brak — potrzebny patch.\n💰 Saldo: {balance} pkt\nStopnie odblokujesz po otrzymaniu patcha: /patch",
+    en: "🎖 Rank: none — patch required.\n💰 Balance: {balance} pts\nRanks unlock once you get the patch: /patch",
+    uk: "🎖 Звання: немає — потрібен патч.\n💰 Баланс: {balance} б.\nЗвання відкриються після отримання патча: /patch",
+  },
+  btn_buy_rank: {
+    pl: "⬆️ Kup: {next} ({cost})",
+    en: "⬆️ Buy: {next} ({cost})",
+    uk: "⬆️ Купити: {next} ({cost})",
+  },
+  rank_not_enough: {
+    pl: "Brakuje {need} pkt do stopnia {next}.",
+    en: "You need {need} more pts for {next}.",
+    uk: "Бракує {need} б. до звання {next}.",
+  },
+  rank_bought: {
+    pl: "🎉 Gratulacje! Nowy stopień: {rank}. 💰 Saldo: {balance} pkt",
+    en: "🎉 Congrats! New rank: {rank}. 💰 Balance: {balance} pts",
+    uk: "🎉 Вітаємо! Нове звання: {rank}. 💰 Баланс: {balance} б.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {
