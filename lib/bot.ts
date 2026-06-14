@@ -72,24 +72,37 @@ bot.command("admin", async (ctx) => {
   await ctx.reply(tr(lang, "admin_panel", { perms }));
 });
 
-// ── /sethere — зафіксувати топік для анонсів (адмін, у групі) ──
+// ── /sethere — зафіксувати топік для анонсів (адмін групи) ──
 bot.command("sethere", async (ctx) => {
-  const p = await ensurePlayer(ctx.from!);
-  const lang = p.lang as Lang;
-  if (!p.is_admin) {
-    await ctx.reply(tr(lang, "not_admin"));
-    return;
-  }
   if (ctx.chat.type === "private") {
-    await ctx.reply(tr(lang, "sethere_group_only"));
+    await ctx.reply("Виконай цю команду в групі, у топіку «Анонси».");
     return;
   }
+
+  // Перевірка прав через Telegram (працює і для анонімних адмінів — від імені групи).
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+
   await setSetting("announce_chat_id", String(ctx.chat.id));
   await setSetting(
     "announce_thread_id",
     ctx.message?.message_thread_id ? String(ctx.message.message_thread_id) : "",
   );
-  await ctx.reply(tr(lang, "sethere_ok"));
+  await ctx.reply("✅ Топік для анонсів збережено. Сюди йтимуть анонси ігор.");
 });
 
 // ── Анти-бот шилд: заявка на вступ → тримовна капча в особисті ──
