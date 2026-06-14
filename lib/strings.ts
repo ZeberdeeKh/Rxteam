@@ -272,6 +272,57 @@ const S: Record<string, Dict> = {
     en: "You've already checked in for this game.",
     uk: "Ти вже відмітився на цій грі.",
   },
+
+  // /top — рейтинг
+  top_title: {
+    pl: "🏆 Ranking — rozegrane gry",
+    en: "🏆 Leaderboard — games played",
+    uk: "🏆 Рейтинг — зіграні ігри",
+  },
+  top_empty: {
+    pl: "Nikt jeszcze nie rozegrał gry. Bądź pierwszy!",
+    en: "No games played yet. Be the first!",
+    uk: "Ще ніхто не зіграв жодної гри. Стань першим!",
+  },
+  top_line: { pl: "{place} {who} — {games}", en: "{place} {who} — {games}", uk: "{place} {who} — {games}" },
+  top_me: {
+    pl: "📊 Twoje miejsce: {place} ({games} gier)",
+    en: "📊 Your place: {place} ({games} games)",
+    uk: "📊 Твоє місце: {place} ({games} ігор)",
+  },
+
+  // ручний чек-ін адміном (/markcheckin)
+  mc_no_perm: {
+    pl: "⛔ Brak uprawnienia „check-in”.",
+    en: "⛔ You don't have the “check-in” permission.",
+    uk: "⛔ Немає права «чек-ін».",
+  },
+  mc_no_games: { pl: "Brak gier.", en: "No games.", uk: "Ігор немає." },
+  mc_pick_game: {
+    pl: "Wybierz grę do ręcznego check-inu:",
+    en: "Pick a game for manual check-in:",
+    uk: "Обери гру для ручного чек-іну:",
+  },
+  mc_no_players: {
+    pl: "Brak zapisanych graczy bez check-inu na tej grze.",
+    en: "No registered players awaiting check-in for this game.",
+    uk: "Немає записаних гравців без чек-іну на цій грі.",
+  },
+  mc_pick_player: {
+    pl: "Wybierz gracza do odznaczenia obecności:",
+    en: "Pick a player to mark present:",
+    uk: "Обери гравця, щоб відмітити присутність:",
+  },
+  mc_done: {
+    pl: "✅ {who} — check-in zaliczony (ręcznie, +1 gra).",
+    en: "✅ {who} — checked in (manual, +1 game).",
+    uk: "✅ {who} — чек-ін зараховано (вручну, +1 гра).",
+  },
+  mc_already: {
+    pl: "{who} ma już check-in na tej grze.",
+    en: "{who} is already checked in for this game.",
+    uk: "{who} вже має чек-ін на цій грі.",
+  },
 };
 
 export function tr(lang: Lang, key: string, vars?: Record<string, string | number>): string {

@@ -67,3 +67,24 @@ export async function getPlayerByTg(tgUserId: number) {
     .maybeSingle();
   return data;
 }
+
+// Топ гравців за к-стю зіграних ігор (для /top).
+export async function getTopPlayers(limit = 10) {
+  const { data } = await supabase
+    .from("players")
+    .select("id, callsign, name, games_played")
+    .gt("games_played", 0)
+    .order("games_played", { ascending: false })
+    .order("id", { ascending: true })
+    .limit(limit);
+  return data ?? [];
+}
+
+// Місце гравця в рейтингу: к-сть гравців із більшою к-стю ігор + 1 (нічиї ділять місце).
+export async function getPlayerRank(gamesPlayed: number): Promise<number> {
+  const { count } = await supabase
+    .from("players")
+    .select("*", { count: "exact", head: true })
+    .gt("games_played", gamesPlayed);
+  return (count ?? 0) + 1;
+}

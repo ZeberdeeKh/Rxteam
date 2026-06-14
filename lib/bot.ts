@@ -3,7 +3,7 @@ import { supabase } from "./supabase";
 import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
 import { makeChallenge } from "./captcha";
 import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
-import { ensurePlayer, setPlayerLang } from "./players";
+import { ensurePlayer, setPlayerLang, getTopPlayers, getPlayerRank } from "./players";
 import { getState, setState, clearState } from "./state";
 import { tr } from "./strings";
 import {
@@ -63,6 +63,33 @@ bot.command("rules", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
   await ctx.reply(faq[p.lang as Lang]);
+});
+
+bot.command("top", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const top = await getTopPlayers(10);
+  let msg = tr(lang, "top_title");
+  if (!top.length) {
+    msg += "\n\n" + tr(lang, "top_empty");
+  } else {
+    const medals = ["🥇", "🥈", "🥉"];
+    msg +=
+      "\n\n" +
+      top
+        .map((pl, i) =>
+          tr(lang, "top_line", {
+            place: medals[i] ?? `${i + 1}.`,
+            who: pl.callsign ?? pl.name ?? "—",
+            games: pl.games_played ?? 0,
+          }),
+        )
+        .join("\n");
+  }
+  const myPlace = await getPlayerRank(p.games_played ?? 0);
+  msg += "\n\n" + tr(lang, "top_me", { place: myPlace, games: p.games_played ?? 0 });
+  await ctx.reply(msg);
 });
 
 bot.command("admin", async (ctx) => {
