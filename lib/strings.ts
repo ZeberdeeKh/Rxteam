@@ -611,6 +611,18 @@ const S: Record<string, Dict> = {
     en: "📊 In numbers — {q}\nGames: {games}\nCheck-ins: {checkins}\nPlayers: {players}\nNewcomers: {newcomers}\nNo-shows: {noshows}",
     uk: "📊 У цифрах — {q}\nІгор: {games}\nЧек-інів: {checkins}\nГравців: {players}\nНовачків: {newcomers}\nНеявок: {noshows}",
   },
+
+  // модерація топіка «Анонси» — повідомлення в приват порушнику
+  announce_guard_warn: {
+    pl: "⛔ Temat „Zapowiedzi gier” (RX Team) jest tylko do czytania — piszą tam wyłącznie ogłoszenia bota. Twoja wiadomość została usunięta. Za kolejną wiadomość w tym temacie dostaniesz wyciszenie w grupie na 1 godzinę.",
+    en: "⛔ The «Game announcements» topic (RX Team) is read-only — only the bot posts announcements there. Your message was deleted. Another message in that topic will get you a 1-hour mute in the group.",
+    uk: "⛔ Топік «Анонси ігор» (RX Team) — лише для читання, туди пише тільки бот. Твоє повідомлення видалено. За наступне повідомлення в цьому топіку отримаєш мут у групі на 1 годину.",
+  },
+  announce_guard_muted: {
+    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 1 godzinę. Powód: ponowne wiadomości w temacie „Zapowiedzi gier”, gdzie piszą tylko ogłoszenia (bot). Za godzinę znów napiszesz w innych tematach.",
+    en: "🔇 You've been muted in the RX Team group for 1 hour. Reason: repeated messages in the «Game announcements» topic, which is for bot announcements only. In an hour you'll be able to post in other topics again.",
+    uk: "🔇 Тебе заглушено в групі RX Team на 1 годину. Причина: повторні повідомлення в топіку «Анонси ігор», куди пише лише бот. Через годину знову зможеш писати в інших топіках.",
+  },
 };
 
 // Двомовний (PL/UA) пост переможця лотереї у топік.

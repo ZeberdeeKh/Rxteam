@@ -59,6 +59,89 @@ bot.use(async (ctx, next) => {
   await next();
 });
 
+// ─── Гард топіка «Анонси»: туди пише лише бот; решту — видаляємо ───
+// 1-ше порушення → попередження в приват; 2-ге і кожне наступне → мут у групі
+// на 1 год (заборона писати скрізь) + пояснення в приват. Лічильник — announce_violations.
+const ANNOUNCE_MUTE_SECONDS = 60 * 60; // 1 година
+
+async function guardAnnounceTopic(ctx: Context): Promise<boolean> {
+  const msg = ctx.message;
+  const chat = ctx.chat;
+  const from = ctx.from;
+  if (!msg || !chat || !from) return false;
+  if (chat.type !== "group" && chat.type !== "supergroup") return false;
+  if (from.is_bot) return false; // боту в цей топік можна
+  if (!(await featureEnabled("announce_guard"))) return false;
+
+  const guardChatId = await getSetting("announce_chat_id");
+  const guardThreadId = await getSetting("announce_thread_id");
+  if (!guardChatId || !guardThreadId) return false;
+  if (String(chat.id) !== guardChatId) return false;
+  if (String(msg.message_thread_id ?? "") !== guardThreadId) return false;
+
+  // Видаляємо повідомлення (для адмінів Telegram може не дати — мовчки ігноруємо).
+  try {
+    await ctx.api.deleteMessage(chat.id, msg.message_id);
+  } catch (e) {
+    console.error("announce guard: delete failed", e);
+  }
+
+  // Лічильник порушень користувача.
+  const { data: row } = await supabase
+    .from("announce_violations")
+    .select("count")
+    .eq("tg_user_id", from.id)
+    .maybeSingle();
+  const violations = (row?.count ?? 0) + 1;
+  await supabase.from("announce_violations").upsert(
+    { tg_user_id: from.id, count: violations, last_at: new Date().toISOString() },
+    { onConflict: "tg_user_id" },
+  );
+
+  const lang = ((await getPlayerByTg(from.id))?.lang as Lang) ?? "uk";
+
+  if (violations === 1) {
+    // Перше порушення — лише попередження в приват (у топіку нічого не постимо).
+    try {
+      await bot.api.sendMessage(from.id, tr(lang, "announce_guard_warn"));
+    } catch {}
+    return true;
+  }
+
+  // 2-ге і кожне наступне — мут у групі на годину + пояснення в приват.
+  try {
+    await ctx.api.restrictChatMember(
+      chat.id,
+      from.id,
+      {
+        can_send_messages: false,
+        can_send_audios: false,
+        can_send_documents: false,
+        can_send_photos: false,
+        can_send_videos: false,
+        can_send_video_notes: false,
+        can_send_voice_notes: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+      },
+      { until_date: Math.floor(Date.now() / 1000) + ANNOUNCE_MUTE_SECONDS },
+    );
+  } catch (e) {
+    console.error("announce guard: restrict failed", e);
+  }
+  try {
+    await bot.api.sendMessage(from.id, tr(lang, "announce_guard_muted"));
+  } catch {}
+  return true;
+}
+
+// Перехоплюємо повідомлення в топіку анонсів до інших хендлерів.
+bot.use(async (ctx, next) => {
+  if (await guardAnnounceTopic(ctx)) return; // видалили — далі не обробляємо
+  await next();
+});
+
 // Апдейти chat_member: вступ/вихід учасників (потрібен allowed_updates: chat_member).
 bot.on("chat_member", async (ctx) => {
   const upd = ctx.chatMember;
