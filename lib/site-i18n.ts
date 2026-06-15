@@ -405,6 +405,56 @@ const SITE: Record<string, Dict> = {
   },
   shop_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
 
+  // ── Звання в магазині (купівля наступного — правила як у боті /rank) ──
+  shop_ranks_title: { pl: "Stopnie", en: "Ranks", uk: "Звання" },
+  shop_ranks_intro: {
+    pl: "Kupuj kolejne stopnie za punkty. Wymagany patch; stopnie zdobywasz po kolei.",
+    en: "Buy higher ranks with points. Patch required; ranks unlock one by one.",
+    uk: "Купуй вищі звання за бали. Потрібен патч; звання відкриваються по черзі.",
+  },
+  shop_rank_free: {
+    pl: "W zestawie z patchem",
+    en: "Included with the patch",
+    uk: "Входить із патчем",
+  },
+  shop_rank_current: { pl: "Aktualny", en: "Current", uk: "Поточне" },
+  shop_rank_owned: { pl: "Zdobyty", en: "Owned", uk: "Отримано" },
+  shop_rank_need_patch: {
+    pl: "Stopnie są dostępne po odebraniu patcha (członkostwo).",
+    en: "Ranks unlock once you receive the patch (membership).",
+    uk: "Звання доступні після отримання патча (членство).",
+  },
+  shop_rank_bought_ok: {
+    pl: "🎉 Gratulacje! Masz nowy stopień.",
+    en: "🎉 Congrats! You have a new rank.",
+    uk: "🎉 Вітаємо! У тебе нове звання.",
+  },
+  shop_err_rank_need_patch: {
+    pl: "Najpierw odbierz patch, aby kupować stopnie.",
+    en: "Get the patch first to buy ranks.",
+    uk: "Спершу отримай патч, щоб купувати звання.",
+  },
+  shop_err_rank_max: {
+    pl: "Masz już najwyższy stopień.",
+    en: "You already have the top rank.",
+    uk: "У тебе вже максимальне звання.",
+  },
+  shop_err_rank_balance: {
+    pl: "Za mało punktów na ten stopień.",
+    en: "Not enough points for this rank.",
+    uk: "Недостатньо балів на це звання.",
+  },
+  shop_err_rank_changed: {
+    pl: "Stopień się zmienił — odśwież stronę.",
+    en: "Your rank changed — refresh the page.",
+    uk: "Звання змінилося — онови сторінку.",
+  },
+  shop_err_rank_econ_off: {
+    pl: "Ekonomia punktów jest wyłączona.",
+    en: "The points economy is disabled.",
+    uk: "Економіку балів вимкнено.",
+  },
+
   // ── 6.4 Адмінка ──
   nav_admin: { pl: "Panel", en: "Admin", uk: "Адмінка" },
   adm_title: { pl: "Panel administracyjny", en: "Admin panel", uk: "Панель адміністратора" },

@@ -4,7 +4,13 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { featureEnabled } from "@/lib/settings";
-import { awardPoints } from "@/lib/economy";
+import {
+  awardPoints,
+  nextRank,
+  getPointValue,
+  RANK_COST_KEY,
+  RANK_COST_FALLBACK,
+} from "@/lib/economy";
 import { getSessionPlayer } from "@/lib/site-player";
 import { notifyAdminsPurchase } from "@/lib/notify";
 
@@ -52,4 +58,41 @@ export async function buyItem(formData: FormData) {
   revalidatePath("/shop");
   revalidatePath("/cabinet");
   back("?bought=1");
+}
+
+// Купівля наступного звання за бали. Ті самі правила, що й бот /rank:
+// потрібен патч, тільки наступне звання по черзі, ціна з Налаштувань (rank_cost_*).
+export async function buyRank(formData: FormData) {
+  if (!(await featureEnabled("shop"))) back("?err=disabled");
+  if (!(await featureEnabled("economy"))) back("?err=rank_econ_off");
+
+  const player = await getSessionPlayer();
+  if (!player) redirect("/login"); // лише linked-гравець із балансом
+
+  // Звання потребують патч (членство).
+  if (!player.has_patch) back("?err=rank_need_patch");
+
+  const current = player.rank ?? "Recruit";
+  const next = nextRank(current);
+  if (!next) back("?err=rank_max");
+
+  // Захист від гонки: купуємо саме показане у формі звання.
+  if (String(formData.get("rank") ?? "") !== next) back("?err=rank_changed");
+
+  const cost = await getPointValue(RANK_COST_KEY[next!], RANK_COST_FALLBACK[next!]);
+  const balance = player.points_balance ?? 0;
+  if (balance < cost) back("?err=rank_balance");
+
+  // Списання + підвищення звання (як у боті buyrank): point_log + оновлення гравця.
+  await supabase
+    .from("point_log")
+    .insert({ player_id: player.id, delta: -cost, reason: "rank_purchase", meta: next! });
+  await supabase
+    .from("players")
+    .update({ points_balance: balance - cost, rank: next! })
+    .eq("id", player.id);
+
+  revalidatePath("/shop");
+  revalidatePath("/cabinet");
+  back("?rank_bought=1");
 }
