@@ -515,6 +515,43 @@ const SITE: Record<string, Dict> = {
   adm_role_admin: { pl: "Admin", en: "Admin", uk: "Адмін" },
   adm_role_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
 
+  // Легенда дозволів (показується внизу «Ролі адмінів», лише майстру).
+  adm_perms_legend_title: {
+    pl: "Co oznaczają uprawnienia",
+    en: "What the permissions mean",
+    uk: "Що означають дозволи",
+  },
+  adm_perm_games: {
+    pl: "tworzenie i odwoływanie gier, zarządzanie lokalizacjami.",
+    en: "create and cancel games, manage locations.",
+    uk: "створення й скасування ігор, керування локаціями.",
+  },
+  adm_perm_rental: {
+    pl: "podgląd zgłoszeń wynajmu sprzętu.",
+    en: "view equipment rental requests.",
+    uk: "перегляд заявок на оренду спорядження.",
+  },
+  adm_perm_checkin: {
+    pl: "ręczne odhaczanie obecności graczy, eksport check-inów.",
+    en: "manually mark player attendance, export check-ins.",
+    uk: "ручне відмічання присутності гравців, експорт чек-інів.",
+  },
+  adm_perm_referrals: {
+    pl: "zatwierdzanie i odrzucanie poleceń.",
+    en: "confirm and reject referrals.",
+    uk: "підтвердження й відхилення рефералів.",
+  },
+  adm_perm_players: {
+    pl: "korekta punktów/salda, patch, zmiana pseudonimu, eksport graczy.",
+    en: "adjust points/balance, patch, change callsign, export players.",
+    uk: "корекція балів/балансу, патч, зміна позивного, експорт гравців.",
+  },
+  adm_perm_joins: {
+    pl: "podgląd zgłoszeń dołączenia do grupy.",
+    en: "view group join attempts.",
+    uk: "перегляд заявок на приєднання до групи.",
+  },
+
   adm_export: { pl: "Eksport CSV", en: "CSV export", uk: "Експорт CSV" },
   adm_export_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
   adm_export_regs: { pl: "Rejestracje", en: "Registrations", uk: "Реєстрації" },

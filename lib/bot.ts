@@ -1,6 +1,7 @@
 import { Bot, InlineKeyboard, Keyboard, type Context } from "grammy";
 import { supabase } from "./supabase";
 import { type Lang } from "./i18n";
+import { playerCommands } from "./bot-commands";
 import {
   buildCaptchaText,
   buildCorrectText,
@@ -1170,6 +1171,12 @@ bot.callbackQuery(/^lang:(pl|en|uk)$/, async (ctx) => {
   const lang = ctx.match[1] as Lang;
   await ensurePlayer(ctx.from);
   await setPlayerLang(ctx.from.id, lang);
+  // Меню бота для цього користувача — мовою його вибору (scope chat має пріоритет над дефолтом).
+  try {
+    await ctx.api.setMyCommands(playerCommands(lang), {
+      scope: { type: "chat", chat_id: ctx.from.id },
+    });
+  } catch {}
   await ctx.editMessageText(tr(lang, "lang_set"));
   await ctx.answerCallbackQuery();
 });

@@ -78,6 +78,19 @@ export default async function AdminRoles({
           </form>
         ))}
       </div>
+
+      {/* Легенда дозволів — пояснення для суперадміна, за що відповідає кожен прапорець. */}
+      <section className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
+        <h2 className="mb-2 font-semibold text-gray-800">{st(lang, "adm_perms_legend_title")}</h2>
+        <ul className="space-y-1.5 text-gray-600">
+          {ALL_PERMS.map((perm) => (
+            <li key={perm} className="flex flex-wrap gap-x-2">
+              <code className="font-mono font-semibold text-brand-dark">{perm}</code>
+              <span>— {st(lang, `adm_perm_${perm}`)}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
     </div>
   );
 }
