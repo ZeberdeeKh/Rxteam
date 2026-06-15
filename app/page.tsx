@@ -9,7 +9,7 @@ import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
 
-// Лендінг (публічний, одна сторінка): герой + найближча гра + рейтинг + «Про нас» + соцмережі.
+// Лендінг (публічний, одна сторінка): «Про нас» + соцмережі + галерея + герой + найближча гра + рейтинг.
 export default async function Home() {
   const lang = getServerLang();
   const [next, ranking, settings, galleryPhotos] = await Promise.all([
@@ -38,11 +38,16 @@ export default async function Home() {
 
   return (
     <div className="space-y-10">
-      {/* Галерея (перший модуль на сторінці; випадкова добірка фото) */}
+      {/* Про нас + соцмережі (перший модуль на сторінці) */}
+      <section>
+        <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
+        <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
+        <SocialLinks settings={settings} lang={lang} />
+      </section>
+
+      {/* Галерея (мозаїка, без заголовка/підпису) */}
       {showGallery && (
         <section>
-          <h2 className={ui.sectionTitle}>{st(lang, "gallery_title")}</h2>
-          <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "gallery_intro")}</p>
           <GalleryGrid photos={galleryPhotos} closeLabel={st(lang, "gallery_close")} />
         </section>
       )}
@@ -110,13 +115,6 @@ export default async function Home() {
         <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
         <RankingTable rows={ranking} lang={lang} />
         {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
-      </section>
-
-      {/* Про нас + соцмережі */}
-      <section>
-        <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
-        <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
-        <SocialLinks settings={settings} lang={lang} />
       </section>
     </div>
   );

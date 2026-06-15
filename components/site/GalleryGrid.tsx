@@ -3,7 +3,17 @@
 import { useEffect, useState } from "react";
 import type { GalleryPhoto } from "@/lib/site-data";
 
-// Сітка фото + простий лайтбокс (без зовнішніх бібліотек): клік → fullscreen overlay,
+// Розкид плиток для «мозаїки»: кілька великих/високих/широких серед звичайних.
+// dense-упаковка CSS-grid заповнює діри між плитками різного розміру.
+function mosaicSpan(i: number): string {
+  const m = i % 6;
+  if (m === 0) return "sm:col-span-2 sm:row-span-2"; // великий квадрат (десктоп)
+  if (m === 3) return "row-span-2"; // високий
+  if (m === 4) return "sm:col-span-2"; // широкий (десктоп)
+  return "";
+}
+
+// Мозаїчна сітка фото + простий лайтбокс (без зовнішніх бібліотек): клік → fullscreen overlay,
 // Esc або клік по тлу закриває. Звичайний <img> (URL зі Supabase Storage).
 export default function GalleryGrid({
   photos,
@@ -29,20 +39,20 @@ export default function GalleryGrid({
 
   return (
     <>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {photos.map((p) => (
+      <div className="grid grid-flow-dense auto-rows-[150px] grid-cols-2 gap-2 sm:auto-rows-[180px] sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+        {photos.map((p, i) => (
           <button
             key={p.id}
             type="button"
             onClick={() => setActive(p)}
-            className="group overflow-hidden rounded-lg border border-gray-200 bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+            className={`group relative overflow-hidden rounded-lg bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${mosaicSpan(i)}`}
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={p.url}
               alt={p.caption ?? ""}
               loading="lazy"
-              className="aspect-square w-full object-cover transition duration-200 group-hover:scale-105"
+              className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
             />
           </button>
         ))}
