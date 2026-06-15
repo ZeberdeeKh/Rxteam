@@ -1,21 +1,24 @@
 import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
-import { getNextGame, getRanking } from "@/lib/site-data";
+import { getNextGame, getRanking, getGalleryPhotos } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
 import { ui } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
+import GalleryGrid from "@/components/site/GalleryGrid";
 
 // Лендінг (публічний, одна сторінка): герой + найближча гра + рейтинг + «Про нас» + соцмережі.
 export default async function Home() {
   const lang = getServerLang();
-  const [next, ranking, settings] = await Promise.all([
+  const [next, ranking, settings, galleryPhotos] = await Promise.all([
     getNextGame(),
     getRanking(10),
     getAllSettings(),
+    getGalleryPhotos(12),
   ]);
+  const showGallery = settings.feature_gallery !== "false" && galleryPhotos.length > 0;
 
   const countText = (() => {
     if (!next) return "";
@@ -35,6 +38,15 @@ export default async function Home() {
 
   return (
     <div className="space-y-10">
+      {/* Галерея (перший модуль на сторінці; випадкова добірка фото) */}
+      {showGallery && (
+        <section>
+          <h2 className={ui.sectionTitle}>{st(lang, "gallery_title")}</h2>
+          <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "gallery_intro")}</p>
+          <GalleryGrid photos={galleryPhotos} closeLabel={st(lang, "gallery_close")} />
+        </section>
+      )}
+
       {/* Герой */}
       <section>
         <p className={ui.body}>{st(lang, "home_hero_sub")}</p>
