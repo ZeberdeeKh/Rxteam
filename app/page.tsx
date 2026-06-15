@@ -27,7 +27,7 @@ export default async function Home() {
   return (
     <div className="space-y-10">
       {/* Герой */}
-      <section className="max-w-2xl">
+      <section>
         <h1 className={ui.display}>{st(lang, "home_title")}</h1>
         <p className={`mt-3 ${ui.body}`}>{st(lang, "home_hero_sub")}</p>
       </section>
@@ -64,7 +64,7 @@ export default async function Home() {
       </section>
 
       {/* Про нас + соцмережі */}
-      <section className="max-w-2xl">
+      <section>
         <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
         <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
         <SocialLinks settings={settings} lang={lang} />
