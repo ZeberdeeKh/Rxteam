@@ -9,7 +9,8 @@ import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
 import BugReport from "@/components/BugReport";
-import { ui } from "@/components/ui";
+import NavLink from "@/components/site/NavLink";
+import { ui, headerNavClass, headerAdminClass } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "RX Team",
@@ -18,9 +19,6 @@ export const metadata: Metadata = {
 
 // Уникаємо «спалаху» світлої теми: ставимо .dark ДО першого рендера за збереженим вибором.
 const themeInit = `(function(){try{var t=localStorage.getItem('rxteam-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
-
-// Єдиний стиль навігаційного посилання у шапці.
-const navLink = "rounded-md px-2.5 py-1.5 text-gray-600 transition hover:bg-brand/10 hover:text-brand";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
@@ -66,32 +64,32 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
             </Link>
             <nav className="flex items-center gap-1 text-sm">
-              <Link href="/" className={navLink}>
+              <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_home")}
-              </Link>
+              </NavLink>
               {loggedIn ? (
                 <>
-                  <Link href="/shop" className={navLink}>
+                  <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_shop")}
-                  </Link>
-                  <Link href="/cabinet" className={navLink}>
+                  </NavLink>
+                  <NavLink href="/cabinet" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_cabinet")}
-                  </Link>
+                  </NavLink>
                   {admin && (
-                    <Link href="/admin" className={`${navLink} font-medium text-brand`}>
+                    <NavLink href="/admin" className={headerAdminClass(false)} activeClassName={headerAdminClass(true)}>
                       {st(lang, "nav_admin")}
-                    </Link>
+                    </NavLink>
                   )}
                   <form action={signOut}>
-                    <button type="submit" className={navLink}>
+                    <button type="submit" className={headerNavClass(false)}>
                       {st(lang, "nav_logout")}
                     </button>
                   </form>
                 </>
               ) : (
-                <Link href="/login" className={navLink}>
+                <NavLink href="/login" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                   {st(lang, "nav_login")}
-                </Link>
+                </NavLink>
               )}
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <ThemeToggle title={st(lang, "theme_toggle")} />

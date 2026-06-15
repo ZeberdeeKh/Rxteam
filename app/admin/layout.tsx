@@ -1,9 +1,9 @@
-﻿import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
-import { getAdmin, hasPerm } from "@/lib/admin";
-import { ui, buttonClass } from "@/components/ui";
+import { getAdmin } from "@/lib/admin";
+import { adminNavLinks } from "@/lib/admin-nav";
+import { ui, subNavClass } from "@/components/ui";
+import NavLink from "@/components/site/NavLink";
 
 export const dynamic = "force-dynamic";
 
@@ -12,36 +12,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const admin = await getAdmin();
   if (!admin) notFound();
   const lang = getServerLang();
-
-  const links: { href: string; label: string; show: boolean }[] = [
-    { href: "/admin/settings", label: st(lang, "adm_nav_settings"), show: !!admin.is_master },
-    { href: "/admin/social", label: st(lang, "adm_nav_social"), show: !!admin.is_master },
-    { href: "/admin/shop", label: st(lang, "adm_nav_shop"), show: !!admin.is_master },
-    { href: "/admin/games", label: st(lang, "adm_nav_games"), show: hasPerm(admin, "games") },
-    { href: "/admin/locations", label: st(lang, "adm_nav_locations"), show: hasPerm(admin, "games") },
-    { href: "/admin/players", label: st(lang, "adm_nav_players"), show: hasPerm(admin, "players") },
-    { href: "/admin/referrals", label: st(lang, "adm_nav_referrals"), show: hasPerm(admin, "referrals") },
-    { href: "/admin/rental", label: st(lang, "adm_nav_rental"), show: hasPerm(admin, "rental") },
-    { href: "/admin/joins", label: st(lang, "adm_nav_joins"), show: hasPerm(admin, "joins") },
-    { href: "/admin/roles", label: st(lang, "adm_nav_roles"), show: !!admin.is_master },
-    { href: "/admin/chores", label: st(lang, "adm_nav_chores"), show: !!admin.is_master },
-    {
-      href: "/admin/export",
-      label: st(lang, "adm_nav_export"),
-      show: hasPerm(admin, "players") || hasPerm(admin, "games") || hasPerm(admin, "checkin"),
-    },
-  ];
+  const links = adminNavLinks(admin, lang).filter((l) => l.show);
 
   return (
     <div className={ui.pageStack}>
       <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
-        {links
-          .filter((l) => l.show)
-          .map((l) => (
-            <Link key={l.href} href={l.href} className={buttonClass("ghost", "sm")}>
-              {l.label}
-            </Link>
-          ))}
+        {links.map((l) => (
+          <NavLink
+            key={l.href}
+            href={l.href}
+            className={subNavClass(false)}
+            activeClassName={subNavClass(true)}
+          >
+            {l.label}
+          </NavLink>
+        ))}
       </nav>
       {children}
     </div>

@@ -52,6 +52,30 @@ export function badgeClass(color: BadgeColor = "gray"): string {
   return `${BADGE_BASE} ${BADGE_COLOR[color]}`;
 }
 
+// ── Навігація (активний стан — підсвічування поточного пункту) ──
+const NAV_HEADER_BASE = "rounded-md px-2.5 py-1.5 text-sm transition";
+/** Посилання верхнього меню шапки. */
+export function headerNavClass(active: boolean): string {
+  return active
+    ? `${NAV_HEADER_BASE} bg-brand/10 text-brand font-semibold`
+    : `${NAV_HEADER_BASE} text-gray-600 hover:bg-brand/10 hover:text-brand`;
+}
+/** Пункт «Адмінка» — завжди акцентований брендом; активний — підсвічений. */
+export function headerAdminClass(active: boolean): string {
+  return active
+    ? `${NAV_HEADER_BASE} bg-brand/10 text-brand font-semibold`
+    : `${NAV_HEADER_BASE} text-brand font-medium hover:bg-brand/10`;
+}
+
+const NAV_SUB_BASE =
+  "inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-medium transition";
+/** Підпункт підменю адмінки. */
+export function subNavClass(active: boolean): string {
+  return active
+    ? `${NAV_SUB_BASE} bg-brand/10 text-brand font-semibold`
+    : `${NAV_SUB_BASE} text-gray-700 hover:bg-brand/10 hover:text-brand`;
+}
+
 // ── Токени (типографіка, поверхні, поля, таблиці, банери, розкладка) ──
 export const ui = {
   // Типографіка
