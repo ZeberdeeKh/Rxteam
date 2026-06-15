@@ -60,7 +60,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-3xl items-center justify-between gap-4 px-4 py-3">
+          <div className="mx-auto flex w-full max-w-[60rem] items-center justify-between gap-4 px-4 py-3">
             <Link href="/" className="flex items-baseline gap-2">
               <span className="text-lg font-bold uppercase tracking-wide text-brand-dark">RX&nbsp;Team</span>
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
@@ -100,10 +100,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8">{children}</main>
+        <main className="mx-auto w-full max-w-[60rem] flex-1 px-4 py-8">{children}</main>
 
         <footer className="border-t border-gray-200 bg-white">
-          <div className={`mx-auto w-full max-w-3xl px-4 py-4 ${ui.meta}`}>
+          <div className={`mx-auto w-full max-w-[60rem] px-4 py-4 text-center ${ui.meta}`}>
             RX Team · {st(lang, "footer_note")}
           </div>
         </footer>
