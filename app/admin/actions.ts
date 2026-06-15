@@ -164,9 +164,10 @@ export async function createChore(formData: FormData) {
   const kind = parseChoreKind(formData);
   const label = String(formData.get("label") ?? "").trim();
   if (!kind || !label) backChores("?err=fields");
+  const note = String(formData.get("note") ?? "").trim() || null;
   const sortRaw = Number(formData.get("sort_order"));
   const sort_order = Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0;
-  await supabase.from("chore_templates").insert({ kind, label, sort_order, active: true });
+  await supabase.from("chore_templates").insert({ kind, label, note, sort_order, active: true });
   revalidatePath("/admin/chores");
   backChores("?created=1");
 }
@@ -177,12 +178,13 @@ export async function updateChore(formData: FormData) {
   const kind = parseChoreKind(formData);
   const label = String(formData.get("label") ?? "").trim();
   if (!Number.isFinite(id) || !kind || !label) backChores("?err=fields");
+  const note = String(formData.get("note") ?? "").trim() || null;
   const sortRaw = Number(formData.get("sort_order"));
   const sort_order = Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0;
   const active = formData.get("active") === "on";
   await supabase
     .from("chore_templates")
-    .update({ kind, label, sort_order, active })
+    .update({ kind, label, note, sort_order, active })
     .eq("id", id);
   revalidatePath("/admin/chores");
   backChores("?saved=1");

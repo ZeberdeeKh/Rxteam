@@ -242,6 +242,7 @@ export type ChoreTemplate = {
   id: number;
   kind: string; // 'action' | 'gear'
   label: string;
+  note: string | null;
   sort_order: number;
   active: boolean;
 };
@@ -249,7 +250,7 @@ export type ChoreTemplate = {
 export async function listChoreTemplates(): Promise<ChoreTemplate[]> {
   const { data } = await supabase
     .from("chore_templates")
-    .select("id, kind, label, sort_order, active")
+    .select("id, kind, label, note, sort_order, active")
     .order("kind", { ascending: true })
     .order("sort_order", { ascending: true });
   return (data ?? []) as ChoreTemplate[];

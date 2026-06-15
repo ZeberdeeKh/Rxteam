@@ -52,6 +52,10 @@ export default async function AdminChores({
             <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_sort")}</span>
             <input name="sort_order" type="number" defaultValue={0} className={ui.input} />
           </label>
+          <label className="text-sm sm:col-span-12">
+            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_note")}</span>
+            <input name="note" className={ui.input} />
+          </label>
           <div className="flex items-end sm:col-span-12">
             <button type="submit" className={buttonClass("primary", "md")}>
               {st(lang, "adm_btn_create")}
@@ -80,6 +84,10 @@ export default async function AdminChores({
                 <label className="text-sm sm:col-span-2">
                   <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_sort")}</span>
                   <input name="sort_order" type="number" defaultValue={it.sort_order} className={ui.input} />
+                </label>
+                <label className="text-sm sm:col-span-12">
+                  <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_note")}</span>
+                  <input name="note" defaultValue={it.note ?? ""} className={ui.input} />
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-sm sm:col-span-2">
                   <input

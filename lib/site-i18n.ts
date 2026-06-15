@@ -487,6 +487,11 @@ const SITE: Record<string, Dict> = {
   adm_chore_kind_action: { pl: "Działanie", en: "Action", uk: "Дія" },
   adm_chore_kind_gear: { pl: "Zabrać na grę", en: "Bring to game", uk: "Взяти на гру" },
   adm_chore_label: { pl: "Treść", en: "Label", uk: "Текст" },
+  adm_chore_note: {
+    pl: "Opis (opcjonalnie, np. lista zakupów)",
+    en: "Note (optional, e.g. shopping list)",
+    uk: "Опис (необов'язково, напр. список покупок)",
+  },
   adm_chore_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
   adm_chore_active: { pl: "Aktywna", en: "Active", uk: "Активний" },
   adm_chore_empty: { pl: "Brak pozycji.", en: "No items.", uk: "Немає пунктів." },

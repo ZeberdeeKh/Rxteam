@@ -15,6 +15,7 @@ export type ChoreItem = {
   id: number;
   kind: string; // 'action' | 'gear'
   label: string;
+  note: string | null; // опис під пунктом (напр. список покупок)
   sort_order: number;
   claimed_tg_id: number | null;
   claimed_name: string | null;
@@ -52,11 +53,12 @@ function header(prefix: string, game: GameLite): string {
 function lines(items: ChoreItem[], kind: string, freeMark: string): string {
   return items
     .filter((i) => i.kind === kind)
-    .map((i) =>
-      i.claimed_name
+    .map((i) => {
+      const head = i.claimed_name
         ? `✅ ${esc(i.label)} — <i>${esc(i.claimed_name)}</i>`
-        : `${freeMark} ${esc(i.label)}`,
-    )
+        : `${freeMark} ${esc(i.label)}`;
+      return i.note ? `${head}\n   <i>${esc(i.note)}</i>` : head;
+    })
     .join("\n");
 }
 
@@ -87,11 +89,12 @@ export function buildReportText(game: GameLite, items: ChoreItem[]): string {
     const list = items.filter((i) => i.kind === kind);
     if (!list.length) return "";
     const body = list
-      .map((i) =>
-        i.claimed_name
+      .map((i) => {
+        const head = i.claimed_name
           ? `✅ ${esc(i.label)} — <i>${esc(i.claimed_name)}</i>`
-          : `❌ ${esc(i.label)} — <b>вільно</b>`,
-      )
+          : `❌ ${esc(i.label)} — <b>вільно</b>`;
+        return i.note ? `${head}\n   <i>${esc(i.note)}</i>` : head;
+      })
       .join("\n");
     return `\n${head}\n${body}`;
   };
@@ -110,7 +113,7 @@ export function buildReportText(game: GameLite, items: ChoreItem[]): string {
 async function fetchItems(runId: number): Promise<ChoreItem[]> {
   const { data } = await supabase
     .from("chore_run_items")
-    .select("id, kind, label, sort_order, claimed_tg_id, claimed_name")
+    .select("id, kind, label, note, sort_order, claimed_tg_id, claimed_name")
     .eq("run_id", runId)
     .order("kind", { ascending: true })
     .order("sort_order", { ascending: true });
@@ -142,7 +145,7 @@ export async function postChoreRun(api: Api, gameId: number): Promise<void> {
 
   const { data: templates } = await supabase
     .from("chore_templates")
-    .select("kind, label, sort_order")
+    .select("kind, label, note, sort_order")
     .eq("active", true)
     .order("kind", { ascending: true })
     .order("sort_order", { ascending: true });
@@ -166,6 +169,7 @@ export async function postChoreRun(api: Api, gameId: number): Promise<void> {
       run_id: run.id,
       kind: t.kind,
       label: t.label,
+      note: t.note,
       sort_order: t.sort_order,
     })),
   );
