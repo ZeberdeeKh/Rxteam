@@ -72,12 +72,26 @@ async function guardAnnounceTopic(ctx: Context): Promise<boolean> {
   if (!(await featureEnabled("announce_guard"))) return false;
 
   const guardChatId = await getSetting("announce_chat_id");
+  if (!guardChatId || String(chat.id) !== guardChatId) return false;
+  // Ціль гарду: конкретна тема (announce_thread_id) АБО головна тема «General»
+  // (announce_guard_general=true) — у форумі повідомлення General не мають thread_id.
   const guardThreadId = await getSetting("announce_thread_id");
-  if (!guardChatId || !guardThreadId) return false;
-  if (String(chat.id) !== guardChatId) return false;
-  if (String(msg.message_thread_id ?? "") !== guardThreadId) return false;
+  const guardGeneral = (await getSetting("announce_guard_general")) === "true";
+  if (!guardThreadId && !guardGeneral) return false; // гард не налаштовано
+  const inTarget = guardThreadId
+    ? String(msg.message_thread_id ?? "") === guardThreadId
+    : !msg.message_thread_id;
+  if (!inTarget) return false;
 
-  // Strict bot-only: у цей топік пише лише НАШ бот (його власні апдейти сюди не приходять),
+  // Службові повідомлення (вступ/вихід/піни/події теми) не модеруємо — лише контент.
+  const m = msg as any;
+  const hasContent =
+    m.text || m.caption || m.photo || m.video || m.document || m.audio || m.voice ||
+    m.sticker || m.animation || m.video_note || m.contact || m.location || m.venue ||
+    m.poll || m.dice || m.game || m.story;
+  if (!hasContent) return false;
+
+  // Strict bot-only: у цю гілку пише лише НАШ бот (його власні апдейти сюди не приходять),
   // тож усе, що ми тут бачимо, — стороннє. Захист на випадок, якщо апдейт усе ж від нас:
   const from = ctx.from;
   if (from && from.id === ctx.me.id) return false;
@@ -812,6 +826,8 @@ bot.command("sethere", async (ctx) => {
   const threadId = ctx.message?.message_thread_id;
   await setSetting("announce_chat_id", String(ctx.chat.id));
   await setSetting("announce_thread_id", threadId ? String(threadId) : "");
+  // Без thread_id → це головна тема «General» форуму (її повідомлення без thread_id).
+  await setSetting("announce_guard_general", threadId ? "false" : "true");
   if (threadId) {
     await ctx.reply(
       `✅ Тему для анонсів збережено.\n` +
@@ -820,8 +836,9 @@ bot.command("sethere", async (ctx) => {
     );
   } else {
     await ctx.reply(
-      `⚠️ Команду виконано НЕ всередині теми форуму (thread_id порожній), тож захист НЕ ввімкнено.\n` +
-        `Зайди саме в тему «Zapowiedzi gier / Анонси ігор» (зі списку тем) і виконай /sethere ТАМ.`,
+      `✅ Збережено: гілка анонсів — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\n` +
+        `chat_id: ${ctx.chat.id}\n\n` +
+        `Тепер тут пише лише бот — решту повідомлень бот видалятиме.`,
     );
   }
 });
