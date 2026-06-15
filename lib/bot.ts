@@ -91,22 +91,22 @@ async function guardAnnounceTopic(ctx: Context): Promise<boolean> {
     m.poll || m.dice || m.game || m.story;
   if (!hasContent) return false;
 
-  // Strict bot-only: у цю гілку пише лише НАШ бот (його власні апдейти сюди не приходять),
-  // тож усе, що ми тут бачимо, — стороннє. Захист на випадок, якщо апдейт усе ж від нас:
+  // Анонси публікуються «від імені групи» (анонімно) — саме так постить наш бот.
+  // Telegram не дає відрізнити бота-від-групи від адміна-від-групи, тож такі пости
+  // (sender_chat = ця група) НЕ чіпаємо — це й є анонси. Видаляємо лише сторонні.
   const from = ctx.from;
-  if (from && from.id === ctx.me.id) return false;
+  if (ctx.senderChat?.id === chat.id) return false; // анонімно від імені групи = анонс
+  if (from && from.id === ctx.me.id) return false; // наш бот напряму (про всяк випадок)
 
-  // Видаляємо (бот — адмін із can_delete_messages → може видалити будь-кого,
-  // зокрема анонімних адмінів, що пишуть «від імені групи»).
+  // Видаляємо стороннє повідомлення (бот — адмін із can_delete_messages).
   try {
     await ctx.api.deleteMessage(chat.id, msg.message_id);
   } catch (e) {
     console.error("announce guard: delete failed", e);
   }
 
-  // Мут/попередження — лише для звичайного користувача. Анонімних адмінів (GroupAnonymousBot),
-  // пости від каналу (sender_chat) і ботів видаляємо, але не мутимо й не пишемо в приват —
-  // у них немає особистого user_id.
+  // Мут/попередження — лише для звичайного користувача. Пости від іншого каналу (sender_chat)
+  // та ботів видаляємо, але не мутимо й не пишемо в приват — у них немає особистого user_id.
   if (!from || from.is_bot) return true;
 
   // Лічильник порушень користувача.
