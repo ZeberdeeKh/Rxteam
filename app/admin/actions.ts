@@ -80,6 +80,13 @@ export async function cancelGame(formData: FormData) {
   const gameId = Number(formData.get("gameId"));
   if (Number.isFinite(gameId)) {
     await supabase.from("games").update({ status: "cancelled" }).eq("id", gameId);
+    // Скасування гри прибирає й активні реєстрації — інакше у гравців лишаються «записи»
+    // на скасовану гру (видно у /drivers, /myride і кабінеті на сайті).
+    await supabase
+      .from("registrations")
+      .update({ status: "cancelled" })
+      .eq("game_id", gameId)
+      .eq("status", "registered");
     revalidatePath("/admin/games");
   }
   redirect("/admin/games?cancelled=1");

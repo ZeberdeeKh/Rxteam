@@ -329,13 +329,14 @@ bot.callbackQuery(/^drivers:(\d+)$/, async (ctx) => {
 async function myUpcomingGames(playerId: number) {
   const { data: regs } = await supabase
     .from("registrations")
-    .select("games(id, title, start_at)")
+    .select("games(id, title, start_at, status)")
     .eq("player_id", playerId)
     .eq("status", "registered");
   const cutoff = Date.now() - 3 * 3600 * 1000;
   return (regs ?? [])
     .map((r) => (r as any).games)
-    .filter((g) => g && new Date(g.start_at).getTime() > cutoff)
+    // Лише активні ігри: скасування гри не чистить реєстрації, тому відсіюємо скасовані за статусом гри.
+    .filter((g) => g && g.status === "announced" && new Date(g.start_at).getTime() > cutoff)
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
 }
 
@@ -659,14 +660,15 @@ bot.callbackQuery("noop", (ctx) => ctx.answerCallbackQuery());
 async function myDriverGames(playerId: number) {
   const { data: regs } = await supabase
     .from("registrations")
-    .select("games(id, title, start_at)")
+    .select("games(id, title, start_at, status)")
     .eq("player_id", playerId)
     .eq("status", "registered")
     .eq("transport", "own");
   const cutoff = Date.now() - 3 * 3600 * 1000;
   return (regs ?? [])
     .map((r) => (r as any).games)
-    .filter((g) => g && new Date(g.start_at).getTime() > cutoff)
+    // Лише активні ігри (скасовані не чистять реєстрації — фільтруємо за статусом гри).
+    .filter((g) => g && g.status === "announced" && new Date(g.start_at).getTime() > cutoff)
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
 }
 
