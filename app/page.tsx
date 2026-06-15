@@ -16,7 +16,7 @@ export default async function Home() {
     getNextGame(),
     getRanking(10),
     getAllSettings(),
-    getGalleryPhotos(12),
+    getGalleryPhotos(60),
   ]);
   const showGallery = settings.feature_gallery !== "false" && galleryPhotos.length > 0;
 

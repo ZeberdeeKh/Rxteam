@@ -50,3 +50,13 @@ html.dark body {
 body {
   @apply bg-gray-50 text-gray-900 antialiased;
 }
+
+/* Плавна поява фото в галереї (ротація надлишку + первинне завантаження). */
+@keyframes rxFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
