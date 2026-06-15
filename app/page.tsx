@@ -34,9 +34,6 @@ export default async function Home() {
           <Link href="/games" className={buttonClass("primary")}>
             {st(lang, "home_cta_games")}
           </Link>
-          <a href="#ranking" className={buttonClass("secondary")}>
-            {st(lang, "home_cta_ranking")}
-          </a>
         </div>
       </section>
 
