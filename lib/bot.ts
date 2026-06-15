@@ -1385,6 +1385,18 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
         await ctx.api.sendMessage(ch.user_chat_id, await getFaqText(p.lang as Lang));
       } catch {}
     }
+    // Завжди пропонуємо вибрати мову після успішної капчі.
+    try {
+      const langKb = new InlineKeyboard()
+        .text("🇵🇱 Polski", "lang:pl")
+        .text("🇬🇧 English", "lang:en")
+        .text("🇺🇦 Українська", "lang:uk");
+      await ctx.api.sendMessage(
+        ch.user_chat_id,
+        "🇵🇱 Wybierz język bota\n🇬🇧 Choose your bot language\n🇺🇦 Обери мову бота",
+        { reply_markup: langKb },
+      );
+    } catch {}
   } else {
     try {
       await ctx.api.declineChatJoinRequest(ch.chat_id, userId);
