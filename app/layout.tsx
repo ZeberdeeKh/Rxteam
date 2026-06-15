@@ -59,9 +59,24 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
           <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-3">
-            <Link href="/" className="flex items-baseline gap-2">
-              <span className="text-lg font-bold uppercase tracking-wide text-brand-dark">RX&nbsp;Team</span>
-              <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
+            <Link href="/" className="flex items-center" aria-label="RX Team">
+              {/* Лого: світла тема — темні літери (logo-light), темна — світлі (logo-dark). */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-light.png"
+                alt="RX Team — ASG / Airsoft Wrocław"
+                width={486}
+                height={76}
+                className="block h-6 w-auto sm:h-7 dark:hidden"
+              />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-dark.png"
+                alt="RX Team — ASG / Airsoft Wrocław"
+                width={486}
+                height={76}
+                className="hidden h-6 w-auto sm:h-7 dark:block"
+              />
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
