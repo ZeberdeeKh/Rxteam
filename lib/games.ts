@@ -102,8 +102,17 @@ export type GameForAnnounce = {
   fireMode: string; // auto | semi
 };
 
+// Ліміти локації, потрібні для блоку лімітів (підмножина GameForAnnounce).
+export type LocationLimits = {
+  replicaTypes: string[]; // які типи реплік допущені на локації
+  pyro: string; // yes | no | limited
+  pyroNote: string | null; // уточнення для «з обмеженням»
+  fireMode: string; // auto | semi
+};
+
 // Блок лімітів для однієї мови: допущені типи реплік (з їх лімітами) + піро + режим вогню.
-function limitsBlock(lang: "pl" | "uk", g: GameForAnnounce, s: Record<string, string>): string {
+// Експортується, щоб лендінг показав ті самі ліміти в короткому тізері найближчої гри.
+export function buildLimits(lang: "pl" | "uk", g: LocationLimits, s: Record<string, string>): string {
   const lines: string[] = [];
   const allowed = g.replicaTypes ?? [];
   if (allowed.length) {
@@ -144,7 +153,7 @@ export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>)
     for (const key of [`ann_coffee_${lang}`, `ann_rental_${lang}`, `ann_transport_${lang}`]) {
       if (s[key]) parts.push("", s[key]);
     }
-    const lim = limitsBlock(lang, g, s);
+    const lim = buildLimits(lang, g, s);
     if (lim) parts.push("", lim);
     if (s[`ann_disclaimer_${lang}`]) parts.push("", s[`ann_disclaimer_${lang}`]);
     return parts.join("\n");

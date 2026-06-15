@@ -1,7 +1,7 @@
 // Спільні серверні читання для сайту (лендінг, /games).
 // Усе через service-key (lib/supabase.ts) — RLS off, лише сервер. Жодних next/headers тут.
 import { supabase } from "./supabase";
-import { buildAnnouncement } from "./games";
+import { buildAnnouncement, type LocationLimits } from "./games";
 import { getAllSettings } from "./settings";
 
 export type SiteLocation = {
@@ -21,6 +21,9 @@ export type SiteGame = {
   location: SiteLocation | null;
   count: number; // записаних (status='registered')
   announcement: string | null; // повний текст анонсу (як у Телеграмі), null якщо нема локації
+  scenario_pl: string | null; // опис сценарію (PL) — для короткого тізера на лендінгу
+  scenario_uk: string | null; // опис сценарію (UA) — для короткого тізера на лендінгу
+  limits: LocationLimits | null; // ліміти локації (репліки/піро/режим вогню) для тізера
 };
 
 const GAME_COLS =
@@ -31,6 +34,18 @@ function normLoc(row: any): SiteLocation | null {
   const l = Array.isArray(row?.locations) ? row.locations[0] : row?.locations;
   if (!l) return null;
   return { name: l.name ?? null, map_url: l.map_url ?? null, lat: l.lat ?? null, lng: l.lng ?? null };
+}
+
+// Ліміти локації (репліки/піро/режим вогню) — ті самі дані, що й у блоці лімітів анонсу.
+function normLimits(row: any): LocationLimits | null {
+  const l = Array.isArray(row?.locations) ? row.locations[0] : row?.locations;
+  if (!l) return null;
+  return {
+    replicaTypes: l.replica_types ?? [],
+    pyro: l.pyro ?? "no",
+    pyroNote: l.pyro_note ?? null,
+    fireMode: l.fire_mode ?? "semi",
+  };
 }
 
 // Відтворює той самий анонс, що бот постить у Телеграм (lib/bot.ts → updateAnnouncement),
@@ -87,6 +102,9 @@ function toSiteGame(row: any, count: number, settings?: Record<string, string>):
     location: normLoc(row),
     count,
     announcement: settings ? buildGameAnnouncement(row, count, settings) : null,
+    scenario_pl: row.scenario_pl ?? null,
+    scenario_uk: row.scenario_uk ?? null,
+    limits: normLimits(row),
   };
 }
 
