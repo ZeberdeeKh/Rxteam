@@ -11,6 +11,18 @@ import { formatWhen } from "./games";
 
 const ZONE = "Europe/Warsaw";
 
+// Адміни, яких пінгуємо при постингу чек-листа. Беруться з settings.chores_admin_mentions
+// (рядок виду "@BETEP_OK @BaRon25cm @Delltex", роздільник — пробіл або кома).
+async function fetchAdminMentions(): Promise<string[]> {
+  const raw = await getSetting("chores_admin_mentions");
+  if (!raw) return [];
+  return raw
+    .split(/[\s,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((s) => (s.startsWith("@") ? s : `@${s}`));
+}
+
 export type ChoreItem = {
   id: number;
   kind: string; // 'action' | 'gear'
@@ -62,14 +74,15 @@ function lines(items: ChoreItem[], kind: string, freeMark: string): string {
     .join("\n");
 }
 
-// Текст інтерактивного чек-листа (HTML).
-export function buildChoreText(game: GameLite, items: ChoreItem[]): string {
+// Текст інтерактивного чек-листа (HTML). mentions — @нікі адмінів для пінгу (опц.).
+export function buildChoreText(game: GameLite, items: ChoreItem[], mentions: string[] = []): string {
   const actions = lines(items, "action", "⬜");
   const gear = lines(items, "gear", "⬜");
   const parts = [`🗒 <b>Підготовка до гри</b>${header("", game)}`];
   if (actions) parts.push(`\n🔧 <b>Дії:</b>\n${actions}`);
   if (gear) parts.push(`\n🎒 <b>Взяти на гру:</b>\n${gear}`);
   parts.push(`\n<i>Тицяй на пункт, щоб взяти його на себе (повторний клік — звільнити).</i>`);
+  if (mentions.length) parts.push(`\n${mentions.join(" ")}`);
   return parts.join("\n");
 }
 
@@ -194,8 +207,9 @@ export async function postChoreRun(api: Api, gameId: number): Promise<void> {
   );
 
   const items = await fetchItems(run.id);
+  const mentions = await fetchAdminMentions();
   try {
-    const msg = await api.sendMessage(Number(chatId), buildChoreText(game, items), {
+    const msg = await api.sendMessage(Number(chatId), buildChoreText(game, items, mentions), {
       parse_mode: "HTML",
       reply_markup: buildChoreKeyboard(items),
       ...(threadId ? { message_thread_id: Number(threadId) } : {}),
@@ -273,8 +287,9 @@ export async function refreshChoreMessage(api: Api, runId: number): Promise<void
   if (!run?.chat_id || !run.message_id) return;
   const game = await fetchGame(run.game_id);
   const items = await fetchItems(runId);
+  const mentions = await fetchAdminMentions();
   try {
-    await api.editMessageText(Number(run.chat_id), run.message_id, buildChoreText(game, items), {
+    await api.editMessageText(Number(run.chat_id), run.message_id, buildChoreText(game, items, mentions), {
       parse_mode: "HTML",
       reply_markup: buildChoreKeyboard(items),
     });

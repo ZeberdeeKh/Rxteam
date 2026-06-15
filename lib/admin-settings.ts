@@ -161,6 +161,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "announce_thread_id", type: "text", label: "Announce thread_id" },
       { key: "chores_chat_id", type: "text", label: "Czek-lista chat_id (grupa adminów)" },
       { key: "chores_thread_id", type: "text", label: "Czek-lista thread_id" },
+      { key: "chores_admin_mentions", type: "text", label: "Czek-lista — pingowani admini (@user, spacja/przecinek)" },
     ],
   },
 ];
