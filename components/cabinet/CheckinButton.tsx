@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import { webCheckin } from "@/app/cabinet/actions";
+import { buttonClass } from "@/components/ui";
 
 // Веб-чек-ін: бере геолокацію браузера → кладе lat/lng у форму → сабмітить серверну дію.
 export default function CheckinButton({ gameId, lang }: { gameId: number; lang: Lang }) {
@@ -36,7 +37,7 @@ export default function CheckinButton({ gameId, lang }: { gameId: number; lang: 
         type="submit"
         onClick={onClick}
         disabled={status === "locating"}
-        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark disabled:opacity-60"
+        className={buttonClass("primary", "md")}
       >
         {status === "locating" ? st(lang, "checkin_locating") : st(lang, "web_checkin_btn")}
       </button>

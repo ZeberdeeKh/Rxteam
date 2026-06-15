@@ -2,6 +2,7 @@
 import { st } from "@/lib/site-i18n";
 import { getNextGame, getUpcomingGames, getPastGames } from "@/lib/site-data";
 import GameCard from "@/components/site/GameCard";
+import { ui } from "@/components/ui";
 
 export const dynamic = "force-dynamic"; // завжди свіжі ігри/лічильники
 
@@ -19,10 +20,10 @@ export default async function GamesPage() {
 
   return (
     <div className="space-y-10">
-      <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "games_title")}</h1>
+      <h1 className={ui.pageTitle}>{st(lang, "games_title")}</h1>
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-brand-dark">
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>
           {st(lang, "games_next_heading")}
         </h2>
         {next ? (
@@ -36,7 +37,7 @@ export default async function GamesPage() {
 
       {restUpcoming.length > 0 && (
         <section>
-          <h2 className="mb-3 text-lg font-semibold text-brand-dark">
+          <h2 className={`mb-3 ${ui.sectionTitle}`}>
             {st(lang, "games_upcoming_heading")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -48,7 +49,7 @@ export default async function GamesPage() {
       )}
 
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-brand-dark">
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>
           {st(lang, "games_past_heading")}
         </h2>
         {past.length > 0 ? (

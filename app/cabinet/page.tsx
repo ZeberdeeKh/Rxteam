@@ -16,6 +16,7 @@ import RegisterForm from "@/components/cabinet/RegisterForm";
 import CheckinButton from "@/components/cabinet/CheckinButton";
 import GameCard from "@/components/site/GameCard";
 import { createStandalone, saveCallsign, unregisterFromGame } from "@/app/cabinet/actions";
+import { ui, buttonClass, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -54,12 +55,8 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
   const banners = (
     <>
-      {okKey && (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, okKey)}</p>
-      )}
-      {errKey && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{st(lang, errKey)}</p>
-      )}
+      {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
+      {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
     </>
   );
 
@@ -68,9 +65,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
     return (
       <div className="mx-auto max-w-lg space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
-            {st(lang, "cabinet_title")}
-          </h1>
+          <h1 className={ui.pageTitle}>{st(lang, "cabinet_title")}</h1>
           <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>
         </div>
         {banners}
@@ -80,14 +75,11 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           {st(lang, "or_divider")}
           <span className="h-px flex-1 bg-gray-200" />
         </div>
-        <section className="rounded-lg border border-gray-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-gray-900">{st(lang, "standalone_title")}</h2>
+        <section className={ui.card}>
+          <h2 className={ui.cardTitle}>{st(lang, "standalone_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
           <form action={createStandalone} className="mt-3">
-            <button
-              type="submit"
-              className="rounded-md border border-brand px-4 py-1.5 text-sm font-medium text-brand transition hover:bg-brand hover:text-neutral-50"
-            >
+            <button type="submit" className={buttonClass("secondary", "md")}>
               {st(lang, "standalone_btn")}
             </button>
           </form>
@@ -103,12 +95,12 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   if (!player.callsign) {
     return (
       <div className="mx-auto max-w-lg space-y-6">
-        <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
+        <h1 className={ui.pageTitle}>
           {st(lang, "cabinet_title")}
         </h1>
         {banners}
-        <section className="rounded-lg border border-gray-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-gray-900">{st(lang, "callsign_title")}</h2>
+        <section className={ui.card}>
+          <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "callsign_intro")}</p>
           <form action={saveCallsign} className="mt-3 flex gap-2">
             <input
@@ -117,12 +109,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               minLength={2}
               maxLength={32}
               placeholder={st(lang, "callsign_ph")}
-              className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none"
+              className={`${ui.input} flex-1`}
             />
-            <button
-              type="submit"
-              className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
-            >
+            <button type="submit" className={buttonClass("primary", "md")}>
               {st(lang, "callsign_btn")}
             </button>
           </form>
@@ -141,7 +130,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
+        <h1 className={ui.pageTitle}>
           {st(lang, "cabinet_title")}
         </h1>
         {ctx.email && <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>}
@@ -149,7 +138,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       {banners}
 
       {/* Профіль */}
-      <section className="rounded-lg border border-gray-200 bg-white p-5">
+      <section className={ui.card}>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
           {st(lang, "prof_section")}
         </h2>
@@ -185,7 +174,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
       {/* Ачівки */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "ach_title")}</h2>
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "ach_title")}</h2>
         {achs.length === 0 ? (
           <p className="text-sm text-gray-500">{st(lang, "ach_empty")}</p>
         ) : (
@@ -205,7 +194,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
       {/* Мої ігри */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "mygames_title")}</h2>
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "mygames_title")}</h2>
         {games.length === 0 ? (
           <p className="text-sm text-gray-500">{st(lang, "mygames_empty")}</p>
         ) : (
@@ -217,13 +206,13 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                   <div className="flex flex-wrap items-center gap-3">
                     {label && (
                       <span
-                        className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        className={badgeClass(
                           g.regStatus === "registered"
-                            ? "bg-green-100 text-green-700"
+                            ? "green"
                             : g.regStatus === "no_show"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-gray-100 text-gray-600"
-                        }`}
+                              ? "red"
+                              : "gray",
+                        )}
                       >
                         {label}
                       </span>
@@ -239,10 +228,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                     {g.canUnregister && (
                       <form action={unregisterFromGame}>
                         <input type="hidden" name="gameId" value={g.id} />
-                        <button
-                          type="submit"
-                          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 transition hover:border-red-400 hover:text-red-600"
-                        >
+                        <button type="submit" className={buttonClass("danger", "md")}>
                           {st(lang, "btn_unregister")}
                         </button>
                       </form>
@@ -269,7 +255,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
       {/* Історія балів */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "hist_title")}</h2>
+        <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "hist_title")}</h2>
         {log.length === 0 ? (
           <p className="text-sm text-gray-500">{st(lang, "hist_empty")}</p>
         ) : (

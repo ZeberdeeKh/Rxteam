@@ -1,6 +1,7 @@
 ﻿import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getRanking } from "@/lib/site-data";
+import { ui } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -12,10 +13,10 @@ export default async function RankingPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
+        <h1 className={ui.pageTitle}>
           {st(lang, "ranking_title")}
         </h1>
-        <p className="mt-1 text-sm text-gray-500">{st(lang, "ranking_intro")}</p>
+        <p className={`mt-1 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
       </div>
 
       {rows.length === 0 ? (
@@ -24,35 +25,35 @@ export default async function RankingPage() {
         </p>
       ) : (
         <>
-          <div className="overflow-hidden rounded-lg border border-gray-200 bg-white">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 text-left text-gray-500">
-                  <th className="w-10 px-3 py-2 font-medium">{st(lang, "ranking_col_pos")}</th>
-                  <th className="px-3 py-2 font-medium">{st(lang, "ranking_col_player")}</th>
-                  <th className="px-3 py-2 font-medium">{st(lang, "ranking_col_rank")}</th>
-                  <th className="px-3 py-2 text-right font-medium">
+          <div className={ui.tableWrap}>
+            <table className={ui.table}>
+              <thead className={ui.thead}>
+                <tr>
+                  <th className={`${ui.th} w-10`}>{st(lang, "ranking_col_pos")}</th>
+                  <th className={ui.th}>{st(lang, "ranking_col_player")}</th>
+                  <th className={ui.th}>{st(lang, "ranking_col_rank")}</th>
+                  <th className={`${ui.th} text-right`}>
                     {st(lang, "ranking_col_earned")}
                   </th>
-                  <th className="px-3 py-2 text-right font-medium">
+                  <th className={`${ui.th} text-right`}>
                     {st(lang, "ranking_col_games")}
                   </th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className={ui.tbody}>
                 {rows.map((r, i) => (
-                  <tr key={r.id} className="border-b border-gray-100 last:border-0">
-                    <td className="px-3 py-2 text-gray-400">{i + 1}</td>
-                    <td className="px-3 py-2 font-medium text-gray-900">
+                  <tr key={r.id}>
+                    <td className={`${ui.td} text-gray-400`}>{i + 1}</td>
+                    <td className={`${ui.td} font-medium text-gray-900`}>
                       {r.callsign ?? st(lang, "ranking_anon")}
                     </td>
-                    <td className="px-3 py-2 text-gray-600">
+                    <td className={ui.td}>
                       {r.has_patch ? r.rank ?? "Recruit" : "—"}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums text-gray-900">
+                    <td className={`${ui.td} text-right tabular-nums text-gray-900`}>
                       {r.points_earned} ⭐
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums text-gray-600">
+                    <td className={`${ui.td} text-right tabular-nums`}>
                       {r.games_played}
                     </td>
                   </tr>
@@ -60,7 +61,7 @@ export default async function RankingPage() {
               </tbody>
             </table>
           </div>
-          <p className="text-xs text-gray-400">{st(lang, "ranking_note_top")}</p>
+          <p className={ui.meta}>{st(lang, "ranking_note_top")}</p>
         </>
       )}
     </div>

@@ -1,6 +1,7 @@
 ﻿import { st, type Lang } from "@/lib/site-i18n";
 import { formatGameWhen } from "@/lib/games";
 import type { SiteGame } from "@/lib/site-data";
+import { ui } from "@/components/ui";
 
 // Презентаційна картка гри (серверкомпонент). children — слот під дії (запис/відписка у 6.2).
 export default function GameCard({
@@ -19,12 +20,10 @@ export default function GameCard({
     : st(lang, "games_count", { n: game.count });
 
   return (
-    <article
-      className={`rounded-lg border border-gray-200 bg-white p-5 ${muted ? "opacity-75" : ""}`}
-    >
+    <article className={`${ui.card} ${muted ? "opacity-75" : ""}`}>
       <div className="flex items-baseline justify-between gap-3">
-        <h3 className="text-base font-semibold text-gray-900">{game.title ?? "ASG"}</h3>
-        <span className="shrink-0 text-sm text-gray-500">{countText}</span>
+        <h3 className={ui.cardTitle}>{game.title ?? "ASG"}</h3>
+        <span className={`shrink-0 ${ui.muted}`}>{countText}</span>
       </div>
 
       <dl className="mt-3 space-y-1 text-sm text-gray-600">

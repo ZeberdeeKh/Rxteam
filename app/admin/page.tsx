@@ -2,6 +2,7 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getAdmin, hasPerm } from "@/lib/admin";
+import { ui, buttonClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -22,15 +23,15 @@ export default async function AdminDashboard() {
   ].filter((t) => t.show);
 
   return (
-    <div className="space-y-8">
-      <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "adm_title")}</h1>
+    <div className={ui.pageStack}>
+      <h1 className={ui.pageTitle}>{st(lang, "adm_title")}</h1>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {tiles.map((t) => (
           <Link
             key={t.href}
             href={t.href}
-            className="rounded-lg border border-gray-200 bg-white p-5 text-base font-medium text-gray-800 transition hover:border-brand hover:text-brand"
+            className={`${ui.cardHover} ${ui.cardTitle}`}
           >
             {t.label} →
           </Link>
@@ -39,31 +40,22 @@ export default async function AdminDashboard() {
 
       {/* Експорт CSV */}
       <section>
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h2 className={`mb-2 ${ui.sectionTitle}`}>
           {st(lang, "adm_export")}
         </h2>
-        <div className="flex flex-wrap gap-2 text-sm">
+        <div className="flex flex-wrap gap-2">
           {hasPerm(admin, "players") && (
-            <a
-              href="/admin/export/players"
-              className="rounded-md border border-gray-300 px-3 py-1.5 hover:border-brand hover:text-brand"
-            >
+            <a href="/admin/export/players" className={buttonClass("secondary", "sm")}>
               {st(lang, "adm_export_players")}
             </a>
           )}
           {hasPerm(admin, "games") && (
-            <a
-              href="/admin/export/registrations"
-              className="rounded-md border border-gray-300 px-3 py-1.5 hover:border-brand hover:text-brand"
-            >
+            <a href="/admin/export/registrations" className={buttonClass("secondary", "sm")}>
               {st(lang, "adm_export_regs")}
             </a>
           )}
           {hasPerm(admin, "checkin") && (
-            <a
-              href="/admin/export/checkins"
-              className="rounded-md border border-gray-300 px-3 py-1.5 hover:border-brand hover:text-brand"
-            >
+            <a href="/admin/export/checkins" className={buttonClass("secondary", "sm")}>
               {st(lang, "adm_export_checkins")}
             </a>
           )}

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getAdmin, hasPerm } from "@/lib/admin";
+import { ui, buttonClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -25,16 +26,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   ];
 
   return (
-    <div className="space-y-6">
-      <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3 text-sm">
+    <div className={ui.pageStack}>
+      <nav className="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
         {links
           .filter((l) => l.show)
           .map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="rounded-md px-3 py-1 text-gray-700 hover:bg-brand/10 hover:text-brand"
-            >
+            <Link key={l.href} href={l.href} className={buttonClass("ghost", "sm")}>
               {l.label}
             </Link>
           ))}

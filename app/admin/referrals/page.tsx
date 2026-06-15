@@ -4,6 +4,7 @@ import { requirePerm } from "@/lib/admin";
 import { listReferrals } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { setReferralStatus } from "@/app/admin/actions";
+import { ui, buttonClass, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -13,39 +14,39 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
   const refs = await listReferrals();
 
   return (
-    <div className="space-y-5">
-      <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "adm_referrals_title")}</h1>
+    <div className={ui.pageStack}>
+      <h1 className={ui.pageTitle}>{st(lang, "adm_referrals_title")}</h1>
       {searchParams.saved && (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, "adm_saved")}</p>
+        <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>
       )}
 
       {refs.length === 0 ? (
-        <p className="text-sm text-gray-500">{st(lang, "adm_empty")}</p>
+        <p className={ui.muted}>{st(lang, "adm_empty")}</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-gray-200 text-left text-gray-500">
-                <th className="px-3 py-2 font-medium">{st(lang, "adm_inviter")}</th>
-                <th className="px-3 py-2 font-medium">{st(lang, "adm_invited")}</th>
-                <th className="px-3 py-2 font-medium">{st(lang, "adm_col_status")}</th>
-                <th className="px-3 py-2" />
+        <div className={`overflow-x-auto ${ui.tableWrap} bg-white`}>
+          <table className={ui.table}>
+            <thead className={ui.thead}>
+              <tr>
+                <th className={ui.th}>{st(lang, "adm_inviter")}</th>
+                <th className={ui.th}>{st(lang, "adm_invited")}</th>
+                <th className={ui.th}>{st(lang, "adm_col_status")}</th>
+                <th className={ui.th} />
               </tr>
             </thead>
-            <tbody>
+            <tbody className={ui.tbody}>
               {refs.map((r) => (
-                <tr key={r.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-3 py-2 font-medium text-gray-900">{r.inviter}</td>
-                  <td className="px-3 py-2 text-gray-700">{r.invited}</td>
-                  <td className="px-3 py-2">
+                <tr key={r.id}>
+                  <td className={`${ui.td} font-medium text-gray-900`}>{r.inviter}</td>
+                  <td className={ui.td}>{r.invited}</td>
+                  <td className={ui.td}>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-xs ${
+                      className={badgeClass(
                         r.status === "confirmed"
-                          ? "bg-green-100 text-green-700"
+                          ? "green"
                           : r.status === "rejected"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-amber-100 text-amber-700"
-                      }`}
+                            ? "red"
+                            : "amber",
+                      )}
                     >
                       {r.status}
                     </span>
@@ -53,20 +54,20 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                       {formatGameWhen(r.created_at, lang)}
                     </span>
                   </td>
-                  <td className="px-3 py-2 text-right">
+                  <td className={`${ui.td} text-right`}>
                     {r.status === "pending" && (
                       <div className="flex justify-end gap-2">
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="confirmed" />
-                          <button type="submit" className="rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-neutral-50 hover:bg-brand-dark">
+                          <button type="submit" className={buttonClass("primary", "sm")}>
                             {st(lang, "adm_btn_confirm")}
                           </button>
                         </form>
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="rejected" />
-                          <button type="submit" className="rounded-md border border-gray-300 px-2.5 py-1 text-xs hover:border-red-400 hover:text-red-600">
+                          <button type="submit" className={buttonClass("danger", "sm")}>
                             {st(lang, "adm_btn_reject")}
                           </button>
                         </form>

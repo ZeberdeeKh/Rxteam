@@ -1,5 +1,6 @@
 ﻿import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
+import { ui } from "@/components/ui";
 import AuthForm from "@/components/auth/AuthForm";
 import TelegramLoginButton from "@/components/auth/TelegramLoginButton";
 
@@ -11,9 +12,7 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
   return (
     <div className="mx-auto max-w-sm">
       {searchParams.error === "tg" && (
-        <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          {st(lang, "auth_err_tg")}
-        </p>
+        <p className={`mb-4 ${ui.alertErr}`}>{st(lang, "auth_err_tg")}</p>
       )}
 
       <AuthForm mode="login" lang={lang} />
@@ -24,7 +23,7 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
         <span className="h-px flex-1 bg-gray-200" />
       </div>
 
-      <p className="mb-3 text-center text-sm text-gray-600">{st(lang, "auth_tg_hint")}</p>
+      <p className={`mb-3 text-center ${ui.muted}`}>{st(lang, "auth_tg_hint")}</p>
       <TelegramLoginButton bot={TG_BOT} />
     </div>
   );

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import { registerForGame } from "@/app/cabinet/actions";
+import { ui, buttonClass } from "@/components/ui";
 
 // Форма запису на гру: оренда + транспорт (own/need) + (для own) звідки + вільні місця.
 export default function RegisterForm({ gameId, lang }: { gameId: number; lang: Lang }) {
   const [transport, setTransport] = useState<"need" | "own">("need");
-  const inputCls =
-    "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
+  const inputCls = ui.input;
 
   return (
     <form action={registerForGame} className="space-y-3">
@@ -59,10 +59,7 @@ export default function RegisterForm({ gameId, lang }: { gameId: number; lang: L
         </div>
       )}
 
-      <button
-        type="submit"
-        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
-      >
+      <button type="submit" className={buttonClass("primary", "md")}>
         {st(lang, "btn_register")}
       </button>
     </form>

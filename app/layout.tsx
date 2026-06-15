@@ -9,6 +9,7 @@ import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
 import BugReport from "@/components/BugReport";
+import { ui } from "@/components/ui";
 
 export const metadata: Metadata = {
   title: "RX Team",
@@ -17,6 +18,9 @@ export const metadata: Metadata = {
 
 // Уникаємо «спалаху» світлої теми: ставимо .dark ДО першого рендера за збереженим вибором.
 const themeInit = `(function(){try{var t=localStorage.getItem('rxteam-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+
+// Єдиний стиль навігаційного посилання у шапці.
+const navLink = "rounded-md px-2.5 py-1.5 text-gray-600 transition hover:bg-brand/10 hover:text-brand";
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
@@ -55,48 +59,49 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body className="flex min-h-screen flex-col">
-        <header className="border-b border-gray-200 bg-white">
+        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
           <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 py-3">
             <Link href="/" className="flex items-baseline gap-2">
-              <span className="text-lg font-bold tracking-tight text-brand-dark">RX&nbsp;Team</span>
+              <span className="text-lg font-bold uppercase tracking-wide text-brand-dark">RX&nbsp;Team</span>
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link href="/games" className="text-gray-700 hover:text-brand">
+            <nav className="flex items-center gap-1 text-sm">
+              <Link href="/games" className={navLink}>
                 {st(lang, "nav_games")}
               </Link>
-              <Link href="/ranking" className="text-gray-700 hover:text-brand">
+              <Link href="/ranking" className={navLink}>
                 {st(lang, "nav_ranking")}
               </Link>
               {loggedIn ? (
                 <>
-                  <Link href="/shop" className="text-gray-700 hover:text-brand">
+                  <Link href="/shop" className={navLink}>
                     {st(lang, "nav_shop")}
                   </Link>
-                  <Link href="/cabinet" className="text-gray-700 hover:text-brand">
+                  <Link href="/cabinet" className={navLink}>
                     {st(lang, "nav_cabinet")}
                   </Link>
                   {admin && (
-                    <Link href="/admin" className="font-medium text-brand hover:text-brand-dark">
+                    <Link href="/admin" className={`${navLink} font-medium text-brand`}>
                       {st(lang, "nav_admin")}
                     </Link>
                   )}
                   <form action={signOut}>
-                    <button type="submit" className="text-gray-700 hover:text-brand">
+                    <button type="submit" className={navLink}>
                       {st(lang, "nav_logout")}
                     </button>
                   </form>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-gray-700 hover:text-brand">
+                  <Link href="/login" className={navLink}>
                     {st(lang, "nav_login")}
                   </Link>
-                  <Link href="/register" className="text-gray-700 hover:text-brand">
+                  <Link href="/register" className={navLink}>
                     {st(lang, "nav_register")}
                   </Link>
                 </>
               )}
+              <span className="mx-1 h-5 w-px bg-gray-200" />
               <ThemeToggle title={st(lang, "theme_toggle")} />
               <LangSwitcher current={lang} />
             </nav>
@@ -106,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
 
         <footer className="border-t border-gray-200 bg-white">
-          <div className="mx-auto w-full max-w-5xl px-4 py-4 text-xs text-gray-500">
+          <div className={`mx-auto w-full max-w-5xl px-4 py-4 ${ui.meta}`}>
             © RX Team · {st(lang, "footer_note")}
           </div>
         </footer>
