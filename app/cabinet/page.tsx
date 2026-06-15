@@ -134,7 +134,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   const [rel, games, log, achs] = await Promise.all([
     getReliability(player.id),
     getCabinetGames(player.id),
-    getPointLog(player.id),
+    getPointLog(player.id, lang),
     getPlayerAchievements(player.id),
   ]);
 
@@ -281,6 +281,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                   <span className="ml-2 text-xs text-neutral-400">
                     {formatGameWhen(row.created_at, lang)}
                   </span>
+                  {row.itemTitle && (
+                    <p className="mt-0.5 text-xs text-neutral-500">{row.itemTitle}</p>
+                  )}
                 </div>
                 <span
                   className={`shrink-0 tabular-nums font-medium ${

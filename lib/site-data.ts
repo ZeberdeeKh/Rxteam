@@ -196,17 +196,48 @@ export type PointLogRow = {
   meta: string | null;
   game_id: number | null;
   created_at: string;
+  itemTitle: string | null; // заповнюється лише для reason=purchase
 };
 
 // Останні рухи балів гравця (журнал point_log).
-export async function getPointLog(playerId: number, limit = 25): Promise<PointLogRow[]> {
+// Для покупок магазину підтягує назву товару з shop_items.
+export async function getPointLog(playerId: number, lang = "uk", limit = 25): Promise<PointLogRow[]> {
   const { data } = await supabase
     .from("point_log")
     .select("delta, reason, meta, game_id, created_at")
     .eq("player_id", playerId)
     .order("created_at", { ascending: false })
     .limit(limit);
-  return (data ?? []) as PointLogRow[];
+  const rows = (data ?? []) as Omit<PointLogRow, "itemTitle">[];
+
+  // Резолвимо назви товарів одним запитом.
+  const itemIds = [...new Set(
+    rows
+      .filter((r) => r.reason === "purchase" && r.meta?.startsWith("shop:"))
+      .map((r) => Number(r.meta!.split(":")[1]))
+      .filter((id) => Number.isFinite(id)),
+  )];
+  const itemMap = new Map<number, string>();
+  if (itemIds.length) {
+    const { data: items } = await supabase
+      .from("shop_items")
+      .select("id, title_pl, title_en, title_uk")
+      .in("id", itemIds);
+    for (const it of items ?? []) {
+      const title =
+        (lang === "pl" ? it.title_pl : lang === "en" ? it.title_en : it.title_uk) ??
+        it.title_pl ?? it.title_en ?? it.title_uk ?? null;
+      itemMap.set(it.id as number, title as string);
+    }
+  }
+
+  return rows.map((r) => ({
+    ...r,
+    itemTitle:
+      r.reason === "purchase" && r.meta?.startsWith("shop:")
+        ? (itemMap.get(Number(r.meta.split(":")[1])) ?? null)
+        : null,
+  }));
 }
 
 export type PlayerAch = {

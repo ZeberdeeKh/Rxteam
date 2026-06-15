@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { featureEnabled } from "@/lib/settings";
 import { awardPoints } from "@/lib/economy";
 import { getSessionPlayer } from "@/lib/site-player";
+import { notifyAdminsPurchase } from "@/lib/notify";
 
 const back = (q: string) => redirect(`/shop${q}`);
 
@@ -21,7 +22,7 @@ export async function buyItem(formData: FormData) {
 
   const { data: item } = await supabase
     .from("shop_items")
-    .select("id, cost, active")
+    .select("id, cost, active, title_pl, title_en, title_uk")
     .eq("id", itemId)
     .maybeSingle();
   if (!item || !item.active) back("?err=inactive");
@@ -38,6 +39,15 @@ export async function buyItem(formData: FormData) {
     meta: `shop:${itemId}`,
     hasPatch: !!player.has_patch,
   });
+
+  // Сповіщення адмінів (fire-and-forget).
+  const itemTitle = (item!.title_pl ?? item!.title_en ?? item!.title_uk ?? `#${itemId}`) as string;
+  notifyAdminsPurchase({
+    playerCallsign: (player as any).callsign ?? null,
+    playerName: (player as any).name ?? null,
+    itemTitle,
+    cost,
+  }).catch(() => {});
 
   revalidatePath("/shop");
   revalidatePath("/cabinet");
