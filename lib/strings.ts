@@ -151,9 +151,16 @@ const S: Record<string, Dict> = {
 
   // картка гри + реєстрація
   game_card: {
-    pl: "🎯 {title}\n📅 {when}\n📍 {loc}",
-    en: "🎯 {title}\n📅 {when}\n📍 {loc}",
-    uk: "🎯 {title}\n📅 {when}\n📍 {loc}",
+    pl: "🎯 {title}\n📅 {when}",
+    en: "🎯 {title}\n📅 {when}",
+    uk: "🎯 {title}\n📅 {when}",
+  },
+  // Окремий рядок локації — показуємо лише коли вона відрізняється від назви гри
+  // (у нас назва зазвичай і є локацією, тому не дублюємо).
+  game_card_loc: {
+    pl: "📍 {loc}",
+    en: "📍 {loc}",
+    uk: "📍 {loc}",
   },
   // Рядок лічильника гравців — додається до картки лише коли feature_announce_count != "false".
   game_card_count: {

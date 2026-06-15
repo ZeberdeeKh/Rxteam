@@ -2096,14 +2096,23 @@ async function buildGameCard(
   const kb = new InlineKeyboard();
   if (reg?.status === "registered") kb.text(tr(lang, "btn_leave"), `unreg:${gameId}`);
   else kb.text(tr(lang, "btn_register"), `reg:${gameId}`);
+  // Назва зазвичай і є локацією — показуємо одну, а локацію окремим рядком лише якщо вона інша.
+  const name = game.title ?? loc?.name ?? "ASG";
   let text = tr(lang, "game_card", {
-    title: game.title ?? "ASG",
+    title: name,
     when: formatWhen(game.gather_at ?? game.start_at),
-    loc: loc?.name ?? "—",
   });
+  if (loc?.name && loc.name !== name) {
+    text += "\n" + tr(lang, "game_card_loc", { loc: loc.name });
+  }
   // Лічильник гравців — вмикається/вимикається в адмінці (default ON).
   if (await featureEnabled("announce_count")) {
     text += "\n" + tr(lang, "game_card_count", { count: await registeredCount(gameId) });
+  }
+  // Сценарій гри (з налаштувань гри) — щоб картка була інформативнішою.
+  const scenario = (lang === "pl" ? game.scenario_pl : game.scenario_uk)?.trim();
+  if (scenario) {
+    text += "\n\n" + scenario;
   }
   // Знижка за приведених новачків на цю гру (інфо «при оплаті»).
   const { count: refCount } = await supabase
