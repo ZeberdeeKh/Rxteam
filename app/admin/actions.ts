@@ -151,6 +151,53 @@ export async function deleteLocation(formData: FormData) {
   back2("?deleted=1");
 }
 
+// ── Чек-лист підготовки до гри (Етап 13, майстер) ──
+const backChores = (q: string) => redirect(`/admin/chores${q}`);
+
+function parseChoreKind(formData: FormData): "action" | "gear" | null {
+  const raw = String(formData.get("kind") ?? "");
+  return raw === "action" || raw === "gear" ? raw : null;
+}
+
+export async function createChore(formData: FormData) {
+  await requireMaster();
+  const kind = parseChoreKind(formData);
+  const label = String(formData.get("label") ?? "").trim();
+  if (!kind || !label) backChores("?err=fields");
+  const sortRaw = Number(formData.get("sort_order"));
+  const sort_order = Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0;
+  await supabase.from("chore_templates").insert({ kind, label, sort_order, active: true });
+  revalidatePath("/admin/chores");
+  backChores("?created=1");
+}
+
+export async function updateChore(formData: FormData) {
+  await requireMaster();
+  const id = Number(formData.get("id"));
+  const kind = parseChoreKind(formData);
+  const label = String(formData.get("label") ?? "").trim();
+  if (!Number.isFinite(id) || !kind || !label) backChores("?err=fields");
+  const sortRaw = Number(formData.get("sort_order"));
+  const sort_order = Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0;
+  const active = formData.get("active") === "on";
+  await supabase
+    .from("chore_templates")
+    .update({ kind, label, sort_order, active })
+    .eq("id", id);
+  revalidatePath("/admin/chores");
+  backChores("?saved=1");
+}
+
+export async function deleteChore(formData: FormData) {
+  await requireMaster();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backChores("");
+  // Знімок пунктів зберігається в chore_run_items — видалення шаблону не чіпає минулі run.
+  await supabase.from("chore_templates").delete().eq("id", id);
+  revalidatePath("/admin/chores");
+  backChores("?deleted=1");
+}
+
 // ── Реєстрації / чек-іни наживо (право checkin) ──
 export async function manualCheckin(formData: FormData) {
   await requirePerm("checkin");

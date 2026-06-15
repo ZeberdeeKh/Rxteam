@@ -421,6 +421,7 @@ const SITE: Record<string, Dict> = {
   adm_nav_rental: { pl: "Wynajem", en: "Rental", uk: "Оренда" },
   adm_nav_joins: { pl: "Wnioski (grupa)", en: "Join requests", uk: "Заявки в групу" },
   adm_nav_roles: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
+  adm_nav_chores: { pl: "Czek-lista", en: "Checklist", uk: "Чек-лист" },
 
   adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
@@ -473,6 +474,22 @@ const SITE: Record<string, Dict> = {
   adm_loc_firemode: { pl: "Tryb ognia", en: "Fire mode", uk: "Режим вогню" },
   adm_fire_auto: { pl: "Full-auto + semi", en: "Full-auto + semi", uk: "Full-auto + semi" },
   adm_fire_semi: { pl: "Tylko semi", en: "Semi only", uk: "Лише semi" },
+
+  // ── Чек-лист підготовки до гри (Етап 13, майстер) ──
+  adm_chores_title: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" },
+  adm_chores_hint: {
+    pl: "Pozycje wysyłane do grupy adminów przy anonsie gry. Każdy bierze pozycję na siebie; raport w piątek o 22:00.",
+    en: "Items posted to the admin group when a game is announced. Each member claims items; report on Friday at 22:00.",
+    uk: "Пункти йдуть у адмін-групу при анонсі гри. Кожен бере пункт на себе; звіт у п'ятницю о 22:00.",
+  },
+  adm_chore_add: { pl: "Nowa pozycja", en: "New item", uk: "Новий пункт" },
+  adm_chore_kind: { pl: "Typ", en: "Type", uk: "Тип" },
+  adm_chore_kind_action: { pl: "Działanie", en: "Action", uk: "Дія" },
+  adm_chore_kind_gear: { pl: "Zabrać na grę", en: "Bring to game", uk: "Взяти на гру" },
+  adm_chore_label: { pl: "Treść", en: "Label", uk: "Текст" },
+  adm_chore_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
+  adm_chore_active: { pl: "Aktywna", en: "Active", uk: "Активний" },
+  adm_chore_empty: { pl: "Brak pozycji.", en: "No items.", uk: "Немає пунктів." },
 
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },

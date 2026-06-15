@@ -237,6 +237,24 @@ export async function listLocations() {
   return (data ?? []) as { id: number; name: string }[];
 }
 
+// ── Чек-лист підготовки до гри (Етап 13, майстер) ──
+export type ChoreTemplate = {
+  id: number;
+  kind: string; // 'action' | 'gear'
+  label: string;
+  sort_order: number;
+  active: boolean;
+};
+
+export async function listChoreTemplates(): Promise<ChoreTemplate[]> {
+  const { data } = await supabase
+    .from("chore_templates")
+    .select("id, kind, label, sort_order, active")
+    .order("kind", { ascending: true })
+    .order("sort_order", { ascending: true });
+  return (data ?? []) as ChoreTemplate[];
+}
+
 export type AdminLocation = {
   id: number;
   name: string;

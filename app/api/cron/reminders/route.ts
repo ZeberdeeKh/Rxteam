@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
 import { getSetting, featureEnabled } from "@/lib/settings";
 import { formatWhen } from "@/lib/games";
+import { processDueChoreReports } from "@/lib/chores";
 import { tr } from "@/lib/strings";
 import type { Lang } from "@/lib/i18n";
 import { DateTime } from "luxon";
@@ -19,7 +20,14 @@ export async function GET(req: Request) {
   if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return new Response("Unauthorized", { status: 401 });
   }
-  if (!(await featureEnabled("reminders"))) return Response.json({ skipped: "disabled" });
+  // Звіт по чек-листах підготовки (пт 22:00) — незалежно від feature_reminders.
+  // Ідемпотентно через chore_runs.report_at + status; пінгер ходить кожні ~15 хв.
+  const chores = await processDueChoreReports(bot.api).catch((e) => {
+    console.error("chore reports failed", e);
+    return 0;
+  });
+
+  if (!(await featureEnabled("reminders"))) return Response.json({ skipped: "disabled", chores });
 
   const nowMs = Date.now();
   const horizonIso = new Date(nowMs + 26 * 3600 * 1000).toISOString();
@@ -57,7 +65,7 @@ export async function GET(req: Request) {
     }
   }
 
-  return Response.json({ day, before });
+  return Response.json({ day, before, chores });
 }
 
 async function sendRemind(game: { id: number; title: string | null; start_at: string }, key: string) {

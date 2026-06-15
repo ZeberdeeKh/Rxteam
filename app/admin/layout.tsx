@@ -24,6 +24,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: "/admin/rental", label: st(lang, "adm_nav_rental"), show: hasPerm(admin, "rental") },
     { href: "/admin/joins", label: st(lang, "adm_nav_joins"), show: hasPerm(admin, "joins") },
     { href: "/admin/roles", label: st(lang, "adm_nav_roles"), show: !!admin.is_master },
+    { href: "/admin/chores", label: st(lang, "adm_nav_chores"), show: !!admin.is_master },
   ];
 
   return (

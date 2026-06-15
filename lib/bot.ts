@@ -46,6 +46,7 @@ import {
   formatWhen,
   distanceMeters,
 } from "./games";
+import { postChoreRun, toggleChoreClaim, refreshChoreMessage } from "./chores";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
@@ -840,6 +841,57 @@ bot.command("sethere", async (ctx) => {
         `chat_id: ${ctx.chat.id}\n\n` +
         `Тепер тут пише лише бот — решту повідомлень бот видалятиме.`,
     );
+  }
+});
+
+// Прив'язка адмін-групи (другої, закритої) для чек-листів підготовки до гри (Етап 13).
+// Виконати в потрібній групі/топіку — далі при анонсі гри сюди летить інтерактивний список.
+bot.command("setchores", async (ctx) => {
+  if (ctx.chat.type === "private") {
+    await ctx.reply("Виконай цю команду в адмін-групі (у потрібному топіку).");
+    return;
+  }
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+  const threadId = ctx.message?.message_thread_id;
+  await setSetting("chores_chat_id", String(ctx.chat.id));
+  await setSetting("chores_thread_id", threadId ? String(threadId) : "");
+  await ctx.reply(
+    `✅ Групу для чек-листів підготовки збережено.\nchat_id: ${ctx.chat.id}` +
+      (threadId ? `\nthread_id: ${threadId}` : "") +
+      `\n\nТепер при анонсі гри сюди прилітатиме інтерактивний список завдань.`,
+  );
+});
+
+// Тогл пункту чек-листа: вільно → взяв; мій → звільнив; чужий → «вже взяв …».
+bot.callbackQuery(/^chore:(\d+)$/, async (ctx) => {
+  const itemId = Number(ctx.match[1]);
+  const from = ctx.from!;
+  const fullName = [from.first_name, from.last_name].filter(Boolean).join(" ") || `id${from.id}`;
+  const display = from.username ? `${fullName} (@${from.username})` : fullName;
+  const res = await toggleChoreClaim(itemId, from.id, display);
+  if (res.result === "busy") {
+    await ctx.answerCallbackQuery({ text: `Вже взяв: ${res.busyName ?? "інший учасник"}` });
+  } else if (res.result === "closed") {
+    await ctx.answerCallbackQuery({ text: "Список уже закрито." });
+  } else if (res.result === "gone") {
+    await ctx.answerCallbackQuery();
+  } else {
+    await ctx.answerCallbackQuery({ text: res.result === "taken" ? "Взяв ✅" : "Звільнив ⬜" });
+    if (res.runId) await refreshChoreMessage(ctx.api, res.runId);
   }
 });
 
@@ -1852,6 +1904,13 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
     console.error("announcement post failed", e);
     await ctx.reply("⚠️ Гру створено, але анонс не запостився (можливо, текст задовгий або немає прав у топіку).");
     return;
+  }
+
+  // Чек-лист підготовки до гри в адмін-групу (Етап 13) — не має ламати анонс.
+  try {
+    await postChoreRun(ctx.api, game!.id);
+  } catch (e) {
+    console.error("postChoreRun failed", e);
   }
 
   await ctx.reply(

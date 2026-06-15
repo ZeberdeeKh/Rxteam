@@ -61,6 +61,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_lottery", type: "toggle", label: "Loteria niezawodnych" },
       { key: "feature_shop", type: "toggle", label: "Sklep za punkty" },
       { key: "feature_site_link", type: "toggle", label: "Łączenie konta z TG" },
+      { key: "feature_chores", type: "toggle", label: "Czek-lista przygotowań" },
     ],
   },
   {
@@ -157,6 +158,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "master_username", type: "text", label: "Master username (Telegram, bez @)" },
       { key: "announce_chat_id", type: "text", label: "Announce chat_id (grupa)" },
       { key: "announce_thread_id", type: "text", label: "Announce thread_id" },
+      { key: "chores_chat_id", type: "text", label: "Czek-lista chat_id (grupa adminów)" },
+      { key: "chores_thread_id", type: "text", label: "Czek-lista thread_id" },
     ],
   },
 ];
