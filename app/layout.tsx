@@ -66,8 +66,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
             </Link>
             <nav className="flex items-center gap-1 text-sm">
-              <Link href="/games" className={navLink}>
-                {st(lang, "nav_games")}
+              <Link href="/" className={navLink}>
+                {st(lang, "nav_home")}
               </Link>
               {loggedIn ? (
                 <>
