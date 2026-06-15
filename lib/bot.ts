@@ -252,6 +252,49 @@ bot.command("linksite", async (ctx) => {
   await ctx.reply(tr(lang, "linksite_msg", { code, min: 15, url }));
 });
 
+// ─────────────────────────── Найближчі ігри (/games) ───────────────────────────
+
+// Список усіх найближчих анонсованих ігор — записатись/виписатись з одного місця.
+bot.command("games", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  const cutoff = new Date(Date.now() - 3 * 3600 * 1000).toISOString();
+  const { data: games } = await supabase
+    .from("games")
+    .select("id, title, start_at")
+    .eq("status", "announced")
+    .gt("start_at", cutoff)
+    .order("start_at");
+  if (!games || !games.length) {
+    await ctx.reply(tr(lang, "games_none"));
+    return;
+  }
+  // Ігри, на які гравець уже записаний — позначаємо ✅.
+  const { data: regs } = await supabase
+    .from("registrations")
+    .select("game_id")
+    .eq("player_id", p.id)
+    .eq("status", "registered");
+  const mine = new Set((regs ?? []).map((r) => r.game_id));
+  const kb = new InlineKeyboard();
+  games.forEach((g) =>
+    kb
+      .text(
+        `${mine.has(g.id) ? "✅ " : ""}${g.title ?? "#" + g.id} — ${formatWhen(g.start_at)}`,
+        `games:${g.id}`,
+      )
+      .row(),
+  );
+  await ctx.reply(tr(lang, "games_pick"), { reply_markup: kb });
+});
+
+bot.callbackQuery(/^games:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  await showGameCard(ctx, p, Number(ctx.match[1]));
+});
+
 // ─────────────────────────── Carpool: водії ───────────────────────────
 
 bot.command("drivers", async (ctx) => {
@@ -1475,16 +1518,24 @@ bot.callbackQuery(/^regrent:(yes|no)$/, async (ctx) => {
   const kb = new InlineKeyboard()
     .text(tr(lang, "btn_transport_own"), "regtr:own")
     .row()
-    .text(tr(lang, "btn_transport_need"), "regtr:need");
+    .text(tr(lang, "btn_transport_need"), "regtr:need")
+    .row()
+    .text(tr(lang, "btn_transport_skip"), "regtr:skip");
   await ctx.editMessageText(tr(lang, "reg_transport_q"), { reply_markup: kb });
 });
 
-bot.callbackQuery(/^regtr:(own|need)$/, async (ctx) => {
+bot.callbackQuery(/^regtr:(own|need|skip)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const { state, data } = await getState(ctx.from.id);
   if (state !== "reg_transport") return;
   const p = await ensurePlayer(ctx.from);
   const lang = p.lang as Lang;
+  // Пропустити — не водій і транспорт не потрібен: завершуємо без даних про дорогу.
+  if (ctx.match[1] === "skip") {
+    await ctx.editMessageText(tr(lang, "transport_skip_noted"));
+    await finalizeReg(ctx, p, { ...data, transport: null });
+    return;
+  }
   if (ctx.match[1] === "need") {
     await ctx.editMessageText(tr(lang, "transport_need_noted"));
     await finalizeReg(ctx, p, { ...data, transport: "need" });
@@ -1522,6 +1573,15 @@ bot.callbackQuery(/^unreg:(\d+)$/, async (ctx) => {
     .eq("game_id", gameId)
     .eq("player_id", p.id);
   await updateAnnouncement(gameId);
+  // Оновлюємо картку на місці — кнопка перемикається «Відписатись» → «Записатись».
+  const card = await buildGameCard(p, gameId);
+  if (card) {
+    try {
+      await ctx.editMessageText(card.text, { reply_markup: card.kb });
+    } catch (e) {
+      console.error("refresh card after unreg failed", e);
+    }
+  }
   await ctx.reply(tr(lang, "unreg_done"));
 });
 
@@ -2010,19 +2070,21 @@ async function updateAnnouncement(gameId: number) {
   }
 }
 
-async function showGameCard(ctx: Context, p: any, gameId: number) {
+// Будує картку гри: текст + клавіатура (записатись/виписатись).
+// Лічильник гравців додається лише коли увімкнено feature_announce_count (як у анонсі).
+// Повертає null, якщо гри не існує.
+async function buildGameCard(
+  p: any,
+  gameId: number,
+): Promise<{ text: string; kb: InlineKeyboard } | null> {
   const lang = p.lang as Lang;
   const { data: game } = await supabase
     .from("games")
     .select("*, locations(*)")
     .eq("id", gameId)
     .single();
-  if (!game) {
-    await ctx.reply(tr(lang, "game_not_found"));
-    return;
-  }
+  if (!game) return null;
   const loc = (game as any).locations;
-  const count = await registeredCount(gameId);
   const { data: reg } = await supabase
     .from("registrations")
     .select("status")
@@ -2032,12 +2094,15 @@ async function showGameCard(ctx: Context, p: any, gameId: number) {
   const kb = new InlineKeyboard();
   if (reg?.status === "registered") kb.text(tr(lang, "btn_leave"), `unreg:${gameId}`);
   else kb.text(tr(lang, "btn_register"), `reg:${gameId}`);
-  let msg = tr(lang, "game_card", {
+  let text = tr(lang, "game_card", {
     title: game.title ?? "ASG",
     when: formatWhen(game.gather_at ?? game.start_at),
     loc: loc?.name ?? "—",
-    count,
   });
+  // Лічильник гравців — вмикається/вимикається в адмінці (default ON).
+  if (await featureEnabled("announce_count")) {
+    text += "\n" + tr(lang, "game_card_count", { count: await registeredCount(gameId) });
+  }
   // Знижка за приведених новачків на цю гру (інфо «при оплаті»).
   const { count: refCount } = await supabase
     .from("referrals")
@@ -2047,9 +2112,18 @@ async function showGameCard(ctx: Context, p: any, gameId: number) {
     .eq("status", "confirmed");
   if ((refCount ?? 0) > 0) {
     const discount = (refCount ?? 0) >= 2 ? tr(lang, "ref_disc_free") : tr(lang, "ref_disc_half");
-    msg += "\n" + tr(lang, "ref_card_discount", { discount });
+    text += "\n" + tr(lang, "ref_card_discount", { discount });
   }
-  await ctx.reply(msg, { reply_markup: kb });
+  return { text, kb };
+}
+
+async function showGameCard(ctx: Context, p: any, gameId: number) {
+  const card = await buildGameCard(p, gameId);
+  if (!card) {
+    await ctx.reply(tr(p.lang as Lang, "game_not_found"));
+    return;
+  }
+  await ctx.reply(card.text, { reply_markup: card.kb });
 }
 
 async function startRegFlow(ctx: Context, lang: Lang, gameId: number) {

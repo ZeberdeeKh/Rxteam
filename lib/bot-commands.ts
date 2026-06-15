@@ -13,6 +13,7 @@ const COMMANDS: Record<Lang, BotMenuCommand[]> = {
   uk: [
     { command: "start", description: "🚀 Старт / Про бота" },
     { command: "profile", description: "👤 Мій профіль" },
+    { command: "games", description: "📅 Найближчі ігри" },
     { command: "checkin", description: "✅ Чек-ін на гру" },
     { command: "top", description: "🏆 Топ гравців" },
     { command: "patch", description: "🪖 Нашивка" },
@@ -27,6 +28,7 @@ const COMMANDS: Record<Lang, BotMenuCommand[]> = {
   pl: [
     { command: "start", description: "🚀 Start / O bocie" },
     { command: "profile", description: "👤 Mój profil" },
+    { command: "games", description: "📅 Nadchodzące gry" },
     { command: "checkin", description: "✅ Check-in na grę" },
     { command: "top", description: "🏆 Najlepsi gracze" },
     { command: "patch", description: "🪖 Naszywka członkowska" },
@@ -41,6 +43,7 @@ const COMMANDS: Record<Lang, BotMenuCommand[]> = {
   en: [
     { command: "start", description: "🚀 Start / About" },
     { command: "profile", description: "👤 My profile" },
+    { command: "games", description: "📅 Upcoming games" },
     { command: "checkin", description: "✅ Check in" },
     { command: "top", description: "🏆 Top players" },
     { command: "patch", description: "🪖 Membership patch" },

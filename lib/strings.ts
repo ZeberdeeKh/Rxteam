@@ -151,9 +151,15 @@ const S: Record<string, Dict> = {
 
   // картка гри + реєстрація
   game_card: {
-    pl: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Zapisani: {count}",
-    en: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Registered: {count}",
-    uk: "🎯 {title}\n📅 {when}\n📍 {loc}\n👥 Записані: {count}",
+    pl: "🎯 {title}\n📅 {when}\n📍 {loc}",
+    en: "🎯 {title}\n📅 {when}\n📍 {loc}",
+    uk: "🎯 {title}\n📅 {when}\n📍 {loc}",
+  },
+  // Рядок лічильника гравців — додається до картки лише коли feature_announce_count != "false".
+  game_card_count: {
+    pl: "👥 Zapisani: {count}",
+    en: "👥 Registered: {count}",
+    uk: "👥 Записані: {count}",
   },
   btn_register: { pl: "✅ Zapisz się", en: "✅ Sign up", uk: "✅ Записатись" },
   btn_leave: { pl: "❌ Wypisz się", en: "❌ Leave", uk: "❌ Відписатись" },
@@ -210,10 +216,17 @@ const S: Record<string, Dict> = {
   },
   btn_transport_own: { pl: "🚗 Własnym autem", en: "🚗 My own ride", uk: "🚗 Своїм ходом" },
   btn_transport_need: { pl: "🙋 Potrzebuję transportu", en: "🙋 Need a ride", uk: "🙋 Потрібен транспорт" },
+  // Для тих, хто не водій і не шукає транспорт — реєстрація завершується без даних про дорогу.
+  btn_transport_skip: { pl: "⏭️ Pomiń", en: "⏭️ Skip", uk: "⏭️ Пропустити" },
   transport_need_noted: {
     pl: "Zapisane. Lista kierowców — /drivers.",
     en: "Noted. Driver list — /drivers.",
     uk: "Записано. Список водіїв — /drivers.",
+  },
+  transport_skip_noted: {
+    pl: "OK, bez transportu.",
+    en: "OK, no transport.",
+    uk: "Гаразд, без транспорту.",
   },
   reg_from_q: {
     pl: "Skąd jedziesz? (dzielnica/miejsce)",
@@ -481,6 +494,18 @@ const S: Record<string, Dict> = {
     pl: "🎟 Twój znajomy {who} zrobił pierwszy check-in! +{pts} pkt. Zniżka na «{title}»: {discount}.",
     en: "🎟 Your friend {who} did their first check-in! +{pts} pts. Discount for «{title}»: {discount}.",
     uk: "🎟 Твій друг {who} зробив перший чек-ін! +{pts} балів. Знижка на «{title}»: {discount}.",
+  },
+
+  // /games — список найближчих ігор (записатись / виписатись з одного місця)
+  games_none: {
+    pl: "Brak nadchodzących gier.",
+    en: "No upcoming games.",
+    uk: "Зараз немає найближчих ігор.",
+  },
+  games_pick: {
+    pl: "Nadchodzące gry — wybierz, aby się zapisać lub wypisać:",
+    en: "Upcoming games — pick one to sign up or leave:",
+    uk: "Найближчі ігри — обери, щоб записатись чи виписатись:",
   },
 
   // carpool — /drivers (пасажир) і /myride (водій)
