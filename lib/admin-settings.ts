@@ -62,6 +62,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_shop", type: "toggle", label: "Sklep za punkty" },
       { key: "feature_site_link", type: "toggle", label: "Łączenie konta z TG" },
       { key: "feature_chores", type: "toggle", label: "Czek-lista przygotowań" },
+      { key: "feature_announce_count", type: "toggle", label: "Licznik graczy w anonsie" },
     ],
   },
   {

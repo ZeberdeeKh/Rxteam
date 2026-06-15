@@ -153,5 +153,7 @@ export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>)
   const cap = g.capacity ? `/${g.capacity}` : "";
   const head = `👥 ${g.count}${cap}`;
   const map = g.mapUrl ? `\n\n${g.mapUrl}` : "";
-  return `${head}\n\n${block("pl", g.scenarioPl)}\n\n———————————————\n\n${block("uk", g.scenarioUk)}${map}`;
+  const body = `${block("pl", g.scenarioPl)}\n\n———————————————\n\n${block("uk", g.scenarioUk)}${map}`;
+  // Лічильник гравців у шапці — вмикається/вимикається в адмінці (default ON).
+  return s["feature_announce_count"] !== "false" ? `${head}\n\n${body}` : body;
 }
