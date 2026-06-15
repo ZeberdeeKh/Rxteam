@@ -568,7 +568,11 @@ const SITE: Record<string, Dict> = {
     en: "Describe the problem — what happened and how to reproduce it…",
     uk: "Опишіть проблему — що сталося і як це відтворити…",
   },
-  bug_email: { pl: "Twój e-mail (opcjonalnie)", en: "Your email (optional)", uk: "Ваш e-mail (необов'язково)" },
+  bug_email: {
+    pl: "E-mail lub nick w Telegramie (opcjonalnie)",
+    en: "Email or Telegram username (optional)",
+    uk: "E-mail або нік у Telegram (необов'язково)",
+  },
   bug_attach: { pl: "Dołącz zrzut ekranu", en: "Attach screenshot", uk: "Прикріпити знімок екрана" },
   bug_screenshot_hint: { pl: "PNG, JPG · do 5 MB", en: "PNG, JPG · up to 5 MB", uk: "PNG, JPG · до 5 МБ" },
   bug_remove: { pl: "Usuń zrzut ekranu", en: "Remove screenshot", uk: "Видалити знімок екрана" },

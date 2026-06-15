@@ -14,23 +14,23 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Бренд indigo/violet (як у калькуляторі). DEFAULT/dark/light — аліаси,
-        // щоб наявні класи bg-brand / text-brand-dark / hover:bg-brand-dark працювали без правок.
+        // Бренд — хакі (мілітарі-оливковий), пасує тематиці ASG/Airsoft. DEFAULT/dark/light —
+        // аліаси, щоб наявні класи bg-brand / text-brand-dark / hover:bg-brand-dark працювали без правок.
         brand: {
-          DEFAULT: "#4f46e5", // brand-600
-          dark: "#4338ca",    // brand-700
-          light: "#818cf8",   // brand-400
-          50: "#eef2ff",
-          100: "#e0e7ff",
-          200: "#c7d2fe",
-          300: "#a5b4fc",
-          400: "#818cf8",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
-          950: "#1e1b4b",
+          DEFAULT: "#6b6a3c", // brand-600
+          dark: "#545331",    // brand-700
+          light: "#9d9b66",   // brand-400
+          50: "#f6f6f1",
+          100: "#e9e9da",
+          200: "#d3d3b6",
+          300: "#b8b78d",
+          400: "#9d9b66",
+          500: "#83814b",
+          600: "#6b6a3c",
+          700: "#545331",
+          800: "#45442b",
+          900: "#3b3a27",
+          950: "#1f1f13",
         },
         // Поверхні/текст сайту — перемикаються між світлою і темною темою через CSS-змінні.
         white: "var(--c-white)",
