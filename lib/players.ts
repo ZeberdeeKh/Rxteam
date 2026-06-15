@@ -69,10 +69,13 @@ export async function getPlayerByTg(tgUserId: number) {
 }
 
 // Топ гравців за «зароблено всього» (бали); к-сть ігор — поряд як статистика.
+// Адмінів і майстра в рейтингу не показуємо (як на сайті, getRanking).
 export async function getTopPlayers(limit = 10) {
   const { data } = await supabase
     .from("players")
     .select("id, callsign, name, games_played, points_earned")
+    .eq("is_admin", false)
+    .eq("is_master", false)
     .or("points_earned.gt.0,games_played.gt.0")
     .order("points_earned", { ascending: false })
     .order("games_played", { ascending: false })
@@ -91,10 +94,13 @@ export async function getAdminsWithPerm(perm: string) {
 }
 
 // Місце гравця в рейтингу: к-сть гравців із більшим «зароблено» + 1 (нічиї ділять місце).
+// Адмінів і майстра не рахуємо — щоб місце збігалося з публічним топом.
 export async function getPlayerRank(pointsEarned: number): Promise<number> {
   const { count } = await supabase
     .from("players")
     .select("*", { count: "exact", head: true })
+    .eq("is_admin", false)
+    .eq("is_master", false)
     .gt("points_earned", pointsEarned);
   return (count ?? 0) + 1;
 }
