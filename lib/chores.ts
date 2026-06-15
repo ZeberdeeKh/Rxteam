@@ -128,9 +128,15 @@ async function fetchGame(gameId: number): Promise<GameLite> {
 // Створити run для гри + знімок активних шаблонів, запостити чек-лист у адмін-групу.
 // Гейти: feature_chores увімкнено, налаштовано chores_chat_id, run на цю гру ще нема.
 export async function postChoreRun(api: Api, gameId: number): Promise<void> {
-  if (!(await featureEnabled("chores"))) return;
+  if (!(await featureEnabled("chores"))) {
+    console.warn("postChoreRun skip: feature_chores вимкнено");
+    return;
+  }
   const chatId = await getSetting("chores_chat_id");
-  if (!chatId) return;
+  if (!chatId) {
+    console.warn("postChoreRun skip: chores_chat_id не задано (/setchores)");
+    return;
+  }
   const threadId = await getSetting("chores_thread_id");
 
   const { data: existing } = await supabase
@@ -138,18 +144,31 @@ export async function postChoreRun(api: Api, gameId: number): Promise<void> {
     .select("id")
     .eq("game_id", gameId)
     .maybeSingle();
-  if (existing) return;
+  if (existing) {
+    console.warn(`postChoreRun skip: run для гри ${gameId} вже існує`);
+    return;
+  }
 
   const game = await fetchGame(gameId);
-  if (!game) return;
+  if (!game) {
+    console.warn(`postChoreRun skip: гру ${gameId} не знайдено`);
+    return;
+  }
 
-  const { data: templates } = await supabase
+  const { data: templates, error: tErr } = await supabase
     .from("chore_templates")
     .select("kind, label, note, sort_order")
     .eq("active", true)
     .order("kind", { ascending: true })
     .order("sort_order", { ascending: true });
-  if (!templates?.length) return;
+  if (tErr) {
+    console.error("postChoreRun: помилка чтення chore_templates", tErr);
+    return;
+  }
+  if (!templates?.length) {
+    console.warn("postChoreRun skip: немає активних шаблонів (etap13.sql?)");
+    return;
+  }
 
   const { data: run } = await supabase
     .from("chore_runs")

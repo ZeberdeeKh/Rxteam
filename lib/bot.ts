@@ -895,6 +895,52 @@ bot.callbackQuery(/^chore:(\d+)$/, async (ctx) => {
   }
 });
 
+// Діагностика чек-листа: чому при анонсі не летить список. Виконати в приваті з ботом.
+bot.command("choresdiag", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  if (!p.is_master && !p.is_admin) {
+    await ctx.reply("⛔ Лише для адмінів.");
+    return;
+  }
+  const out: string[] = ["🔎 Діагностика чек-листа:"];
+
+  const feat = await getSetting("feature_chores");
+  const featOn = feat === null ? true : feat !== "false";
+  out.push(`• feature_chores: ${feat ?? "(не задано)"} → ${featOn ? "✅ увімкнено" : "❌ ВИМКНЕНО"}`);
+
+  const chatId = await getSetting("chores_chat_id");
+  const threadId = await getSetting("chores_thread_id");
+  out.push(`• chores_chat_id: ${chatId ?? "❌ НЕ ЗАДАНО (зроби /setchores)"}`);
+  out.push(`• chores_thread_id: ${threadId || "(немає, ок)"}`);
+
+  // Та сама вибірка, що й у реальному коді (впаде, якщо нема таблиці/колонки note).
+  const { data: tpl, error: tErr } = await supabase
+    .from("chore_templates")
+    .select("kind, label, note, sort_order")
+    .eq("active", true);
+  if (tErr) out.push(`• chore_templates: ❌ ПОМИЛКА — ${tErr.message} (перевір etap13.sql)`);
+  else out.push(`• chore_templates (активних): ${tpl?.length ?? 0}${(tpl?.length ?? 0) ? " ✅" : " ❌ порожньо"}`);
+
+  const { error: rErr } = await supabase.from("chore_runs").select("id").limit(1);
+  if (rErr) out.push(`• chore_runs: ❌ ПОМИЛКА — ${rErr.message}`);
+
+  if (chatId) {
+    try {
+      await ctx.api.sendMessage(
+        Number(chatId),
+        "🧪 Тест: бот може писати в цю групу (чек-лист). Це повідомлення можна видалити.",
+        { ...(threadId ? { message_thread_id: Number(threadId) } : {}) },
+      );
+      out.push("• Тест-надсилання в групу: ✅ дійшло");
+    } catch (e: any) {
+      out.push(`• Тест-надсилання в групу: ❌ ${e?.description ?? e?.message ?? String(e)}`);
+    }
+  }
+
+  await ctx.reply(out.join("\n"));
+});
+
 bot.command("addlocation", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
