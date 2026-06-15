@@ -244,13 +244,17 @@ export type AdminLocation = {
   lng: number;
   radius_m: number;
   map_url: string | null;
+  replica_types: string[]; // допущені типи реплік (коди з lib/replicas.ts)
+  pyro: string; // yes | no | limited
+  pyro_note: string | null; // уточнення для «з обмеженням»
+  fire_mode: string; // auto | semi
   gameCount: number; // у скількох іграх використана (для блокування видалення)
 };
 
 export async function listLocationsFull(): Promise<AdminLocation[]> {
   const { data: locs } = await supabase
     .from("locations")
-    .select("id, name, lat, lng, radius_m, map_url")
+    .select("id, name, lat, lng, radius_m, map_url, replica_types, pyro, pyro_note, fire_mode")
     .order("name", { ascending: true });
   const rows = locs ?? [];
   if (!rows.length) return [];
@@ -268,6 +272,10 @@ export async function listLocationsFull(): Promise<AdminLocation[]> {
     lng: l.lng as number,
     radius_m: (l.radius_m as number) ?? 300,
     map_url: (l.map_url as string) ?? null,
+    replica_types: ((l as any).replica_types as string[]) ?? [],
+    pyro: ((l as any).pyro as string) ?? "no",
+    pyro_note: ((l as any).pyro_note as string) ?? null,
+    fire_mode: ((l as any).fire_mode as string) ?? "semi",
     gameCount: used.get(l.id as number) ?? 0,
   }));
 }

@@ -10,6 +10,7 @@ import { SOCIALS } from "@/lib/social";
 import { makeUtc, computeWindows } from "@/lib/games";
 import { performCheckin } from "@/lib/checkins";
 import { setCallsignForPlayer } from "@/lib/site-player";
+import { REPLICA_CODES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
 
 const back2 = (q: string) => redirect(`/admin/locations${q}`);
 
@@ -89,6 +90,20 @@ function mapUrl(lat: number, lng: number) {
   return `https://maps.google.com/?q=${lat},${lng}`;
 }
 
+// Ліміти локації з форми: допущені типи реплік, стан піро (+уточнення), режим вогню.
+function parseLimits(formData: FormData) {
+  const replica_types = formData
+    .getAll("replica_types")
+    .map(String)
+    .filter((c) => (REPLICA_CODES as readonly string[]).includes(c));
+  const pyroRaw = String(formData.get("pyro") ?? "no");
+  const pyro = (PYRO_STATES as readonly string[]).includes(pyroRaw) ? pyroRaw : "no";
+  const fireRaw = String(formData.get("fire_mode") ?? "semi");
+  const fire_mode = (FIRE_MODES as readonly string[]).includes(fireRaw) ? fireRaw : "semi";
+  const pyro_note = String(formData.get("pyro_note") ?? "").trim() || null;
+  return { replica_types, pyro, pyro_note, fire_mode };
+}
+
 export async function createLocation(formData: FormData) {
   await requirePerm("games");
   const name = String(formData.get("name") ?? "").trim();
@@ -97,7 +112,9 @@ export async function createLocation(formData: FormData) {
   const radiusRaw = Number(formData.get("radius_m"));
   if (!name || !Number.isFinite(lat) || !Number.isFinite(lng)) back2("?err=fields");
   const radius_m = Number.isFinite(radiusRaw) && radiusRaw > 0 ? Math.round(radiusRaw) : 300;
-  await supabase.from("locations").insert({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng) });
+  await supabase
+    .from("locations")
+    .insert({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng), ...parseLimits(formData) });
   revalidatePath("/admin/locations");
   back2("?created=1");
 }
@@ -113,7 +130,7 @@ export async function updateLocation(formData: FormData) {
   const radius_m = Number.isFinite(radiusRaw) && radiusRaw > 0 ? Math.round(radiusRaw) : 300;
   await supabase
     .from("locations")
-    .update({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng) })
+    .update({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng), ...parseLimits(formData) })
     .eq("id", id);
   revalidatePath("/admin/locations");
   back2("?saved=1");

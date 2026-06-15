@@ -455,6 +455,25 @@ const SITE: Record<string, Dict> = {
   adm_btn_delete: { pl: "Usuń", en: "Delete", uk: "Видалити" },
   adm_btn_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
 
+  // ── Ліміти локації: типи реплік, піро, режим вогню ──
+  adm_loc_replicas: {
+    pl: "Dozwolone repliki (do anonsu)",
+    en: "Allowed replicas (for the announcement)",
+    uk: "Дозволені репліки (для анонсу)",
+  },
+  adm_loc_pyro: { pl: "Pirotechnika", en: "Pyrotechnics", uk: "Піротехніка" },
+  adm_pyro_yes: { pl: "Dozwolona", en: "Allowed", uk: "Дозволена" },
+  adm_pyro_no: { pl: "Zakazana", en: "Forbidden", uk: "Заборонена" },
+  adm_pyro_limited: { pl: "Z ograniczeniem", en: "Limited", uk: "З обмеженням" },
+  adm_loc_pyro_note: {
+    pl: "Doprecyzowanie (przy „z ograniczeniem”)",
+    en: "Note (for “limited”)",
+    uk: "Уточнення (для «з обмеженням»)",
+  },
+  adm_loc_firemode: { pl: "Tryb ognia", en: "Fire mode", uk: "Режим вогню" },
+  adm_fire_auto: { pl: "Full-auto + semi", en: "Full-auto + semi", uk: "Full-auto + semi" },
+  adm_fire_semi: { pl: "Tylko semi", en: "Semi only", uk: "Лише semi" },
+
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },
   adm_no_locations: {

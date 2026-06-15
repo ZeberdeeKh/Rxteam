@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { supabase } from "./supabase";
+import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
 
 const ZONE = "Europe/Warsaw";
 
@@ -94,9 +95,37 @@ export type GameForAnnounce = {
   scenarioUk: string | null;
   count: number;
   capacity: number | null;
+  // Ліміти конкретної локації (підставляються автоматично).
+  replicaTypes: string[]; // які типи реплік допущені на локації
+  pyro: string; // yes | no | limited
+  pyroNote: string | null; // уточнення для «з обмеженням»
+  fireMode: string; // auto | semi
 };
 
-// Будує двомовний (PL+UA) анонс у форматі RX Team зі статичних блоків (settings).
+// Блок лімітів для однієї мови: допущені типи реплік (з їх лімітами) + піро + режим вогню.
+function limitsBlock(lang: "pl" | "uk", g: GameForAnnounce, s: Record<string, string>): string {
+  const lines: string[] = [];
+  const allowed = g.replicaTypes ?? [];
+  if (allowed.length) {
+    lines.push(lang === "pl" ? "🔫 Limity mocy:" : "🔫 Ліміти потужності:");
+    for (const t of REPLICA_TYPES) {
+      if (!allowed.includes(t.code)) continue;
+      const label = lang === "pl" ? t.pl : t.uk;
+      const lim = s[`limit_${t.code}_${lang}`];
+      lines.push(lim ? `• ${label}: ${lim}` : `• ${label}`);
+    }
+  }
+  const pyroKey = `pyro_${g.pyro}_${lang}`;
+  const pyroMsg = s[pyroKey] || LIMIT_SETTING_DEFAULTS[pyroKey];
+  if (pyroMsg) lines.push(g.pyro === "limited" && g.pyroNote ? `${pyroMsg} ${g.pyroNote}` : pyroMsg);
+  const fmKey = `firemode_${g.fireMode}_${lang}`;
+  const fmMsg = s[fmKey] || LIMIT_SETTING_DEFAULTS[fmKey];
+  if (fmMsg) lines.push(fmMsg);
+  return lines.join("\n");
+}
+
+// Будує двомовний (PL+UA) анонс у форматі RX Team зі статичних блоків (settings)
+// + автоматичного блоку лімітів за даними локації.
 export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>): string {
   const block = (lang: "pl" | "uk", scenario: string | null) => {
     const L = LABELS[lang];
@@ -112,15 +141,12 @@ export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>)
       `🎯 ${L.start}: ${formatTime(g.startUtc)}`,
     ];
     if (scenario) parts.push("", scenario);
-    for (const key of [
-      `ann_coffee_${lang}`,
-      `ann_rental_${lang}`,
-      `ann_transport_${lang}`,
-      `ann_limits_${lang}`,
-      `ann_disclaimer_${lang}`,
-    ]) {
+    for (const key of [`ann_coffee_${lang}`, `ann_rental_${lang}`, `ann_transport_${lang}`]) {
       if (s[key]) parts.push("", s[key]);
     }
+    const lim = limitsBlock(lang, g, s);
+    if (lim) parts.push("", lim);
+    if (s[`ann_disclaimer_${lang}`]) parts.push("", s[`ann_disclaimer_${lang}`]);
     return parts.join("\n");
   };
 

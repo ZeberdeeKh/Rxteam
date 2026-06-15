@@ -1790,6 +1790,10 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
       scenarioUk: data.scenarioUk,
       count: 0,
       capacity,
+      replicaTypes: loc!.replica_types ?? [],
+      pyro: loc!.pyro ?? "no",
+      pyroNote: loc!.pyro_note ?? null,
+      fireMode: loc!.fire_mode ?? "semi",
     },
     settings,
   );
@@ -1846,6 +1850,10 @@ async function updateAnnouncement(gameId: number) {
       scenarioUk: game.scenario_uk,
       count,
       capacity: game.capacity,
+      replicaTypes: loc.replica_types ?? [],
+      pyro: loc.pyro ?? "no",
+      pyroNote: loc.pyro_note ?? null,
+      fireMode: loc.fire_mode ?? "semi",
     },
     settings,
   );

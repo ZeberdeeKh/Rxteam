@@ -1,6 +1,22 @@
 // Схема редактора налаштувань (6.4, майстер-онлі). Керується таблицею settings.
 // Підписи — технічні (ключі + короткий опис); екран бачить лише майстер.
 import { captchaPrompt, correctMap, wrongMap, expiredMap, faq } from "./i18n";
+import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
+
+export type SettingField = {
+  key: string;
+  type: "toggle" | "number" | "text" | "textarea";
+  label: string;
+};
+export type SettingGroup = { title: string; fields: SettingField[] };
+
+// Підказка-формат у полях лімітів реплік (показується сірим, поки поле порожнє).
+const replicaLimitPlaceholders: Record<string, string> = Object.fromEntries(
+  REPLICA_TYPES.flatMap((t) => [
+    [`limit_${t.code}_pl`, "np. 1.4 J · brak min. dystansu"],
+    [`limit_${t.code}_uk`, "напр. 1.4 Дж · без мін. дистанції"],
+  ]),
+);
 
 // Стандартні (fallback) значення для текстів бота — показуємо як placeholder,
 // щоб майстер бачив, що бот шле зараз (порожнє поле = використовується це значення).
@@ -20,14 +36,15 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   faq_pl: faq.pl,
   faq_en: faq.en,
   faq_uk: faq.uk,
+  ...LIMIT_SETTING_DEFAULTS,
+  ...replicaLimitPlaceholders,
 };
 
-export type SettingField = {
-  key: string;
-  type: "toggle" | "number" | "text" | "textarea";
-  label: string;
-};
-export type SettingGroup = { title: string; fields: SettingField[] };
+// Поля лімітів за типами реплік (пара PL+UA на кожен тип, у порядку REPLICA_TYPES).
+const replicaLimitFields: SettingField[] = REPLICA_TYPES.flatMap((t): SettingField[] => [
+  { key: `limit_${t.code}_pl`, type: "textarea", label: `${t.pl} — limit (PL)` },
+  { key: `limit_${t.code}_uk`, type: "textarea", label: `${t.uk} — ліміт (UA)` },
+]);
 
 export const SETTINGS_GROUPS: SettingGroup[] = [
   {
@@ -81,7 +98,6 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "ann_coffee_pl", type: "textarea", label: "Kawa/przekąski" },
       { key: "ann_rental_pl", type: "textarea", label: "Wynajem" },
       { key: "ann_transport_pl", type: "textarea", label: "Transport" },
-      { key: "ann_limits_pl", type: "textarea", label: "Limity FPS/J" },
       { key: "ann_disclaimer_pl", type: "textarea", label: "Disclaimer" },
     ],
   },
@@ -91,8 +107,28 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "ann_coffee_uk", type: "textarea", label: "Кава/перекус" },
       { key: "ann_rental_uk", type: "textarea", label: "Оренда" },
       { key: "ann_transport_uk", type: "textarea", label: "Транспорт" },
-      { key: "ann_limits_uk", type: "textarea", label: "Ліміти FPS/J" },
       { key: "ann_disclaimer_uk", type: "textarea", label: "Disclaimer" },
+    ],
+  },
+  {
+    // Ліміти за типами реплік. Самі типи фіксовані в коді (lib/replicas.ts);
+    // тут редагуються лише тексти лімітів. У локації обираєш, які типи допущені.
+    title: "Limity replik (Дж/FPS)",
+    fields: replicaLimitFields,
+  },
+  {
+    title: "Pyro i tryb ognia — komunikaty",
+    fields: [
+      { key: "pyro_yes_pl", type: "textarea", label: "Pyro: dozwolone (PL)" },
+      { key: "pyro_yes_uk", type: "textarea", label: "Піро: дозволено (UA)" },
+      { key: "pyro_no_pl", type: "textarea", label: "Pyro: zakazane (PL)" },
+      { key: "pyro_no_uk", type: "textarea", label: "Піро: заборонено (UA)" },
+      { key: "pyro_limited_pl", type: "textarea", label: "Pyro: z ograniczeniem (PL)" },
+      { key: "pyro_limited_uk", type: "textarea", label: "Піро: з обмеженням (UA)" },
+      { key: "firemode_auto_pl", type: "textarea", label: "Full-auto (PL)" },
+      { key: "firemode_auto_uk", type: "textarea", label: "Full-auto (UA)" },
+      { key: "firemode_semi_pl", type: "textarea", label: "Tylko semi (PL)" },
+      { key: "firemode_semi_uk", type: "textarea", label: "Лише semi (UA)" },
     ],
   },
   {
