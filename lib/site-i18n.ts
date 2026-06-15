@@ -168,6 +168,7 @@ const SITE: Record<string, Dict> = {
     uk: "RX Team — неформальна спільнота поціновувачів ASG із Вроцлава. Ми не компанія й не офіційна організація — граємо із пристрасті, заради спільного драйву. Збираємося на ігри щонеділі, окрім деяких свят. Усі новини шукай у нашому Instagram, Telegram, Facebook і TikTok — посилання нижче.",
   },
   social_soon: { pl: "wkrótce", en: "soon", uk: "скоро" },
+  home_social_title: { pl: "Sociale", en: "Socials", uk: "Соцмережі" },
 
   // ── 6.1 Ігри ──
   games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
