@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
@@ -17,7 +17,7 @@ export default async function AdminGames({
   const lang = getServerLang();
   const [games, locations] = await Promise.all([listGamesAdmin(), listLocations()]);
   const inputCls =
-    "w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
+    "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
 
   return (
     <div className="space-y-8">
@@ -34,14 +34,14 @@ export default async function AdminGames({
       )}
 
       {/* Нова гра */}
-      <section className="rounded-lg border border-neutral-200 bg-white p-5">
-        <h2 className="mb-3 text-base font-semibold text-neutral-900">{st(lang, "adm_game_create")}</h2>
+      <section className="rounded-lg border border-gray-200 bg-white p-5">
+        <h2 className="mb-3 text-base font-semibold text-gray-900">{st(lang, "adm_game_create")}</h2>
         {locations.length === 0 ? (
-          <p className="text-sm text-neutral-500">{st(lang, "adm_no_locations")}</p>
+          <p className="text-sm text-gray-500">{st(lang, "adm_no_locations")}</p>
         ) : (
           <form action={createGame} className="grid gap-3 sm:grid-cols-2">
             <label className="text-sm">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_location")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_location")}</span>
               <select name="locationId" className={inputCls} required>
                 {locations.map((l) => (
                   <option key={l.id} value={l.id}>
@@ -51,39 +51,39 @@ export default async function AdminGames({
               </select>
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_title")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_title")}</span>
               <input name="title" className={inputCls} />
             </label>
             <label className="text-sm">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_date")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_date")}</span>
               <input name="date" type="date" required className={inputCls} />
             </label>
             <div className="grid grid-cols-2 gap-3">
               <label className="text-sm">
-                <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_gather")}</span>
+                <span className="mb-1 block text-gray-600">{st(lang, "adm_f_gather")}</span>
                 <input name="gather" type="time" required className={inputCls} />
               </label>
               <label className="text-sm">
-                <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_start")}</span>
+                <span className="mb-1 block text-gray-600">{st(lang, "adm_f_start")}</span>
                 <input name="start" type="time" required className={inputCls} />
               </label>
             </div>
             <label className="text-sm">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_capacity")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_capacity")}</span>
               <input name="capacity" type="number" min={0} defaultValue={0} className={inputCls} />
             </label>
             <label className="text-sm sm:col-span-2">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_scenario_pl")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_scenario_pl")}</span>
               <textarea name="scenario_pl" rows={2} className={inputCls} />
             </label>
             <label className="text-sm sm:col-span-2">
-              <span className="mb-1 block text-neutral-600">{st(lang, "adm_f_scenario_uk")}</span>
+              <span className="mb-1 block text-gray-600">{st(lang, "adm_f_scenario_uk")}</span>
               <textarea name="scenario_uk" rows={2} className={inputCls} />
             </label>
             <div className="sm:col-span-2">
               <button
                 type="submit"
-                className="rounded-md bg-brand px-5 py-2 text-sm font-medium text-white transition hover:bg-brand-dark"
+                className="rounded-md bg-brand px-5 py-2 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
               >
                 {st(lang, "adm_btn_create")}
               </button>
@@ -94,10 +94,10 @@ export default async function AdminGames({
 
       {/* Список ігор */}
       <section>
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-neutral-500">
+              <tr className="border-b border-gray-200 text-left text-gray-500">
                 <th className="px-3 py-2 font-medium">{st(lang, "games_label_when")}</th>
                 <th className="px-3 py-2 font-medium">{st(lang, "adm_f_title")}</th>
                 <th className="px-3 py-2 font-medium">{st(lang, "adm_col_status")}</th>
@@ -108,13 +108,13 @@ export default async function AdminGames({
             </thead>
             <tbody>
               {games.map((g) => (
-                <tr key={g.id} className="border-b border-neutral-100 last:border-0">
-                  <td className="whitespace-nowrap px-3 py-2 text-neutral-600">
+                <tr key={g.id} className="border-b border-gray-100 last:border-0">
+                  <td className="whitespace-nowrap px-3 py-2 text-gray-600">
                     {formatGameWhen(g.gather_at ?? g.start_at, lang)}
                   </td>
-                  <td className="px-3 py-2 text-neutral-900">
+                  <td className="px-3 py-2 text-gray-900">
                     {g.title ?? "ASG"}
-                    <span className="ml-1 text-xs text-neutral-400">{g.location_name ?? ""}</span>
+                    <span className="ml-1 text-xs text-gray-400">{g.location_name ?? ""}</span>
                   </td>
                   <td className="px-3 py-2">
                     <span
@@ -123,7 +123,7 @@ export default async function AdminGames({
                           ? "bg-green-100 text-green-700"
                           : g.status === "cancelled"
                             ? "bg-red-100 text-red-700"
-                            : "bg-neutral-100 text-neutral-600"
+                            : "bg-gray-100 text-gray-600"
                       }`}
                     >
                       {g.status}

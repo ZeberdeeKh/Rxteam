@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
 import { featureEnabled } from "@/lib/settings";
@@ -30,7 +30,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
     return (
       <div className="space-y-4">
         <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "shop_title")}</h1>
-        <p className="text-sm text-neutral-500">{st(lang, "shop_disabled")}</p>
+        <p className="text-sm text-gray-500">{st(lang, "shop_disabled")}</p>
       </div>
     );
   }
@@ -42,7 +42,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "shop_title")}</h1>
-        <p className="mt-1 text-sm text-neutral-500">{st(lang, "shop_intro")}</p>
+        <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_intro")}</p>
       </div>
 
       {okKey && (
@@ -53,7 +53,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       )}
 
       {player ? (
-        <p className="text-sm text-neutral-600">
+        <p className="text-sm text-gray-600">
           {st(lang, "shop_balance")}: <span className="font-semibold">{balance} 💰</span>
         </p>
       ) : (
@@ -66,7 +66,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       )}
 
       {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-neutral-300 p-5 text-sm text-neutral-500">
+        <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
           {st(lang, "shop_empty")}
         </p>
       ) : (
@@ -77,10 +77,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
             return (
               <article
                 key={it.id}
-                className="flex flex-col rounded-lg border border-neutral-200 bg-white p-5"
+                className="flex flex-col rounded-lg border border-gray-200 bg-white p-5"
               >
-                <h3 className="text-base font-semibold text-neutral-900">{itemTitle(it, lang)}</h3>
-                {desc && <p className="mt-1 flex-1 text-sm text-neutral-600">{desc}</p>}
+                <h3 className="text-base font-semibold text-gray-900">{itemTitle(it, lang)}</h3>
+                {desc && <p className="mt-1 flex-1 text-sm text-gray-600">{desc}</p>}
                 <div className="mt-4 flex items-center justify-between gap-3">
                   <span className="text-sm font-semibold text-brand-dark">{it.cost} 💰</span>
                   {player && (
@@ -89,7 +89,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                       <button
                         type="submit"
                         disabled={!affordable}
-                        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {st(lang, "shop_buy")}
                       </button>

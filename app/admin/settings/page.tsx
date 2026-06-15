@@ -1,4 +1,4 @@
-import { getServerLang } from "@/lib/server-lang";
+﻿import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
@@ -19,7 +19,7 @@ export default async function AdminSettings({
   // toggle вважається увімкненим, якщо значення не 'false' (за замовчуванням — on).
   const isOn = (key: string) => values[key] === undefined || values[key] !== "false";
   const inputCls =
-    "w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
+    "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
 
   return (
     <div className="space-y-6">
@@ -29,19 +29,19 @@ export default async function AdminSettings({
       {searchParams.saved && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, "adm_saved")}</p>
       )}
-      <p className="rounded-md bg-neutral-100 px-3 py-2 text-sm text-neutral-600">
+      <p className="rounded-md bg-gray-100 px-3 py-2 text-sm text-gray-600">
         {st(lang, "adm_settings_hint")}
       </p>
 
       <form action={saveSettings} className="space-y-8">
         {SETTINGS_GROUPS.map((g) => (
-          <fieldset key={g.title} className="rounded-lg border border-neutral-200 bg-white p-5">
+          <fieldset key={g.title} className="rounded-lg border border-gray-200 bg-white p-5">
             <legend className="px-1 text-sm font-semibold text-brand-dark">{g.title}</legend>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
               {g.fields.map((f) => (
                 <label key={f.key} className="block text-sm">
-                  <span className="mb-1 block text-neutral-600">
-                    {f.label} <code className="text-xs text-neutral-400">{f.key}</code>
+                  <span className="mb-1 block text-gray-600">
+                    {f.label} <code className="text-xs text-gray-400">{f.key}</code>
                   </span>
                   {f.type === "toggle" ? (
                     <input
@@ -76,7 +76,7 @@ export default async function AdminSettings({
 
         <button
           type="submit"
-          className="rounded-md bg-brand px-5 py-2 text-sm font-medium text-white transition hover:bg-brand-dark"
+          className="rounded-md bg-brand px-5 py-2 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
         >
           {st(lang, "adm_save")}
         </button>

@@ -1,4 +1,4 @@
-import { getServerLang } from "@/lib/server-lang";
+﻿import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listReferrals } from "@/lib/admin-data";
@@ -20,12 +20,12 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
       )}
 
       {refs.length === 0 ? (
-        <p className="text-sm text-neutral-500">{st(lang, "adm_empty")}</p>
+        <p className="text-sm text-gray-500">{st(lang, "adm_empty")}</p>
       ) : (
-        <div className="overflow-x-auto rounded-lg border border-neutral-200 bg-white">
+        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-neutral-200 text-left text-neutral-500">
+              <tr className="border-b border-gray-200 text-left text-gray-500">
                 <th className="px-3 py-2 font-medium">{st(lang, "adm_inviter")}</th>
                 <th className="px-3 py-2 font-medium">{st(lang, "adm_invited")}</th>
                 <th className="px-3 py-2 font-medium">{st(lang, "adm_col_status")}</th>
@@ -34,9 +34,9 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
             </thead>
             <tbody>
               {refs.map((r) => (
-                <tr key={r.id} className="border-b border-neutral-100 last:border-0">
-                  <td className="px-3 py-2 font-medium text-neutral-900">{r.inviter}</td>
-                  <td className="px-3 py-2 text-neutral-700">{r.invited}</td>
+                <tr key={r.id} className="border-b border-gray-100 last:border-0">
+                  <td className="px-3 py-2 font-medium text-gray-900">{r.inviter}</td>
+                  <td className="px-3 py-2 text-gray-700">{r.invited}</td>
                   <td className="px-3 py-2">
                     <span
                       className={`rounded-full px-2 py-0.5 text-xs ${
@@ -49,7 +49,7 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                     >
                       {r.status}
                     </span>
-                    <span className="ml-2 text-xs text-neutral-400">
+                    <span className="ml-2 text-xs text-gray-400">
                       {formatGameWhen(r.created_at, lang)}
                     </span>
                   </td>
@@ -59,14 +59,14 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="confirmed" />
-                          <button type="submit" className="rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-white hover:bg-brand-dark">
+                          <button type="submit" className="rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-neutral-50 hover:bg-brand-dark">
                             {st(lang, "adm_btn_confirm")}
                           </button>
                         </form>
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="rejected" />
-                          <button type="submit" className="rounded-md border border-neutral-300 px-2.5 py-1 text-xs hover:border-red-400 hover:text-red-600">
+                          <button type="submit" className="rounded-md border border-gray-300 px-2.5 py-1 text-xs hover:border-red-400 hover:text-red-600">
                             {st(lang, "adm_btn_reject")}
                           </button>
                         </form>

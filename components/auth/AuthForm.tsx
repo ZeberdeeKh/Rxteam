@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
@@ -11,7 +11,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark disabled:opacity-60"
+      className="w-full rounded-md bg-brand px-4 py-2 text-sm font-semibold text-neutral-50 transition hover:bg-brand-dark disabled:opacity-60"
     >
       {pending ? "…" : label}
     </button>
@@ -33,7 +33,7 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
 
       <form action={formAction} className="mt-6 space-y-4">
         <div>
-          <label className="block text-sm font-medium text-neutral-700" htmlFor="email">
+          <label className="block text-sm font-medium text-gray-700" htmlFor="email">
             {st(lang, "auth_email")}
           </label>
           <input
@@ -42,12 +42,12 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
             type="email"
             required
             autoComplete="email"
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700" htmlFor="password">
+          <label className="block text-sm font-medium text-gray-700" htmlFor="password">
             {st(lang, "auth_password")}
           </label>
           <input
@@ -57,10 +57,10 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
             required
             minLength={8}
             autoComplete={mode === "login" ? "current-password" : "new-password"}
-            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
           />
           {mode === "register" && (
-            <p className="mt-1 text-xs text-neutral-500">{st(lang, "auth_min_pass")}</p>
+            <p className="mt-1 text-xs text-gray-500">{st(lang, "auth_min_pass")}</p>
           )}
         </div>
 

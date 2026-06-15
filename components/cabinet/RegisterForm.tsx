@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
@@ -8,20 +8,20 @@ import { registerForGame } from "@/app/cabinet/actions";
 export default function RegisterForm({ gameId, lang }: { gameId: number; lang: Lang }) {
   const [transport, setTransport] = useState<"need" | "own">("need");
   const inputCls =
-    "w-full rounded-md border border-neutral-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
+    "w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none";
 
   return (
     <form action={registerForGame} className="space-y-3">
       <input type="hidden" name="gameId" value={gameId} />
 
-      <label className="flex items-center gap-2 text-sm text-neutral-700">
+      <label className="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" name="needs_rental" className="h-4 w-4 accent-brand" />
         {st(lang, "reg_rental_q")}
       </label>
 
       <fieldset className="space-y-1">
-        <legend className="text-sm text-neutral-500">{st(lang, "reg_transport_q")}</legend>
-        <label className="flex items-center gap-2 text-sm text-neutral-700">
+        <legend className="text-sm text-gray-500">{st(lang, "reg_transport_q")}</legend>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
           <input
             type="radio"
             name="transport"
@@ -32,7 +32,7 @@ export default function RegisterForm({ gameId, lang }: { gameId: number; lang: L
           />
           {st(lang, "reg_transport_need")}
         </label>
-        <label className="flex items-center gap-2 text-sm text-neutral-700">
+        <label className="flex items-center gap-2 text-sm text-gray-700">
           <input
             type="radio"
             name="transport"
@@ -61,7 +61,7 @@ export default function RegisterForm({ gameId, lang }: { gameId: number; lang: L
 
       <button
         type="submit"
-        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-dark"
+        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
       >
         {st(lang, "btn_register")}
       </button>

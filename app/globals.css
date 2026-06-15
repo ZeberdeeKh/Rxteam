@@ -2,11 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Нейтральна база. Фінальні токени — Етап 7. */
+/* Дизайн-токени перенесено з «Kalkulator». Світла тема — стандартна нейтраль Tailwind,
+   темна (html.dark) — інвертована палітра калькулятора. `gray`/`white` у tailwind.config
+   прив'язані до цих змінних, тому колір перемикається без dark:-варіантів. */
 :root {
   color-scheme: light;
+
+  --c-white: #ffffff;
+  --c-gray-50: #fafafa;
+  --c-gray-100: #f5f5f5;
+  --c-gray-200: #e5e5e5;
+  --c-gray-300: #d4d4d4;
+  --c-gray-400: #a3a3a3;
+  --c-gray-500: #737373;
+  --c-gray-600: #525252;
+  --c-gray-700: #404040;
+  --c-gray-800: #262626;
+  --c-gray-900: #171717;
+  --c-gray-950: #0a0a0a;
+}
+
+html.dark {
+  color-scheme: dark;
+
+  --c-white: #1f2126;   /* панелі: шапка, картки, інпути */
+  --c-gray-50: #24262c;
+  --c-gray-100: #2a2c33;
+  --c-gray-200: #383b43; /* бордери, hover-поверхні */
+  --c-gray-300: #474b54;
+  --c-gray-400: #8b909b;
+  --c-gray-500: #a2a7b1;
+  --c-gray-600: #bcc0c8;
+  --c-gray-700: #d2d5db;
+  --c-gray-800: #e6e8ec;
+  --c-gray-900: #f5f6f8; /* основний текст */
+  --c-gray-950: #ffffff;
+}
+
+html, body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+html.dark body {
+  background: #17181c;
 }
 
 body {
-  @apply bg-neutral-50 text-neutral-900 antialiased;
+  @apply bg-gray-50 text-gray-900 antialiased;
 }

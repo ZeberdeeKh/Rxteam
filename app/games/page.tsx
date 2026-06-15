@@ -1,4 +1,4 @@
-import { getServerLang } from "@/lib/server-lang";
+﻿import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getNextGame, getUpcomingGames, getPastGames } from "@/lib/site-data";
 import GameCard from "@/components/site/GameCard";
@@ -28,7 +28,7 @@ export default async function GamesPage() {
         {next ? (
           <GameCard game={next} lang={lang} />
         ) : (
-          <p className="rounded-lg border border-dashed border-neutral-300 p-5 text-sm text-neutral-500">
+          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
             {st(lang, "games_none_upcoming")}
           </p>
         )}
@@ -58,7 +58,7 @@ export default async function GamesPage() {
             ))}
           </div>
         ) : (
-          <p className="rounded-lg border border-dashed border-neutral-300 p-5 text-sm text-neutral-500">
+          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
             {st(lang, "games_none_past")}
           </p>
         )}

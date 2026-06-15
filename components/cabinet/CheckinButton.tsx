@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
@@ -36,7 +36,7 @@ export default function CheckinButton({ gameId, lang }: { gameId: number; lang: 
         type="submit"
         onClick={onClick}
         disabled={status === "locating"}
-        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-dark disabled:opacity-60"
+        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark disabled:opacity-60"
       >
         {status === "locating" ? st(lang, "checkin_locating") : st(lang, "web_checkin_btn")}
       </button>

@@ -519,6 +519,34 @@ const SITE: Record<string, Dict> = {
   adm_export_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
   adm_export_regs: { pl: "Rejestracje", en: "Registrations", uk: "Реєстрації" },
   adm_export_checkins: { pl: "Check-iny", en: "Check-ins", uk: "Чек-іни" },
+
+  // ── Перемикач теми ──
+  theme_toggle: { pl: "Motyw", en: "Theme", uk: "Тема" },
+
+  // ── Етап 9: «Повідомити про помилку» (перенесено з Kalkulator) ──
+  bug_button: { pl: "Zgłoś błąd", en: "Report a bug", uk: "Повідомити про помилку" },
+  bug_title: { pl: "Zgłoś błąd", en: "Report a bug", uk: "Повідомити про помилку" },
+  bug_desc_ph: {
+    pl: "Opisz problem — co się stało i jak to powtórzyć…",
+    en: "Describe the problem — what happened and how to reproduce it…",
+    uk: "Опишіть проблему — що сталося і як це відтворити…",
+  },
+  bug_email: { pl: "Twój e-mail (opcjonalnie)", en: "Your email (optional)", uk: "Ваш e-mail (необов'язково)" },
+  bug_attach: { pl: "Dołącz zrzut ekranu", en: "Attach screenshot", uk: "Прикріпити знімок екрана" },
+  bug_screenshot_hint: { pl: "PNG, JPG · do 5 MB", en: "PNG, JPG · up to 5 MB", uk: "PNG, JPG · до 5 МБ" },
+  bug_remove: { pl: "Usuń zrzut ekranu", en: "Remove screenshot", uk: "Видалити знімок екрана" },
+  bug_too_large: { pl: "Plik jest za duży (maks. 5 MB)", en: "File is too large (max 5 MB)", uk: "Файл завеликий (макс. 5 МБ)" },
+  bug_invalid_image: { pl: "Wybierz plik graficzny", en: "Please select an image file", uk: "Виберіть файл зображення" },
+  bug_send: { pl: "Wyślij", en: "Send", uk: "Надіслати" },
+  bug_cancel: { pl: "Anuluj", en: "Cancel", uk: "Скасувати" },
+  bug_success: { pl: "Dziękujemy! Zgłoszenie wysłane.", en: "Thanks! Your report was sent.", uk: "Дякуємо! Звіт надіслано." },
+  bug_success_hint: {
+    pl: "Dziękujemy, że pomagasz ulepszać serwis.",
+    en: "Thank you for helping us make the service better.",
+    uk: "Дякуємо, що допомагаєте робити сервіс кращим.",
+  },
+  bug_close: { pl: "Zamknij", en: "Close", uk: "Закрити" },
+  bug_error: { pl: "Nie udało się wysłać. Spróbuj ponownie.", en: "Could not send. Please try again.", uk: "Не вдалося надіслати. Спробуйте ще раз." },
 };
 
 export function st(lang: Lang, key: string, vars?: Record<string, string | number>): string {

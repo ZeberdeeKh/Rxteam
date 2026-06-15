@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+﻿import { redirect } from "next/navigation";
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-player";
@@ -71,22 +71,22 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
             {st(lang, "cabinet_title")}
           </h1>
-          <p className="mt-2 text-sm text-neutral-500">{ctx.email}</p>
+          <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>
         </div>
         {banners}
         <LinkTelegramForm lang={lang} />
-        <div className="flex items-center gap-3 text-xs uppercase text-neutral-400">
-          <span className="h-px flex-1 bg-neutral-200" />
+        <div className="flex items-center gap-3 text-xs uppercase text-gray-400">
+          <span className="h-px flex-1 bg-gray-200" />
           {st(lang, "or_divider")}
-          <span className="h-px flex-1 bg-neutral-200" />
+          <span className="h-px flex-1 bg-gray-200" />
         </div>
-        <section className="rounded-lg border border-neutral-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-neutral-900">{st(lang, "standalone_title")}</h2>
-          <p className="mt-1 text-sm text-neutral-600">{st(lang, "standalone_intro")}</p>
+        <section className="rounded-lg border border-gray-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-gray-900">{st(lang, "standalone_title")}</h2>
+          <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
           <form action={createStandalone} className="mt-3">
             <button
               type="submit"
-              className="rounded-md border border-brand px-4 py-1.5 text-sm font-medium text-brand transition hover:bg-brand hover:text-white"
+              className="rounded-md border border-brand px-4 py-1.5 text-sm font-medium text-brand transition hover:bg-brand hover:text-neutral-50"
             >
               {st(lang, "standalone_btn")}
             </button>
@@ -107,9 +107,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           {st(lang, "cabinet_title")}
         </h1>
         {banners}
-        <section className="rounded-lg border border-neutral-200 bg-white p-5">
-          <h2 className="text-base font-semibold text-neutral-900">{st(lang, "callsign_title")}</h2>
-          <p className="mt-1 text-sm text-neutral-600">{st(lang, "callsign_intro")}</p>
+        <section className="rounded-lg border border-gray-200 bg-white p-5">
+          <h2 className="text-base font-semibold text-gray-900">{st(lang, "callsign_title")}</h2>
+          <p className="mt-1 text-sm text-gray-600">{st(lang, "callsign_intro")}</p>
           <form action={saveCallsign} className="mt-3 flex gap-2">
             <input
               name="callsign"
@@ -117,11 +117,11 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               minLength={2}
               maxLength={32}
               placeholder={st(lang, "callsign_ph")}
-              className="flex-1 rounded-md border border-neutral-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none"
+              className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm focus:border-brand focus:outline-none"
             />
             <button
               type="submit"
-              className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-white transition hover:bg-brand-dark"
+              className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark"
             >
               {st(lang, "callsign_btn")}
             </button>
@@ -144,41 +144,41 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         <h1 className="text-2xl font-bold tracking-tight text-brand-dark">
           {st(lang, "cabinet_title")}
         </h1>
-        {ctx.email && <p className="mt-2 text-sm text-neutral-500">{ctx.email}</p>}
+        {ctx.email && <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>}
       </div>
       {banners}
 
       {/* Профіль */}
-      <section className="rounded-lg border border-neutral-200 bg-white p-5">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-neutral-500">
+      <section className="rounded-lg border border-gray-200 bg-white p-5">
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
           {st(lang, "prof_section")}
         </h2>
         <dl className="grid grid-cols-2 gap-y-3 text-sm sm:grid-cols-3">
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_callsign")}</dt>
-            <dd className="font-medium text-neutral-900">{player.callsign}</dd>
+            <dt className="text-gray-500">{st(lang, "prof_callsign")}</dt>
+            <dd className="font-medium text-gray-900">{player.callsign}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_rank")}</dt>
-            <dd className="font-medium text-neutral-900">
+            <dt className="text-gray-500">{st(lang, "prof_rank")}</dt>
+            <dd className="font-medium text-gray-900">
               {player.has_patch ? player.rank ?? "Recruit" : st(lang, "prof_no_rank")}
             </dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_reliability")}</dt>
-            <dd className="font-medium text-neutral-900">{rel.pct === null ? "—" : `${rel.pct}%`}</dd>
+            <dt className="text-gray-500">{st(lang, "prof_reliability")}</dt>
+            <dd className="font-medium text-gray-900">{rel.pct === null ? "—" : `${rel.pct}%`}</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_earned")}</dt>
-            <dd className="font-medium text-neutral-900">{player.points_earned ?? 0} ⭐</dd>
+            <dt className="text-gray-500">{st(lang, "prof_earned")}</dt>
+            <dd className="font-medium text-gray-900">{player.points_earned ?? 0} ⭐</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_balance")}</dt>
-            <dd className="font-medium text-neutral-900">{player.points_balance ?? 0} 💰</dd>
+            <dt className="text-gray-500">{st(lang, "prof_balance")}</dt>
+            <dd className="font-medium text-gray-900">{player.points_balance ?? 0} 💰</dd>
           </div>
           <div>
-            <dt className="text-neutral-500">{st(lang, "prof_games")}</dt>
-            <dd className="font-medium text-neutral-900">{player.games_played ?? 0}</dd>
+            <dt className="text-gray-500">{st(lang, "prof_games")}</dt>
+            <dd className="font-medium text-gray-900">{player.games_played ?? 0}</dd>
           </div>
         </dl>
       </section>
@@ -187,7 +187,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "ach_title")}</h2>
         {achs.length === 0 ? (
-          <p className="text-sm text-neutral-500">{st(lang, "ach_empty")}</p>
+          <p className="text-sm text-gray-500">{st(lang, "ach_empty")}</p>
         ) : (
           <ul className="flex flex-wrap gap-2">
             {achs.map((a) => (
@@ -207,7 +207,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "mygames_title")}</h2>
         {games.length === 0 ? (
-          <p className="text-sm text-neutral-500">{st(lang, "mygames_empty")}</p>
+          <p className="text-sm text-gray-500">{st(lang, "mygames_empty")}</p>
         ) : (
           <div className="space-y-4">
             {games.map((g) => {
@@ -222,7 +222,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                             ? "bg-green-100 text-green-700"
                             : g.regStatus === "no_show"
                               ? "bg-red-100 text-red-700"
-                              : "bg-neutral-100 text-neutral-600"
+                              : "bg-gray-100 text-gray-600"
                         }`}
                       >
                         {label}
@@ -241,7 +241,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                         <input type="hidden" name="gameId" value={g.id} />
                         <button
                           type="submit"
-                          className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm text-neutral-600 transition hover:border-red-400 hover:text-red-600"
+                          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-600 transition hover:border-red-400 hover:text-red-600"
                         >
                           {st(lang, "btn_unregister")}
                         </button>
@@ -249,7 +249,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                     )}
 
                     {g.regStatus === "registered" && !g.canUnregister && !g.checkinOpen && (
-                      <span className="text-xs text-neutral-400">
+                      <span className="text-xs text-gray-400">
                         {st(lang, "cancel_locked_info")}
                       </span>
                     )}
@@ -271,18 +271,18 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className="mb-3 text-lg font-semibold text-brand-dark">{st(lang, "hist_title")}</h2>
         {log.length === 0 ? (
-          <p className="text-sm text-neutral-500">{st(lang, "hist_empty")}</p>
+          <p className="text-sm text-gray-500">{st(lang, "hist_empty")}</p>
         ) : (
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 bg-white text-sm">
+          <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white text-sm">
             {log.map((row, i) => (
               <li key={i} className="flex items-center justify-between gap-3 px-4 py-2">
                 <div>
-                  <span className="text-neutral-700">{st(lang, `reason_${row.reason}`)}</span>
-                  <span className="ml-2 text-xs text-neutral-400">
+                  <span className="text-gray-700">{st(lang, `reason_${row.reason}`)}</span>
+                  <span className="ml-2 text-xs text-gray-400">
                     {formatGameWhen(row.created_at, lang)}
                   </span>
                   {row.itemTitle && (
-                    <p className="mt-0.5 text-xs text-neutral-500">{row.itemTitle}</p>
+                    <p className="mt-0.5 text-xs text-gray-500">{row.itemTitle}</p>
                   )}
                 </div>
                 <span
