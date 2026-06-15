@@ -3,22 +3,50 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GalleryPhoto } from "@/lib/site-data";
 
-// Мозаїка різнорозмірних плиток, що складається в ЧІТКИЙ прямокутник:
-//  • патерн «одна 2×2 + решта 1×1» на кожен блок cols×2 рівно замощує блок (для cols ≥ 3),
-//    тож при кратній к-ті плиток прямокутник без дір; зайве по краях — обрізаємо (object-cover);
-//  • висота обмежена MAX_ROWS рядами → блок стандартного розміру, не росте;
-//  • надлишок фото крутиться: випадкова плитка плавно змінює фото на ще не показане;
+// Різнорозмірна мозаїка, що складається в ЧІТКИЙ прямокутник cols×ROWS:
+//  • розкладка — жадібне укладання за висотою колонок: завжди кладемо плитку в найнижчу
+//    рівну ділянку → сітка заповнюється повністю, без дір (плитки 1–3 завширшки, 1–2 заввишки);
+//  • фіксована висота ROWS рядів → блок «трьохповерховий», стандартного розміру;
+//  • фото кропляться під клітинку (object-cover);
+//  • надлишок фото крутиться (випадкова плитка плавно змінює фото на ще не показане);
 //  • лайтбокс зі стрілками ‹ › гортає ВСІ фото (клавіші ←/→, Esc — закрити).
 
-const MAX_ROWS = 4; // парне (плитка 2×2 = 2 ряди) → фіксована висота
+const ROWS = 3; // «трьохповерхова» — фіксована висота
 const GAP = 8; // px, = gap-2
 const ROTATE_MS = 3500;
+const WIDTHS = [1, 1, 1, 2, 2, 3]; // ваги ширини плитки (більше дрібних)
+const HEIGHTS = [1, 1, 2]; // ваги висоти
+
+type Tile = { c: number; r: number; w: number; h: number };
 
 function colsForWidth(w: number): number {
   if (w < 500) return 3;
   if (w < 760) return 4;
   if (w < 1024) return 5;
   return 6;
+}
+
+// Жадібне укладання у прямокутник cols×rows без дір (плитки різних розмірів).
+function buildLayout(cols: number, rows: number): Tile[] {
+  const heights = new Array<number>(cols).fill(0);
+  const tiles: Tile[] = [];
+  let guard = 0;
+  while (guard++ < 4000) {
+    let minH = Infinity;
+    for (const h of heights) if (h < minH) minH = h;
+    if (minH >= rows) break;
+    const c = heights.indexOf(minH);
+    let run = 1; // довжина рівної (однакової висоти) ділянки від c
+    while (c + run < cols && heights[c + run] === minH) run++;
+    const remaining = rows - minH;
+    const hOpts = HEIGHTS.filter((h) => h <= Math.min(2, remaining));
+    const h = hOpts[Math.floor(Math.random() * hOpts.length)];
+    const wOpts = WIDTHS.filter((w) => w <= Math.min(run, 3));
+    const w = wOpts[Math.floor(Math.random() * wOpts.length)];
+    tiles.push({ c, r: minH, w, h });
+    for (let k = c; k < c + w; k++) heights[k] += h;
+  }
+  return tiles;
 }
 
 export default function GalleryGrid({
@@ -32,7 +60,7 @@ export default function GalleryGrid({
   const [width, setWidth] = useState(0);
   const [idx, setIdx] = useState<number | null>(null); // індекс у photos для лайтбокса
 
-  // Вимір ширини контейнера → кількість колонок і розмір базової (квадратної) плитки.
+  // Вимір ширини контейнера.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -42,24 +70,25 @@ export default function GalleryGrid({
     return () => ro.disconnect();
   }, []);
 
-  const { cols, autoRow, count, unit } = useMemo(() => {
-    const w = width || 1024;
-    const c = colsForWidth(w);
-    const colW = Math.max(60, Math.floor((w - GAP * (c - 1)) / c));
-    const u = 2 * c - 3; // фото на блок cols×2 (1 з них — велика 2×2)
-    const capacity = (MAX_ROWS / 2) * u;
-    const full = Math.floor(photos.length / u) * u; // кратно блоку → без дір
-    const cnt = Math.min(full || photos.length, capacity);
-    return { cols: c, autoRow: colW, count: cnt, unit: u };
-  }, [width, photos.length]);
+  const cols = useMemo(() => colsForWidth(width || 1024), [width]);
+  const colW = useMemo(
+    () => Math.max(60, Math.floor(((width || 1024) - GAP * (cols - 1)) / cols)),
+    [width, cols],
+  );
 
-  // Фото у слотах (велика/мала визначається позицією: перша в кожному блоці — велика).
+  // Розкладку рахуємо на клієнті (Math.random) → жодних розбіжностей SSR/гідрації.
+  const [tiles, setTiles] = useState<Tile[]>([]);
+  useEffect(() => {
+    setTiles(buildLayout(cols, ROWS));
+  }, [cols]);
+
+  // Фото у слотах (по одному на плитку).
   const [slotPhotos, setSlotPhotos] = useState<GalleryPhoto[]>([]);
   useEffect(() => {
-    setSlotPhotos(photos.slice(0, count));
-  }, [photos, count]);
+    setSlotPhotos(photos.slice(0, tiles.length));
+  }, [photos, tiles]);
 
-  const overflow = photos.length > count;
+  const overflow = photos.length > tiles.length;
 
   // Ротація надлишку (пауза, коли відкрито лайтбокс).
   useEffect(() => {
@@ -86,7 +115,6 @@ export default function GalleryGrid({
     [photos.length],
   );
 
-  // Клавіатура для лайтбокса.
   useEffect(() => {
     if (idx === null) return;
     const onKey = (e: KeyboardEvent) => {
@@ -116,30 +144,32 @@ export default function GalleryGrid({
           className="grid gap-2"
           style={{
             gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
-            gridAutoRows: `${autoRow}px`,
-            gridAutoFlow: "dense",
+            gridAutoRows: `${colW}px`,
           }}
         >
-          {slotPhotos.map((p, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => openTile(p)}
-              className={`group overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
-                i % unit === 0 ? "col-span-2 row-span-2" : ""
-              }`}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                key={p.id}
-                src={p.url}
-                alt={p.caption ?? ""}
-                loading="lazy"
-                style={{ animation: "rxFade 0.6s ease both" }}
-                className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
-              />
-            </button>
-          ))}
+          {tiles.map((t, i) => {
+            const p = slotPhotos[i];
+            if (!p) return null;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => openTile(p)}
+                style={{ gridColumn: `${t.c + 1} / span ${t.w}`, gridRow: `${t.r + 1} / span ${t.h}` }}
+                className="group overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  key={p.id}
+                  src={p.url}
+                  alt={p.caption ?? ""}
+                  loading="lazy"
+                  style={{ animation: "rxFade 0.6s ease both" }}
+                  className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                />
+              </button>
+            );
+          })}
         </div>
       </div>
 
