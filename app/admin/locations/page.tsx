@@ -28,7 +28,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
                 defaultChecked={types.includes(t.code)}
                 className="h-4 w-4 accent-brand"
               />
-              {lang === "uk" ? t.uk : t.pl}
+              {lang === "uk" ? t.uk : lang === "pl" ? t.pl : t.en}
             </label>
           ))}
         </div>

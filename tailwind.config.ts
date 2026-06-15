@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-// Дизайн перенесено з «Kalkulator» (Етап 7): бренд indigo/violet + шрифт Inter + темна тема.
+// Дизайн перенесено з «Kalkulator» (Етап 7): бренд indigo/violet + шрифт Montserrat + темна тема.
 // Темна тема працює БЕЗ dark:-варіантів на кожному елементі: палітри `gray` та `white`
 // прив'язані до CSS-змінних, які перевизначаються в globals.css під html.dark.
 // `neutral` НЕ перемикається — це фіксована світла палітра для тексту на кольорових кнопках
@@ -63,7 +63,7 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
       },
     },
   },

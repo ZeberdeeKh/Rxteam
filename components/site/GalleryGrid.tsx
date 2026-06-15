@@ -52,9 +52,13 @@ function buildLayout(cols: number, rows: number): Tile[] {
 export default function GalleryGrid({
   photos,
   closeLabel,
+  prevLabel,
+  nextLabel,
 }: {
   photos: GalleryPhoto[];
   closeLabel: string;
+  prevLabel: string;
+  nextLabel: string;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
@@ -182,7 +186,7 @@ export default function GalleryGrid({
         >
           <button
             type="button"
-            aria-label="prev"
+            aria-label={prevLabel}
             onClick={(e) => {
               e.stopPropagation();
               go(-1);
@@ -202,7 +206,7 @@ export default function GalleryGrid({
 
           <button
             type="button"
-            aria-label="next"
+            aria-label={nextLabel}
             onClick={(e) => {
               e.stopPropagation();
               go(1);

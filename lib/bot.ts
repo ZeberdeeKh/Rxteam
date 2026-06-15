@@ -851,7 +851,9 @@ bot.command("cancel", async (ctx) => {
 
 bot.command("sethere", async (ctx) => {
   if (ctx.chat.type === "private") {
-    await ctx.reply("Виконай цю команду в групі, у топіку «Анонси».");
+    // Приватна відповідь конкретному адміну — мовою цього адміна (pl/en/uk).
+    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
+    await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
   let isChatAdmin = false;
@@ -2010,7 +2012,7 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
       .eq("id", game!.id);
   } catch (e) {
     console.error("announcement post failed", e);
-    await ctx.reply("⚠️ Гру створено, але анонс не запостився (можливо, текст задовгий або немає прав у топіку).");
+    await ctx.reply(tr(lang, "gamenew_announce_failed"));
     return;
   }
 

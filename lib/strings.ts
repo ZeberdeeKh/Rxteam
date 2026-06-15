@@ -148,6 +148,11 @@ const S: Record<string, Dict> = {
     en: "✅ Game #{id} created, announcement posted.\n📅 {when}\nRegistration until {regclose}.",
     uk: "✅ Гру #{id} створено, анонс опубліковано.\n📅 {when}\nРеєстрація до {regclose}.",
   },
+  gamenew_announce_failed: {
+    pl: "⚠️ Gra utworzona, ale ogłoszenie nie zostało opublikowane (tekst może być za długi lub brak uprawnień w temacie).",
+    en: "⚠️ Game created, but the announcement wasn't posted (text may be too long or no rights in the topic).",
+    uk: "⚠️ Гру створено, але анонс не запостився (можливо, текст задовгий або немає прав у топіку).",
+  },
 
   // картка гри + реєстрація
   game_card: {
@@ -254,6 +259,11 @@ const S: Record<string, Dict> = {
     pl: "🔫 {callsign} zapisał się z WYNAJMEM na «{title}» ({when}). Napisz ws. zestawu.",
     en: "🔫 {callsign} signed up with RENTAL for «{title}» ({when}). Message them about the set.",
     uk: "🔫 {callsign} записався з ОРЕНДОЮ на «{title}» ({when}). Напиши щодо комплекту.",
+  },
+  admin_purchase_notify: {
+    pl: "🛒 Nowy zakup w sklepie!\n👤 Gracz: {who}\n📦 Towar: {item}\n💰 Koszt: {cost} pkt\n\nPotrzebne Twoje działanie — wydaj towar graczowi.",
+    en: "🛒 New shop purchase!\n👤 Player: {who}\n📦 Item: {item}\n💰 Cost: {cost} pts\n\nAction needed — hand the item to the player.",
+    uk: "🛒 Нова покупка в магазині!\n👤 Гравець: {who}\n📦 Товар: {item}\n💰 Вартість: {cost} балів\n\nПотрібна ваша дія — видайте товар гравцю.",
   },
 
   // чек-ін

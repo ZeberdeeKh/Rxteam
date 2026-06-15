@@ -47,7 +47,12 @@ export default async function Home() {
       {/* Галерея (мозаїка, без заголовка/підпису) */}
       {showGallery && (
         <section>
-          <GalleryGrid photos={galleryPhotos} closeLabel={st(lang, "gallery_close")} />
+          <GalleryGrid
+            photos={galleryPhotos}
+            closeLabel={st(lang, "gallery_close")}
+            prevLabel={st(lang, "gallery_prev")}
+            nextLabel={st(lang, "gallery_next")}
+          />
         </section>
       )}
 

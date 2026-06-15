@@ -1,7 +1,7 @@
 // Соцмережі RX Team (лендінг). Лінки керуються в адмінці → «Соцмережі» (лише майстер),
 // зберігаються в таблиці settings. Порожнє значення → береться defaultUrl;
 // якщо й він порожній (поки що Facebook) — блок показуємо як «скоро».
-export type SocialKey = "instagram" | "telegram" | "facebook" | "tiktok";
+export type SocialKey = "instagram" | "telegram" | "facebook" | "tiktok" | "youtube";
 
 export type SocialDef = {
   key: SocialKey;
@@ -16,6 +16,7 @@ export const SOCIALS: SocialDef[] = [
   { key: "telegram", settingKey: "social_telegram_url", label: "Telegram", defaultUrl: "https://t.me/rxteampl" },
   { key: "facebook", settingKey: "social_facebook_url", label: "Facebook", defaultUrl: "" }, // поки заглушка
   { key: "tiktok", settingKey: "social_tiktok_url", label: "TikTok", defaultUrl: "https://www.tiktok.com/@rxteam.pl" },
+  { key: "youtube", settingKey: "social_youtube_url", label: "YouTube", defaultUrl: "" }, // поки заглушка
 ];
 
 export type ResolvedSocial = SocialDef & { url: string };

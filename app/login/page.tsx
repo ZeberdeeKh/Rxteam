@@ -13,9 +13,17 @@ export default function LoginPage({ searchParams }: { searchParams: { error?: st
 
   return (
     <div className="mx-auto max-w-sm">
-      {searchParams.error === "tg" && (
-        <p className={`mb-4 ${ui.alertErr}`}>{st(lang, "auth_err_tg")}</p>
-      )}
+      {(() => {
+        // tg → невдалий вхід через Telegram; confirm → невдале підтвердження e-mail
+        // (редірект з app/auth/confirm/route.ts). Обидва ключі вже перекладені pl/en/uk.
+        const errKey =
+          searchParams.error === "tg"
+            ? "auth_err_tg"
+            : searchParams.error === "confirm"
+            ? "auth_confirm_failed"
+            : null;
+        return errKey ? <p className={`mb-4 ${ui.alertErr}`}>{st(lang, errKey)}</p> : null;
+      })()}
 
       <AuthForm mode="login" lang={lang} />
 

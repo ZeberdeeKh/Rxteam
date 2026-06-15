@@ -28,7 +28,17 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
     password,
     options: { emailRedirectTo: `${siteOrigin()}/auth/confirm` },
   });
-  if (error) return { error: error.message };
+  if (error) {
+    // Не віддаємо сирий англомовний текст Supabase в UI — мапимо на ключі словника (pl/en/uk).
+    const m = error.message.toLowerCase();
+    if (m.includes("already registered") || m.includes("already been registered"))
+      return { error: "auth_err_email_taken" };
+    if (m.includes("rate limit")) return { error: "auth_err_rate_limit" };
+    if (m.includes("invalid format") || m.includes("invalid email"))
+      return { error: "auth_err_email_invalid" };
+    if (m.includes("password")) return { error: "auth_min_pass" };
+    return { error: "auth_err_generic" };
+  }
 
   redirect("/auth/check-email");
 }
@@ -40,7 +50,14 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
 
   const supabase = createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) return { error: error.message };
+  if (error) {
+    // Сирий текст Supabase → ключі словника (pl/en/uk), інакше англійський бекенд-текст витікає в UI.
+    const m = error.message.toLowerCase();
+    if (m.includes("not confirmed")) return { error: "auth_err_not_confirmed" };
+    if (m.includes("invalid login") || m.includes("invalid credentials"))
+      return { error: "auth_err_bad_creds" };
+    return { error: "auth_err_generic" };
+  }
 
   redirect("/cabinet");
 }

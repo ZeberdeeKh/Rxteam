@@ -1,4 +1,6 @@
 import { supabase } from "./supabase";
+import { tr } from "./strings";
+import type { Lang } from "./i18n";
 
 const TG = `https://api.telegram.org/bot${process.env.BOT_TOKEN}`;
 
@@ -64,20 +66,21 @@ export async function notifyAdminsPurchase(opts: {
   cost: number;
 }) {
   const who = opts.playerCallsign ?? opts.playerName ?? "?";
-  const text =
-    `🛒 Нова покупка в магазині!\n` +
-    `👤 Гравець: ${who}\n` +
-    `📦 Товар: ${opts.itemTitle}\n` +
-    `💰 Вартість: ${opts.cost} балів\n\n` +
-    `Потрібна ваша дія — видайте товар гравцю.`;
 
+  // Кожному адміну — його мовою (pl/en/uk), як у notifyAdminsRental (lib/bot.ts).
   const { data: admins } = await supabase
     .from("players")
-    .select("tg_user_id")
+    .select("tg_user_id, lang")
     .eq("is_admin", true)
     .not("tg_user_id", "is", null);
 
   for (const a of admins ?? []) {
-    if (a.tg_user_id) await sendTg(a.tg_user_id as number, text);
+    if (!a.tg_user_id) continue;
+    const text = tr((a.lang as Lang) ?? "uk", "admin_purchase_notify", {
+      who,
+      item: opts.itemTitle,
+      cost: opts.cost,
+    });
+    await sendTg(a.tg_user_id as number, text);
   }
 }

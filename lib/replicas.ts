@@ -8,12 +8,12 @@
 export type ReplicaCode = "cqb" | "dmr" | "sniper" | "pistol" | "lmg";
 
 // Порядок = порядок показу в налаштуваннях і в анонсі.
-export const REPLICA_TYPES: { code: ReplicaCode; pl: string; uk: string }[] = [
-  { code: "cqb", pl: "CQB", uk: "CQB" },
-  { code: "dmr", pl: "DMR", uk: "DMR" },
-  { code: "sniper", pl: "Snajper", uk: "Снайпер" },
-  { code: "pistol", pl: "Pistolet", uk: "Пістолет" },
-  { code: "lmg", pl: "Karabin maszynowy (LMG)", uk: "Кулемет (LMG)" },
+export const REPLICA_TYPES: { code: ReplicaCode; pl: string; en: string; uk: string }[] = [
+  { code: "cqb", pl: "CQB", en: "CQB", uk: "CQB" },
+  { code: "dmr", pl: "DMR", en: "DMR", uk: "DMR" },
+  { code: "sniper", pl: "Snajper", en: "Sniper", uk: "Снайпер" },
+  { code: "pistol", pl: "Pistolet", en: "Pistol", uk: "Пістолет" },
+  { code: "lmg", pl: "Karabin maszynowy (LMG)", en: "Machine gun (LMG)", uk: "Кулемет (LMG)" },
 ];
 
 export const REPLICA_CODES: ReplicaCode[] = REPLICA_TYPES.map((t) => t.code);

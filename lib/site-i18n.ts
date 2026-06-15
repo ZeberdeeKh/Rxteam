@@ -109,6 +109,33 @@ const SITE: Record<string, Dict> = {
     en: "Something went wrong. Try again.",
     uk: "Щось пішло не так. Спробуй ще раз.",
   },
+  // Помилки реєстрації/входу — мапимо raw-повідомлення Supabase на ці ключі (app/auth/actions.ts),
+  // інакше англомовний бекенд-текст витікав би в UI повз словник.
+  auth_err_email_taken: {
+    pl: "Ten e-mail jest już zarejestrowany. Zaloguj się.",
+    en: "This e-mail is already registered. Please log in.",
+    uk: "Ця пошта вже зареєстрована. Увійди.",
+  },
+  auth_err_rate_limit: {
+    pl: "Zbyt wiele prób. Spróbuj ponownie za chwilę.",
+    en: "Too many attempts. Please try again shortly.",
+    uk: "Забагато спроб. Спробуй ще раз за хвилину.",
+  },
+  auth_err_email_invalid: {
+    pl: "Nieprawidłowy adres e-mail.",
+    en: "Invalid e-mail address.",
+    uk: "Неправильна адреса e-mail.",
+  },
+  auth_err_bad_creds: {
+    pl: "Nieprawidłowy e-mail lub hasło.",
+    en: "Invalid e-mail or password.",
+    uk: "Неправильний e-mail або пароль.",
+  },
+  auth_err_not_confirmed: {
+    pl: "Najpierw potwierdź adres e-mail (sprawdź skrzynkę).",
+    en: "Please confirm your e-mail first (check your inbox).",
+    uk: "Спершу підтверди e-mail (перевір пошту).",
+  },
   cabinet_title: { pl: "Mój profil", en: "My profile", uk: "Кабінет" },
 
   // ── Лінк Telegram ──
@@ -133,7 +160,7 @@ const SITE: Record<string, Dict> = {
   link_err_not_found: {
     pl: "Nieprawidłowy kod.",
     en: "Invalid code.",
-    uk: "Невірний код.",
+    uk: "Неправильний код.",
   },
   link_err_expired: { pl: "Kod wygasł. Wygeneruj nowy w bocie.", en: "Code expired. Generate a new one in the bot.", uk: "Код прострочено. Згенеруй новий у боті." },
   link_err_used: { pl: "Kod już użyty.", en: "Code already used.", uk: "Код уже використано." },
@@ -221,6 +248,8 @@ const SITE: Record<string, Dict> = {
     uk: "Поки що порожньо — скоро з'являться фото.",
   },
   gallery_close: { pl: "Zamknij", en: "Close", uk: "Закрити" },
+  gallery_prev: { pl: "Poprzednie zdjęcie", en: "Previous photo", uk: "Попереднє фото" },
+  gallery_next: { pl: "Następne zdjęcie", en: "Next photo", uk: "Наступне фото" },
 
   // ── 6.1 Рейтинг ──
   ranking_title: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
@@ -377,7 +406,7 @@ const SITE: Record<string, Dict> = {
   },
   reg_transport_q: { pl: "Transport", en: "Transport", uk: "Транспорт" },
   reg_transport_own: { pl: "Własnym autem, podwiozę", en: "Driving, can give a lift", uk: "Своїм авто, підвезу" },
-  reg_transport_need: { pl: "Potrzebuję podwózki", en: "I need a ride", uk: "Потребую підвезти" },
+  reg_transport_need: { pl: "Potrzebuję podwózki", en: "I need a ride", uk: "Потрібен транспорт" },
   reg_from_ph: { pl: "Skąd jedziesz?", en: "Where from?", uk: "Звідки їдеш?" },
   reg_seats_ph: { pl: "Wolne miejsca w aucie", en: "Free seats in car", uk: "Вільних місць в авто" },
 
