@@ -1,5 +1,27 @@
 // Схема редактора налаштувань (6.4, майстер-онлі). Керується таблицею settings.
 // Підписи — технічні (ключі + короткий опис); екран бачить лише майстер.
+import { captchaPrompt, correctMap, wrongMap, expiredMap, faq } from "./i18n";
+
+// Стандартні (fallback) значення для текстів бота — показуємо як placeholder,
+// щоб майстер бачив, що бот шле зараз (порожнє поле = використовується це значення).
+export const SETTING_DEFAULTS: Record<string, string> = {
+  captcha_pl: captchaPrompt.pl,
+  captcha_en: captchaPrompt.en,
+  captcha_uk: captchaPrompt.uk,
+  cap_ok_pl: correctMap.pl,
+  cap_ok_en: correctMap.en,
+  cap_ok_uk: correctMap.uk,
+  cap_wrong_pl: wrongMap.pl,
+  cap_wrong_en: wrongMap.en,
+  cap_wrong_uk: wrongMap.uk,
+  cap_expired_pl: expiredMap.pl,
+  cap_expired_en: expiredMap.en,
+  cap_expired_uk: expiredMap.uk,
+  faq_pl: faq.pl,
+  faq_en: faq.en,
+  faq_uk: faq.uk,
+};
+
 export type SettingField = {
   key: string;
   type: "toggle" | "number" | "text" | "textarea";

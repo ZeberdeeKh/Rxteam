@@ -236,3 +236,38 @@ export async function listLocations() {
     .order("name", { ascending: true });
   return (data ?? []) as { id: number; name: string }[];
 }
+
+export type AdminLocation = {
+  id: number;
+  name: string;
+  lat: number;
+  lng: number;
+  radius_m: number;
+  map_url: string | null;
+  gameCount: number; // у скількох іграх використана (для блокування видалення)
+};
+
+export async function listLocationsFull(): Promise<AdminLocation[]> {
+  const { data: locs } = await supabase
+    .from("locations")
+    .select("id, name, lat, lng, radius_m, map_url")
+    .order("name", { ascending: true });
+  const rows = locs ?? [];
+  if (!rows.length) return [];
+
+  const { data: games } = await supabase.from("games").select("location_id");
+  const used = new Map<number, number>();
+  for (const g of games ?? []) {
+    const id = g.location_id as number | null;
+    if (id != null) used.set(id, (used.get(id) ?? 0) + 1);
+  }
+  return rows.map((l) => ({
+    id: l.id as number,
+    name: l.name as string,
+    lat: l.lat as number,
+    lng: l.lng as number,
+    radius_m: (l.radius_m as number) ?? 300,
+    map_url: (l.map_url as string) ?? null,
+    gameCount: used.get(l.id as number) ?? 0,
+  }));
+}

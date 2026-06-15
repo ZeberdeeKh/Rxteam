@@ -422,6 +422,28 @@ const SITE: Record<string, Dict> = {
 
   adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
+  adm_settings_hint: {
+    pl: "Puste pole = używana jest wartość domyślna (pokazana szarym tekstem). Wpisz coś, aby ją nadpisać.",
+    en: "Empty field = the default value is used (shown in grey). Type to override it.",
+    uk: "Порожнє поле = використовується стандартне значення (показане сірим). Введи текст, щоб перекрити.",
+  },
+
+  // ── 6.4 Локації ──
+  adm_nav_locations: { pl: "Lokalizacje", en: "Locations", uk: "Локації" },
+  adm_locations_title: { pl: "Lokalizacje (poligony)", en: "Locations (sites)", uk: "Локації (полігони)" },
+  adm_loc_add: { pl: "Nowa lokalizacja", en: "New location", uk: "Нова локація" },
+  adm_loc_name: { pl: "Nazwa", en: "Name", uk: "Назва" },
+  adm_loc_lat: { pl: "Szerokość (lat)", en: "Latitude", uk: "Широта (lat)" },
+  adm_loc_lng: { pl: "Długość (lng)", en: "Longitude", uk: "Довгота (lng)" },
+  adm_loc_radius: { pl: "Promień check-in (m)", en: "Check-in radius (m)", uk: "Радіус чек-іну (м)" },
+  adm_loc_empty: { pl: "Brak zapisanych lokalizacji.", en: "No saved locations.", uk: "Немає збережених локацій." },
+  adm_loc_inuse: {
+    pl: "Używana w grach — nie można usunąć",
+    en: "Used by games — cannot delete",
+    uk: "Використовується в іграх — видалити не можна",
+  },
+  adm_btn_delete: { pl: "Usuń", en: "Delete", uk: "Видалити" },
+  adm_btn_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
 
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },

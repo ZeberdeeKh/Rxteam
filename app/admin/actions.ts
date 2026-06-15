@@ -10,6 +10,8 @@ import { makeUtc, computeWindows } from "@/lib/games";
 import { performCheckin } from "@/lib/checkins";
 import { setCallsignForPlayer } from "@/lib/site-player";
 
+const back2 = (q: string) => redirect(`/admin/locations${q}`);
+
 // ── Налаштування (майстер) ──
 export async function saveSettings(formData: FormData) {
   await requireMaster();
@@ -67,6 +69,56 @@ export async function cancelGame(formData: FormData) {
     revalidatePath("/admin/games");
   }
   redirect("/admin/games?cancelled=1");
+}
+
+// ── Локації (право games) ──
+function mapUrl(lat: number, lng: number) {
+  return `https://maps.google.com/?q=${lat},${lng}`;
+}
+
+export async function createLocation(formData: FormData) {
+  await requirePerm("games");
+  const name = String(formData.get("name") ?? "").trim();
+  const lat = Number(formData.get("lat"));
+  const lng = Number(formData.get("lng"));
+  const radiusRaw = Number(formData.get("radius_m"));
+  if (!name || !Number.isFinite(lat) || !Number.isFinite(lng)) back2("?err=fields");
+  const radius_m = Number.isFinite(radiusRaw) && radiusRaw > 0 ? Math.round(radiusRaw) : 300;
+  await supabase.from("locations").insert({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng) });
+  revalidatePath("/admin/locations");
+  back2("?created=1");
+}
+
+export async function updateLocation(formData: FormData) {
+  await requirePerm("games");
+  const id = Number(formData.get("id"));
+  const name = String(formData.get("name") ?? "").trim();
+  const lat = Number(formData.get("lat"));
+  const lng = Number(formData.get("lng"));
+  const radiusRaw = Number(formData.get("radius_m"));
+  if (!Number.isFinite(id) || !name || !Number.isFinite(lat) || !Number.isFinite(lng)) back2("?err=fields");
+  const radius_m = Number.isFinite(radiusRaw) && radiusRaw > 0 ? Math.round(radiusRaw) : 300;
+  await supabase
+    .from("locations")
+    .update({ name, lat, lng, radius_m, map_url: mapUrl(lat, lng) })
+    .eq("id", id);
+  revalidatePath("/admin/locations");
+  back2("?saved=1");
+}
+
+export async function deleteLocation(formData: FormData) {
+  await requirePerm("games");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) back2("");
+  // Не видаляємо, якщо локація вже використана в іграх (FK + збереження історії).
+  const { count } = await supabase
+    .from("games")
+    .select("*", { count: "exact", head: true })
+    .eq("location_id", id);
+  if ((count ?? 0) > 0) back2("?err=inuse");
+  await supabase.from("locations").delete().eq("id", id);
+  revalidatePath("/admin/locations");
+  back2("?deleted=1");
 }
 
 // ── Реєстрації / чек-іни наживо (право checkin) ──

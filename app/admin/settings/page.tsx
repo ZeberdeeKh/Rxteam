@@ -2,7 +2,7 @@ import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
-import { SETTINGS_GROUPS } from "@/lib/admin-settings";
+import { SETTINGS_GROUPS, SETTING_DEFAULTS } from "@/lib/admin-settings";
 import { saveSettings } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
@@ -29,6 +29,9 @@ export default async function AdminSettings({
       {searchParams.saved && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, "adm_saved")}</p>
       )}
+      <p className="rounded-md bg-neutral-100 px-3 py-2 text-sm text-neutral-600">
+        {st(lang, "adm_settings_hint")}
+      </p>
 
       <form action={saveSettings} className="space-y-8">
         {SETTINGS_GROUPS.map((g) => (
@@ -51,6 +54,7 @@ export default async function AdminSettings({
                     <textarea
                       name={f.key}
                       defaultValue={values[f.key] ?? ""}
+                      placeholder={SETTING_DEFAULTS[f.key] ?? ""}
                       rows={3}
                       className={inputCls}
                     />
@@ -60,6 +64,7 @@ export default async function AdminSettings({
                       step="any"
                       name={f.key}
                       defaultValue={values[f.key] ?? ""}
+                      placeholder={SETTING_DEFAULTS[f.key] ?? ""}
                       className={inputCls}
                     />
                   )}
