@@ -16,6 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const links: { href: string; label: string; show: boolean }[] = [
     { href: "/admin", label: st(lang, "adm_title"), show: true },
     { href: "/admin/settings", label: st(lang, "adm_nav_settings"), show: !!admin.is_master },
+    { href: "/admin/social", label: st(lang, "adm_nav_social"), show: !!admin.is_master },
     { href: "/admin/games", label: st(lang, "adm_nav_games"), show: hasPerm(admin, "games") },
     { href: "/admin/locations", label: st(lang, "adm_nav_locations"), show: hasPerm(admin, "games") },
     { href: "/admin/players", label: st(lang, "adm_nav_players"), show: hasPerm(admin, "players") },

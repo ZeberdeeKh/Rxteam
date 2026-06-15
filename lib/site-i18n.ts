@@ -31,9 +31,9 @@ const SITE: Record<string, Dict> = {
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
 
   footer_note: {
-    pl: "Nieformalna grupa znajomych grających w ASG dla zabawy.",
-    en: "An informal group of friends playing ASG for fun.",
-    uk: "Неформальна група друзів, що грають в ASG для розваги.",
+    pl: "Nieformalna społeczność miłośników ASG z Wrocławia.",
+    en: "An informal community of ASG enthusiasts in Wrocław.",
+    uk: "Неформальна спільнота поціновувачів ASG із Вроцлава.",
   },
 
   home_title: { pl: "RX Team", en: "RX Team", uk: "RX Team" },
@@ -159,13 +159,14 @@ const SITE: Record<string, Dict> = {
     en: "No games scheduled yet. Check back soon. 🪖",
     uk: "Поки що немає запланованих ігор. Зазирни пізніше. 🪖",
   },
-  home_skladka_title: { pl: "Składka", en: "Voluntary contribution (składka)", uk: "Внесок (składka)" },
-  // Текст складки — PL дослівно (§15 PLAN.md). Однаковий для всіх мов інтерфейсу.
-  home_skladka_body: {
-    pl: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
-    en: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
-    uk: "RX Team to nieformalna grupa znajomych grających w ASG dla zabawy. Podana kwota to dobrowolna składka przeznaczona w całości na rozwój i utrzymanie wspólnego sprzętu wykorzystywanego podczas gier. Nie prowadzimy działalności zarobkowej ani komercyjnej i nie świadczymy usług — zbiórka ma charakter koleżeński (zrzutka na sprzęt).",
+  // Блок «Про нас» на лендінгу (замість складки) + соцмережі.
+  home_about_title: { pl: "O nas", en: "About us", uk: "Про нас" },
+  home_about_body: {
+    pl: "RX Team to nieformalna społeczność miłośników ASG z Wrocławia. Nie jesteśmy firmą ani oficjalną organizacją — gramy z pasji, dla wspólnej frajdy. Spotykamy się na grach w każdą niedzielę, z wyjątkiem niektórych świąt. Wszystkie aktualności znajdziesz na naszym Instagramie, Telegramie, Facebooku i TikToku — linki poniżej.",
+    en: "RX Team is an informal community of ASG enthusiasts from Wrocław. We're not a company or an official organisation — we play out of passion, for the shared fun of it. We meet for games every Sunday, except some holidays. You'll find all the latest news on our Instagram, Telegram, Facebook and TikTok — links below.",
+    uk: "RX Team — неформальна спільнота поціновувачів ASG із Вроцлава. Ми не компанія й не офіційна організація — граємо із пристрасті, заради спільного драйву. Збираємося на ігри щонеділі, окрім деяких свят. Усі новини шукай у нашому Instagram, Telegram, Facebook і TikTok — посилання нижче.",
   },
+  social_soon: { pl: "wkrótce", en: "soon", uk: "скоро" },
 
   // ── 6.1 Ігри ──
   games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
@@ -413,6 +414,7 @@ const SITE: Record<string, Dict> = {
   adm_err_fields: { pl: "Uzupełnij pola.", en: "Fill in the fields.", uk: "Заповни поля." },
 
   adm_nav_settings: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
+  adm_nav_social: { pl: "Sociale", en: "Socials", uk: "Соцмережі" },
   adm_nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_nav_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
   adm_nav_referrals: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },
@@ -426,6 +428,14 @@ const SITE: Record<string, Dict> = {
     pl: "Puste pole = używana jest wartość domyślna (pokazana szarym tekstem). Wpisz coś, aby ją nadpisać.",
     en: "Empty field = the default value is used (shown in grey). Type to override it.",
     uk: "Порожнє поле = використовується стандартне значення (показане сірим). Введи текст, щоб перекрити.",
+  },
+
+  // ── Соцмережі (майстер) ──
+  adm_social_title: { pl: "Sociale (linki)", en: "Socials (links)", uk: "Соцмережі (посилання)" },
+  adm_social_hint: {
+    pl: "Linki pokazywane na stronie głównej (sekcja „O nas”). Puste pole = blok pokazany jako „wkrótce”.",
+    en: "Links shown on the landing page (the “About us” section). Empty field = the block is shown as “soon”.",
+    uk: "Посилання показуються на головній (блок «Про нас»). Порожнє поле = блок показується як «скоро».",
   },
 
   // ── 6.4 Локації ──

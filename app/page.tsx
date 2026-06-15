@@ -2,14 +2,20 @@ import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getNextGame, getRanking } from "@/lib/site-data";
+import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen } from "@/lib/games";
 import { ui, buttonClass } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
+import SocialLinks from "@/components/site/SocialLinks";
 
-// Лендінг (публічний, одна сторінка): герой + найближча гра + рейтинг + складка.
+// Лендінг (публічний, одна сторінка): герой + найближча гра + рейтинг + «Про нас» + соцмережі.
 export default async function Home() {
   const lang = getServerLang();
-  const [next, ranking] = await Promise.all([getNextGame(), getRanking(10)]);
+  const [next, ranking, settings] = await Promise.all([
+    getNextGame(),
+    getRanking(10),
+    getAllSettings(),
+  ]);
 
   const countText = (() => {
     if (!next) return "";
@@ -65,12 +71,11 @@ export default async function Home() {
         {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
       </section>
 
-      {/* Складка */}
+      {/* Про нас + соцмережі */}
       <section className="max-w-2xl">
-        <h2 className={ui.sectionTitle}>{st(lang, "home_skladka_title")}</h2>
-        <blockquote className={`mt-3 border-l-4 border-brand/40 bg-white px-4 py-3 leading-relaxed ${ui.body}`}>
-          {st(lang, "home_skladka_body")}
-        </blockquote>
+        <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
+        <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
+        <SocialLinks settings={settings} lang={lang} />
       </section>
     </div>
   );

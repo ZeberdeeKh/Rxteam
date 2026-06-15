@@ -104,7 +104,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
         <footer className="border-t border-gray-200 bg-white">
           <div className={`mx-auto w-full max-w-5xl px-4 py-4 ${ui.meta}`}>
-            © RX Team · {st(lang, "footer_note")}
+            RX Team · {st(lang, "footer_note")}
           </div>
         </footer>
 

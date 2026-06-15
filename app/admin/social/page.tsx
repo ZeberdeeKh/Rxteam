@@ -1,0 +1,54 @@
+import { getServerLang } from "@/lib/server-lang";
+import { st } from "@/lib/site-i18n";
+import { requireMaster } from "@/lib/admin";
+import { getAllSettings } from "@/lib/settings";
+import { SOCIALS } from "@/lib/social";
+import { saveSocial } from "@/app/admin/actions";
+import { ui, buttonClass } from "@/components/ui";
+
+export const dynamic = "force-dynamic";
+
+// Соцмережі: лінки для лендінгу. Лише майстер (як і налаштування).
+export default async function AdminSocial({
+  searchParams,
+}: {
+  searchParams: { saved?: string };
+}) {
+  await requireMaster();
+  const lang = getServerLang();
+  const values = await getAllSettings();
+
+  return (
+    <div className={ui.pageStack}>
+      <h1 className={ui.pageTitle}>{st(lang, "adm_social_title")}</h1>
+      {searchParams.saved && <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>}
+      <p className={ui.panel}>{st(lang, "adm_social_hint")}</p>
+
+      <form action={saveSocial} className="space-y-8">
+        <fieldset className="rounded-lg border border-gray-200 bg-white p-5">
+          <legend className={`px-1 ${ui.sectionTitle}`}>{st(lang, "adm_social_title")}</legend>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            {SOCIALS.map((s) => (
+              <label key={s.settingKey} className="block text-sm">
+                <span className={`mb-1 ${ui.label}`}>
+                  {s.label} <code className="text-xs text-gray-400">{s.settingKey}</code>
+                </span>
+                <input
+                  type="url"
+                  name={s.settingKey}
+                  defaultValue={values[s.settingKey] ?? ""}
+                  placeholder={s.defaultUrl || "https://…"}
+                  className={ui.input}
+                />
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <button type="submit" className={buttonClass("primary", "md")}>
+          {st(lang, "adm_save")}
+        </button>
+      </form>
+    </div>
+  );
+}

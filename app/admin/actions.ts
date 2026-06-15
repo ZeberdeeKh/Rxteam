@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { setSetting } from "@/lib/settings";
 import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
 import { TOGGLE_KEYS, VALUE_KEYS } from "@/lib/admin-settings";
+import { SOCIALS } from "@/lib/social";
 import { makeUtc, computeWindows } from "@/lib/games";
 import { performCheckin } from "@/lib/checkins";
 import { setCallsignForPlayer } from "@/lib/site-player";
@@ -24,6 +25,18 @@ export async function saveSettings(formData: FormData) {
   }
   revalidatePath("/admin/settings");
   redirect("/admin/settings?saved=1");
+}
+
+// ── Соцмережі (майстер) ──
+export async function saveSocial(formData: FormData) {
+  await requireMaster();
+  for (const s of SOCIALS) {
+    const v = formData.get(s.settingKey);
+    if (v !== null) await setSetting(s.settingKey, String(v).trim());
+  }
+  revalidatePath("/admin/social");
+  revalidatePath("/"); // лендінг показує лінки
+  redirect("/admin/social?saved=1");
 }
 
 // ── Ігри (право games) ──
