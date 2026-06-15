@@ -42,12 +42,15 @@ async function main() {
   });
   console.log("setWebhook:", JSON.stringify(await whRes.json(), null, 2));
 
-  const cmdRes = await fetch(`https://api.telegram.org/bot${token}/setMyCommands`, {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ commands: PLAYER_COMMANDS }),
-  });
-  console.log("setMyCommands:", JSON.stringify(await cmdRes.json(), null, 2));
+  // Встановлюємо для default і all_private_chats (Telegram пріоритизує конкретний скоуп).
+  for (const scope of [{ type: "default" }, { type: "all_private_chats" }]) {
+    const cmdRes = await fetch(`https://api.telegram.org/bot${token}/setMyCommands`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ commands: PLAYER_COMMANDS, scope }),
+    });
+    console.log(`setMyCommands (${scope.type}):`, JSON.stringify(await cmdRes.json(), null, 2));
+  }
 }
 
 main();
