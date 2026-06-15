@@ -242,3 +242,16 @@ update games set reg_closes_at=now()+interval '2 hours', cancel_deadline=now()+i
 **Порядок:** 6.1 → 6.2 → 6.3 → 6.4 (кожен крок: tsc → build → push, як 6.0). ✅ Усе зроблено й задеплоєно.
 
 **Відкриті бізнес-рішення (нагадування):** склад магазину; чи пускати на реєстрацію з сайту до прив'язки TG; повний рейтинг анонімам (зараз публічно: позивний+звання+зароблено).
+
+---
+
+## 22. Roadmap / відкладені фічі
+
+### Фото-галерея — Етап 15 (зроблено: завантаження з адмінки)
+Публічна `/gallery` з випадковою добіркою фото. Джерело — **ручне завантаження з адмін-панелі** (підпункт «Galeria»). Доступ до підпункту й право завантажувати/видаляти — новий дозвіл `gallery` у «Ролях адмінів». Storage: публічний bucket `gallery` (шлях `photos/<uuid>.<ext>`), запис service-key. Таблиця `gallery_media` (`supabase/etap15.sql`), прапор `feature_gallery`. Випадковість — Fisher–Yates над пулом останніх видимих фото (не `ORDER BY random()`). Файли: `lib/admin.ts` (perm), `lib/admin-nav.ts`, `app/admin/gallery/page.tsx`, `components/admin/GalleryUploader.tsx`, `app/api/admin/gallery/upload/route.ts`, `app/gallery/page.tsx`, `components/site/GalleryGrid.tsx`, `lib/site-data.ts`, `lib/admin-data.ts`, `app/admin/actions.ts`, `app/layout.tsx`, `lib/site-i18n.ts`.
+
+### Автозбір фото з Telegram-топіка — ВІДКЛАДЕНО
+Альтернатива ручному завантаженню: бот сам ловить фото з форум-топіка «Zdjęcia i filmy z gier / Фото та відео з ігор» і наповнює ту саму галерею. Не реалізовано — лишаємо як ідею.
+- Хендлер `bot.on("message:photo")` у `lib/bot.ts`, скоупнутий на топік через нові settings `gallery_chat_id`/`gallery_thread_id`; команда `/setphotos` (дзеркало `/sethere`) для прив'язки топіка (+ захист від збігу з топіком анонсів, інакше `guardAnnounceTopic` видалятиме фото до захоплення).
+- Дедуп по `file_unique_id` (`upsert onConflict`), денний ліміт на користувача; `getFile`→download→upload у той самий bucket. `allowed_updates` уже містить `"message"` — set-webhook міняти не треба.
+- Ризики, через які відкладено: бекфіл історії неможливий (Bot API не читає старі повідомлення — лише нові фото); великі/відео-файли впираються в serverless-ліміт (треба розчіпляти через cron); **RODO** — публічні обличчя без явної згоди, тож потрібна модерація-перед-показом або нота згоди в правилах топіка + канал на видалення. Саме модерація/згода роблять цей варіант складнішим за ручне завантаження куратором.

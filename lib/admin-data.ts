@@ -306,6 +306,25 @@ export async function listShopItemsAdmin(): Promise<ShopItem[]> {
   return getShopItems(false);
 }
 
+// ── Фото-галерея (Етап 15) ──
+export type AdminGalleryItem = {
+  id: number;
+  public_url: string;
+  status: string; // visible | hidden
+  caption: string | null;
+  created_at: string;
+};
+
+// Усі фото галереї для модерації в адмінці (новіші — згори).
+export async function listGalleryMedia(limit = 200): Promise<AdminGalleryItem[]> {
+  const { data } = await supabase
+    .from("gallery_media")
+    .select("id, public_url, status, caption, created_at")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []) as AdminGalleryItem[];
+}
+
 export type AdminPurchase = {
   id: number;
   cost: number;

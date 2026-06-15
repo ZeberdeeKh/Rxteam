@@ -5,6 +5,7 @@ import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-player";
 import { isAdmin } from "@/lib/admin";
+import { featureEnabled } from "@/lib/settings";
 import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ctx = await getSessionContext();
   const loggedIn = ctx.state !== "anon";
   const admin = ctx.state === "linked" && isAdmin(ctx.player);
+  const showGallery = await featureEnabled("gallery");
 
   // Лейбли bug-report резолвимо на сервері (є lang) і передаємо в клієнтський компонент.
   const bugLabels = {
@@ -67,6 +69,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_home")}
               </NavLink>
+              {showGallery && (
+                <NavLink href="/gallery" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
+                  {st(lang, "nav_gallery")}
+                </NavLink>
+              )}
               {loggedIn ? (
                 <>
                   <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>

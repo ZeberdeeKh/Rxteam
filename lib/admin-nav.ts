@@ -17,6 +17,7 @@ export function adminNavLinks(admin: SitePlayer, lang: Lang): AdminNavLink[] {
     { href: "/admin/referrals", label: st(lang, "adm_nav_referrals"), show: hasPerm(admin, "referrals") },
     { href: "/admin/rental", label: st(lang, "adm_nav_rental"), show: hasPerm(admin, "rental") },
     { href: "/admin/joins", label: st(lang, "adm_nav_joins"), show: hasPerm(admin, "joins") },
+    { href: "/admin/gallery", label: st(lang, "adm_nav_gallery"), show: hasPerm(admin, "gallery") },
     { href: "/admin/roles", label: st(lang, "adm_nav_roles"), show: !!admin.is_master },
     { href: "/admin/chores", label: st(lang, "adm_nav_chores"), show: !!admin.is_master },
     {

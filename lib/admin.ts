@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getSessionPlayer, type SitePlayer } from "./site-player";
 
 // Гейт ролей адмінки (серверний). Майстер має всі права; інші — за admin_perms[].
-export type AdminPerm = "games" | "rental" | "checkin" | "referrals" | "players" | "joins";
+export type AdminPerm = "games" | "rental" | "checkin" | "referrals" | "players" | "joins" | "gallery";
 
 export const ALL_PERMS: AdminPerm[] = [
   "games",
@@ -11,6 +11,7 @@ export const ALL_PERMS: AdminPerm[] = [
   "referrals",
   "players",
   "joins",
+  "gallery",
 ];
 
 export function hasPerm(p: SitePlayer | null, perm: AdminPerm): boolean {

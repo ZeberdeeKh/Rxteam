@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
-import { setSetting } from "@/lib/settings";
+import { setSetting, getSetting } from "@/lib/settings";
 import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
 import { TOGGLE_KEYS, VALUE_KEYS } from "@/lib/admin-settings";
 import { SOCIALS } from "@/lib/social";
@@ -428,4 +428,42 @@ export async function markFulfilled(formData: FormData) {
     .eq("id", id);
   revalidatePath("/admin/shop");
   backShop("?fulfilled=1");
+}
+
+// ── Фото-галерея (право gallery) ──
+// Перемикає видимість фото (visible ↔ hidden) без видалення файлу.
+export async function toggleGalleryMedia(formData: FormData) {
+  await requirePerm("gallery");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) redirect("/admin/gallery");
+  const { data } = await supabase
+    .from("gallery_media")
+    .select("status")
+    .eq("id", id)
+    .maybeSingle();
+  const next = data?.status === "hidden" ? "visible" : "hidden";
+  await supabase.from("gallery_media").update({ status: next }).eq("id", id);
+  revalidatePath("/admin/gallery");
+  revalidatePath("/gallery");
+  redirect("/admin/gallery?saved=1");
+}
+
+// Повне видалення: прибирає і файл зі Storage, і рядок (механізм «видаліть моє фото»).
+export async function deleteGalleryMedia(formData: FormData) {
+  await requirePerm("gallery");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) redirect("/admin/gallery");
+  const { data } = await supabase
+    .from("gallery_media")
+    .select("storage_path")
+    .eq("id", id)
+    .maybeSingle();
+  if (data?.storage_path) {
+    const bucket = (await getSetting("gallery_bucket")) || "gallery";
+    await supabase.storage.from(bucket).remove([data.storage_path]);
+  }
+  await supabase.from("gallery_media").delete().eq("id", id);
+  revalidatePath("/admin/gallery");
+  revalidatePath("/gallery");
+  redirect("/admin/gallery?saved=1");
 }

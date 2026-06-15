@@ -29,6 +29,7 @@ const SITE: Record<string, Dict> = {
   nav_login: { pl: "Zaloguj", en: "Log in", uk: "Увійти" },
   nav_logout: { pl: "Wyloguj", en: "Log out", uk: "Вийти" },
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
+  nav_gallery: { pl: "Galeria", en: "Gallery", uk: "Галерея" },
 
   footer_note: {
     pl: "Nieformalna społeczność miłośników ASG z Wrocławia.",
@@ -200,6 +201,20 @@ const SITE: Record<string, Dict> = {
     uk: "Задайте позивний у кабінеті, щоб записатися",
   },
   games_reg_closed: { pl: "Zapisy zamknięte", en: "Registration closed", uk: "Реєстрацію закрито" },
+
+  // ── Галерея (Етап 15) ──
+  gallery_title: { pl: "Galeria zdjęć", en: "Photo gallery", uk: "Галерея фото" },
+  gallery_intro: {
+    pl: "Losowy wybór zdjęć z naszych gier.",
+    en: "A random selection of shots from our games.",
+    uk: "Випадкова добірка фото з наших ігор.",
+  },
+  gallery_empty: {
+    pl: "Brak zdjęć — wkrótce pojawią się nowe.",
+    en: "No photos yet — check back soon.",
+    uk: "Поки що порожньо — скоро з'являться фото.",
+  },
+  gallery_close: { pl: "Zamknij", en: "Close", uk: "Закрити" },
 
   // ── 6.1 Рейтинг ──
   ranking_title: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
@@ -487,6 +502,26 @@ const SITE: Record<string, Dict> = {
   adm_nav_roles: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
   adm_nav_chores: { pl: "Czek-lista", en: "Checklist", uk: "Чек-лист" },
   adm_nav_export: { pl: "Eksport", en: "Export", uk: "Експорт" },
+  adm_nav_gallery: { pl: "Galeria", en: "Gallery", uk: "Галерея" },
+
+  // ── Фото-галерея (Етап 15) ──
+  adm_gallery_title: { pl: "Galeria zdjęć", en: "Photo gallery", uk: "Галерея фото" },
+  adm_gallery_empty: { pl: "Brak zdjęć w galerii.", en: "No photos in the gallery yet.", uk: "У галереї поки немає фото." },
+  adm_gallery_upload_title: { pl: "Dodaj zdjęcia", en: "Add photos", uk: "Додати фото" },
+  adm_gallery_caption_ph: { pl: "Podpis (opcjonalnie)", en: "Caption (optional)", uk: "Підпис (необов'язково)" },
+  adm_gallery_uploading: { pl: "Wgrywanie…", en: "Uploading…", uk: "Завантаження…" },
+  adm_gallery_uploaded: { pl: "✅ Dodano: {n}", en: "✅ Added: {n}", uk: "✅ Додано: {n}" },
+  adm_gallery_upload_err: { pl: "Nie udało się wgrać.", en: "Upload failed.", uk: "Не вдалося завантажити." },
+  adm_gallery_upload_hint: {
+    pl: "JPG, PNG · do 8 MB na plik. Można zaznaczyć kilka naraz.",
+    en: "JPG, PNG · up to 8 MB per file. You can select several at once.",
+    uk: "JPG, PNG · до 8 МБ на файл. Можна обрати кілька одразу.",
+  },
+  adm_gallery_st_visible: { pl: "Widoczne", en: "Visible", uk: "Видиме" },
+  adm_gallery_st_hidden: { pl: "Ukryte", en: "Hidden", uk: "Приховане" },
+  adm_btn_upload: { pl: "Wgraj", en: "Upload", uk: "Завантажити" },
+  adm_btn_hide: { pl: "Ukryj", en: "Hide", uk: "Сховати" },
+  adm_btn_show: { pl: "Pokaż", en: "Show", uk: "Показати" },
 
   adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
@@ -694,6 +729,11 @@ const SITE: Record<string, Dict> = {
     pl: "podgląd zgłoszeń dołączenia do grupy.",
     en: "view group join attempts.",
     uk: "перегляд заявок на приєднання до групи.",
+  },
+  adm_perm_gallery: {
+    pl: "wgrywanie i usuwanie zdjęć w galerii.",
+    en: "upload and remove gallery photos.",
+    uk: "завантаження й видалення фото в галереї.",
   },
 
   adm_export: { pl: "Eksport CSV", en: "CSV export", uk: "Експорт CSV" },

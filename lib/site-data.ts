@@ -316,6 +316,32 @@ export async function getShopItems(activeOnly = true): Promise<ShopItem[]> {
   return (data ?? []) as ShopItem[];
 }
 
+// ─────────────────────────────── Галерея (Етап 15) ───────────────────────────────
+
+export type GalleryPhoto = {
+  id: number;
+  url: string;
+  caption: string | null;
+};
+
+// Випадкова добірка видимих фото для публічної /gallery.
+// Беремо обмежений пул останніх схвалених і перемішуємо у Node (Fisher–Yates) —
+// надійніше за ORDER BY random() через PostgREST і не залежить від розміру таблиці.
+export async function getGalleryPhotos(limit = 24): Promise<GalleryPhoto[]> {
+  const { data } = await supabase
+    .from("gallery_media")
+    .select("id, public_url, caption")
+    .eq("status", "visible")
+    .order("created_at", { ascending: false })
+    .limit(200);
+  const rows = (data ?? []) as { id: number; public_url: string; caption: string | null }[];
+  for (let i = rows.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rows[i], rows[j]] = [rows[j], rows[i]];
+  }
+  return rows.slice(0, limit).map((r) => ({ id: r.id, url: r.public_url, caption: r.caption }));
+}
+
 // Здобуті ачівки гравця (з назвами).
 export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
   const { data } = await supabase
