@@ -67,10 +67,8 @@ const ANNOUNCE_MUTE_SECONDS = 60 * 60; // 1 година
 async function guardAnnounceTopic(ctx: Context): Promise<boolean> {
   const msg = ctx.message;
   const chat = ctx.chat;
-  const from = ctx.from;
-  if (!msg || !chat || !from) return false;
+  if (!msg || !chat) return false;
   if (chat.type !== "group" && chat.type !== "supergroup") return false;
-  if (from.is_bot) return false; // боту в цей топік можна
   if (!(await featureEnabled("announce_guard"))) return false;
 
   const guardChatId = await getSetting("announce_chat_id");
@@ -79,12 +77,23 @@ async function guardAnnounceTopic(ctx: Context): Promise<boolean> {
   if (String(chat.id) !== guardChatId) return false;
   if (String(msg.message_thread_id ?? "") !== guardThreadId) return false;
 
-  // Видаляємо повідомлення (для адмінів Telegram може не дати — мовчки ігноруємо).
+  // Strict bot-only: у цей топік пише лише НАШ бот (його власні апдейти сюди не приходять),
+  // тож усе, що ми тут бачимо, — стороннє. Захист на випадок, якщо апдейт усе ж від нас:
+  const from = ctx.from;
+  if (from && from.id === ctx.me.id) return false;
+
+  // Видаляємо (бот — адмін із can_delete_messages → може видалити будь-кого,
+  // зокрема анонімних адмінів, що пишуть «від імені групи»).
   try {
     await ctx.api.deleteMessage(chat.id, msg.message_id);
   } catch (e) {
     console.error("announce guard: delete failed", e);
   }
+
+  // Мут/попередження — лише для звичайного користувача. Анонімних адмінів (GroupAnonymousBot),
+  // пости від каналу (sender_chat) і ботів видаляємо, але не мутимо й не пишемо в приват —
+  // у них немає особистого user_id.
+  if (!from || from.is_bot) return true;
 
   // Лічильник порушень користувача.
   const { data: row } = await supabase
@@ -800,12 +809,21 @@ bot.command("sethere", async (ctx) => {
     await ctx.reply("⛔ Лише для адмінів групи.");
     return;
   }
+  const threadId = ctx.message?.message_thread_id;
   await setSetting("announce_chat_id", String(ctx.chat.id));
-  await setSetting(
-    "announce_thread_id",
-    ctx.message?.message_thread_id ? String(ctx.message.message_thread_id) : "",
-  );
-  await ctx.reply("✅ Топік для анонсів збережено. Сюди йтимуть анонси ігор.");
+  await setSetting("announce_thread_id", threadId ? String(threadId) : "");
+  if (threadId) {
+    await ctx.reply(
+      `✅ Тему для анонсів збережено.\n` +
+        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
+        `Тепер у цій темі пише лише бот — решту повідомлень бот видалятиме.`,
+    );
+  } else {
+    await ctx.reply(
+      `⚠️ Команду виконано НЕ всередині теми форуму (thread_id порожній), тож захист НЕ ввімкнено.\n` +
+        `Зайди саме в тему «Zapowiedzi gier / Анонси ігор» (зі списку тем) і виконай /sethere ТАМ.`,
+    );
+  }
 });
 
 bot.command("addlocation", async (ctx) => {
