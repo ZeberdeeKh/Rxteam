@@ -186,6 +186,20 @@ const SITE: Record<string, Dict> = {
   games_count_cap: { pl: "{n}/{cap} zapisanych", en: "{n}/{cap} signed up", uk: "{n}/{cap} записаних" },
   games_map: { pl: "Mapa", en: "Map", uk: "Карта" },
   games_tbd_loc: { pl: "Lokalizacja w trakcie ustalania", en: "Location TBD", uk: "Локація уточнюється" },
+  games_announce_heading: { pl: "Opis gry", en: "Game description", uk: "Опис гри" },
+  games_show_more: { pl: "Pokaż całość", en: "Show more", uk: "Показати повністю" },
+  games_show_less: { pl: "Zwiń", en: "Show less", uk: "Згорнути" },
+  games_login_to_register: {
+    pl: "Zaloguj się, aby się zapisać",
+    en: "Log in to sign up",
+    uk: "Увійдіть, щоб записатися",
+  },
+  games_need_callsign: {
+    pl: "Ustaw pseudonim w profilu, aby się zapisać",
+    en: "Set a callsign in your profile to sign up",
+    uk: "Задайте позивний у кабінеті, щоб записатися",
+  },
+  games_reg_closed: { pl: "Zapisy zamknięte", en: "Registration closed", uk: "Реєстрацію закрито" },
 
   // ── 6.1 Рейтинг ──
   ranking_title: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },

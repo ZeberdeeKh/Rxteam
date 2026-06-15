@@ -6,13 +6,23 @@ import { registerForGame } from "@/app/cabinet/actions";
 import { ui, buttonClass } from "@/components/ui";
 
 // Форма запису на гру: оренда + транспорт (own/need) + (для own) звідки + вільні місця.
-export default function RegisterForm({ gameId, lang }: { gameId: number; lang: Lang }) {
+// returnTo — куди повернути після сабміту (/cabinet за дефолтом або /games).
+export default function RegisterForm({
+  gameId,
+  lang,
+  returnTo,
+}: {
+  gameId: number;
+  lang: Lang;
+  returnTo?: string;
+}) {
   const [transport, setTransport] = useState<"need" | "own">("need");
   const inputCls = ui.input;
 
   return (
     <form action={registerForGame} className="space-y-3">
       <input type="hidden" name="gameId" value={gameId} />
+      {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
       <label className="flex items-center gap-2 text-sm text-gray-700">
         <input type="checkbox" name="needs_rental" className="h-4 w-4 accent-brand" />

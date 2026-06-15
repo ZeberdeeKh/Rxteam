@@ -1,6 +1,8 @@
 // Спільні серверні читання для сайту (лендінг, /games).
 // Усе через service-key (lib/supabase.ts) — RLS off, лише сервер. Жодних next/headers тут.
 import { supabase } from "./supabase";
+import { buildAnnouncement } from "./games";
+import { getAllSettings } from "./settings";
 
 export type SiteLocation = {
   name: string | null;
@@ -18,16 +20,47 @@ export type SiteGame = {
   status: string;
   location: SiteLocation | null;
   count: number; // записаних (status='registered')
+  announcement: string | null; // повний текст анонсу (як у Телеграмі), null якщо нема локації
 };
 
 const GAME_COLS =
-  "id, title, start_at, gather_at, capacity, status, locations(name, map_url, lat, lng)";
+  "id, title, start_at, gather_at, capacity, status, scenario_pl, scenario_uk, locations(name, map_url, lat, lng, replica_types, pyro, pyro_note, fire_mode)";
 
 // Нормалізує вкладену локацію (Supabase повертає масив/обʼєкт залежно від звʼязку).
 function normLoc(row: any): SiteLocation | null {
   const l = Array.isArray(row?.locations) ? row.locations[0] : row?.locations;
   if (!l) return null;
   return { name: l.name ?? null, map_url: l.map_url ?? null, lat: l.lat ?? null, lng: l.lng ?? null };
+}
+
+// Відтворює той самий анонс, що бот постить у Телеграм (lib/bot.ts → updateAnnouncement),
+// з даних, які бот уже зберіг у БД. Bot API не вміє читати назад текст повідомлення за ID.
+function buildGameAnnouncement(
+  row: any,
+  count: number,
+  settings: Record<string, string>,
+): string | null {
+  const loc = Array.isArray(row?.locations) ? row.locations[0] : row?.locations;
+  if (!loc || loc.lat == null || loc.lng == null) return null;
+  return buildAnnouncement(
+    {
+      title: row.title ?? null,
+      lat: loc.lat,
+      lng: loc.lng,
+      mapUrl: loc.map_url ?? null,
+      gatherUtc: row.gather_at ?? row.start_at,
+      startUtc: row.start_at,
+      scenarioPl: row.scenario_pl ?? null,
+      scenarioUk: row.scenario_uk ?? null,
+      count,
+      capacity: row.capacity ?? null,
+      replicaTypes: loc.replica_types ?? [],
+      pyro: loc.pyro ?? "no",
+      pyroNote: loc.pyro_note ?? null,
+      fireMode: loc.fire_mode ?? "semi",
+    },
+    settings,
+  );
 }
 
 // Кількість записаних для набору ігор — одним запитом (без N+1).
@@ -43,7 +76,7 @@ async function countsFor(gameIds: number[]): Promise<Map<number, number>> {
   return map;
 }
 
-function toSiteGame(row: any, count: number): SiteGame {
+function toSiteGame(row: any, count: number, settings?: Record<string, string>): SiteGame {
   return {
     id: row.id,
     title: row.title ?? null,
@@ -53,6 +86,7 @@ function toSiteGame(row: any, count: number): SiteGame {
     status: row.status,
     location: normLoc(row),
     count,
+    announcement: settings ? buildGameAnnouncement(row, count, settings) : null,
   };
 }
 
@@ -68,8 +102,8 @@ export async function getNextGame(): Promise<SiteGame | null> {
     .limit(1)
     .maybeSingle();
   if (!data) return null;
-  const counts = await countsFor([data.id as number]);
-  return toSiteGame(data, counts.get(data.id as number) ?? 0);
+  const [counts, settings] = await Promise.all([countsFor([data.id as number]), getAllSettings()]);
+  return toSiteGame(data, counts.get(data.id as number) ?? 0, settings);
 }
 
 // Майбутні анонсовані ігри (start_at >= now), за зростанням часу.
@@ -83,8 +117,11 @@ export async function getUpcomingGames(limit = 20): Promise<SiteGame[]> {
     .order("start_at", { ascending: true })
     .limit(limit);
   const rows = data ?? [];
-  const counts = await countsFor(rows.map((r) => r.id as number));
-  return rows.map((r) => toSiteGame(r, counts.get(r.id as number) ?? 0));
+  const [counts, settings] = await Promise.all([
+    countsFor(rows.map((r) => r.id as number)),
+    getAllSettings(),
+  ]);
+  return rows.map((r) => toSiteGame(r, counts.get(r.id as number) ?? 0, settings));
 }
 
 // Минулі ігри (start_at < now), за спаданням часу.
@@ -98,8 +135,11 @@ export async function getPastGames(limit = 12): Promise<SiteGame[]> {
     .order("start_at", { ascending: false })
     .limit(limit);
   const rows = data ?? [];
-  const counts = await countsFor(rows.map((r) => r.id as number));
-  return rows.map((r) => toSiteGame(r, counts.get(r.id as number) ?? 0));
+  const [counts, settings] = await Promise.all([
+    countsFor(rows.map((r) => r.id as number)),
+    getAllSettings(),
+  ]);
+  return rows.map((r) => toSiteGame(r, counts.get(r.id as number) ?? 0, settings));
 }
 
 export type RankingRow = {
@@ -153,10 +193,11 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
   if (!rows.length) return [];
 
   const ids = rows.map((r) => r.id as number);
-  const [counts, regsRes, checksRes] = await Promise.all([
+  const [counts, regsRes, checksRes, settings] = await Promise.all([
     countsFor(ids),
     supabase.from("registrations").select("game_id, status").eq("player_id", playerId).in("game_id", ids),
     supabase.from("checkins").select("game_id").eq("player_id", playerId).in("game_id", ids),
+    getAllSettings(),
   ]);
   const regMap = new Map<number, string>();
   for (const r of regsRes.data ?? []) regMap.set(r.game_id as number, r.status as string);
@@ -175,7 +216,7 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
     const capacityFull = r.capacity != null && count >= r.capacity;
 
     return {
-      ...toSiteGame(r, count),
+      ...toSiteGame(r, count, settings),
       regStatus,
       checkedIn,
       canRegister:

@@ -41,6 +41,15 @@ export async function linkTelegram(_prev: LinkState, formData: FormData): Promis
 // Усі дії — серверні, з перевіркою сесії. Бізнес-правила = ті самі, що в боті.
 const back = (q: string) => redirect(`/cabinet${q}`);
 
+// Куди повертати після дії: /cabinet (дефолт) або /games — за полем returnTo форми.
+// Дозволяємо лише власні шляхи (захист від open-redirect).
+const RETURN_PATHS = new Set(["/cabinet", "/games"]);
+function backTo(formData: FormData, q: string): never {
+  const rt = String(formData.get("returnTo") ?? "");
+  const base = RETURN_PATHS.has(rt) ? rt : "/cabinet";
+  return redirect(`${base}${q}`);
+}
+
 // Створити standalone-профіль (email-юзер без TG). Рішення організатора 2026-06-15.
 export async function createStandalone() {
   const res = await createStandalonePlayerForSession();
@@ -63,15 +72,15 @@ export async function saveCallsign(formData: FormData) {
 export async function registerForGame(formData: FormData) {
   const player = await getSessionPlayer();
   if (!player) redirect("/login");
-  if (!player.callsign) back("?err=need_callsign");
+  if (!player.callsign) backTo(formData, "?err=need_callsign");
 
   const gameId = Number(formData.get("gameId"));
-  if (!Number.isFinite(gameId)) back("?err=generic");
+  if (!Number.isFinite(gameId)) backTo(formData, "?err=generic");
 
   const { data: game } = await supabase.from("games").select("*").eq("id", gameId).single();
-  if (!game || game.status !== "announced") back("?err=game_not_found");
-  if (game!.reg_closes_at && new Date(game!.reg_closes_at).getTime() < Date.now()) back("?err=reg_closed");
-  if (game!.capacity && (await registeredCount(gameId)) >= game!.capacity) back("?err=game_full");
+  if (!game || game.status !== "announced") backTo(formData, "?err=game_not_found");
+  if (game!.reg_closes_at && new Date(game!.reg_closes_at).getTime() < Date.now()) backTo(formData, "?err=reg_closed");
+  if (game!.capacity && (await registeredCount(gameId)) >= game!.capacity) backTo(formData, "?err=game_full");
 
   const transport = formData.get("transport") === "own" ? "own" : "need";
   const needsRental = formData.get("needs_rental") === "on";
@@ -93,7 +102,8 @@ export async function registerForGame(formData: FormData) {
     { onConflict: "game_id,player_id" },
   );
   revalidatePath("/cabinet");
-  back("?reg=1");
+  revalidatePath("/games");
+  backTo(formData, "?reg=1");
 }
 
 // Відписка (без штрафу до cancel_deadline = збір −24год; після — зобов'язання, блок).
@@ -102,11 +112,11 @@ export async function unregisterFromGame(formData: FormData) {
   if (!player) redirect("/login");
 
   const gameId = Number(formData.get("gameId"));
-  if (!Number.isFinite(gameId)) back("?err=generic");
+  if (!Number.isFinite(gameId)) backTo(formData, "?err=generic");
 
   const { data: game } = await supabase.from("games").select("*").eq("id", gameId).single();
-  if (!game) back("?err=game_not_found");
-  if (game!.cancel_deadline && new Date(game!.cancel_deadline).getTime() < Date.now()) back("?err=cancel_locked");
+  if (!game) backTo(formData, "?err=game_not_found");
+  if (game!.cancel_deadline && new Date(game!.cancel_deadline).getTime() < Date.now()) backTo(formData, "?err=cancel_locked");
 
   await supabase
     .from("registrations")
@@ -114,7 +124,8 @@ export async function unregisterFromGame(formData: FormData) {
     .eq("game_id", gameId)
     .eq("player_id", player.id);
   revalidatePath("/cabinet");
-  back("?unreg=1");
+  revalidatePath("/games");
+  backTo(formData, "?unreg=1");
 }
 
 // Самочек-ін для не-TG (браузерна геолокація). Той самий haversine + вікно, що в боті.

@@ -2,6 +2,7 @@
 import { formatGameWhen } from "@/lib/games";
 import type { SiteGame } from "@/lib/site-data";
 import { ui } from "@/components/ui";
+import AnnouncementBlock from "@/components/site/AnnouncementBlock";
 
 // Презентаційна картка гри (серверкомпонент). children — слот під дії (запис/відписка у 6.2).
 export default function GameCard({
@@ -51,6 +52,8 @@ export default function GameCard({
           </dd>
         </div>
       </dl>
+
+      {game.announcement && <AnnouncementBlock text={game.announcement} lang={lang} />}
 
       {children && <div className="mt-4 border-t border-gray-100 pt-4">{children}</div>}
     </article>
