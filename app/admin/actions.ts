@@ -354,3 +354,71 @@ export async function saveRoles(formData: FormData) {
   revalidatePath("/admin/roles");
   redirect("/admin/roles?saved=1");
 }
+
+// ── Магазин за бали (майстер) ──
+const backShop = (q: string) => redirect(`/admin/shop${q}`);
+
+// Поля товару з форми (спільні для створення і правки).
+function parseShopItem(formData: FormData) {
+  const costRaw = Number(formData.get("cost"));
+  const sortRaw = Number(formData.get("sort"));
+  return {
+    title_pl: String(formData.get("title_pl") ?? "").trim() || null,
+    title_en: String(formData.get("title_en") ?? "").trim() || null,
+    title_uk: String(formData.get("title_uk") ?? "").trim() || null,
+    desc_pl: String(formData.get("desc_pl") ?? "").trim() || null,
+    desc_en: String(formData.get("desc_en") ?? "").trim() || null,
+    desc_uk: String(formData.get("desc_uk") ?? "").trim() || null,
+    cost: Number.isFinite(costRaw) && costRaw >= 0 ? Math.round(costRaw) : 0,
+    sort: Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0,
+    active: formData.get("active") === "on",
+  };
+}
+
+export async function createShopItem(formData: FormData) {
+  await requireMaster();
+  const item = parseShopItem(formData);
+  // Потрібна хоча б одна назва, щоб товар не був безіменним.
+  if (!item.title_pl && !item.title_en && !item.title_uk) backShop("?err=fields");
+  await supabase.from("shop_items").insert(item);
+  revalidatePath("/admin/shop");
+  revalidatePath("/shop");
+  backShop("?created=1");
+}
+
+export async function updateShopItem(formData: FormData) {
+  await requireMaster();
+  const id = Number(formData.get("id"));
+  const item = parseShopItem(formData);
+  if (!Number.isFinite(id) || (!item.title_pl && !item.title_en && !item.title_uk)) {
+    backShop("?err=fields");
+  }
+  await supabase.from("shop_items").update(item).eq("id", id);
+  revalidatePath("/admin/shop");
+  revalidatePath("/shop");
+  backShop("?saved=1");
+}
+
+export async function deleteShopItem(formData: FormData) {
+  await requireMaster();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backShop("");
+  // purchases.item_id = ON DELETE SET NULL → видалення безпечне, історія лишається.
+  await supabase.from("shop_items").delete().eq("id", id);
+  revalidatePath("/admin/shop");
+  revalidatePath("/shop");
+  backShop("?deleted=1");
+}
+
+// Позначити покупку виданою (журнал покупок).
+export async function markFulfilled(formData: FormData) {
+  await requireMaster();
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backShop("");
+  await supabase
+    .from("purchases")
+    .update({ fulfilled: true, fulfilled_at: new Date().toISOString() })
+    .eq("id", id);
+  revalidatePath("/admin/shop");
+  backShop("?fulfilled=1");
+}

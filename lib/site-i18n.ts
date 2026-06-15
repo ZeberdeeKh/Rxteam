@@ -496,6 +496,33 @@ const SITE: Record<string, Dict> = {
   adm_chore_active: { pl: "Aktywna", en: "Active", uk: "Активний" },
   adm_chore_empty: { pl: "Brak pozycji.", en: "No items.", uk: "Немає пунктів." },
 
+  // ── 6.4 Магазин за бали (майстер) ──
+  adm_nav_shop: { pl: "Sklep", en: "Shop", uk: "Магазин" },
+  adm_shop_title: { pl: "Sklep za punkty", en: "Points shop", uk: "Магазин за бали" },
+  adm_shop_add: { pl: "Nowy towar", en: "New item", uk: "Новий товар" },
+  adm_shop_empty: { pl: "Brak towarów.", en: "No items yet.", uk: "Немає товарів." },
+  adm_shop_hidden: { pl: "ukryty", en: "hidden", uk: "прихований" },
+  adm_shop_title_pl: { pl: "Nazwa (PL)", en: "Title (PL)", uk: "Назва (PL)" },
+  adm_shop_title_en: { pl: "Nazwa (EN)", en: "Title (EN)", uk: "Назва (EN)" },
+  adm_shop_title_uk: { pl: "Nazwa (UA)", en: "Title (UA)", uk: "Назва (UA)" },
+  adm_shop_desc_pl: { pl: "Opis (PL)", en: "Description (PL)", uk: "Опис (PL)" },
+  adm_shop_desc_en: { pl: "Opis (EN)", en: "Description (EN)", uk: "Опис (EN)" },
+  adm_shop_desc_uk: { pl: "Opis (UA)", en: "Description (UA)", uk: "Опис (UA)" },
+  adm_shop_cost: { pl: "Cena (punkty)", en: "Cost (points)", uk: "Ціна (бали)" },
+  adm_shop_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
+  adm_shop_active: { pl: "Aktywny", en: "Active", uk: "Активний" },
+  // Журнал покупок
+  adm_shop_orders_title: { pl: "Zakupy", en: "Purchases", uk: "Покупки" },
+  adm_shop_orders_empty: { pl: "Brak zakupów.", en: "No purchases.", uk: "Немає покупок." },
+  adm_shop_col_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
+  adm_shop_col_item: { pl: "Towar", en: "Item", uk: "Товар" },
+  adm_shop_col_cost: { pl: "Cena", en: "Cost", uk: "Ціна" },
+  adm_shop_col_date: { pl: "Data", en: "Date", uk: "Дата" },
+  adm_shop_col_status: { pl: "Status", en: "Status", uk: "Статус" },
+  adm_shop_status_pending: { pl: "Oczekuje", en: "Pending", uk: "Очікує" },
+  adm_shop_status_done: { pl: "Wydano", en: "Handed over", uk: "Видано" },
+  adm_shop_mark_done: { pl: "Wydano", en: "Hand over", uk: "Видати" },
+
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },
   adm_no_locations: {

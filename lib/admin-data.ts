@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { getShopItems, type ShopItem } from "./site-data";
 
 // Серверні читання для адмінки (6.4). Лише з адмін-гейтом у викликачах.
 
@@ -297,4 +298,49 @@ export async function listLocationsFull(): Promise<AdminLocation[]> {
     fire_mode: ((l as any).fire_mode as string) ?? "semi",
     gameCount: used.get(l.id as number) ?? 0,
   }));
+}
+
+// ── Магазин за бали (адмінка) ──
+// Каталог для адмінки: усі товари, зокрема неактивні. Переюз read-шляху з site-data.
+export async function listShopItemsAdmin(): Promise<ShopItem[]> {
+  return getShopItems(false);
+}
+
+export type AdminPurchase = {
+  id: number;
+  cost: number;
+  created_at: string;
+  fulfilled: boolean;
+  fulfilled_at: string | null;
+  callsign: string | null;
+  name: string | null;
+  itemTitle: { pl: string | null; en: string | null; uk: string | null } | null;
+};
+
+// Журнал покупок: спершу невидані, потім за датою спадання.
+export async function listPurchasesAdmin(limit = 200): Promise<AdminPurchase[]> {
+  const { data } = await supabase
+    .from("purchases")
+    .select(
+      "id, cost, created_at, fulfilled, fulfilled_at, players(callsign, name), shop_items(title_pl, title_en, title_uk)",
+    )
+    .order("fulfilled", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r: any) => {
+    const p = Array.isArray(r.players) ? r.players[0] : r.players;
+    const it = Array.isArray(r.shop_items) ? r.shop_items[0] : r.shop_items;
+    return {
+      id: r.id as number,
+      cost: r.cost as number,
+      created_at: r.created_at as string,
+      fulfilled: !!r.fulfilled,
+      fulfilled_at: r.fulfilled_at ?? null,
+      callsign: p?.callsign ?? null,
+      name: p?.name ?? null,
+      itemTitle: it
+        ? { pl: it.title_pl ?? null, en: it.title_en ?? null, uk: it.title_uk ?? null }
+        : null,
+    };
+  });
 }
