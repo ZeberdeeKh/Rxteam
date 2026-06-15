@@ -94,6 +94,11 @@ const SITE: Record<string, Dict> = {
     en: "Have a bot account? Log in with one click:",
     uk: "Є акаунт у боті? Увійди в один клік:",
   },
+  auth_tg_btn: {
+    pl: "Zaloguj się przez Telegram",
+    en: "Log in with Telegram",
+    uk: "Увійти через Telegram",
+  },
   auth_err_tg: {
     pl: "Logowanie przez Telegram nie powiodło się. Spróbuj ponownie.",
     en: "Telegram login failed. Please try again.",

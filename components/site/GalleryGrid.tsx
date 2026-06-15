@@ -1,21 +1,25 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { GalleryPhoto } from "@/lib/site-data";
 
-// Фото-вол фіксованого («стандартного») розміру:
-//  • колонки рахуються з виміряної ширини І кількості фото — більше фото означає дрібніші
-//    плитки, але не дрібніше за TILE_MIN;
-//  • висота обмежена MAX_ROWS рядами → блок не росте вгору, лишається прямокутником;
-//  • коли фото більше за місткість, зайві крутяться: випадкова плитка плавно змінює фото
-//    на ще не показане (кожні ROTATE_MS).
-// + простий лайтбокс (клік → fullscreen, Esc/клік по тлу закриває).
+// Мозаїка різнорозмірних плиток, що складається в ЧІТКИЙ прямокутник:
+//  • патерн «одна 2×2 + решта 1×1» на кожен блок cols×2 рівно замощує блок (для cols ≥ 3),
+//    тож при кратній к-ті плиток прямокутник без дір; зайве по краях — обрізаємо (object-cover);
+//  • висота обмежена MAX_ROWS рядами → блок стандартного розміру, не росте;
+//  • надлишок фото крутиться: випадкова плитка плавно змінює фото на ще не показане;
+//  • лайтбокс зі стрілками ‹ › гортає ВСІ фото (клавіші ←/→, Esc — закрити).
 
-const MAX_ROWS = 3; // макс. рядів → фіксована висота прямокутника
-const TILE_MIN = 104; // px — найдрібніша плитка (далі вмикається ротація)
-const TILE_MAX = 200; // px — найбільша плитка (коли фото мало)
-const GAP = 8; // px — відступ між плитками (gap-2)
-const ROTATE_MS = 3500; // інтервал підміни фото при надлишку
+const MAX_ROWS = 4; // парне (плитка 2×2 = 2 ряди) → фіксована висота
+const GAP = 8; // px, = gap-2
+const ROTATE_MS = 3500;
+
+function colsForWidth(w: number): number {
+  if (w < 500) return 3;
+  if (w < 760) return 4;
+  if (w < 1024) return 5;
+  return 6;
+}
 
 export default function GalleryGrid({
   photos,
@@ -26,9 +30,9 @@ export default function GalleryGrid({
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
-  const [active, setActive] = useState<GalleryPhoto | null>(null);
+  const [idx, setIdx] = useState<number | null>(null); // індекс у photos для лайтбокса
 
-  // Вимірюємо ширину контейнера (від неї залежить кількість колонок).
+  // Вимір ширини контейнера → кількість колонок і розмір базової (квадратної) плитки.
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
@@ -38,57 +42,57 @@ export default function GalleryGrid({
     return () => ro.disconnect();
   }, []);
 
-  const total = photos.length;
+  const { cols, autoRow, count, unit } = useMemo(() => {
+    const w = width || 1024;
+    const c = colsForWidth(w);
+    const colW = Math.max(60, Math.floor((w - GAP * (c - 1)) / c));
+    const u = 2 * c - 3; // фото на блок cols×2 (1 з них — велика 2×2)
+    const capacity = (MAX_ROWS / 2) * u;
+    const full = Math.floor(photos.length / u) * u; // кратно блоку → без дір
+    const cnt = Math.min(full || photos.length, capacity);
+    return { cols: c, autoRow: colW, count: cnt, unit: u };
+  }, [width, photos.length]);
 
-  // Колонки: у межах [TILE_MIN, TILE_MAX] за шириною, але не більше, ніж треба для MAX_ROWS рядів.
-  const { cols, capacity } = useMemo(() => {
-    const w = width || 960;
-    const colMin = Math.max(2, Math.floor((w + GAP) / (TILE_MAX + GAP))); // найбільші плитки
-    const colMax = Math.max(colMin, Math.floor((w + GAP) / (TILE_MIN + GAP))); // найдрібніші
-    const colsForCount = Math.max(1, Math.ceil(total / MAX_ROWS));
-    const c = Math.min(colMax, Math.max(colMin, colsForCount));
-    return { cols: c, capacity: c * MAX_ROWS };
-  }, [width, total]);
-
-  const overflow = total > capacity;
-
-  // Скільки плиток статично (лише повні ряди → прямокутник без дір).
-  const baseCount = useMemo(() => {
-    if (overflow) return capacity;
-    if (total < cols) return total; // мало фото — один (неповний) ряд
-    return Math.floor(total / cols) * cols; // повні ряди
-  }, [overflow, capacity, total, cols]);
-
-  // Поточні фото у слотах.
-  const [slots, setSlots] = useState<GalleryPhoto[]>([]);
+  // Фото у слотах (велика/мала визначається позицією: перша в кожному блоці — велика).
+  const [slotPhotos, setSlotPhotos] = useState<GalleryPhoto[]>([]);
   useEffect(() => {
-    setSlots(photos.slice(0, baseCount));
-  }, [photos, baseCount]);
+    setSlotPhotos(photos.slice(0, count));
+  }, [photos, count]);
 
-  // Ротація надлишку: кожні ROTATE_MS міняємо випадкову плитку на ще не показане фото.
+  const overflow = photos.length > count;
+
+  // Ротація надлишку (пауза, коли відкрито лайтбокс).
   useEffect(() => {
-    if (!overflow) return;
+    if (!overflow || idx !== null) return;
     const id = setInterval(() => {
-      setSlots((cur) => {
+      setSlotPhotos((cur) => {
         if (!cur.length) return cur;
         const shown = new Set(cur.map((p) => p.id));
         const pool = photos.filter((p) => !shown.has(p.id));
         if (!pool.length) return cur;
         const i = Math.floor(Math.random() * cur.length);
-        const next = pool[Math.floor(Math.random() * pool.length)];
         const copy = cur.slice();
-        copy[i] = next;
+        copy[i] = pool[Math.floor(Math.random() * pool.length)];
         return copy;
       });
     }, ROTATE_MS);
     return () => clearInterval(id);
-  }, [overflow, photos]);
+  }, [overflow, idx, photos]);
 
-  // Esc + блокування скролу для лайтбокса.
+  const close = useCallback(() => setIdx(null), []);
+  const go = useCallback(
+    (d: number) =>
+      setIdx((cur) => (cur === null ? cur : (cur + d + photos.length) % photos.length)),
+    [photos.length],
+  );
+
+  // Клавіатура для лайтбокса.
   useEffect(() => {
-    if (!active) return;
+    if (idx === null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setActive(null);
+      if (e.key === "Escape") close();
+      else if (e.key === "ArrowRight") go(1);
+      else if (e.key === "ArrowLeft") go(-1);
     };
     window.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
@@ -96,21 +100,34 @@ export default function GalleryGrid({
       window.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
-  }, [active]);
+  }, [idx, close, go]);
+
+  const openTile = (photo: GalleryPhoto) => {
+    const i = photos.findIndex((p) => p.id === photo.id);
+    setIdx(i < 0 ? 0 : i);
+  };
+
+  const activePhoto = idx === null ? null : photos[idx];
 
   return (
     <>
       <div ref={wrapRef} className="w-full">
         <div
           className="grid gap-2"
-          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
+          style={{
+            gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+            gridAutoRows: `${autoRow}px`,
+            gridAutoFlow: "dense",
+          }}
         >
-          {slots.map((p, i) => (
+          {slotPhotos.map((p, i) => (
             <button
               key={i}
               type="button"
-              onClick={() => setActive(p)}
-              className="group block aspect-square overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              onClick={() => openTile(p)}
+              className={`group overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
+                i % unit === 0 ? "col-span-2 row-span-2" : ""
+              }`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -126,30 +143,58 @@ export default function GalleryGrid({
         </div>
       </div>
 
-      {active && (
+      {activePhoto && (
         <div
           role="dialog"
           aria-modal="true"
-          onClick={() => setActive(null)}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/80 p-4"
+          onClick={close}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-8"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={active.url}
-            alt={active.caption ?? ""}
-            onClick={(e) => e.stopPropagation()}
-            className="max-h-[85vh] max-w-full object-contain"
-          />
-          {active.caption && (
-            <p className="max-w-2xl text-center text-sm text-neutral-50">{active.caption}</p>
-          )}
           <button
             type="button"
-            onClick={() => setActive(null)}
-            className="rounded-md bg-white/10 px-4 py-1.5 text-sm font-medium text-neutral-50 hover:bg-white/20"
+            aria-label="prev"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(-1);
+            }}
+            className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-neutral-50 hover:bg-white/20 sm:left-4"
+          >
+            ‹
+          </button>
+
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={activePhoto.url}
+            alt={activePhoto.caption ?? ""}
+            onClick={(e) => e.stopPropagation()}
+            className="max-h-[85vh] max-w-[88vw] object-contain"
+          />
+
+          <button
+            type="button"
+            aria-label="next"
+            onClick={(e) => {
+              e.stopPropagation();
+              go(1);
+            }}
+            className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-neutral-50 hover:bg-white/20 sm:right-4"
+          >
+            ›
+          </button>
+
+          <button
+            type="button"
+            onClick={close}
+            className="absolute right-3 top-3 rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium text-neutral-50 hover:bg-white/20"
           >
             {closeLabel}
           </button>
+
+          {activePhoto.caption && (
+            <p className="absolute inset-x-0 bottom-4 mx-auto max-w-2xl px-4 text-center text-sm text-neutral-50">
+              {activePhoto.caption}
+            </p>
+          )}
         </div>
       )}
     </>
