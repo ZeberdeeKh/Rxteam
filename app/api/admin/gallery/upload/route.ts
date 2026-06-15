@@ -8,7 +8,7 @@ import { getSetting } from "@/lib/settings";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8 МБ на файл
+const MAX_BYTES = 1 * 1024 * 1024; // 1 МБ на файл — збігається з лімітом bucket-а `gallery`
 
 // Завантаження фото в галерею. Лише для адмінів із правом `gallery`.
 // Файли йдуть multipart/form-data (server actions мають жорсткий ліміт тіла).

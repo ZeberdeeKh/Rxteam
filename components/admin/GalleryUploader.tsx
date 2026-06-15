@@ -1,29 +1,54 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { st, type Lang } from "@/lib/site-i18n";
 import { ui, buttonClass } from "@/components/ui";
 
+// Ліміт = ліміт bucket-а `gallery` у Supabase (1 МБ на файл). Тримати синхронно з route.ts.
+const MAX_BYTES = 1 * 1024 * 1024;
+
 // Завантаження фото в галерею: multipart → /api/admin/gallery/upload → router.refresh().
 export default function GalleryUploader({ lang }: { lang: Lang }) {
   const router = useRouter();
-  const formRef = useRef<HTMLFormElement>(null);
-  const [status, setStatus] = useState<"idle" | "uploading" | "done" | "error">("idle");
-  const [count, setCount] = useState(0);
+  const [status, setStatus] = useState<"idle" | "uploading" | "done" | "error" | "all_big">("idle");
+  const [added, setAdded] = useState(0);
+  const [skipped, setSkipped] = useState(0);
+  const [oversize, setOversize] = useState(0); // завеликі серед щойно обраних (одразу при виборі)
+
+  // Повідомлення про ліміт ОДРАЗУ при додаванні фото: рахуємо завеликі файли у виборі.
+  function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    setOversize(files.filter((f) => f.size > MAX_BYTES).length);
+    setStatus("idle");
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
-    const data = new FormData(form);
-    if (!(data.getAll("files").some((f) => f instanceof File && f.size > 0))) return;
+    const input = form.elements.namedItem("files") as HTMLInputElement;
+    const all = Array.from(input.files ?? []);
+    const valid = all.filter((f) => f.size > 0 && f.size <= MAX_BYTES);
+    const tooBig = all.length - valid.length;
+    if (!valid.length) {
+      setStatus("all_big");
+      return;
+    }
+
+    const data = new FormData();
+    for (const f of valid) data.append("files", f);
+    const caption = (form.elements.namedItem("caption") as HTMLInputElement)?.value?.trim();
+    if (caption) data.append("caption", caption);
+
     setStatus("uploading");
     try {
       const res = await fetch("/api/admin/gallery/upload", { method: "POST", body: data });
       if (!res.ok) throw new Error("upload failed");
       const json = await res.json();
-      setCount(json.created ?? 0);
+      setAdded(json.created ?? valid.length);
+      setSkipped(tooBig + (json.skipped ?? 0));
       setStatus("done");
+      setOversize(0);
       form.reset();
       router.refresh();
     } catch {
@@ -32,7 +57,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
   }
 
   return (
-    <form ref={formRef} onSubmit={onSubmit} className={`${ui.card} space-y-3`}>
+    <form onSubmit={onSubmit} className={`${ui.card} space-y-3`}>
       <h2 className={ui.cardTitle}>{st(lang, "adm_gallery_upload_title")}</h2>
       <input
         type="file"
@@ -40,6 +65,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         accept="image/*"
         multiple
         required
+        onChange={onPick}
         className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-brand file:px-3 file:py-1.5 file:text-neutral-50 hover:file:bg-brand-dark"
       />
       <input
@@ -48,6 +74,14 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         placeholder={st(lang, "adm_gallery_caption_ph")}
         className={ui.input}
       />
+
+      {/* Одразу при виборі: попередження, якщо є файли > 1 МБ. */}
+      {oversize > 0 && status !== "done" && (
+        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">
+          {st(lang, "adm_gallery_oversize", { n: oversize })}
+        </p>
+      )}
+
       <div className="flex items-center gap-3">
         <button
           type="submit"
@@ -58,8 +92,12 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         </button>
         {status === "done" && (
           <span className="text-sm text-green-600">
-            {st(lang, "adm_gallery_uploaded", { n: count })}
+            {st(lang, "adm_gallery_uploaded", { n: added })}
+            {skipped > 0 && ` · ${st(lang, "adm_gallery_skipped", { n: skipped })}`}
           </span>
+        )}
+        {status === "all_big" && (
+          <span className="text-sm text-red-600">{st(lang, "adm_gallery_all_big")}</span>
         )}
         {status === "error" && (
           <span className="text-sm text-red-600">{st(lang, "adm_gallery_upload_err")}</span>

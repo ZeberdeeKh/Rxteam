@@ -513,9 +513,24 @@ const SITE: Record<string, Dict> = {
   adm_gallery_uploaded: { pl: "✅ Dodano: {n}", en: "✅ Added: {n}", uk: "✅ Додано: {n}" },
   adm_gallery_upload_err: { pl: "Nie udało się wgrać.", en: "Upload failed.", uk: "Не вдалося завантажити." },
   adm_gallery_upload_hint: {
-    pl: "JPG, PNG · do 8 MB na plik. Można zaznaczyć kilka naraz.",
-    en: "JPG, PNG · up to 8 MB per file. You can select several at once.",
-    uk: "JPG, PNG · до 8 МБ на файл. Можна обрати кілька одразу.",
+    pl: "JPG, PNG · maks. 1 MB na plik (limit magazynu). Można zaznaczyć kilka naraz.",
+    en: "JPG, PNG · max 1 MB per file (storage limit). You can select several at once.",
+    uk: "JPG, PNG · макс. 1 МБ на файл (ліміт сховища). Можна обрати кілька одразу.",
+  },
+  adm_gallery_oversize: {
+    pl: "Plików > 1 MB: {n} — zostaną pominięte (limit magazynu).",
+    en: "Files over 1 MB: {n} — they will be skipped (storage limit).",
+    uk: "Файлів > 1 МБ: {n} — їх буде пропущено (ліміт сховища).",
+  },
+  adm_gallery_skipped: {
+    pl: "pominięto {n} (> 1 MB)",
+    en: "skipped {n} (> 1 MB)",
+    uk: "пропущено {n} (> 1 МБ)",
+  },
+  adm_gallery_all_big: {
+    pl: "Wszystkie pliki są za duże (maks. 1 MB). Skompresuj je i spróbuj ponownie.",
+    en: "All files are too large (max 1 MB). Compress them and try again.",
+    uk: "Усі файли завеликі (макс. 1 МБ). Стисни їх і спробуй ще раз.",
   },
   adm_gallery_st_visible: { pl: "Widoczne", en: "Visible", uk: "Видиме" },
   adm_gallery_st_hidden: { pl: "Ukryte", en: "Hidden", uk: "Приховане" },
