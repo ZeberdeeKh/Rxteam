@@ -4,7 +4,7 @@ import { st } from "@/lib/site-i18n";
 import { getNextGame, getRanking } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen } from "@/lib/games";
-import { ui, buttonClass } from "@/components/ui";
+import { ui } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 
@@ -30,11 +30,6 @@ export default async function Home() {
       <section className="max-w-2xl">
         <h1 className={ui.display}>{st(lang, "home_title")}</h1>
         <p className={`mt-3 ${ui.body}`}>{st(lang, "home_hero_sub")}</p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link href="/games" className={buttonClass("primary")}>
-            {st(lang, "home_cta_games")}
-          </Link>
-        </div>
       </section>
 
       {/* Найближча гра */}
