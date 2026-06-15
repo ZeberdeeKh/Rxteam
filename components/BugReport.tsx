@@ -184,7 +184,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center">
           <IconBug size={18} />
         </span>
-        <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-bold transition-all duration-300 group-hover:max-w-[260px]">
+        <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-bold uppercase tracking-wide transition-all duration-300 group-hover:max-w-[260px]">
           <span className="pr-4">{labels.button}</span>
         </span>
       </button>
@@ -211,7 +211,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="mt-3 bg-brand-600 px-6 py-2 text-sm font-bold text-neutral-50 shadow-sm transition-colors hover:bg-brand-500"
+                  className="mt-3 bg-brand-600 px-6 py-2 text-sm font-bold uppercase tracking-wide text-neutral-50 shadow-sm transition-colors hover:bg-brand-500"
                 >
                   {labels.close}
                 </button>
@@ -263,7 +263,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex w-full items-center justify-center gap-2 border border-dashed border-gray-300 px-3 py-2 text-xs font-bold text-gray-700 transition-colors hover:bg-gray-50"
+                        className="flex w-full items-center justify-center gap-2 border border-dashed border-gray-300 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-700 transition-colors hover:bg-gray-50"
                       >
                         <span className="text-gray-500">
                           <IconPaperclip />
@@ -307,14 +307,14 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                   <button
                     onClick={closeModal}
                     disabled={sending}
-                    className="px-4 py-2 text-sm font-bold text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-800 disabled:opacity-40"
+                    className="px-4 py-2 text-sm font-bold uppercase tracking-wide text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-800 disabled:opacity-40"
                   >
                     {labels.cancel}
                   </button>
                   <button
                     onClick={submit}
                     disabled={!canSend}
-                    className="flex items-center gap-1.5 bg-brand-600 px-4 py-2 text-sm font-bold text-neutral-50 shadow-sm transition-colors hover:bg-brand-500 disabled:opacity-40"
+                    className="flex items-center gap-1.5 bg-brand-600 px-4 py-2 text-sm font-bold uppercase tracking-wide text-neutral-50 shadow-sm transition-colors hover:bg-brand-500 disabled:opacity-40"
                   >
                     {sending ? <IconSpinner /> : <IconBug size={14} />}
                     {labels.send}

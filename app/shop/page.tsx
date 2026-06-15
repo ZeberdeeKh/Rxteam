@@ -119,7 +119,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                       <button
                         type="submit"
                         disabled={!affordable}
-                        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+                        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                       >
                         {st(lang, "shop_buy")}
                       </button>
@@ -181,7 +181,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                         <button
                           type="submit"
                           disabled={!affordable}
-                          className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
+                          className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           {st(lang, "shop_buy")}
                         </button>

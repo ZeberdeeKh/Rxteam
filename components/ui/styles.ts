@@ -18,7 +18,7 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md";
 
 const BTN_BASE =
-  "inline-flex items-center justify-center gap-1.5 rounded-md font-medium transition " +
+  "inline-flex items-center justify-center gap-1.5 rounded-md font-medium uppercase tracking-wide transition " +
   "disabled:opacity-60 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40";
 
 const BTN_VARIANT: Record<ButtonVariant, string> = {
@@ -53,7 +53,8 @@ export function badgeClass(color: BadgeColor = "gray"): string {
 }
 
 // ── Навігація (активний стан — підсвічування поточного пункту) ──
-const NAV_HEADER_BASE = "rounded-md px-2.5 py-1.5 text-sm transition";
+// Пункти меню — у ВЕРХНЬОМУ РЕГІСТРІ (як кнопки й заголовки).
+const NAV_HEADER_BASE = "rounded-md px-2.5 py-1.5 text-sm uppercase tracking-wide transition";
 /** Посилання верхнього меню шапки. */
 export function headerNavClass(active: boolean): string {
   return active
@@ -68,7 +69,7 @@ export function headerAdminClass(active: boolean): string {
 }
 
 const NAV_SUB_BASE =
-  "inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-medium transition";
+  "inline-flex items-center justify-center rounded-md px-2.5 py-1 text-xs font-medium uppercase tracking-wide transition";
 /** Підпункт підменю адмінки. */
 export function subNavClass(active: boolean): string {
   return active

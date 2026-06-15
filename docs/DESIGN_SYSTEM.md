@@ -33,6 +33,10 @@
 - Варіанти: `primary` (хакі-залив), `secondary` (контур), `ghost`, `danger`.
 - Розміри: `md` (типовий), `sm` (компактний, в адмінці/таблицях).
 - `<button>` → компонент `<Button variant size>`; `<Link>`/`<a>` → `className={buttonClass(variant, size)}`.
+- Текст кнопок — у ВЕРХНЬОМУ РЕГІСТРІ (`uppercase tracking-wide`, у базовому класі).
+
+## Меню — `headerNavClass` / `headerAdminClass` / `subNavClass`
+Пункти меню (шапка + підменю адмінки) — теж `uppercase tracking-wide`.
 
 ## Бейджі — `badgeClass(color)`
 Кольори: `brand` (роль майстра), `green` (адмін/успіх), `gray` (нейтрально), `red`, `amber`.

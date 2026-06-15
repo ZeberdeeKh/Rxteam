@@ -219,7 +219,7 @@ export default function GalleryGrid({
           <button
             type="button"
             onClick={close}
-            className="absolute right-3 top-3 rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium text-neutral-50 hover:bg-white/20"
+            className="absolute right-3 top-3 rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 hover:bg-white/20"
           >
             {closeLabel}
           </button>
