@@ -485,6 +485,13 @@ const SITE: Record<string, Dict> = {
   adm_roles_title: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
   adm_master: { pl: "Master", en: "Master", uk: "Майстер" },
   adm_btn_save_roles: { pl: "Zapisz role", en: "Save roles", uk: "Зберегти ролі" },
+  adm_roles_help: {
+    pl: "Zaznacz uprawnienia i kliknij „Zapisz role”. Każde uprawnienie czyni gracza adminem; odznacz wszystkie i zapisz — wraca do roli zwykłego gracza.",
+    en: "Tick permissions and click “Save roles”. Any permission makes the player an admin; clear them all and save to demote back to a regular player.",
+    uk: "Відмітьте права й натисніть «Зберегти ролі». Будь-яке право робить гравця адміном; зніміть усі й збережіть — і він знову звичайний гравець.",
+  },
+  adm_role_admin: { pl: "Admin", en: "Admin", uk: "Адмін" },
+  adm_role_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
 
   adm_export: { pl: "Eksport CSV", en: "CSV export", uk: "Експорт CSV" },
   adm_export_players: { pl: "Gracze", en: "Players", uk: "Гравці" },

@@ -17,39 +17,39 @@ function tri(map: Record<Lang, string>): string {
   return ORDER.map((l) => `${FLAG[l]} ${map[l]}`).join("\n");
 }
 
-const captchaPrompt: Record<Lang, string> = {
+// Базові (fallback) тексти капчі — мапи по мовах. Можна перекрити в settings
+// (captcha_*, cap_ok_*, cap_wrong_*, cap_expired_*) через lib/bot-texts.ts.
+export const captchaPrompt: Record<Lang, string> = {
   pl: "Witaj w RX Team! Aby potwierdzić, że nie jesteś botem, rozwiąż zadanie:",
   en: "Welcome to RX Team! To confirm you're not a bot, solve:",
   uk: "Вітаємо в RX Team! Щоб підтвердити, що ти не бот, розв'яжи:",
+};
+
+export const correctMap: Record<Lang, string> = {
+  pl: "Dziękujemy! Twoja prośba o dołączenie została zatwierdzona.",
+  en: "Thanks! Your join request has been approved.",
+  uk: "Дякуємо! Твою заявку на вступ підтверджено.",
+};
+
+export const wrongMap: Record<Lang, string> = {
+  pl: "Niepoprawna odpowiedź. Możesz ponownie wysłać prośbę o dołączenie.",
+  en: "Wrong answer. You can request to join again.",
+  uk: "Невірна відповідь. Можеш подати заявку на вступ ще раз.",
+};
+
+export const expiredMap: Record<Lang, string> = {
+  pl: "Czas minął. Wyślij prośbę o dołączenie ponownie.",
+  en: "Time's up. Please request to join again.",
+  uk: "Час вийшов. Подай заявку на вступ ще раз.",
 };
 
 export function captchaText(a: number, b: number): string {
   return `🪖\n${tri(captchaPrompt)}\n\n${a} + ${b} = ?`;
 }
 
-export const correctText =
-  "✅\n" +
-  tri({
-    pl: "Dziękujemy! Twoja prośba o dołączenie została zatwierdzona.",
-    en: "Thanks! Your join request has been approved.",
-    uk: "Дякуємо! Твою заявку на вступ підтверджено.",
-  });
-
-export const wrongText =
-  "❌\n" +
-  tri({
-    pl: "Niepoprawna odpowiedź. Możesz ponownie wysłać prośbę o dołączenie.",
-    en: "Wrong answer. You can request to join again.",
-    uk: "Невірна відповідь. Можеш подати заявку на вступ ще раз.",
-  });
-
-export const expiredText =
-  "⏳\n" +
-  tri({
-    pl: "Czas minął. Wyślij prośbę o dołączenie ponownie.",
-    en: "Time's up. Please request to join again.",
-    uk: "Час вийшов. Подай заявку на вступ ще раз.",
-  });
+export const correctText = "✅\n" + tri(correctMap);
+export const wrongText = "❌\n" + tri(wrongMap);
+export const expiredText = "⏳\n" + tri(expiredMap);
 
 // ЧЕРНЕТКА онбордингу — доопрацюємо з організатором (ліміти FPS/джоулів заповнить адмін).
 export const faq: Record<Lang, string> = {

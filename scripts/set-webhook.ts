@@ -19,7 +19,7 @@ async function main() {
     body: JSON.stringify({
       url,
       secret_token: secret || undefined,
-      allowed_updates: ["chat_join_request", "callback_query", "message"],
+      allowed_updates: ["chat_join_request", "chat_member", "callback_query", "message"],
       drop_pending_updates: true,
     }),
   });

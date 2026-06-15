@@ -18,6 +18,9 @@ export default async function AdminRoles({
   return (
     <div className="space-y-5">
       <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "adm_roles_title")}</h1>
+      <p className="rounded-md bg-neutral-100 px-3 py-2 text-sm text-neutral-600">
+        {st(lang, "adm_roles_help")}
+      </p>
       {searchParams.saved && (
         <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, "adm_saved")}</p>
       )}
@@ -35,9 +38,17 @@ export default async function AdminRoles({
                 {p.callsign ?? p.name ?? `#${p.id}`}
                 {p.tg_username && <span className="ml-2 text-xs text-neutral-400">@{p.tg_username}</span>}
               </span>
-              {p.is_master && (
-                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs text-brand-dark">
+              {p.is_master ? (
+                <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-dark">
                   {st(lang, "adm_master")}
+                </span>
+              ) : p.is_admin || (Array.isArray(p.admin_perms) && p.admin_perms.length > 0) ? (
+                <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                  {st(lang, "adm_role_admin")}
+                </span>
+              ) : (
+                <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-500">
+                  {st(lang, "adm_role_player")}
                 </span>
               )}
             </div>

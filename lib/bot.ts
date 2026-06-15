@@ -1,6 +1,14 @@
 import { Bot, InlineKeyboard, Keyboard, type Context } from "grammy";
 import { supabase } from "./supabase";
-import { captchaText, correctText, wrongText, expiredText, faq, type Lang } from "./i18n";
+import { type Lang } from "./i18n";
+import {
+  buildCaptchaText,
+  buildCorrectText,
+  buildWrongText,
+  buildExpiredText,
+  getFaqText,
+} from "./bot-texts";
+import { recordMemberSeen, recordMemberLeft, hasEverLeft } from "./members";
 import { makeChallenge } from "./captcha";
 import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
 import {
@@ -39,6 +47,29 @@ import {
 } from "./games";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
+
+// Облік членства: будь-яка активність у групі → фіксуємо користувача як члена
+// (так «доіндексовуємо» наявних учасників, яких Bot API не дає перелічити).
+bot.use(async (ctx, next) => {
+  const chat = ctx.chat;
+  if (chat && (chat.type === "group" || chat.type === "supergroup") && ctx.from && !ctx.from.is_bot) {
+    recordMemberSeen(ctx.from.id).catch(() => {});
+  }
+  await next();
+});
+
+// Апдейти chat_member: вступ/вихід учасників (потрібен allowed_updates: chat_member).
+bot.on("chat_member", async (ctx) => {
+  const upd = ctx.chatMember;
+  const tgId = upd.new_chat_member.user.id;
+  if (upd.new_chat_member.user.is_bot) return;
+  const status = upd.new_chat_member.status;
+  if (status === "left" || status === "kicked") {
+    await recordMemberLeft(tgId);
+  } else {
+    await recordMemberSeen(tgId);
+  }
+});
 
 const REG_BTN = "✅ Записатись / Sign up";
 
@@ -513,10 +544,28 @@ async function renderRide(playerId: number, gameId: number, lang: Lang) {
   return { text, kb };
 }
 
-// Прив'язує новачка до інвайтера (лише якщо це справді нова людина).
+// Чи перебуває користувач ЗАРАЗ у групі (Telegram getChatMember по announce_chat_id).
+async function isCurrentGroupMember(tgUserId?: number | null): Promise<boolean> {
+  if (!tgUserId) return false;
+  const groupId = await getSetting("announce_chat_id");
+  if (!groupId) return false;
+  try {
+    const m = await bot.api.getChatMember(Number(groupId), tgUserId);
+    return ["creator", "administrator", "member", "restricted"].includes(m.status);
+  } catch {
+    return false;
+  }
+}
+
+// Прив'язує новачка до інвайтера (лише якщо це СПРАВДІ нова людина).
 async function bindReferral(invited: any, inviterId: number, isNewcomer: boolean) {
   if (!isNewcomer || inviterId === invited.id) return;
   if (!(await featureEnabled("referrals"))) return;
+  // Анти-абуз: не нараховуємо за того, хто вже був у групі.
+  //  - viходив колись (left_at у group_members) → повернувся по лінку;
+  //  - або вже зараз є учасником групи (наявний член «прийшов по лінку»).
+  if (await hasEverLeft(invited.tg_user_id)) return;
+  if (await isCurrentGroupMember(invited.tg_user_id)) return;
   const { data: existing } = await supabase
     .from("referrals")
     .select("id")
@@ -592,7 +641,7 @@ bot.command("profile", async (ctx) => {
 bot.command("rules", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
-  await ctx.reply(faq[p.lang as Lang]);
+  await ctx.reply(await getFaqText(p.lang as Lang));
 });
 
 bot.command("top", async (ctx) => {
@@ -1286,7 +1335,7 @@ bot.on("chat_join_request", async (ctx) => {
   options.forEach((o) => kb.text(String(o), `cap:${o}`));
 
   try {
-    await ctx.api.sendMessage(req.user_chat_id, captchaText(a, b), { reply_markup: kb });
+    await ctx.api.sendMessage(req.user_chat_id, await buildCaptchaText(a, b), { reply_markup: kb });
   } catch (e) {
     console.error("captcha DM failed (user privacy?)", e);
   }
@@ -1312,7 +1361,7 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
 
   if (new Date(ch.expires_at).getTime() < Date.now()) {
     await supabase.from("join_challenges").update({ status: "expired" }).eq("id", ch.id);
-    await ctx.editMessageText(expiredText);
+    await ctx.editMessageText(await buildExpiredText());
     try {
       await ctx.api.declineChatJoinRequest(ch.chat_id, userId);
     } catch {}
@@ -1327,12 +1376,13 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
       console.error("approve failed", e);
     }
     await supabase.from("join_challenges").update({ status: "passed" }).eq("id", ch.id);
-    await ctx.editMessageText(correctText);
+    await recordMemberSeen(userId); // пройшов капчу → у групі
+    await ctx.editMessageText(await buildCorrectText());
 
     const p = await ensurePlayer(ctx.from);
     if (await featureEnabled("onboarding_faq")) {
       try {
-        await ctx.api.sendMessage(ch.user_chat_id, faq[p.lang as Lang]);
+        await ctx.api.sendMessage(ch.user_chat_id, await getFaqText(p.lang as Lang));
       } catch {}
     }
   } else {
@@ -1340,7 +1390,7 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
       await ctx.api.declineChatJoinRequest(ch.chat_id, userId);
     } catch {}
     await supabase.from("join_challenges").update({ status: "failed" }).eq("id", ch.id);
-    await ctx.editMessageText(wrongText);
+    await ctx.editMessageText(await buildWrongText());
   }
 
   await ctx.answerCallbackQuery();
