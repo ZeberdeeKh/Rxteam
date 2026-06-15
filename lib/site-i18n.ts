@@ -514,6 +514,7 @@ const SITE: Record<string, Dict> = {
   },
   adm_role_admin: { pl: "Admin", en: "Admin", uk: "Адмін" },
   adm_role_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
+  adm_make_admin: { pl: "Zrób adminem", en: "Make admin", uk: "Зробити адміном" },
 
   // Легенда дозволів (показується внизу «Ролі адмінів», лише майстру).
   adm_perms_legend_title: {

@@ -11,6 +11,9 @@ dist/
 .env*.local
 !.env.example
 
+# вигрузка учасників групи — персональні дані, лише локально
+scripts/group-members.csv
+
 # RX Team design/media materials (local only — kept on disk, out of the code repo)
 /Northern Ridge/
 /Видос/

@@ -2,22 +2,22 @@
 import { st } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listPlayers } from "@/lib/admin-data";
-import { adjustPoints, setPlayerCallsign, togglePatch } from "@/app/admin/actions";
+import { adjustPoints, setPlayerCallsign, togglePatch, makeAdmin } from "@/app/admin/actions";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminPlayers({
   searchParams,
 }: {
-  searchParams: { adjusted?: string; callsign?: string; patch?: string; err?: string };
+  searchParams: { adjusted?: string; callsign?: string; patch?: string; admin?: string; err?: string };
 }) {
-  await requirePerm("players");
+  const me = await requirePerm("players");
   const lang = getServerLang();
   const players = await listPlayers();
   const smallInput =
     "rounded-md border border-gray-300 px-2 py-1 text-xs focus:border-brand focus:outline-none";
 
-  const ok = searchParams.adjusted || searchParams.callsign || searchParams.patch;
+  const ok = searchParams.adjusted || searchParams.callsign || searchParams.patch || searchParams.admin;
 
   return (
     <div className="space-y-5">
@@ -35,10 +35,16 @@ export default async function AdminPlayers({
                 <span className="font-semibold text-gray-900">{p.callsign ?? "—"}</span>
                 <span className="ml-2 text-sm text-gray-500">{p.name ?? ""}</span>
                 {p.tg_username && <span className="ml-2 text-xs text-gray-400">@{p.tg_username}</span>}
-                {p.is_master && (
+                {p.is_master ? (
                   <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-xs text-brand-dark">
                     {st(lang, "adm_master")}
                   </span>
+                ) : (
+                  p.is_admin && (
+                    <span className="ml-2 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                      {st(lang, "adm_role_admin")}
+                    </span>
+                  )
                 )}
               </div>
               <div className="text-xs text-gray-500">
@@ -77,6 +83,19 @@ export default async function AdminPlayers({
                   {st(lang, "adm_btn_patch")}
                 </button>
               </form>
+
+              {/* Призначення адміном — лише майстер, і лише для звичайних гравців. */}
+              {me.is_master && !p.is_master && !p.is_admin && (
+                <form action={makeAdmin}>
+                  <input type="hidden" name="playerId" value={p.id} />
+                  <button
+                    type="submit"
+                    className="rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-neutral-50 hover:bg-brand-dark"
+                  >
+                    {st(lang, "adm_make_admin")}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         ))}

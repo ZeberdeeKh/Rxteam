@@ -13,7 +13,11 @@ export default async function AdminRoles({
 }) {
   await requireMaster();
   const lang = getServerLang();
-  const players = await listPlayers();
+  // Лише адміни: майстер, is_admin або хтось із правами. Звичайних гравців тут не показуємо
+  // (їх призначають адмінами на сторінці «Гравці»).
+  const players = (await listPlayers()).filter(
+    (p) => p.is_master || p.is_admin || (Array.isArray(p.admin_perms) && p.admin_perms.length > 0),
+  );
 
   return (
     <div className="space-y-5">

@@ -219,6 +219,23 @@ export async function togglePatch(formData: FormData) {
   redirect("/admin/players?patch=1");
 }
 
+// Призначити гравця адміном (лише майстер). Далі майстер видає конкретні права в «Ролі адмінів».
+export async function makeAdmin(formData: FormData) {
+  await requireMaster();
+  const playerId = Number(formData.get("playerId"));
+  if (!Number.isFinite(playerId)) redirect("/admin/players");
+  const { data: target } = await supabase
+    .from("players")
+    .select("is_master")
+    .eq("id", playerId)
+    .single();
+  if (target?.is_master) redirect("/admin/players"); // майстер і так усе має
+  await supabase.from("players").update({ is_admin: true }).eq("id", playerId);
+  revalidatePath("/admin/players");
+  revalidatePath("/admin/roles");
+  redirect("/admin/players?admin=1");
+}
+
 // ── Реферали (право referrals) ──
 export async function setReferralStatus(formData: FormData) {
   await requirePerm("referrals");

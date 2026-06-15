@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "set-webhook": "tsx scripts/set-webhook.ts"
+    "set-webhook": "tsx scripts/set-webhook.ts",
+    "export-members": "tsx scripts/export-group-members.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
