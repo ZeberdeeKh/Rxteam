@@ -221,7 +221,7 @@ const S: Record<string, Dict> = {
     en: "How are you getting to the game?",
     uk: "Як добираєшся на гру?",
   },
-  btn_transport_own: { pl: "🚗 Własnym autem", en: "🚗 My own ride", uk: "🚗 Своїм ходом" },
+  btn_transport_own: { pl: "🚗 Własnym autem, podwiozę", en: "🚗 Driving, can give a lift", uk: "🚗 Своїм авто, підвезу" },
   btn_transport_need: { pl: "🙋 Potrzebuję transportu", en: "🙋 Need a ride", uk: "🙋 Потрібен транспорт" },
   // Для тих, хто не водій і не шукає транспорт — реєстрація завершується без даних про дорогу.
   btn_transport_skip: { pl: "⏭️ Pomiń", en: "⏭️ Skip", uk: "⏭️ Пропустити" },

@@ -355,7 +355,7 @@ const SITE: Record<string, Dict> = {
     uk: "Потрібна оренда спорядження",
   },
   reg_transport_q: { pl: "Transport", en: "Transport", uk: "Транспорт" },
-  reg_transport_own: { pl: "Własnym transportem", en: "My own transport", uk: "Своїм ходом" },
+  reg_transport_own: { pl: "Własnym autem, podwiozę", en: "Driving, can give a lift", uk: "Своїм авто, підвезу" },
   reg_transport_need: { pl: "Potrzebuję podwózki", en: "I need a ride", uk: "Потребую підвезти" },
   reg_from_ph: { pl: "Skąd jedziesz?", en: "Where from?", uk: "Звідки їдеш?" },
   reg_seats_ph: { pl: "Wolne miejsca w aucie", en: "Free seats in car", uk: "Вільних місць в авто" },
