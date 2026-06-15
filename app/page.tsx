@@ -28,8 +28,7 @@ export default async function Home() {
     <div className="space-y-10">
       {/* Герой */}
       <section>
-        <h1 className={ui.display}>{st(lang, "home_title")}</h1>
-        <p className={`mt-3 ${ui.body}`}>{st(lang, "home_hero_sub")}</p>
+        <p className={ui.body}>{st(lang, "home_hero_sub")}</p>
       </section>
 
       {/* Найближча гра */}
