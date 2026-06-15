@@ -1,4 +1,4 @@
-// Спільні серверні читання для сайту (лендінг, /games, /ranking).
+// Спільні серверні читання для сайту (лендінг, /games).
 // Усе через service-key (lib/supabase.ts) — RLS off, лише сервер. Жодних next/headers тут.
 import { supabase } from "./supabase";
 

@@ -2,7 +2,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import type { RankingRow } from "@/lib/site-data";
 import { ui } from "@/components/ui";
 
-// Таблиця рейтингу (топ гравців). Спільна для лендінга й /ranking.
+// Таблиця рейтингу (топ гравців). Показується на лендінгу.
 export default function RankingTable({ rows, lang }: { rows: RankingRow[]; lang: Lang }) {
   if (rows.length === 0) {
     return (
