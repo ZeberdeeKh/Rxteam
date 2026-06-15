@@ -112,11 +112,13 @@ export type RankingRow = {
   games_played: number;
 };
 
-// Публічний рейтинг за «зароблено всього» (як бот /top). Топ-N.
+// Публічний рейтинг за «зароблено всього» (як бот /top). Топ-N. Адмінів і майстра не показуємо.
 export async function getRanking(limit = 10): Promise<RankingRow[]> {
   const { data } = await supabase
     .from("players")
     .select("id, callsign, name, rank, has_patch, points_earned, games_played")
+    .eq("is_admin", false)
+    .eq("is_master", false)
     .or("points_earned.gt.0,games_played.gt.0")
     .order("points_earned", { ascending: false })
     .order("games_played", { ascending: false })

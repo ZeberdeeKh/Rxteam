@@ -2,35 +2,33 @@
 
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { LANG_COOKIE, LANG_FLAG, SITE_LANGS, type Lang } from "@/lib/site-i18n";
+import { LANG_COOKIE, LANG_LABEL, SITE_LANGS, type Lang } from "@/lib/site-i18n";
 
-// Перемикач мови: пише cookie і освіжає серверні дані (router.refresh).
+// Перемикач мови: випадаючий список із повними назвами мов (як у калькуляторі).
+// Пише cookie і освіжає серверні дані (router.refresh).
 export default function LangSwitcher({ current }: { current: Lang }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
 
-  function setLang(lang: Lang) {
-    // 1 рік, доступний усьому сайту.
+  function onChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const lang = e.target.value as Lang;
     document.cookie = `${LANG_COOKIE}=${lang}; path=/; max-age=31536000; samesite=lax`;
     startTransition(() => router.refresh());
   }
 
   return (
-    <div className="flex items-center gap-1" aria-busy={pending}>
+    <select
+      value={current}
+      onChange={onChange}
+      disabled={pending}
+      aria-label={LANG_LABEL[current]}
+      className="cursor-pointer rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 transition hover:border-brand focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-60"
+    >
       {SITE_LANGS.map((l) => (
-        <button
-          key={l}
-          type="button"
-          onClick={() => setLang(l)}
-          aria-pressed={l === current}
-          title={l.toUpperCase()}
-          className={`rounded px-1.5 py-0.5 text-base leading-none transition ${
-            l === current ? "bg-brand/10 ring-1 ring-brand/40" : "opacity-60 hover:opacity-100"
-          }`}
-        >
-          {LANG_FLAG[l]}
-        </button>
+        <option key={l} value={l}>
+          {LANG_LABEL[l]}
+        </option>
       ))}
-    </div>
+    </select>
   );
 }

@@ -70,11 +70,11 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
         <SubmitButton label={st(lang, btn)} />
       </form>
 
-      <p className="mt-4 text-center text-sm">
-        <Link href={switchHref} className="text-brand hover:underline">
+      <div className="mt-6 border-t border-gray-200 pt-4">
+        <Link href={switchHref} className={`${buttonClass("secondary")} w-full`}>
           {st(lang, switchKey)}
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

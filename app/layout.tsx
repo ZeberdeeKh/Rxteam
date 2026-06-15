@@ -69,9 +69,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Link href="/games" className={navLink}>
                 {st(lang, "nav_games")}
               </Link>
-              <Link href="/ranking" className={navLink}>
-                {st(lang, "nav_ranking")}
-              </Link>
               {loggedIn ? (
                 <>
                   <Link href="/shop" className={navLink}>
@@ -92,14 +89,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   </form>
                 </>
               ) : (
-                <>
-                  <Link href="/login" className={navLink}>
-                    {st(lang, "nav_login")}
-                  </Link>
-                  <Link href="/register" className={navLink}>
-                    {st(lang, "nav_register")}
-                  </Link>
-                </>
+                <Link href="/login" className={navLink}>
+                  {st(lang, "nav_login")}
+                </Link>
               )}
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <ThemeToggle title={st(lang, "theme_toggle")} />

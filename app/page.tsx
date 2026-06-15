@@ -1,14 +1,15 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
-import { getNextGame } from "@/lib/site-data";
+import { getNextGame, getRanking } from "@/lib/site-data";
 import { formatGameWhen } from "@/lib/games";
 import { ui, buttonClass } from "@/components/ui";
+import RankingTable from "@/components/site/RankingTable";
 
-// Лендінг (публічний): герой + складка (PL) + блок «найближча гра» + посилання.
+// Лендінг (публічний, одна сторінка): герой + найближча гра + рейтинг + складка.
 export default async function Home() {
   const lang = getServerLang();
-  const next = await getNextGame();
+  const [next, ranking] = await Promise.all([getNextGame(), getRanking(10)]);
 
   const countText = (() => {
     if (!next) return "";
@@ -27,9 +28,9 @@ export default async function Home() {
           <Link href="/games" className={buttonClass("primary")}>
             {st(lang, "home_cta_games")}
           </Link>
-          <Link href="/ranking" className={buttonClass("secondary")}>
+          <a href="#ranking" className={buttonClass("secondary")}>
             {st(lang, "home_cta_ranking")}
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -54,6 +55,14 @@ export default async function Home() {
             {st(lang, "home_next_none")}
           </p>
         )}
+      </section>
+
+      {/* Рейтинг (на лендінгу, замість окремої сторінки в меню) */}
+      <section id="ranking" className="scroll-mt-20">
+        <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
+        <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
+        <RankingTable rows={ranking} lang={lang} />
+        {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
       </section>
 
       {/* Складка */}
