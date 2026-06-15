@@ -24,6 +24,7 @@ export type SiteGame = {
   scenario_pl: string | null; // опис сценарію (PL) — для короткого тізера на лендінгу
   scenario_uk: string | null; // опис сценарію (UA) — для короткого тізера на лендінгу
   limits: LocationLimits | null; // ліміти локації (репліки/піро/режим вогню) для тізера
+  showCount: boolean; // показувати лічильник записаних (тумблер feature_announce_count, як в анонсі)
 };
 
 const GAME_COLS =
@@ -105,6 +106,8 @@ function toSiteGame(row: any, count: number, settings?: Record<string, string>):
     scenario_pl: row.scenario_pl ?? null,
     scenario_uk: row.scenario_uk ?? null,
     limits: normLimits(row),
+    // Той самий критерій, що й у buildAnnouncement: показуємо, доки тумблер не вимкнено явно.
+    showCount: settings?.["feature_announce_count"] !== "false",
   };
 }
 

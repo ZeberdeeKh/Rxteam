@@ -24,7 +24,7 @@ export default function GameCard({
     <article className={`${ui.card} ${muted ? "opacity-75" : ""}`}>
       <div className="flex items-baseline justify-between gap-3">
         <h3 className={ui.cardTitle}>{game.title ?? "ASG"}</h3>
-        <span className={`shrink-0 ${ui.muted}`}>{countText}</span>
+        {game.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
       </div>
 
       <dl className="mt-3 space-y-1 text-sm text-gray-600">

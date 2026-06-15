@@ -61,7 +61,7 @@ export default async function Home() {
               <Link href="/games" className={`${ui.cardTitle} hover:text-brand`}>
                 {next.title ?? "ASG"}
               </Link>
-              <span className={`shrink-0 ${ui.muted}`}>{countText}</span>
+              {next.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
             </div>
             <div className={`mt-2 ${ui.body}`}>
               📅 {formatGameWhen(next.gather_at ?? next.start_at, lang)}
