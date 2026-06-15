@@ -13,6 +13,7 @@ import {
   type Rank,
 } from "@/lib/economy";
 import { buyItem, buyRank } from "@/app/shop/actions";
+import { ui } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -41,7 +42,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
   if (!enabled) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "shop_title")}</h1>
+        <h1 className={ui.pageTitle}>{st(lang, "shop_title")}</h1>
         <p className="text-sm text-gray-500">{st(lang, "shop_disabled")}</p>
       </div>
     );
@@ -70,7 +71,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-brand-dark">{st(lang, "shop_title")}</h1>
+        <h1 className={ui.pageTitle}>{st(lang, "shop_title")}</h1>
         <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_intro")}</p>
       </div>
 
@@ -135,7 +136,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       {economyOn && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-lg font-semibold text-brand-dark">{st(lang, "shop_ranks_title")}</h2>
+            <h2 className={ui.sectionTitle}>{st(lang, "shop_ranks_title")}</h2>
             <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_ranks_intro")}</p>
           </div>
 

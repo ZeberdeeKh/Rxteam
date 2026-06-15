@@ -78,10 +78,11 @@ export function subNavClass(active: boolean): string {
 
 // ── Токени (типографіка, поверхні, поля, таблиці, банери, розкладка) ──
 export const ui = {
-  // Типографіка
-  display: "text-3xl font-bold tracking-tight text-brand-dark",
-  pageTitle: "text-2xl font-bold tracking-tight text-brand-dark",
-  sectionTitle: "text-lg font-semibold text-brand-dark",
+  // Типографіка. Заголовки — ВЕРХНІЙ РЕГІСТР (uppercase) на всьому сайті.
+  // cardTitle НЕ робимо uppercase: там бувають назви ігор і позивні (власні назви).
+  display: "text-3xl font-bold uppercase tracking-tight text-brand-dark",
+  pageTitle: "text-2xl font-bold uppercase tracking-tight text-brand-dark",
+  sectionTitle: "text-lg font-semibold uppercase tracking-wide text-brand-dark",
   cardTitle: "text-base font-semibold text-gray-900",
   body: "text-sm text-gray-700",
   bodyStrong: "text-sm font-medium text-gray-900",

@@ -18,10 +18,10 @@
 ## Типографіка (тільки ці рівні)
 | Токен | Клас | Призначення |
 |-------|------|-------------|
-| `ui.display` | `text-3xl font-bold` | Герой лендінга |
-| `ui.pageTitle` | `text-2xl font-bold` | Заголовок сторінки (H1) |
-| `ui.sectionTitle` | `text-lg font-semibold` | Заголовок секції (H2) |
-| `ui.cardTitle` | `text-base font-semibold` | Заголовок картки (H3) |
+| `ui.display` | `text-3xl font-bold uppercase` | Герой лендінга |
+| `ui.pageTitle` | `text-2xl font-bold uppercase` | Заголовок сторінки (H1) |
+| `ui.sectionTitle` | `text-lg font-semibold uppercase tracking-wide` | Заголовок секції (H2) |
+| `ui.cardTitle` | `text-base font-semibold` | Заголовок картки (H3, БЕЗ uppercase — власні назви) |
 | `ui.body` / `ui.bodyStrong` | `text-sm` | Основний текст |
 | `ui.muted` | `text-sm text-gray-500` | Другорядний текст |
 | `ui.label` | `text-sm font-medium` | Підписи полів |
