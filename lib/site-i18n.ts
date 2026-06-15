@@ -472,6 +472,7 @@ const SITE: Record<string, Dict> = {
   adm_nav_joins: { pl: "Wnioski (grupa)", en: "Join requests", uk: "Заявки в групу" },
   adm_nav_roles: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
   adm_nav_chores: { pl: "Czek-lista", en: "Checklist", uk: "Чек-лист" },
+  adm_nav_export: { pl: "Eksport", en: "Export", uk: "Експорт" },
 
   adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
