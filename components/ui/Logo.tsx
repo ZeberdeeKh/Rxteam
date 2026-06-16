@@ -8,7 +8,7 @@
 
 type Variant = "A" | "B" | "C" | "D";
 
-const LOGO_VARIANT: Variant = "C";
+const LOGO_VARIANT: Variant = "D";
 
 // Спільні класи тексту лого (display-шрифт Oswald, як меню/заголовки).
 const TXT = "font-display text-lg font-extrabold uppercase leading-none tracking-wide";
