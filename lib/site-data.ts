@@ -356,6 +356,10 @@ export type PlayerAch = {
   title_pl: string | null;
   title_en: string | null;
   title_uk: string | null;
+  description_pl: string | null;
+  description_en: string | null;
+  description_uk: string | null;
+  thumbnail_svg: string | null;
 };
 
 export type ShopItem = {
@@ -413,7 +417,9 @@ export async function getGalleryPhotos(limit = 24): Promise<GalleryPhoto[]> {
 export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
   const { data } = await supabase
     .from("player_achievements")
-    .select("code, created_at, achievements(title_pl, title_en, title_uk)")
+    .select(
+      "code, created_at, achievements(title_pl, title_en, title_uk, description_pl, description_en, description_uk, thumbnail_svg)",
+    )
     .eq("player_id", playerId)
     .order("created_at", { ascending: false });
   return (data ?? []).map((r: any) => {
@@ -424,6 +430,10 @@ export async function getPlayerAchievements(playerId: number): Promise<PlayerAch
       title_pl: a?.title_pl ?? null,
       title_en: a?.title_en ?? null,
       title_uk: a?.title_uk ?? null,
+      description_pl: a?.description_pl ?? null,
+      description_en: a?.description_en ?? null,
+      description_uk: a?.description_uk ?? null,
+      thumbnail_svg: a?.thumbnail_svg ?? null,
     };
   });
 }

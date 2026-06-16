@@ -32,6 +32,10 @@ function achTitle(a: PlayerAch, lang: Lang): string {
   return (lang === "pl" ? a.title_pl : lang === "uk" ? a.title_uk : a.title_en) ?? a.code;
 }
 
+function achDesc(a: PlayerAch, lang: Lang): string | null {
+  return (lang === "pl" ? a.description_pl : lang === "uk" ? a.description_uk : a.description_en) ?? null;
+}
+
 export default async function CabinetPage({ searchParams }: { searchParams: Flags }) {
   const ctx = await getSessionContext();
   if (ctx.state === "anon") redirect("/login");
@@ -150,13 +154,31 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         {achs.length === 0 ? (
           <p className={ui.emptyState}>{st(lang, "ach_empty")}</p>
         ) : (
-          <ul className="flex flex-wrap gap-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {achs.map((a) => (
-              <li key={a.code} className={badgeClass("brand")} title={formatGameWhen(a.created_at, lang)}>
-                {GLYPH.rank} {achTitle(a, lang)}
-              </li>
+              <article key={a.code} className={`flex flex-col ${ui.card}`}>
+                <div className="flex items-start gap-3">
+                  {a.thumbnail_svg ? (
+                    // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={a.thumbnail_svg} alt="" className="h-10 w-10 shrink-0 object-contain" />
+                  ) : (
+                    <span aria-hidden className="text-2xl leading-none">
+                      {GLYPH.rank}
+                    </span>
+                  )}
+                  <h3 className={ui.cardTitle}>{achTitle(a, lang)}</h3>
+                </div>
+                {achDesc(a, lang) && (
+                  <p className="mt-2 text-sm text-gray-600">{achDesc(a, lang)}</p>
+                )}
+                <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+                  <span className={ui.metaFaint}>{formatGameWhen(a.created_at, lang)}</span>
+                  <span className={badgeClass("green")}>{st(lang, "ach_earned")}</span>
+                </div>
+              </article>
             ))}
-          </ul>
+          </div>
         )}
       </section>
 

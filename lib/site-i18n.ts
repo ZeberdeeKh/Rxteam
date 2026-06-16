@@ -375,6 +375,7 @@ const SITE: Record<string, Dict> = {
   // ── 6.2 Ачівки ──
   ach_title: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" },
   ach_empty: { pl: "Brak osiągnięć.", en: "No achievements yet.", uk: "Поки що немає ачівок." },
+  ach_earned: { pl: "Zdobyto", en: "Earned", uk: "Отримано" },
 
   // ── 6.2 Мої ігри ──
   mygames_title: { pl: "Moje gry", en: "My games", uk: "Мої ігри" },
