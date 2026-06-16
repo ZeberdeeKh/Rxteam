@@ -25,7 +25,7 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="mt-1 text-xs font-medium text-brand hover:underline"
+          className="mt-1 text-xs font-medium text-[var(--c-brand-text)] hover:underline"
         >
           {st(lang, open ? "games_show_less" : "games_show_more")}
         </button>

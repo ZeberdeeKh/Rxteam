@@ -20,17 +20,17 @@ export default async function AdminExportPage() {
     <div className={ui.pageStack}>
       <div className="flex flex-wrap gap-2">
         {canPlayers && (
-          <a href="/admin/export/players" className={btn("action", "sm")}>
+          <a href="/admin/export/players" className={btn("action")}>
             {st(lang, "adm_export_players")}
           </a>
         )}
         {canGames && (
-          <a href="/admin/export/registrations" className={btn("action", "sm")}>
+          <a href="/admin/export/registrations" className={btn("action")}>
             {st(lang, "adm_export_regs")}
           </a>
         )}
         {canCheckin && (
-          <a href="/admin/export/checkins" className={btn("action", "sm")}>
+          <a href="/admin/export/checkins" className={btn("action")}>
             {st(lang, "adm_export_checkins")}
           </a>
         )}

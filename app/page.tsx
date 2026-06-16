@@ -62,7 +62,7 @@ export default async function Home() {
         {next ? (
           <div className={`mt-3 ${ui.card}`}>
             <div className="flex items-baseline justify-between gap-3">
-              <Link href="/games" className={`${ui.cardTitle} hover:text-brand`}>
+              <Link href="/games" className={`${ui.cardTitle} hover:text-[var(--c-brand-text)]`}>
                 {next.title ?? "ASG"}
               </Link>
               {next.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
@@ -79,7 +79,7 @@ export default async function Home() {
                     href={next.location.map_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-brand hover:underline"
+                    className="text-[var(--c-brand-text)] hover:underline"
                   >
                     {st(lang, "games_map")}
                   </a>
@@ -96,7 +96,7 @@ export default async function Home() {
 
             <Link
               href="/games"
-              className="mt-3 inline-block text-sm font-medium text-brand hover:underline"
+              className="mt-3 inline-block text-sm font-medium text-[var(--c-brand-text)] hover:underline"
             >
               {st(lang, "home_cta_games")} →
             </Link>

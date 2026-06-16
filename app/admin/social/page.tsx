@@ -44,7 +44,7 @@ export default async function AdminSocial({
           </div>
         </fieldset>
 
-        <button type="submit" className={btn("action", "md")}>
+        <button type="submit" className={btn("action")}>
           {st(lang, "adm_save")}
         </button>
       </form>

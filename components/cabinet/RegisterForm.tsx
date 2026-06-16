@@ -69,7 +69,7 @@ export default function RegisterForm({
         </div>
       )}
 
-      <button type="submit" className={btn("action", "md")}>
+      <button type="submit" className={btn("action")}>
         {st(lang, "btn_register")}
       </button>
     </form>

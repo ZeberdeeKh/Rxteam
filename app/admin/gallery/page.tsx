@@ -39,13 +39,13 @@ export default async function AdminGallery({ searchParams }: { searchParams: { s
                 <div className="flex gap-2">
                   <form action={toggleGalleryMedia}>
                     <input type="hidden" name="id" value={p.id} />
-                    <button type="submit" className={btn("action", "sm")}>
+                    <button type="submit" className={btn("action")}>
                       {st(lang, p.status === "hidden" ? "adm_btn_show" : "adm_btn_hide")}
                     </button>
                   </form>
                   <form action={deleteGalleryMedia}>
                     <input type="hidden" name="id" value={p.id} />
-                    <button type="submit" className={btn("delete", "sm")}>
+                    <button type="submit" className={btn("delete")}>
                       {st(lang, "adm_btn_delete")}
                     </button>
                   </form>

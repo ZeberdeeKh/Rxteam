@@ -137,7 +137,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   {player && (
                     <form action={buyItem}>
                       <input type="hidden" name="itemId" value={it.id} />
-                      <button type="submit" disabled={!affordable} className={btn("action", "sm")}>
+                      <button type="submit" disabled={!affordable} className={btn("action")}>
                         {st(lang, "shop_buy")}
                       </button>
                     </form>
@@ -178,7 +178,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   ) : isNext && player ? (
                     <form action={buyRank}>
                       <input type="hidden" name="rank" value={r} />
-                      <button type="submit" disabled={!affordable} className={btn("action", "sm")}>
+                      <button type="submit" disabled={!affordable} className={btn("action")}>
                         {st(lang, "shop_buy")}
                       </button>
                     </form>

@@ -56,7 +56,7 @@ export default async function AdminChores({
             <input name="note" className={ui.input} />
           </label>
           <div className="flex items-end sm:col-span-12">
-            <button type="submit" className={btn("action", "md")}>
+            <button type="submit" className={btn("action")}>
               {st(lang, "adm_btn_create")}
             </button>
           </div>
@@ -101,12 +101,12 @@ export default async function AdminChores({
 
               {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити» (однаковий розмір). */}
               <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
-                <button type="submit" form={`chore-${it.id}`} className={btn("action", "sm")}>
+                <button type="submit" form={`chore-${it.id}`} className={btn("action")}>
                   {st(lang, "adm_btn_save")}
                 </button>
                 <form action={deleteChore}>
                   <input type="hidden" name="id" value={it.id} />
-                  <button type="submit" className={btn("delete", "sm")}>
+                  <button type="submit" className={btn("delete")}>
                     {st(lang, "adm_btn_delete")}
                   </button>
                 </form>

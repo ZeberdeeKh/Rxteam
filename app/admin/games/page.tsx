@@ -79,7 +79,7 @@ export default async function AdminGames({
               <textarea name="scenario_uk" rows={2} className={inputCls} />
             </label>
             <div className="sm:col-span-2">
-              <button type="submit" className={btn("action", "md")}>
+              <button type="submit" className={btn("action")}>
                 {st(lang, "adm_btn_create")}
               </button>
             </div>
@@ -127,7 +127,7 @@ export default async function AdminGames({
                   <td className={`${ui.td} text-right tabular-nums`}>{g.regCount}</td>
                   <td className={`${ui.td} text-right tabular-nums`}>{g.checkinCount}</td>
                   <td className={`${ui.td} text-right`}>
-                    <Link href={`/admin/games/${g.id}`} className="text-brand hover:underline">
+                    <Link href={`/admin/games/${g.id}`} className="text-[var(--c-brand-text)] hover:underline">
                       {st(lang, "adm_open")}
                     </Link>
                   </td>

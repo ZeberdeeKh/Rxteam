@@ -65,7 +65,7 @@ export default async function AdminRoles({
                   </label>
                 ))}
                 {!p.is_master && (
-                  <button type="submit" className={`ml-auto ${btn("action", "sm")}`}>
+                  <button type="submit" className={`ml-auto ${btn("action")}`}>
                     {st(lang, "adm_btn_save_roles")}
                   </button>
                 )}

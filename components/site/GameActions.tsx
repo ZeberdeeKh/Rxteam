@@ -25,7 +25,7 @@ export default function GameActions({
   if (!loggedIn) {
     return (
       <p className="text-sm text-gray-500">
-        <Link href="/login" className="font-medium text-brand hover:underline">
+        <Link href="/login" className="font-medium text-[var(--c-brand-text)] hover:underline">
           {st(lang, "games_login_to_register")}
         </Link>
       </p>
@@ -36,7 +36,7 @@ export default function GameActions({
   if (!hasCallsign) {
     return (
       <p className="text-sm text-gray-500">
-        <Link href="/cabinet" className="font-medium text-brand hover:underline">
+        <Link href="/cabinet" className="font-medium text-[var(--c-brand-text)] hover:underline">
           {st(lang, "games_need_callsign")}
         </Link>
       </p>
@@ -52,7 +52,7 @@ export default function GameActions({
           <form action={unregisterFromGame}>
             <input type="hidden" name="gameId" value={gameId} />
             <input type="hidden" name="returnTo" value="/games" />
-            <button type="submit" className={btn("delete", "md")}>
+            <button type="submit" className={btn("delete")}>
               {st(lang, "btn_unregister")}
             </button>
           </form>

@@ -106,7 +106,7 @@ export default async function AdminShop({
         <form action={createShopItem} className="grid items-end gap-3 sm:grid-cols-12">
           <ShopItemFields lang={lang} />
           <div className="flex items-end sm:col-span-12">
-            <button type="submit" className={btn("action", "md")}>
+            <button type="submit" className={btn("action")}>
               {st(lang, "adm_btn_create")}
             </button>
           </div>
@@ -124,7 +124,7 @@ export default async function AdminShop({
                 <input type="hidden" name="id" value={it.id} />
                 <ShopItemFields lang={lang} item={it} />
                 <div className="flex items-center gap-2 sm:col-span-12">
-                  <button type="submit" className={btn("action", "sm")}>
+                  <button type="submit" className={btn("action")}>
                     {st(lang, "adm_btn_save")}
                   </button>
                   {!it.active && (
@@ -135,7 +135,7 @@ export default async function AdminShop({
 
               <form action={deleteShopItem} className="mt-2 border-t border-gray-100 pt-2">
                 <input type="hidden" name="id" value={it.id} />
-                <button type="submit" className={btn("delete", "sm")}>
+                <button type="submit" className={btn("delete")}>
                   {st(lang, "adm_btn_delete")}
                 </button>
               </form>
@@ -179,7 +179,7 @@ export default async function AdminShop({
                           <span className={badgeClass("amber")}>
                             {st(lang, "adm_shop_status_pending")}
                           </span>
-                          <button type="submit" className={btn("action", "sm")}>
+                          <button type="submit" className={btn("action")}>
                             {st(lang, "adm_shop_mark_done")}
                           </button>
                         </form>

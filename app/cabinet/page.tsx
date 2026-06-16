@@ -76,7 +76,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           <h2 className={ui.cardTitle}>{st(lang, "standalone_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
           <form action={createStandalone} className="mt-3">
-            <button type="submit" className={btn("action", "md")}>
+            <button type="submit" className={btn("action")}>
               {st(lang, "standalone_btn")}
             </button>
           </form>
@@ -105,7 +105,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               placeholder={st(lang, "callsign_ph")}
               className={`${ui.input} flex-1`}
             />
-            <button type="submit" className={btn("action", "md")}>
+            <button type="submit" className={btn("action")}>
               {st(lang, "callsign_btn")}
             </button>
           </form>
@@ -213,7 +213,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                     {g.canUnregister && (
                       <form action={unregisterFromGame}>
                         <input type="hidden" name="gameId" value={g.id} />
-                        <button type="submit" className={btn("delete", "md")}>
+                        <button type="submit" className={btn("delete")}>
                           {st(lang, "btn_unregister")}
                         </button>
                       </form>

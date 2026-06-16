@@ -27,7 +27,7 @@ export default async function AdminGameDetail({
 
   return (
     <div className={ui.pageStack}>
-      <Link href="/admin/games" className="text-sm text-brand hover:underline">
+      <Link href="/admin/games" className="text-sm text-[var(--c-brand-text)] hover:underline">
         {st(lang, "adm_back")}
       </Link>
 
@@ -44,7 +44,7 @@ export default async function AdminGameDetail({
         {game.status === "announced" && (
           <form action={cancelGame}>
             <input type="hidden" name="gameId" value={game.id} />
-            <button type="submit" className={btn("delete", "sm")}>
+            <button type="submit" className={btn("delete")}>
               {st(lang, "adm_btn_cancel_game")}
             </button>
           </form>
@@ -105,7 +105,7 @@ export default async function AdminGameDetail({
                             <form action={manualCheckin}>
                               <input type="hidden" name="gameId" value={game.id} />
                               <input type="hidden" name="playerId" value={r.playerId} />
-                              <button type="submit" className={btn("action", "sm")}>
+                              <button type="submit" className={btn("action")}>
                                 {st(lang, "adm_btn_checkin")}
                               </button>
                             </form>
@@ -113,7 +113,7 @@ export default async function AdminGameDetail({
                               <form action={markNoShow}>
                                 <input type="hidden" name="gameId" value={game.id} />
                                 <input type="hidden" name="playerId" value={r.playerId} />
-                                <button type="submit" className={btn("delete", "sm")}>
+                                <button type="submit" className={btn("delete")}>
                                   {st(lang, "adm_btn_noshow")}
                                 </button>
                               </form>

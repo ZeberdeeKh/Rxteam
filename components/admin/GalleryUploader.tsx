@@ -84,7 +84,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         <button
           type="submit"
           disabled={status === "uploading"}
-          className={btn("action", "md")}
+          className={btn("action")}
         >
           {status === "uploading" ? st(lang, "adm_gallery_uploading") : st(lang, "adm_btn_upload")}
         </button>

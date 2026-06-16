@@ -37,7 +37,7 @@ export default function CheckinButton({ gameId, lang }: { gameId: number; lang: 
         type="submit"
         onClick={onClick}
         disabled={status === "locating"}
-        className={btn("action", "md")}
+        className={btn("action")}
       >
         {status === "locating" ? st(lang, "checkin_locating") : st(lang, "web_checkin_btn")}
       </button>

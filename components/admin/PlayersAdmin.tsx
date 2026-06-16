@@ -107,7 +107,7 @@ export default function PlayersAdmin({
                         className={`${ui.inputSm} w-28`}
                         required
                       />
-                      <button type="submit" className={btn("action", "sm")}>
+                      <button type="submit" className={btn("action")}>
                         {st(lang, "adm_btn_adjust")}
                       </button>
                     </form>
@@ -115,14 +115,14 @@ export default function PlayersAdmin({
                     <form action={setPlayerCallsign} className="flex items-center gap-1">
                       <input type="hidden" name="playerId" value={p.id} />
                       <input name="callsign" defaultValue={p.callsign ?? ""} className={`${ui.inputSm} w-28`} />
-                      <button type="submit" className={btn("action", "sm")}>
+                      <button type="submit" className={btn("action")}>
                         {st(lang, "adm_btn_callsign")}
                       </button>
                     </form>
 
                     <form action={togglePatch}>
                       <input type="hidden" name="playerId" value={p.id} />
-                      <button type="submit" className={btn("action", "sm")}>
+                      <button type="submit" className={btn("action")}>
                         {st(lang, "adm_btn_patch")}
                       </button>
                     </form>
@@ -131,7 +131,7 @@ export default function PlayersAdmin({
                     {isMaster && !p.is_master && !p.is_admin && (
                       <form action={makeAdmin}>
                         <input type="hidden" name="playerId" value={p.id} />
-                        <button type="submit" className={btn("action", "sm")}>
+                        <button type="submit" className={btn("action")}>
                           {st(lang, "adm_make_admin")}
                         </button>
                       </form>

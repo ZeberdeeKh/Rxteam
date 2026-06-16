@@ -1,28 +1,26 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Кнопки RX Team — ЄДИНЕ джерело стилів кнопок.
 //
-// УСІ кнопки сайту мають ОДИН загальний стиль (форма, радіус, типографіка,
-// uppercase, фокус-обведення, поведінка при disabled). Дозволені відмінності:
-//   • РОЗМІР  — "sm" | "md";
-//   • ТИП (колір) — лише ДВА:
-//       – "action"  активна дія: створення / збереження / підтвердження (бренд-хакі);
-//       – "delete"  деструктивна дія: видалення / скасування (червоний).
+// УСІ кнопки сайту мають ОДИН і той самий вигляд: однаковий шрифт, розмір шрифту
+// й висота. Змінюється ЛИШЕ ширина — залежно від довжини тексту. Розмірних
+// варіантів (sm/md) НЕМАЄ. Єдина відмінність між кнопками — ТИП (колір):
+//   • "action"  активна дія: створення / збереження / підтвердження (хакі = заголовки);
+//   • "delete"  деструктивна дія: видалення / скасування (червоний).
 //
-// Інших типів кнопок не існує. Не хардкодимо стилі кнопок по сторінках —
-// завжди btn(kind, size) або <Button kind size>.
+// Не хардкодимо стилі кнопок по сторінках — завжди btn(kind) або <Button kind>.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type ButtonKind = "action" | "delete";
-export type ButtonSize = "sm" | "md";
 
-// Спільна основа — однакова для обох типів (відрізняє лише колір нижче).
+// Спільна основа — однакова висота/шрифт/розмір шрифту для ВСІХ кнопок.
+// Горизонтальний padding фіксований, тож ширина залежить тільки від тексту.
 const BTN_BASE =
-  "inline-flex items-center justify-center gap-1.5 rounded-md font-semibold uppercase tracking-wide " +
-  "shadow-sm transition disabled:opacity-50 disabled:pointer-events-none " +
-  "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-white";
+  "inline-flex items-center justify-center gap-1.5 rounded-md px-3.5 py-1.5 text-sm " +
+  "font-semibold uppercase tracking-wide shadow-sm transition disabled:opacity-50 " +
+  "disabled:pointer-events-none focus:outline-none focus-visible:ring-2 " +
+  "focus-visible:ring-offset-1 focus-visible:ring-offset-white";
 
-// Колір — єдина різниця між типами. Обидва суцільні; «action» бере той самий хакі,
-// що й заголовки/лого (--c-action-* = --c-brand-text), із контрастним текстом.
+// Колір — єдина різниця між типами. «action» бере той самий хакі, що й заголовки/лого.
 const BTN_KIND: Record<ButtonKind, string> = {
   action:
     "bg-[var(--c-action-bg)] text-[var(--c-action-fg)] hover:bg-[var(--c-action-bg-hover)] " +
@@ -32,12 +30,7 @@ const BTN_KIND: Record<ButtonKind, string> = {
     "focus-visible:ring-[var(--c-danger-solid)]/50",
 };
 
-const BTN_SIZE: Record<ButtonSize, string> = {
-  sm: "px-2.5 py-1 text-xs",
-  md: "px-3.5 py-1.5 text-sm",
-};
-
 /** Клас для будь-якого «кнопкового» елемента (button / Link / a). */
-export function btn(kind: ButtonKind = "action", size: ButtonSize = "md"): string {
-  return `${BTN_BASE} ${BTN_KIND[kind]} ${BTN_SIZE[size]}`;
+export function btn(kind: ButtonKind = "action"): string {
+  return `${BTN_BASE} ${BTN_KIND[kind]}`;
 }

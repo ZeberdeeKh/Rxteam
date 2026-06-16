@@ -152,7 +152,7 @@ export default async function AdminLocations({
         <form action={createLocation} className="space-y-4">
           <TopFields lang={lang} />
           <LimitControls lang={lang} />
-          <button type="submit" className={btn("action", "md")}>
+          <button type="submit" className={btn("action")}>
             {st(lang, "adm_btn_create")}
           </button>
         </form>
@@ -174,7 +174,7 @@ export default async function AdminLocations({
 
               {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити». */}
               <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
-                <button type="submit" form={`loc-${l.id}`} className={btn("action", "sm")}>
+                <button type="submit" form={`loc-${l.id}`} className={btn("action")}>
                   {st(lang, "adm_btn_save")}
                 </button>
                 <form action={deleteLocation}>
@@ -183,7 +183,7 @@ export default async function AdminLocations({
                     type="submit"
                     disabled={l.gameCount > 0}
                     title={l.gameCount > 0 ? st(lang, "adm_loc_inuse") : undefined}
-                    className={btn("delete", "sm")}
+                    className={btn("delete")}
                   >
                     {st(lang, "adm_btn_delete")}
                   </button>
@@ -193,7 +193,7 @@ export default async function AdminLocations({
                     href={l.map_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-brand hover:underline"
+                    className="text-sm text-[var(--c-brand-text)] hover:underline"
                   >
                     {st(lang, "games_map")}
                   </a>
