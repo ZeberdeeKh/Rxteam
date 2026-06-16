@@ -271,6 +271,7 @@ const SITE: Record<string, Dict> = {
   ranking_col_rank: { pl: "Stopień", en: "Rank", uk: "Звання" },
   ranking_col_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
   ranking_col_games: { pl: "Gry", en: "Games", uk: "Ігри" },
+  ranking_col_ach: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" },
   ranking_empty: {
     pl: "Na razie nikogo nie ma w rankingu.",
     en: "No one in the ranking yet.",

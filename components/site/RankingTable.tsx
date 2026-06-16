@@ -28,24 +28,35 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
   return (
     <div className={ui.tableWrapCut}>
       <div className="overflow-x-auto">
-        <table className={ui.table}>
+        {/* table-fixed: усі колонки даних рівні (w-1/6), позиція вузька (w-1/12),
+            ачівки — остання й ширша (w-1/4), бо їх кількість у кожного різна. */}
+        <table className={`${ui.table} table-fixed`}>
           <thead className={ui.thead}>
             <tr>
-              <th className={`${ui.th} w-10`}>{st(lang, "ranking_col_pos")}</th>
-              <th className={ui.th}>{st(lang, "ranking_col_player")}</th>
-              <th className={ui.th}>{st(lang, "ranking_col_rank")}</th>
-              <th className={`${ui.th} text-right`}>{st(lang, "ranking_col_earned")}</th>
-              <th className={`${ui.th} text-right`}>{st(lang, "ranking_col_games")}</th>
+              <th className={`${ui.th} w-1/12`}>{st(lang, "ranking_col_pos")}</th>
+              <th className={`${ui.th} w-1/6`}>{st(lang, "ranking_col_player")}</th>
+              <th className={`${ui.th} w-1/6`}>{st(lang, "ranking_col_rank")}</th>
+              <th className={`${ui.th} w-1/6 text-right`}>{st(lang, "ranking_col_earned")}</th>
+              <th className={`${ui.th} w-1/6 text-right`}>{st(lang, "ranking_col_games")}</th>
+              <th className={`${ui.th} w-1/4`}>{st(lang, "ranking_col_ach")}</th>
             </tr>
           </thead>
           <tbody className={ui.tbody}>
             {rows.map((r, i) => (
               <tr key={r.id}>
                 <td className={`${ui.td} text-gray-400`}>{i + 1}</td>
-                <td className={`${ui.td} font-medium text-gray-900`}>
-                  <div>{r.callsign ?? st(lang, "ranking_anon")}</div>
-                  {r.achievements.length > 0 && (
-                    <div className="mt-1 flex flex-wrap items-center gap-1">
+                <td className={`${ui.td} truncate font-medium text-gray-900`}>
+                  {r.callsign ?? st(lang, "ranking_anon")}
+                </td>
+                <td className={`${ui.td} truncate`}>{r.has_patch ? r.rank ?? "Recruit" : "—"}</td>
+                <td className={`${ui.td} text-right tabular-nums text-gray-900`}>
+                  {r.points_earned} {GLYPH.points}
+                </td>
+                <td className={`${ui.td} text-right tabular-nums`}>{r.games_played}</td>
+                {/* Остання колонка — здобуті ачівки (кількість різна → іконки переносяться). */}
+                <td className={`${ui.td} !h-auto py-1.5`}>
+                  {r.achievements.length > 0 ? (
+                    <div className="flex flex-wrap items-center gap-1">
                       {r.achievements.map((a) => {
                         const title = achTitle(a, lang);
                         return a.thumbnail_svg ? (
@@ -56,22 +67,19 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                             src={a.thumbnail_svg}
                             alt={title}
                             title={title}
-                            className="h-4 w-4 object-contain"
+                            className="h-5 w-5 object-contain"
                           />
                         ) : (
-                          <span key={a.code} title={title} className="text-xs leading-none">
+                          <span key={a.code} title={title} className="text-sm leading-none">
                             {GLYPH.rank}
                           </span>
                         );
                       })}
                     </div>
+                  ) : (
+                    <span className="text-gray-300">—</span>
                   )}
                 </td>
-                <td className={ui.td}>{r.has_patch ? r.rank ?? "Recruit" : "—"}</td>
-                <td className={`${ui.td} text-right tabular-nums text-gray-900`}>
-                  {r.points_earned} {GLYPH.points}
-                </td>
-                <td className={`${ui.td} text-right tabular-nums`}>{r.games_played}</td>
               </tr>
             ))}
           </tbody>
