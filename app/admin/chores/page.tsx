@@ -30,7 +30,6 @@ export default async function AdminChores({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_chores_title")}</h1>
       <p className={ui.muted}>{st(lang, "adm_chores_hint")}</p>
 
       {ok && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}

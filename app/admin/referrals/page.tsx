@@ -15,7 +15,6 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_referrals_title")}</h1>
       {searchParams.saved && (
         <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>
       )}

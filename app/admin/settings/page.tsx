@@ -23,9 +23,6 @@ export default async function AdminSettings({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>
-        {st(lang, "adm_settings_title")}
-      </h1>
       {searchParams.saved && (
         <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>
       )}

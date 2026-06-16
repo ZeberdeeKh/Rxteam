@@ -142,8 +142,6 @@ export default async function AdminLocations({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_locations_title")}</h1>
-
       {ok && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
       {searchParams.err === "inuse" && <p className={ui.alertErr}>{st(lang, "adm_loc_inuse")}</p>}
       {searchParams.err === "fields" && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}

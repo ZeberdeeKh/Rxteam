@@ -22,7 +22,6 @@ export default async function AdminRoles({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_roles_title")}</h1>
       <p className={ui.panel}>
         {st(lang, "adm_roles_help")}
       </p>
@@ -82,7 +81,7 @@ export default async function AdminRoles({
         <ul className="space-y-1.5 text-gray-600">
           {ALL_PERMS.map((perm) => (
             <li key={perm} className="flex flex-wrap gap-x-2">
-              <code className="font-mono font-semibold text-brand-dark">{perm}</code>
+              <code className="font-mono font-semibold text-[var(--c-brand-text)]">{perm}</code>
               <span>— {st(lang, `adm_perm_${perm}`)}</span>
             </li>
           ))}

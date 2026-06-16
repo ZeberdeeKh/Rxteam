@@ -18,7 +18,6 @@ export default async function AdminExportPage() {
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_nav_export")}</h1>
       <div className="flex flex-wrap gap-2">
         {canPlayers && (
           <a href="/admin/export/players" className={btn("action", "sm")}>

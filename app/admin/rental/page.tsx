@@ -14,7 +14,6 @@ export default async function AdminRental() {
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_rental_title")}</h1>
       <p className={ui.muted}>{st(lang, "adm_rental_note")}</p>
 
       {reqs.length === 0 ? (

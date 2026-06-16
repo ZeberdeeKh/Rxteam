@@ -97,8 +97,6 @@ export default async function AdminShop({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_shop_title")}</h1>
-
       {ok && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
       {searchParams.err === "fields" && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
 

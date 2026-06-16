@@ -1,49 +1,109 @@
-# RX Team — Дизайн-система
+# RX Team — Стандарт дизайну (єдине джерело)
 
-Єдине джерело стилів: [`components/ui/styles.ts`](../components/ui/styles.ts).
-Імпорт: `import { ui, buttonClass, badgeClass, Button } from "@/components/ui";`
+Будь-яка зміна UI (кнопки, заголовки, шилдики/бейджі, кольори, шрифти) робиться
+**суворо за цим документом**. Не хардкодимо стилі по сторінках — лише через `@/components/ui`.
 
-**Правило:** не хардкодимо Tailwind-класи по сторінках для типових елементів —
-беремо токени звідси. Це гарантує однаковий вигляд скрізь.
+Реалізація в коді:
+- `components/ui/styles.ts` — типографіка, бейджі, поверхні, поля, таблиці, банери, меню.
+- `components/ui/buttons.ts` — кнопки (рівно 2 типи).
+- `app/globals.css` — усі кольори як CSS-змінні + світла/темна теми.
 
-## Бренд і теми
-- Бренд — **хакі** (мілітарі-оливковий), `brand-*` (50–950, + аліаси `DEFAULT/dark/light`).
-- Темна тема — автоматична через CSS-змінні (`tailwind.config.ts` + `globals.css`):
-  - `gray-*` / `white` — **перемикаються** (поверхні, текст);
-  - `brand-*` — хакі, **не** перемикається;
-  - `neutral-50` — фіксований світлий (текст на кольорових кнопках);
-  - `green/red/amber` — семантичні банери/бейджі, **не** перемикаються.
-- Шрифт — **Montserrat** (Google Fonts), базова вага Regular 400.
+---
 
-## Типографіка (тільки ці рівні)
-| Токен | Клас | Призначення |
-|-------|------|-------------|
-| `ui.display` | `text-3xl font-bold uppercase` | Герой лендінга |
-| `ui.pageTitle` | `text-2xl font-bold uppercase` | Заголовок сторінки (H1) |
-| `ui.sectionTitle` | `text-lg font-semibold uppercase tracking-wide` | Заголовок секції (H2) |
-| `ui.cardTitle` | `text-base font-semibold` | Заголовок картки (H3, БЕЗ uppercase — власні назви) |
-| `ui.body` / `ui.bodyStrong` | `text-sm` | Основний текст |
-| `ui.muted` | `text-sm text-gray-500` | Другорядний текст |
-| `ui.label` | `text-sm font-medium` | Підписи полів |
-| `ui.meta` | `text-xs text-gray-500` | Дрібні підписи/мета |
+## 1. Шрифт і розміри
 
-Дозволені розміри шрифту: `text-3xl, text-2xl, text-lg, text-base, text-sm, text-xs`. Інші — ні.
+Шрифт — **Montserrat** (ваги 400/500/600/700/800).
 
-## Кнопки — `buttonClass(variant, size)` або `<Button>`
-- Варіанти: `primary` (хакі-залив), `secondary` (контур), `ghost`, `danger`.
-- Розміри: `md` (типовий), `sm` (компактний, в адмінці/таблицях).
-- `<button>` → компонент `<Button variant size>`; `<Link>`/`<a>` → `className={buttonClass(variant, size)}`.
-- Текст кнопок — у ВЕРХНЬОМУ РЕГІСТРІ (`uppercase tracking-wide`, у базовому класі).
+Дозволені РІВНІ — лише ці. Інших розмірів не вводимо. Заголовки — у ВЕРХНЬОМУ
+РЕГІСТРІ, колір `--c-brand-text` (той самий, що й логотип).
 
-## Меню — `headerNavClass` / `headerAdminClass` / `subNavClass`
-Пункти меню (шапка + підменю адмінки) — теж `uppercase tracking-wide`.
+| Рівень (`ui.*`) | Призначення | Розмір/стиль |
+|---|---|---|
+| `display` | головний герой-заголовок | `text-2xl font-bold uppercase` |
+| `pageTitle` | заголовок сторінки | `text-xl font-bold uppercase` |
+| `sectionTitle` | заголовок секції/блоку | `text-base font-semibold uppercase` |
+| `cardTitle` | назва картки/елемента (ігри, позивні — без uppercase) | `text-base font-semibold` |
+| `body` / `bodyStrong` / `muted` / `label` | текст і підписи | `text-sm` |
+| `meta` | дрібний/допоміжний | `text-xs` |
 
-## Бейджі — `badgeClass(color)`
-Кольори: `brand` (роль майстра), `green` (адмін/успіх), `gray` (нейтрально), `red`, `amber`.
+Дозволені розміри шрифту: `text-2xl, text-xl, text-base, text-sm, text-xs`. Інші — ні.
 
-## Поверхні / поля / таблиці
-- Картка: `ui.card` (статична) / `ui.cardHover` (клікабельна).
-- Поле: `ui.input` (повне) / `ui.inputSm` (компактне).
-- Банери: `ui.alertOk` / `ui.alertErr`.
-- Таблиця: обгортка `ui.tableWrap`, `ui.table`, шапка `ui.thead`+`ui.th`, тіло `ui.tbody`+`ui.td`.
-- Списки карток: контейнер `ui.listStack`; сторінка: `ui.pageStack`.
+---
+
+## 2. Кольори (всі — CSS-змінні в `globals.css`)
+
+### Бренд (хакі, фіксований — НЕ перемикається з темою)
+`brand` 50…950 (DEFAULT `#6b6a3c`). Акценти, заливка кнопок `action`, посилання.
+
+### `--c-brand-text` — заголовки І логотип (ЄДИНИЙ колір)
+Логотип і всі заголовки беруть один токен. Світла тема `#545331`, темна `#9d9b66`.
+Логотип НЕ має відрізнятись від заголовків — це той самий токен.
+
+### Поверхні/текст (перемикаються світла↔темна)
+`gray-50…950`, `white` прив'язані до `--c-gray-*`. Темна тема працює БЕЗ `dark:`-варіантів.
+Не додавай `dark:` для кольору — використовуй сірі токени.
+
+### Семантика (статуси/бейджі/банери) — ПРИГЛУШЕНА
+`success` / `danger` / `warning`, кожна має `-bg` (фон) і `-fg` (текст), плюс `-soft` для
+тексту дельт. Світла — м'які пастелі, темна — напівпрозорі тінти. **Без яскравих кольорів**
+(ніяких чистих `green-500` / `red-500` тощо).
+`--c-danger-solid` — насичений червоний ЛИШЕ для кнопки `delete` (це кнопка, не бейдж).
+
+---
+
+## 3. Кнопки — `buttons.ts` (РІВНО 2 типи)
+
+Один загальний стиль для всіх кнопок (форма, радіус, `uppercase`, тінь, фокус-обведення,
+поведінка `disabled`). Відрізняються ЛИШЕ розміром і кольором:
+
+- **`action`** — створення / збереження / підтвердження / будь-яка позитивна дія (хакі-бренд).
+- **`delete`** — видалення / скасування (червоний `--c-danger-solid`).
+
+Розміри: `sm`, `md`. **Жодних** `secondary` / `ghost` / `outline`.
+
+```tsx
+btn("action", "md")            // клас для <button> / <a> / <Link>
+btn("delete", "sm")
+<Button kind="action" size="md">…</Button>
+```
+
+---
+
+## 4. Шилдики / бейджі — `badgeClass()`
+
+Єдина форма пігулки: `rounded-full px-2 py-0.5 text-xs font-medium`. Кольори — приглушені
+(із семантичних змінних), **не яскраві**.
+
+| Колір | Де використовується |
+|---|---|
+| `brand` | Майстер, ачівки |
+| `green` | Адмін, гра «announced», «registered» |
+| `gray` | Гравець, «hidden» |
+| `red` | гра «cancelled», «no_show» |
+| `amber` | попередження |
+
+```tsx
+badgeClass("brand" | "green" | "gray" | "red" | "amber")
+```
+
+Не хардкодимо плашки по сторінках — лише `badgeClass()`.
+
+---
+
+## 5. Меню — `headerNavClass` / `headerAdminClass` / `subNavClass`
+Пункти меню (шапка + підменю адмінки) — `uppercase tracking-wide`, активний підсвічений.
+
+## 6. Поверхні / поля / таблиці / списки
+- Картка: `ui.card` / `ui.cardHover`. Поле: `ui.input` / `ui.inputSm`.
+- Банери: `ui.alertOk` / `ui.alertErr` / `ui.alertWarn`.
+- Таблиця: `ui.tableWrap` + `ui.table` + `ui.thead`/`ui.th` + `ui.tbody`/`ui.td`.
+- Списки: `ui.listStack`; сторінка: `ui.pageStack`. Згортувані рядки — `Collapsible`.
+
+---
+
+## 7. Правила розкладки
+- **Не дублюй активний пункт меню заголовком сторінки.** Якщо пункт підменю підсвічений
+  (напр. «Гравці»), окремий великий `<h1>` з тим самим словом НЕ потрібен.
+- Доступ до стилів — лише через `@/components/ui` (`ui`, `btn`, `badgeClass`, `Collapsible`).
+- Однотипні списки (гравці, ролі, групи налаштувань) — згортувані рядки `Collapsible`,
+  симетричні, однакові поля/відступи.

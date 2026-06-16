@@ -14,7 +14,6 @@ export default async function AdminJoins() {
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_joins_title")}</h1>
       <p className={ui.muted}>{st(lang, "adm_joins_note")}</p>
 
       {rows.length === 0 ? (

@@ -21,8 +21,6 @@ export default async function AdminGames({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_games_title")}</h1>
-
       {searchParams.created && (
         <p className={ui.alertOk}>{st(lang, "adm_done")}</p>
       )}

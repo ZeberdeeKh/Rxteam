@@ -15,7 +15,6 @@ export default async function AdminGallery({ searchParams }: { searchParams: { s
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_gallery_title")}</h1>
       {searchParams.saved && <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>}
 
       <GalleryUploader lang={lang} />

@@ -21,18 +21,21 @@
   --c-gray-900: #171717;
   --c-gray-950: #0a0a0a;
 
-  /* Семантичні токени (статуси, бейджі, банери). Світла тема — пастельні Tailwind.
-     Перемикаються на приглушені у html.dark, щоб не «світити» на темному фоні. */
-  --c-success-bg: #dcfce7; /* green-100 */
-  --c-success-fg: #15803d; /* green-700 */
-  --c-success-soft: #16a34a; /* green-600 — текст дельт «+» */
-  --c-danger-bg: #fee2e2; /* red-100 */
-  --c-danger-fg: #b91c1c; /* red-700 */
-  --c-danger-soft: #dc2626; /* red-600 — текст дельт «−» */
-  --c-warning-bg: #fef3c7; /* amber-100 */
-  --c-warning-fg: #b45309; /* amber-700 */
-  --c-danger-solid: #dc2626; /* суцільна кнопка «Видалити» (red-600) */
-  --c-danger-solid-hover: #b91c1c; /* red-700 */
+  /* Колір заголовків І логотипу — ЄДИНИЙ токен (хакі). Див. docs/DESIGN_SYSTEM.md. */
+  --c-brand-text: #545331;
+
+  /* Семантичні токени (статуси, бейджі, банери) — ПРИГЛУШЕНІ, без яскравих кольорів.
+     Перемикаються у html.dark на напівпрозорі тінти. */
+  --c-success-bg: #e7f0ea;
+  --c-success-fg: #44735a;
+  --c-success-soft: #4d7d62; /* текст дельт «+» */
+  --c-danger-bg: #f3e7e7;
+  --c-danger-fg: #9b5757;
+  --c-danger-soft: #a85c5c; /* текст дельт «−» */
+  --c-warning-bg: #f2ecdc;
+  --c-warning-fg: #876b3c;
+  --c-danger-solid: #dc2626; /* суцільна кнопка «Видалити» (насичений — це кнопка, не бейдж) */
+  --c-danger-solid-hover: #b91c1c;
 }
 
 html.dark {
@@ -51,15 +54,18 @@ html.dark {
   --c-gray-900: #f5f6f8; /* основний текст */
   --c-gray-950: #ffffff;
 
-  /* Семантика на темному — напівпрозорі фони + м'які пастельні літери (без «кислотних» плашок). */
-  --c-success-bg: rgba(110, 231, 183, 0.13);
-  --c-success-fg: #6ee7b7;
-  --c-success-soft: #6ee7b7;
-  --c-danger-bg: rgba(248, 113, 113, 0.14);
-  --c-danger-fg: #fca5a5;
-  --c-danger-soft: #fca5a5;
-  --c-warning-bg: rgba(251, 191, 36, 0.14);
-  --c-warning-fg: #fcd34d;
+  /* Заголовки + логотип на темній — світла хакі (читабельно, єдиний колір). */
+  --c-brand-text: #9d9b66;
+
+  /* Семантика на темному — напівпрозорі фони + приглушені літери (без «кислотних» плашок). */
+  --c-success-bg: rgba(125, 200, 165, 0.12);
+  --c-success-fg: #9bc2ac;
+  --c-success-soft: #9bc2ac;
+  --c-danger-bg: rgba(216, 140, 140, 0.12);
+  --c-danger-fg: #cb9a9a;
+  --c-danger-soft: #cb9a9a;
+  --c-warning-bg: rgba(212, 184, 130, 0.12);
+  --c-warning-fg: #cab488;
   --c-danger-solid: #d24d4d; /* трохи приглушений червоний — пасує темній палітрі */
   --c-danger-solid-hover: #be3f3f;
 }

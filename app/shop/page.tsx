@@ -108,7 +108,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                 <h3 className="text-base font-semibold text-gray-900">{itemTitle(it, lang)}</h3>
                 {desc && <p className="mt-1 flex-1 text-sm text-gray-600">{desc}</p>}
                 <div className="mt-4 flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-brand-dark">{it.cost} 💰</span>
+                  <span className="text-sm font-semibold text-[var(--c-brand-text)]">{it.cost} 💰</span>
                   {player && (
                     <form action={buyItem}>
                       <input type="hidden" name="itemId" value={it.id} />

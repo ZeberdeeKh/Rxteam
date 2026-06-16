@@ -180,11 +180,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         ) : (
           <ul className="flex flex-wrap gap-2">
             {achs.map((a) => (
-              <li
-                key={a.code}
-                className="rounded-full border border-brand/30 bg-brand/5 px-3 py-1 text-xs font-medium text-brand-dark"
-                title={formatGameWhen(a.created_at, lang)}
-              >
+              <li key={a.code} className={badgeClass("brand")} title={formatGameWhen(a.created_at, lang)}>
                 🎖️ {achTitle(a, lang)}
               </li>
             ))}

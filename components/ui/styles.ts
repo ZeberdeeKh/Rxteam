@@ -20,7 +20,7 @@
 export type BadgeColor = "brand" | "green" | "gray" | "red" | "amber";
 const BADGE_BASE = "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium";
 const BADGE_COLOR: Record<BadgeColor, string> = {
-  brand: "bg-brand/10 text-brand-dark",
+  brand: "bg-brand/10 text-[var(--c-brand-text)]",
   green: "bg-[var(--c-success-bg)] text-[var(--c-success-fg)]",
   gray: "bg-gray-100 text-gray-500",
   red: "bg-[var(--c-danger-bg)] text-[var(--c-danger-fg)]",
@@ -57,11 +57,12 @@ export function subNavClass(active: boolean): string {
 
 // ── Токени (типографіка, поверхні, поля, таблиці, банери, розкладка) ──
 export const ui = {
-  // Типографіка. Заголовки — ВЕРХНІЙ РЕГІСТР (uppercase) на всьому сайті.
+  // Типографіка. Заголовки — ВЕРХНІЙ РЕГІСТР (uppercase) + єдиний колір --c-brand-text
+  // (той самий, що й логотип). Розміри навмисно стримані. Див. docs/DESIGN_SYSTEM.md.
   // cardTitle НЕ робимо uppercase: там бувають назви ігор і позивні (власні назви).
-  display: "text-3xl font-bold uppercase tracking-tight text-brand-dark",
-  pageTitle: "text-2xl font-bold uppercase tracking-tight text-brand-dark",
-  sectionTitle: "text-lg font-semibold uppercase tracking-wide text-brand-dark",
+  display: "text-2xl font-bold uppercase tracking-tight text-[var(--c-brand-text)]",
+  pageTitle: "text-xl font-bold uppercase tracking-tight text-[var(--c-brand-text)]",
+  sectionTitle: "text-base font-semibold uppercase tracking-wide text-[var(--c-brand-text)]",
   cardTitle: "text-base font-semibold text-gray-900",
   body: "text-sm text-gray-700",
   bodyStrong: "text-sm font-medium text-gray-900",

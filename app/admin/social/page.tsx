@@ -20,7 +20,6 @@ export default async function AdminSocial({
 
   return (
     <div className={ui.pageStack}>
-      <h1 className={ui.pageTitle}>{st(lang, "adm_social_title")}</h1>
       {searchParams.saved && <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>}
       <p className={ui.panel}>{st(lang, "adm_social_hint")}</p>
 

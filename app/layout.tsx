@@ -60,9 +60,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
           <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-3">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
-                Колір theme-aware (бренд фіксований): темна хакі на світлій, світла — на темній. */}
+                Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
             <Link href="/" className="flex items-baseline gap-2" aria-label="RX Team">
-              <span className="text-lg font-extrabold uppercase tracking-wide text-brand-dark dark:text-brand-light">
+              <span className="text-lg font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]">
                 RX&nbsp;Team
               </span>
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
