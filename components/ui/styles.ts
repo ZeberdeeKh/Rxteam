@@ -32,7 +32,7 @@ export function badgeClass(color: BadgeColor = "gray"): string {
 
 // ── Навігація (ab3: без плашки-пігулки, лише колір + display-шрифт; активний — помаранч) ──
 const NAV_HEADER_BASE =
-  "px-3 py-2 font-display text-base font-semibold uppercase tracking-wide transition-colors duration-300";
+  "px-3 py-2 font-display text-lg font-semibold uppercase tracking-wide transition-colors duration-300";
 /** Посилання верхнього меню шапки. */
 export function headerNavClass(active: boolean): string {
   return active
@@ -110,7 +110,7 @@ export const ui = {
   warnText: "text-[var(--c-warning-fg)]",
   metaFaint: "text-xs text-gray-400",
   price: "text-sm font-semibold text-[var(--c-brand-text)]",
-  wordmark: "font-display text-2xl font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]",
+  wordmark: "font-display text-3xl font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]",
   emptyState: "border border-dashed border-gray-300 p-5 text-sm text-gray-500",
 
   // Ширини центрованих сторінок (ADR-0024): narrow=форма/діалог, prose=стаття/кабінет, wide=контент
