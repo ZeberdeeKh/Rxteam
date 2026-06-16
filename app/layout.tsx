@@ -61,9 +61,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-[1.6rem]">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
-            <Link href="/" className="flex items-baseline gap-2" aria-label="RX Team">
+            <Link href="/" className="flex flex-col items-start gap-1" aria-label="RX Team">
               <span className={ui.wordmark}>
                 RX&nbsp;Team
+              </span>
+              {/* Тактична плашка-позначення зі зрізаними кутами під вордмарком. */}
+              <span className="rx-chamfer-fill inline-block bg-[var(--c-primary)] px-2.5 py-0.5 font-display text-[0.7rem] font-bold uppercase tracking-[0.18em] text-black">
+                {st(lang, "brand_tagline")}
               </span>
             </Link>
             <nav className="flex items-center gap-1 text-sm">
