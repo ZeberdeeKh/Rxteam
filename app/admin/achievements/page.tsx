@@ -11,7 +11,8 @@ import {
   updateAchievement,
   deleteAchievement,
 } from "@/app/admin/actions";
-import { ui, btn, badgeClass, Collapsible, CreateDrawer, type BadgeColor } from "@/components/ui";
+import { ui, btn, badgeClass, GLYPH, Collapsible, CreateDrawer, type BadgeColor } from "@/components/ui";
+import AchievementIconUploader from "@/components/admin/AchievementIconUploader";
 
 export const dynamic = "force-dynamic";
 
@@ -68,6 +69,39 @@ function AchievementFields({ lang, item }: { lang: Lang; item?: AdminAchievement
         <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_shop_title_en")}</span>
         <input name="title_en" defaultValue={item?.title_en ?? ""} className={ui.input} />
       </label>
+
+      {/* Вид ачівки: auto (код-тригер) лише на правці; на створенні завжди manual (locked). */}
+      <label className="text-sm sm:col-span-4">
+        <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_kind")}</span>
+        <select
+          name="kind"
+          defaultValue={item?.kind ?? "manual"}
+          disabled={!item}
+          className={`${ui.input} ${!item ? "opacity-60" : ""}`}
+        >
+          <option value="manual">{st(lang, "adm_ach_kind_manual")}</option>
+          <option value="auto">{st(lang, "adm_ach_kind_auto")}</option>
+        </select>
+      </label>
+      <p className={`self-center ${ui.meta} sm:col-span-8`}>
+        {st(
+          lang,
+          (item?.kind ?? "manual") === "auto" ? "adm_ach_kind_auto_hint" : "adm_ach_kind_manual_hint",
+        )}
+      </p>
+
+      <label className="text-sm sm:col-span-4">
+        <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_desc_pl")}</span>
+        <textarea name="description_pl" defaultValue={item?.description_pl ?? ""} rows={2} className={ui.input} />
+      </label>
+      <label className="text-sm sm:col-span-4">
+        <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_desc_uk")}</span>
+        <textarea name="description_uk" defaultValue={item?.description_uk ?? ""} rows={2} className={ui.input} />
+      </label>
+      <label className="text-sm sm:col-span-4">
+        <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_desc_en")}</span>
+        <textarea name="description_en" defaultValue={item?.description_en ?? ""} rows={2} className={ui.input} />
+      </label>
     </>
   );
 }
@@ -116,8 +150,9 @@ export default async function AdminAchievements({
         >
           <form action={createAchievement} className="grid items-end gap-3 sm:grid-cols-12">
             <AchievementFields lang={lang} />
-            <div className="flex items-end sm:col-span-12">
-              <button type="submit" className={btn("action")}>
+            <div className="flex flex-col gap-2 sm:col-span-12">
+              <p className={ui.meta}>{st(lang, "adm_ach_thumb_create_hint")}</p>
+              <button type="submit" className={`${btn("action")} self-start`}>
                 {st(lang, "adm_btn_create")}
               </button>
             </div>
@@ -143,20 +178,45 @@ export default async function AdminAchievements({
                   {!it.enabled && (
                     <span className={badgeClass("gray")}>{st(lang, "adm_ach_disabled")}</span>
                   )}
+                  <span className={badgeClass(it.kind === "auto" ? "brand" : "gray")}>
+                    {st(lang, it.kind === "auto" ? "adm_ach_kind_auto" : "adm_ach_kind_manual")}
+                  </span>
                   <span className={badgeClass(TIER_BADGE[it.tier] ?? "gray")}>
                     {st(lang, TIER_KEY[it.tier] ?? "adm_ach_tier_mid")}
                   </span>
                 </div>
               }
               summary={
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <span className={ui.cardTitle}>
-                    {pickTitle({ pl: it.title_pl, en: it.title_en, uk: it.title_uk }, lang)}
-                  </span>
-                  <span className={ui.metaFaint}>{it.code}</span>
-                  {it.earnedCount > 0 && (
-                    <span className={ui.metaFaint}>· {it.earnedCount}</span>
+                <div className="flex items-start gap-2">
+                  {it.thumbnail_svg ? (
+                    // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={it.thumbnail_svg} alt="" className="h-7 w-7 shrink-0 object-contain" loading="lazy" />
+                  ) : (
+                    <span aria-hidden className="text-lg leading-none">
+                      {GLYPH.rank}
+                    </span>
                   )}
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                      <span className={ui.cardTitle}>
+                        {pickTitle({ pl: it.title_pl, en: it.title_en, uk: it.title_uk }, lang)}
+                      </span>
+                      <span className={ui.metaFaint}>{it.code}</span>
+                      {it.earnedCount > 0 && (
+                        <span className={ui.metaFaint}>· {it.earnedCount}</span>
+                      )}
+                    </div>
+                    {pickTitle({ pl: it.description_pl, en: it.description_en, uk: it.description_uk }, lang) !==
+                      "—" && (
+                      <p className={`mt-0.5 ${ui.meta}`}>
+                        {pickTitle(
+                          { pl: it.description_pl, en: it.description_en, uk: it.description_uk },
+                          lang,
+                        )}
+                      </p>
+                    )}
+                  </div>
                 </div>
               }
             >
@@ -168,6 +228,9 @@ export default async function AdminAchievements({
                 >
                   <AchievementFields lang={lang} item={it} />
                 </form>
+
+                {/* SVG-мініатюра — окремий канал (route handler), поза server-action формою. */}
+                <AchievementIconUploader lang={lang} code={it.code} current={it.thumbnail_svg} />
 
                 {/* Ряд дій: «Зберегти» завжди; «Видалити» лише поки ачівку ніхто не здобув. */}
                 <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">

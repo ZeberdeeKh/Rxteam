@@ -13,6 +13,7 @@ import { Api } from "grammy";
 import { performCheckin } from "@/lib/checkins";
 import { setCallsignForPlayer } from "@/lib/site-player";
 import { REPLICA_CODES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
+import { grantAchievement as grantAch } from "@/lib/economy";
 
 const back2 = (q: string) => redirect(`/admin/locations${q}`);
 
@@ -321,6 +322,19 @@ export async function togglePatch(formData: FormData) {
   redirect("/admin/players?patch=1");
 }
 
+// Видати гравцю будь-яку ачівку вручну. Переюз канонічної логіки economy.grantAchievement:
+// нараховує бали за tier (із множником без патча), пише в point_log, дедуп по (player_id, code).
+// Повертає null, якщо ачівка вимкнена / вже є / гонка → показуємо «вже є».
+export async function grantPlayerAchievement(formData: FormData) {
+  await requirePerm("players");
+  const playerId = Number(formData.get("playerId"));
+  const code = String(formData.get("achievementCode") ?? "").trim();
+  if (!Number.isFinite(playerId) || !code) redirect("/admin/players?err=fields");
+  const g = await grantAch(playerId, code);
+  revalidatePath("/admin/players");
+  redirect(g ? "/admin/players?granted=1" : "/admin/players?err=exists");
+}
+
 // Призначити гравця адміном (лише майстер). Далі майстер видає конкретні права в «Ролі адмінів».
 export async function makeAdmin(formData: FormData) {
   await requireMaster();
@@ -450,15 +464,21 @@ export async function markFulfilled(formData: FormData) {
 const backAch = (q: string) => redirect(`/admin/achievements${q}`);
 
 const ACH_TIERS = ["easy", "mid", "hard"];
+const ACH_KINDS = ["auto", "manual"];
 
 // Поля ачівки з форми (спільні для створення і правки; без code — він окремо).
 function parseAchievement(formData: FormData) {
   const tier = String(formData.get("tier") ?? "mid").trim();
+  const kind = String(formData.get("kind") ?? "manual").trim();
   return {
     title_pl: String(formData.get("title_pl") ?? "").trim() || null,
     title_en: String(formData.get("title_en") ?? "").trim() || null,
     title_uk: String(formData.get("title_uk") ?? "").trim() || null,
+    description_pl: String(formData.get("description_pl") ?? "").trim() || null,
+    description_en: String(formData.get("description_en") ?? "").trim() || null,
+    description_uk: String(formData.get("description_uk") ?? "").trim() || null,
     tier: ACH_TIERS.includes(tier) ? tier : "mid",
+    kind: ACH_KINDS.includes(kind) ? kind : "manual",
     enabled: formData.get("enabled") === "on",
   };
 }
@@ -471,7 +491,8 @@ export async function createAchievement(formData: FormData) {
   if (!/^[a-z0-9_]+$/.test(code) || (!ach.title_pl && !ach.title_en && !ach.title_uk)) {
     backAch("?err=fields");
   }
-  const { error } = await supabase.from("achievements").insert({ code, ...ach });
+  // Створені адміном ачівки завжди manual (auto = складна код-логіка, заводиться міграцією).
+  const { error } = await supabase.from("achievements").insert({ code, ...ach, kind: "manual" });
   if (error) backAch("?err=dup"); // конфлікт коду (PK)
   revalidatePath("/admin/achievements");
   backAch("?created=1");

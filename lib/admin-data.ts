@@ -378,6 +378,11 @@ export type AdminAchievement = {
   title_uk: string | null;
   tier: string; // easy | mid | hard (визначає бали через settings)
   enabled: boolean;
+  thumbnail_svg: string | null; // base64 data URL SVG-мініатюри (Етап 20) або null
+  description_pl: string | null; // за що дається / тригер (Етап 21)
+  description_en: string | null;
+  description_uk: string | null;
+  kind: string; // auto (складна код-логіка) | manual (видає адмін) — Етап 21
   earnedCount: number; // скільки гравців уже здобули (блокує видалення)
 };
 
@@ -386,7 +391,9 @@ export async function listAchievementsAdmin(): Promise<AdminAchievement[]> {
   const [{ data: achs }, { data: earned }] = await Promise.all([
     supabase
       .from("achievements")
-      .select("code, title_pl, title_en, title_uk, tier, enabled")
+      .select(
+        "code, title_pl, title_en, title_uk, tier, enabled, thumbnail_svg, description_pl, description_en, description_uk, kind",
+      )
       .order("code", { ascending: true }),
     supabase.from("player_achievements").select("code"),
   ]);
@@ -401,6 +408,11 @@ export async function listAchievementsAdmin(): Promise<AdminAchievement[]> {
     title_uk: a.title_uk ?? null,
     tier: (a.tier as string) ?? "mid",
     enabled: !!a.enabled,
+    thumbnail_svg: a.thumbnail_svg ?? null,
+    description_pl: a.description_pl ?? null,
+    description_en: a.description_en ?? null,
+    description_uk: a.description_uk ?? null,
+    kind: (a.kind as string) ?? "manual",
     earnedCount: counts.get(a.code as string) ?? 0,
   }));
 }

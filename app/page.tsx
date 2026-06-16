@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
-import { getNextGame, getRanking, getGalleryPhotos } from "@/lib/site-data";
+import { getNextGame, getRankingWithAchievements, getGalleryPhotos } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
 import { ui, GLYPH, Reveal } from "@/components/ui";
@@ -15,7 +15,7 @@ export default async function Home() {
   const lang = getServerLang();
   const [next, ranking, settings, galleryPhotos] = await Promise.all([
     getNextGame(),
-    getRanking(10),
+    getRankingWithAchievements(10),
     getAllSettings(),
     getGalleryPhotos(60),
   ]);

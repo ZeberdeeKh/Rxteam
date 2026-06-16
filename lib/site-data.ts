@@ -192,6 +192,48 @@ export async function getRanking(limit = 10): Promise<RankingRow[]> {
   return (data ?? []) as RankingRow[];
 }
 
+// Здобута ачівка для рейтингу (іконка + локалізована назва як підказка).
+export type RankAch = {
+  code: string;
+  title_pl: string | null;
+  title_en: string | null;
+  title_uk: string | null;
+  thumbnail_svg: string | null;
+};
+
+// Bulk: здобуті ачівки для багатьох гравців одним запитом (player_id IN …), з назвами + мініатюрою.
+async function getPlayerAchievementsForMany(playerIds: number[]): Promise<Map<number, RankAch[]>> {
+  const map = new Map<number, RankAch[]>();
+  if (playerIds.length === 0) return map;
+  const { data } = await supabase
+    .from("player_achievements")
+    .select("player_id, code, achievements(title_pl, title_en, title_uk, thumbnail_svg)")
+    .in("player_id", playerIds)
+    .order("created_at", { ascending: false });
+  for (const r of (data ?? []) as any[]) {
+    const a = Array.isArray(r.achievements) ? r.achievements[0] : r.achievements;
+    const arr = map.get(r.player_id as number) ?? [];
+    arr.push({
+      code: r.code as string,
+      title_pl: a?.title_pl ?? null,
+      title_en: a?.title_en ?? null,
+      title_uk: a?.title_uk ?? null,
+      thumbnail_svg: a?.thumbnail_svg ?? null,
+    });
+    map.set(r.player_id as number, arr);
+  }
+  return map;
+}
+
+// Рейтинг + здобуті ачівки кожного гравця (для показу іконок у таблиці на лендінгу).
+export async function getRankingWithAchievements(
+  limit = 10,
+): Promise<(RankingRow & { achievements: RankAch[] })[]> {
+  const rows = await getRanking(limit);
+  const achMap = await getPlayerAchievementsForMany(rows.map((r) => r.id));
+  return rows.map((r) => ({ ...r, achievements: achMap.get(r.id) ?? [] }));
+}
+
 // ─────────────────────────────── Кабінет (6.2) ───────────────────────────────
 
 export type CabinetGame = SiteGame & {

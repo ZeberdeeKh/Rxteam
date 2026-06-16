@@ -3,17 +3,25 @@
 import { useMemo, useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { AdminPlayer } from "@/lib/admin-data";
-import { adjustPoints, setPlayerCallsign, togglePatch, makeAdmin } from "@/app/admin/actions";
+import {
+  adjustPoints,
+  setPlayerCallsign,
+  togglePatch,
+  makeAdmin,
+  grantPlayerAchievement,
+} from "@/app/admin/actions";
 import { ui, btn, badgeClass, Collapsible, GLYPH } from "@/components/ui";
 
 // Список гравців (адмінка): пошук по будь-якому слову + компактний рядок,
 // що розгортає панель дій по кліку. Серверні екшени викликаються з форм напряму.
 export default function PlayersAdmin({
   players,
+  achievementOptions,
   isMaster,
   lang,
 }: {
   players: AdminPlayer[];
+  achievementOptions: { code: string; title: string }[];
   isMaster: boolean;
   lang: Lang;
 }) {
@@ -126,6 +134,31 @@ export default function PlayersAdmin({
                         {st(lang, "adm_btn_patch")}
                       </button>
                     </form>
+
+                    {/* Видати будь-яку ачівку (нараховує бали за tier). */}
+                    {achievementOptions.length > 0 && (
+                      <form action={grantPlayerAchievement} className="flex items-center gap-1">
+                        <input type="hidden" name="playerId" value={p.id} />
+                        <select
+                          name="achievementCode"
+                          defaultValue=""
+                          required
+                          className={`${ui.inputSm} w-40`}
+                        >
+                          <option value="" disabled>
+                            {st(lang, "adm_grant_ach_select_ph")}
+                          </option>
+                          {achievementOptions.map((a) => (
+                            <option key={a.code} value={a.code}>
+                              {a.title}
+                            </option>
+                          ))}
+                        </select>
+                        <button type="submit" className={btn("action")}>
+                          {st(lang, "adm_btn_grant")}
+                        </button>
+                      </form>
+                    )}
 
                     {/* Призначення адміном — лише майстер, лише для звичайних гравців. */}
                     {isMaster && !p.is_master && !p.is_admin && (

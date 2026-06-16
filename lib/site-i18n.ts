@@ -724,6 +724,51 @@ const SITE: Record<string, Dict> = {
     en: "Achievement already earned — disable it instead of deleting.",
     uk: "Ачівку вже здобуто — вимкни її замість видалення.",
   },
+  // SVG-мініатюра ачівки (Етап 20)
+  adm_ach_thumb: { pl: "Miniatura (SVG)", en: "Thumbnail (SVG)", uk: "Мініатюра (SVG)" },
+  adm_ach_thumb_hint: { pl: "SVG, do 50 KB.", en: "SVG, up to 50 KB.", uk: "SVG, до 50 КБ." },
+  adm_ach_thumb_saving: { pl: "Wysyłanie…", en: "Uploading…", uk: "Завантаження…" },
+  adm_ach_thumb_too_big: {
+    pl: "Plik za duży (maks. 50 KB).",
+    en: "File too large (max 50 KB).",
+    uk: "Файл завеликий (макс. 50 КБ).",
+  },
+  adm_ach_thumb_bad_type: { pl: "Tylko plik SVG.", en: "SVG file only.", uk: "Лише файл SVG." },
+  adm_ach_thumb_err: { pl: "Nie udało się wysłać.", en: "Upload failed.", uk: "Не вдалося завантажити." },
+  adm_ach_thumb_create_hint: {
+    pl: "Zapisz osiągnięcie, potem dodaj miniaturę.",
+    en: "Save the achievement, then add a thumbnail.",
+    uk: "Збережіть ачівку, потім додайте мініатюру.",
+  },
+  // Опис + вид ачівки (Етап 21)
+  adm_ach_desc_pl: { pl: "Opis (PL)", en: "Description (PL)", uk: "Опис (PL)" },
+  adm_ach_desc_en: { pl: "Opis (EN)", en: "Description (EN)", uk: "Опис (EN)" },
+  adm_ach_desc_uk: { pl: "Opis (UA)", en: "Description (UA)", uk: "Опис (UA)" },
+  adm_ach_kind: { pl: "Rodzaj", en: "Kind", uk: "Вид" },
+  adm_ach_kind_auto: { pl: "Automatyczna", en: "Auto", uk: "Авто" },
+  adm_ach_kind_manual: { pl: "Ręczna", en: "Manual", uk: "Ручна" },
+  adm_ach_kind_auto_hint: {
+    pl: "Złożona logika wyzwalania — przyznawana automatycznie (opis = warunek).",
+    en: "Complex trigger logic — granted automatically (description = condition).",
+    uk: "Складна логіка спрацювання — видається автоматично (опис = умова).",
+  },
+  adm_ach_kind_manual_hint: {
+    pl: "Prosta — przyznaje administrator ręcznie w panelu (menu Gracze).",
+    en: "Simple — granted by an admin manually in the panel (Players menu).",
+    uk: "Проста — видає адмін вручну в адмінці (меню Гравці).",
+  },
+  // Видача ачівки гравцю (меню Гравці, Етап 21)
+  adm_grant_ach_select_ph: {
+    pl: "Przyznaj osiągnięcie…",
+    en: "Grant achievement…",
+    uk: "Видати ачівку…",
+  },
+  adm_btn_grant: { pl: "Przyznaj", en: "Grant", uk: "Видати" },
+  adm_grant_ach_exists: {
+    pl: "Gracz ma już to osiągnięcie (lub jest ono wyłączone).",
+    en: "Player already has this achievement (or it is disabled).",
+    uk: "У гравця вже є ця ачівка (або вона вимкнена).",
+  },
 
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },
