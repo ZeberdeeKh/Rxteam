@@ -96,7 +96,7 @@ export default async function AdminGameDetail({
                     </td>
                     <td className={`${ui.td} text-right`}>
                       {r.checkedIn ? (
-                        <span className="text-xs font-medium text-green-700">
+                        <span className={`text-xs font-medium ${ui.posText}`}>
                           {st(lang, "adm_checked")}
                         </span>
                       ) : (

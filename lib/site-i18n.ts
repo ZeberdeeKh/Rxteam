@@ -719,6 +719,16 @@ const SITE: Record<string, Dict> = {
   adm_delta_ph: { pl: "±punkty", en: "±points", uk: "±бали" },
   adm_btn_patch: { pl: "Patch ↔", en: "Patch ↔", uk: "Patch ↔" },
   adm_btn_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
+  adm_players_search_ph: {
+    pl: "Szukaj gracza — pseudonim, imię, @telegram…",
+    en: "Search player — callsign, name, @telegram…",
+    uk: "Пошук гравця — позивний, ім'я, @telegram…",
+  },
+  adm_players_search_empty: {
+    pl: "Nic nie znaleziono.",
+    en: "Nothing found.",
+    uk: "Нічого не знайдено.",
+  },
 
   adm_referrals_title: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },
   adm_inviter: { pl: "Zapraszający", en: "Inviter", uk: "Запросив" },

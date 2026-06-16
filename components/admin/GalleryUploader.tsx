@@ -77,9 +77,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
 
       {/* Одразу при виборі: попередження, якщо є файли > 1 МБ. */}
       {oversize > 0 && status !== "done" && (
-        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">
-          {st(lang, "adm_gallery_oversize", { n: oversize })}
-        </p>
+        <p className={ui.alertWarn}>{st(lang, "adm_gallery_oversize", { n: oversize })}</p>
       )}
 
       <div className="flex items-center gap-3">
@@ -91,16 +89,16 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
           {status === "uploading" ? st(lang, "adm_gallery_uploading") : st(lang, "adm_btn_upload")}
         </button>
         {status === "done" && (
-          <span className="text-sm text-green-600">
+          <span className={`text-sm ${ui.posText}`}>
             {st(lang, "adm_gallery_uploaded", { n: added })}
             {skipped > 0 && ` · ${st(lang, "adm_gallery_skipped", { n: skipped })}`}
           </span>
         )}
         {status === "all_big" && (
-          <span className="text-sm text-red-600">{st(lang, "adm_gallery_all_big")}</span>
+          <span className={`text-sm ${ui.negText}`}>{st(lang, "adm_gallery_all_big")}</span>
         )}
         {status === "error" && (
-          <span className="text-sm text-red-600">{st(lang, "adm_gallery_upload_err")}</span>
+          <span className={`text-sm ${ui.negText}`}>{st(lang, "adm_gallery_upload_err")}</span>
         )}
       </div>
       <p className={ui.meta}>{st(lang, "adm_gallery_upload_hint")}</p>

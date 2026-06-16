@@ -39,14 +39,15 @@ export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize
 }
 
 // ── Бейджі (pill) ──
+// Семантичні кольори (green/red/amber) беруться з CSS-змінних — приглушуються на темній темі.
 export type BadgeColor = "brand" | "green" | "gray" | "red" | "amber";
 const BADGE_BASE = "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium";
 const BADGE_COLOR: Record<BadgeColor, string> = {
   brand: "bg-brand/10 text-brand-dark",
-  green: "bg-green-100 text-green-700",
+  green: "bg-[var(--c-success-bg)] text-[var(--c-success-fg)]",
   gray: "bg-gray-100 text-gray-500",
-  red: "bg-red-100 text-red-700",
-  amber: "bg-amber-100 text-amber-700",
+  red: "bg-[var(--c-danger-bg)] text-[var(--c-danger-fg)]",
+  amber: "bg-[var(--c-warning-bg)] text-[var(--c-warning-fg)]",
 };
 export function badgeClass(color: BadgeColor = "gray"): string {
   return `${BADGE_BASE} ${BADGE_COLOR[color]}`;
@@ -112,9 +113,16 @@ export const ui = {
   tbody: "divide-y divide-gray-200",
   td: "px-3 py-2 text-gray-700",
 
-  // Банери
-  alertOk: "rounded-md bg-green-50 px-3 py-2 text-sm text-green-700",
-  alertErr: "rounded-md bg-red-50 px-3 py-2 text-sm text-red-700",
+  // Банери (семантика з CSS-змінних — приглушені на темній темі)
+  alertOk: "rounded-md bg-[var(--c-success-bg)] px-3 py-2 text-sm text-[var(--c-success-fg)]",
+  alertErr: "rounded-md bg-[var(--c-danger-bg)] px-3 py-2 text-sm text-[var(--c-danger-fg)]",
+  alertWarn: "rounded-md bg-[var(--c-warning-bg)] px-3 py-2 text-sm text-[var(--c-warning-fg)]",
+
+  // Семантичний текст (дельти балів, статуси-підписи)
+  posText: "text-[var(--c-success-fg)]",
+  negText: "text-[var(--c-danger-fg)]",
+  posDelta: "text-[var(--c-success-soft)]",
+  negDelta: "text-[var(--c-danger-soft)]",
 
   // Розкладка
   pageStack: "space-y-6",

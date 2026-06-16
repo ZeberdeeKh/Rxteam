@@ -4,7 +4,7 @@ import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
 import { SETTINGS_GROUPS, SETTING_DEFAULTS } from "@/lib/admin-settings";
 import { saveSettings } from "@/app/admin/actions";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, buttonClass, Collapsible } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -33,45 +33,59 @@ export default async function AdminSettings({
         {st(lang, "adm_settings_hint")}
       </p>
 
-      <form action={saveSettings} className="space-y-8">
+      <form action={saveSettings} className="space-y-3">
         {SETTINGS_GROUPS.map((g) => (
-          <fieldset key={g.title} className="rounded-lg border border-gray-200 bg-white p-5">
-            <legend className={`px-1 ${ui.sectionTitle}`}>{g.title}</legend>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2">
-              {g.fields.map((f) => (
-                <label key={f.key} className="block text-sm">
-                  <span className={`mb-1 ${ui.label}`}>
-                    {f.label} <code className="text-xs text-gray-400">{f.key}</code>
-                  </span>
-                  {f.type === "toggle" ? (
+          <Collapsible
+            key={g.title}
+            summary={<span className={ui.sectionTitle}>{g.title}</span>}
+            right={<span className={ui.meta}>{g.fields.length}</span>}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              {g.fields.map((f) =>
+                f.type === "toggle" ? (
+                  // Тоглі — рядок «лейбл + перемикач» праворуч (рівні картки однакової висоти).
+                  <label
+                    key={f.key}
+                    className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                  >
+                    <span className={ui.label}>
+                      {f.label} <code className="text-xs text-gray-400">{f.key}</code>
+                    </span>
                     <input
                       type="checkbox"
                       name={f.key}
                       defaultChecked={isOn(f.key)}
-                      className="h-4 w-4 accent-brand"
+                      className="h-4 w-4 shrink-0 accent-brand"
                     />
-                  ) : f.type === "textarea" ? (
-                    <textarea
-                      name={f.key}
-                      defaultValue={values[f.key] ?? ""}
-                      placeholder={SETTING_DEFAULTS[f.key] ?? ""}
-                      rows={3}
-                      className={inputCls}
-                    />
-                  ) : (
-                    <input
-                      type={f.type === "number" ? "number" : "text"}
-                      step="any"
-                      name={f.key}
-                      defaultValue={values[f.key] ?? ""}
-                      placeholder={SETTING_DEFAULTS[f.key] ?? ""}
-                      className={inputCls}
-                    />
-                  )}
-                </label>
-              ))}
+                  </label>
+                ) : (
+                  <label key={f.key} className="block text-sm">
+                    <span className={`mb-1 ${ui.label}`}>
+                      {f.label} <code className="text-xs text-gray-400">{f.key}</code>
+                    </span>
+                    {f.type === "textarea" ? (
+                      <textarea
+                        name={f.key}
+                        defaultValue={values[f.key] ?? ""}
+                        placeholder={SETTING_DEFAULTS[f.key] ?? ""}
+                        rows={3}
+                        className={inputCls}
+                      />
+                    ) : (
+                      <input
+                        type={f.type === "number" ? "number" : "text"}
+                        step="any"
+                        name={f.key}
+                        defaultValue={values[f.key] ?? ""}
+                        placeholder={SETTING_DEFAULTS[f.key] ?? ""}
+                        className={inputCls}
+                      />
+                    )}
+                  </label>
+                ),
+              )}
             </div>
-          </fieldset>
+          </Collapsible>
         ))}
 
         <button type="submit" className={buttonClass("primary", "md")}>

@@ -3,7 +3,7 @@ import { st } from "@/lib/site-i18n";
 import { requireMaster, ALL_PERMS } from "@/lib/admin";
 import { listPlayers } from "@/lib/admin-data";
 import { saveRoles } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, buttonClass, badgeClass, Collapsible } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -31,50 +31,49 @@ export default async function AdminRoles({
       )}
 
       <div className={ui.listStack}>
-        {players.map((p) => (
-          <form key={p.id} action={saveRoles} className={ui.card}>
-            <input type="hidden" name="playerId" value={p.id} />
-            <div className="mb-2 flex items-center justify-between gap-2">
-              <span className={ui.cardTitle}>
-                {p.callsign ?? p.name ?? `#${p.id}`}
-                {p.tg_username && <span className="ml-2 text-xs text-gray-400">@{p.tg_username}</span>}
-              </span>
-              {p.is_master ? (
-                <span className={badgeClass("brand")}>
-                  {st(lang, "adm_master")}
+        {players.map((p) => {
+          const roleBadge = p.is_master ? (
+            <span className={badgeClass("brand")}>{st(lang, "adm_master")}</span>
+          ) : p.is_admin || (Array.isArray(p.admin_perms) && p.admin_perms.length > 0) ? (
+            <span className={badgeClass("green")}>{st(lang, "adm_role_admin")}</span>
+          ) : (
+            <span className={badgeClass("gray")}>{st(lang, "adm_role_player")}</span>
+          );
+          return (
+            <Collapsible
+              key={p.id}
+              right={roleBadge}
+              summary={
+                <span className={ui.cardTitle}>
+                  {p.callsign ?? p.name ?? `#${p.id}`}
+                  {p.tg_username && <span className="ml-2 text-xs text-gray-400">@{p.tg_username}</span>}
                 </span>
-              ) : p.is_admin || (Array.isArray(p.admin_perms) && p.admin_perms.length > 0) ? (
-                <span className={badgeClass("green")}>
-                  {st(lang, "adm_role_admin")}
-                </span>
-              ) : (
-                <span className={badgeClass("gray")}>
-                  {st(lang, "adm_role_player")}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-3">
-              {ALL_PERMS.map((perm) => (
-                <label key={perm} className="flex items-center gap-1 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    name="perms"
-                    value={perm}
-                    defaultChecked={Array.isArray(p.admin_perms) && p.admin_perms.includes(perm)}
-                    disabled={p.is_master}
-                    className="h-4 w-4 accent-brand"
-                  />
-                  {perm}
-                </label>
-              ))}
-              {!p.is_master && (
-                <button type="submit" className={`ml-auto ${buttonClass("primary", "sm")}`}>
-                  {st(lang, "adm_btn_save_roles")}
-                </button>
-              )}
-            </div>
-          </form>
-        ))}
+              }
+            >
+              <form action={saveRoles} className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                <input type="hidden" name="playerId" value={p.id} />
+                {ALL_PERMS.map((perm) => (
+                  <label key={perm} className="flex items-center gap-1.5 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      name="perms"
+                      value={perm}
+                      defaultChecked={Array.isArray(p.admin_perms) && p.admin_perms.includes(perm)}
+                      disabled={p.is_master}
+                      className="h-4 w-4 accent-brand"
+                    />
+                    {perm}
+                  </label>
+                ))}
+                {!p.is_master && (
+                  <button type="submit" className={`ml-auto ${buttonClass("primary", "sm")}`}>
+                    {st(lang, "adm_btn_save_roles")}
+                  </button>
+                )}
+              </form>
+            </Collapsible>
+          );
+        })}
       </div>
 
       {/* Легенда дозволів — пояснення для суперадміна, за що відповідає кожен прапорець. */}

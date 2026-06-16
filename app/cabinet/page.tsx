@@ -218,7 +218,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                       </span>
                     )}
                     {g.checkedIn && (
-                      <span className="text-xs font-medium text-green-700">
+                      <span className={`text-xs font-medium ${ui.posText}`}>
                         {st(lang, "game_checked_in")}
                       </span>
                     )}
@@ -273,7 +273,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                 </div>
                 <span
                   className={`shrink-0 tabular-nums font-medium ${
-                    row.delta >= 0 ? "text-green-600" : "text-red-600"
+                    row.delta >= 0 ? ui.posDelta : ui.negDelta
                   }`}
                 >
                   {row.delta >= 0 ? "+" : ""}

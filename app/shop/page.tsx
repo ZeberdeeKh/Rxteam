@@ -13,7 +13,7 @@ import {
   type Rank,
 } from "@/lib/economy";
 import { buyItem, buyRank } from "@/app/shop/actions";
-import { ui } from "@/components/ui";
+import { ui, buttonClass, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -75,19 +75,15 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_intro")}</p>
       </div>
 
-      {okKey && (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm text-green-700">{st(lang, okKey)}</p>
-      )}
-      {errKey && (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{st(lang, errKey)}</p>
-      )}
+      {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
+      {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
 
       {player ? (
         <p className="text-sm text-gray-600">
           {st(lang, "shop_balance")}: <span className="font-semibold">{balance} 💰</span>
         </p>
       ) : (
-        <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">
+        <p className={ui.alertWarn}>
           {st(lang, "shop_need_login")}{" "}
           <Link href="/login" className="font-medium underline">
             {st(lang, "nav_login")}
@@ -116,11 +112,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   {player && (
                     <form action={buyItem}>
                       <input type="hidden" name="itemId" value={it.id} />
-                      <button
-                        type="submit"
-                        disabled={!affordable}
-                        className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
-                      >
+                      <button type="submit" disabled={!affordable} className={buttonClass("primary", "md")}>
                         {st(lang, "shop_buy")}
                       </button>
                     </form>
@@ -140,11 +132,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
             <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_ranks_intro")}</p>
           </div>
 
-          {player && !hasPatch && (
-            <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-700">
-              {st(lang, "shop_rank_need_patch")}
-            </p>
-          )}
+          {player && !hasPatch && <p className={ui.alertWarn}>{st(lang, "shop_rank_need_patch")}</p>}
 
           <div className="space-y-2">
             {RANKS.map((r, i) => {
@@ -168,21 +156,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   </div>
                   <div className="shrink-0">
                     {isCurrent ? (
-                      <span className="rounded-full bg-brand/10 px-2 py-0.5 text-xs font-medium text-brand-dark">
-                        {st(lang, "shop_rank_current")}
-                      </span>
+                      <span className={badgeClass("brand")}>{st(lang, "shop_rank_current")}</span>
                     ) : owned ? (
-                      <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                        {st(lang, "shop_rank_owned")}
-                      </span>
+                      <span className={badgeClass("green")}>{st(lang, "shop_rank_owned")}</span>
                     ) : isNext && player ? (
                       <form action={buyRank}>
                         <input type="hidden" name="rank" value={r} />
-                        <button
-                          type="submit"
-                          disabled={!affordable}
-                          className="rounded-md bg-brand px-4 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-50"
-                        >
+                        <button type="submit" disabled={!affordable} className={buttonClass("primary", "md")}>
                           {st(lang, "shop_buy")}
                         </button>
                       </form>

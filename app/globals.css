@@ -20,6 +20,17 @@
   --c-gray-800: #262626;
   --c-gray-900: #171717;
   --c-gray-950: #0a0a0a;
+
+  /* Семантичні токени (статуси, бейджі, банери). Світла тема — пастельні Tailwind.
+     Перемикаються на приглушені у html.dark, щоб не «світити» на темному фоні. */
+  --c-success-bg: #dcfce7; /* green-100 */
+  --c-success-fg: #15803d; /* green-700 */
+  --c-success-soft: #16a34a; /* green-600 — текст дельт «+» */
+  --c-danger-bg: #fee2e2; /* red-100 */
+  --c-danger-fg: #b91c1c; /* red-700 */
+  --c-danger-soft: #dc2626; /* red-600 — текст дельт «−» */
+  --c-warning-bg: #fef3c7; /* amber-100 */
+  --c-warning-fg: #b45309; /* amber-700 */
 }
 
 html.dark {
@@ -37,6 +48,16 @@ html.dark {
   --c-gray-800: #e6e8ec;
   --c-gray-900: #f5f6f8; /* основний текст */
   --c-gray-950: #ffffff;
+
+  /* Семантика на темному — напівпрозорі фони + м'які пастельні літери (без «кислотних» плашок). */
+  --c-success-bg: rgba(110, 231, 183, 0.13);
+  --c-success-fg: #6ee7b7;
+  --c-success-soft: #6ee7b7;
+  --c-danger-bg: rgba(248, 113, 113, 0.14);
+  --c-danger-fg: #fca5a5;
+  --c-danger-soft: #fca5a5;
+  --c-warning-bg: rgba(251, 191, 36, 0.14);
+  --c-warning-fg: #fcd34d;
 }
 
 html, body {
@@ -59,4 +80,17 @@ body {
   to {
     opacity: 1;
   }
+}
+
+/* Згортувані блоки (<details class="rx-collapse">): ховаємо нативний маркер,
+   обертаємо стрілку у відкритому стані. Контент закритого <details> лишається
+   у DOM (display:none) — поля форми все одно надсилаються при сабміті. */
+.rx-collapse > summary {
+  list-style: none;
+}
+.rx-collapse > summary::-webkit-details-marker {
+  display: none;
+}
+.rx-collapse[open] > summary .rx-chevron {
+  transform: rotate(180deg);
 }
