@@ -1,16 +1,22 @@
 // Схема редактора налаштувань (6.4, майстер-онлі). Керується таблицею settings.
-// Підписи — технічні (ключі + короткий опис); екран бачить лише майстер.
-import { captchaPrompt, correctMap, wrongMap, expiredMap, faq } from "./i18n";
+// Підписи (title груп + label полів) — тримовні (PL/EN/UA), щоб редактор слідував
+// мові сайту (перемикач rx_lang), а не був жорстко польським. Резолвимо в page.tsx
+// через f.label[lang] / g.title[lang]. Маркери мови контенту «(PL)/(EN)/(UA)» лишаються
+// як є — вони позначають, якою мовою редагується сам текст бота, а не мову UI.
+import { captchaPrompt, correctMap, wrongMap, expiredMap, faq, type Lang } from "./i18n";
 import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
+
+type Loc = Record<Lang, string>;
 
 export type SettingField = {
   key: string;
   type: "toggle" | "number" | "text" | "textarea";
-  label: string;
+  label: Loc;
 };
-export type SettingGroup = { title: string; fields: SettingField[] };
+export type SettingGroup = { title: Loc; fields: SettingField[] };
 
 // Підказка-формат у полях лімітів реплік (показується сірим, поки поле порожнє).
+// Це приклад КОНТЕНТУ потрібною мовою (PL у _pl-полі, UA у _uk-полі) — лишаємо як є.
 const replicaLimitPlaceholders: Record<string, string> = Object.fromEntries(
   REPLICA_TYPES.flatMap((t) => [
     [`limit_${t.code}_pl`, "np. 1.4 J · brak min. dystansu"],
@@ -40,128 +46,153 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   ...replicaLimitPlaceholders,
 };
 
+// Слово «ліміт» для згенерованих підписів полів лімітів реплік.
+const LIMIT_WORD: Loc = { pl: "limit", en: "limit", uk: "ліміт" };
+
 // Поля лімітів за типами реплік (пара PL+UA на кожен тип, у порядку REPLICA_TYPES).
+// Назва репліки береться мовою UI (REPLICA_TYPES має pl/en/uk), маркер «(PL)/(UA)»
+// позначає мову контенту і лишається сталим.
 const replicaLimitFields: SettingField[] = REPLICA_TYPES.flatMap((t): SettingField[] => [
-  { key: `limit_${t.code}_pl`, type: "textarea", label: `${t.pl} — limit (PL)` },
-  { key: `limit_${t.code}_uk`, type: "textarea", label: `${t.uk} — ліміт (UA)` },
+  {
+    key: `limit_${t.code}_pl`,
+    type: "textarea",
+    label: {
+      pl: `${t.pl} — ${LIMIT_WORD.pl} (PL)`,
+      en: `${t.en} — ${LIMIT_WORD.en} (PL)`,
+      uk: `${t.uk} — ${LIMIT_WORD.uk} (PL)`,
+    },
+  },
+  {
+    key: `limit_${t.code}_uk`,
+    type: "textarea",
+    label: {
+      pl: `${t.pl} — ${LIMIT_WORD.pl} (UA)`,
+      en: `${t.en} — ${LIMIT_WORD.en} (UA)`,
+      uk: `${t.uk} — ${LIMIT_WORD.uk} (UA)`,
+    },
+  },
 ]);
 
 export const SETTINGS_GROUPS: SettingGroup[] = [
   {
-    title: "Funkcje (on/off)",
+    title: { pl: "Funkcje (on/off)", en: "Features (on/off)", uk: "Функції (вкл/викл)" },
     fields: [
-      { key: "feature_shield", type: "toggle", label: "Anti-bot shield" },
-      { key: "feature_onboarding_faq", type: "toggle", label: "Onboarding FAQ" },
-      { key: "feature_economy", type: "toggle", label: "Ekonomia (punkty)" },
-      { key: "feature_patch", type: "toggle", label: "Patch (członkostwo)" },
-      { key: "feature_achievements", type: "toggle", label: "Osiągnięcia" },
-      { key: "feature_referrals", type: "toggle", label: "Polecenia" },
-      { key: "feature_reminders", type: "toggle", label: "Przypomnienia" },
-      { key: "feature_voting", type: "toggle", label: "Głosowanie lokalizacji" },
-      { key: "feature_lottery", type: "toggle", label: "Loteria niezawodnych" },
-      { key: "feature_shop", type: "toggle", label: "Sklep za punkty" },
-      { key: "feature_site_link", type: "toggle", label: "Łączenie konta z TG" },
-      { key: "feature_chores", type: "toggle", label: "Czek-lista przygotowań" },
-      { key: "feature_announce_count", type: "toggle", label: "Licznik graczy w anonsie" },
+      { key: "feature_shield", type: "toggle", label: { pl: "Tarcza anty-bot", en: "Anti-bot shield", uk: "Захист від ботів" } },
+      { key: "feature_onboarding_faq", type: "toggle", label: { pl: "FAQ powitalne", en: "Onboarding FAQ", uk: "Привітальний FAQ" } },
+      { key: "feature_economy", type: "toggle", label: { pl: "Ekonomia (punkty)", en: "Economy (points)", uk: "Економіка (бали)" } },
+      { key: "feature_patch", type: "toggle", label: { pl: "Patch (członkostwo)", en: "Patch (membership)", uk: "Патч (членство)" } },
+      { key: "feature_achievements", type: "toggle", label: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" } },
+      { key: "feature_referrals", type: "toggle", label: { pl: "Polecenia", en: "Referrals", uk: "Реферали" } },
+      { key: "feature_reminders", type: "toggle", label: { pl: "Przypomnienia", en: "Reminders", uk: "Нагадування" } },
+      { key: "feature_voting", type: "toggle", label: { pl: "Głosowanie lokalizacji", en: "Location voting", uk: "Голосування за локацію" } },
+      { key: "feature_lottery", type: "toggle", label: { pl: "Loteria niezawodnych", en: "Reliable players' lottery", uk: "Лотерея надійних" } },
+      { key: "feature_shop", type: "toggle", label: { pl: "Sklep za punkty", en: "Points shop", uk: "Магазин за бали" } },
+      { key: "feature_site_link", type: "toggle", label: { pl: "Łączenie konta z TG", en: "Link account with TG", uk: "Прив'язка акаунта до TG" } },
+      { key: "feature_chores", type: "toggle", label: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" } },
+      { key: "feature_announce_count", type: "toggle", label: { pl: "Licznik graczy w anonsie", en: "Player counter in announcement", uk: "Лічильник гравців в анонсі" } },
     ],
   },
   {
-    title: "Punkty",
+    title: { pl: "Punkty", en: "Points", uk: "Бали" },
     fields: [
-      { key: "pts_attend", type: "number", label: "Za obecność (+)" },
-      { key: "pts_noshow", type: "number", label: "Za nieobecność (−)" },
-      { key: "pts_friend", type: "number", label: "Za poleconego znajomego (+)" },
-      { key: "pts_ach_easy", type: "number", label: "Osiągnięcie: easy" },
-      { key: "pts_ach_mid", type: "number", label: "Osiągnięcie: mid" },
-      { key: "pts_ach_hard", type: "number", label: "Osiągnięcie: hard" },
-      { key: "no_patch_multiplier", type: "number", label: "Mnożnik bez patcha (0–1)" },
+      { key: "pts_attend", type: "number", label: { pl: "Za obecność (+)", en: "For attendance (+)", uk: "За явку (+)" } },
+      { key: "pts_noshow", type: "number", label: { pl: "Za nieobecność (−)", en: "For no-show (−)", uk: "За неявку (−)" } },
+      { key: "pts_friend", type: "number", label: { pl: "Za poleconego znajomego (+)", en: "For a referred friend (+)", uk: "За приведеного друга (+)" } },
+      { key: "pts_ach_easy", type: "number", label: { pl: "Osiągnięcie: easy", en: "Achievement: easy", uk: "Ачівка: easy" } },
+      { key: "pts_ach_mid", type: "number", label: { pl: "Osiągnięcie: mid", en: "Achievement: mid", uk: "Ачівка: mid" } },
+      { key: "pts_ach_hard", type: "number", label: { pl: "Osiągnięcie: hard", en: "Achievement: hard", uk: "Ачівка: hard" } },
+      { key: "no_patch_multiplier", type: "number", label: { pl: "Mnożnik bez patcha (0–1)", en: "Multiplier without patch (0–1)", uk: "Множник без патча (0–1)" } },
     ],
   },
   {
-    title: "Stopnie i patch",
+    title: { pl: "Stopnie i patch", en: "Ranks and patch", uk: "Звання і патч" },
     fields: [
-      { key: "rank_cost_scout", type: "number", label: "Koszt: Scout" },
-      { key: "rank_cost_squad", type: "number", label: "Koszt: Squad Leader" },
-      { key: "rank_cost_team", type: "number", label: "Koszt: Team Leader" },
-      { key: "patch_price_zl", type: "text", label: "Cena patcha (zł, gotówka)" },
-      { key: "rental_stock", type: "number", label: "Zapas zestawów do wynajęcia" },
+      { key: "rank_cost_scout", type: "number", label: { pl: "Koszt: Scout", en: "Cost: Scout", uk: "Ціна: Scout" } },
+      { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },
+      { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
+      { key: "patch_price_zl", type: "text", label: { pl: "Cena patcha (zł, gotówka)", en: "Patch price (zł, cash)", uk: "Ціна патча (zł, готівка)" } },
+      { key: "rental_stock", type: "number", label: { pl: "Zapas zestawów do wynajęcia", en: "Rental sets in stock", uk: "Запас комплектів для оренди" } },
     ],
   },
   {
-    title: "Przypomnienia",
+    title: { pl: "Przypomnienia", en: "Reminders", uk: "Нагадування" },
     fields: [
-      { key: "remind_day_hour", type: "number", label: "Dzień przed — godzina (0–23)" },
-      { key: "remind_before_h", type: "number", label: "W dniu gry — godz. przed startem" },
+      { key: "remind_day_hour", type: "number", label: { pl: "Dzień przed — godzina (0–23)", en: "Day before — hour (0–23)", uk: "За день — година (0–23)" } },
+      { key: "remind_before_h", type: "number", label: { pl: "W dniu gry — godz. przed startem", en: "On game day — hours before start", uk: "У день гри — годин до старту" } },
     ],
   },
   {
-    title: "Anons — bloki tekstu (PL)",
+    title: { pl: "Anons — bloki tekstu (PL)", en: "Announcement — text blocks (PL)", uk: "Анонс — текстові блоки (PL)" },
     fields: [
-      { key: "ann_coffee_pl", type: "textarea", label: "Kawa/przekąski" },
-      { key: "ann_rental_pl", type: "textarea", label: "Wynajem" },
-      { key: "ann_transport_pl", type: "textarea", label: "Transport" },
-      { key: "ann_disclaimer_pl", type: "textarea", label: "Disclaimer" },
+      { key: "ann_coffee_pl", type: "textarea", label: { pl: "Kawa/przekąski", en: "Coffee/snacks", uk: "Кава/перекус" } },
+      { key: "ann_rental_pl", type: "textarea", label: { pl: "Wynajem", en: "Rental", uk: "Оренда" } },
+      { key: "ann_transport_pl", type: "textarea", label: { pl: "Transport", en: "Transport", uk: "Транспорт" } },
+      { key: "ann_disclaimer_pl", type: "textarea", label: { pl: "Disclaimer", en: "Disclaimer", uk: "Disclaimer" } },
     ],
   },
   {
-    title: "Anons — bloki tekstu (UA)",
+    title: { pl: "Anons — bloki tekstu (UA)", en: "Announcement — text blocks (UA)", uk: "Анонс — текстові блоки (UA)" },
     fields: [
-      { key: "ann_coffee_uk", type: "textarea", label: "Кава/перекус" },
-      { key: "ann_rental_uk", type: "textarea", label: "Оренда" },
-      { key: "ann_transport_uk", type: "textarea", label: "Транспорт" },
-      { key: "ann_disclaimer_uk", type: "textarea", label: "Disclaimer" },
+      { key: "ann_coffee_uk", type: "textarea", label: { pl: "Kawa/przekąski", en: "Coffee/snacks", uk: "Кава/перекус" } },
+      { key: "ann_rental_uk", type: "textarea", label: { pl: "Wynajem", en: "Rental", uk: "Оренда" } },
+      { key: "ann_transport_uk", type: "textarea", label: { pl: "Transport", en: "Transport", uk: "Транспорт" } },
+      { key: "ann_disclaimer_uk", type: "textarea", label: { pl: "Disclaimer", en: "Disclaimer", uk: "Disclaimer" } },
     ],
   },
   {
     // Ліміти за типами реплік. Самі типи фіксовані в коді (lib/replicas.ts);
     // тут редагуються лише тексти лімітів. У локації обираєш, які типи допущені.
-    title: "Limity replik (Дж/FPS)",
+    title: { pl: "Limity replik (J/FPS)", en: "Replica limits (J/FPS)", uk: "Ліміти реплік (Дж/FPS)" },
     fields: replicaLimitFields,
   },
   {
-    title: "Pyro i tryb ognia — komunikaty",
+    title: { pl: "Pyro i tryb ognia — komunikaty", en: "Pyro and fire mode — messages", uk: "Піро і режим вогню — повідомлення" },
     fields: [
-      { key: "pyro_yes_pl", type: "textarea", label: "Pyro: dozwolone (PL)" },
-      { key: "pyro_yes_uk", type: "textarea", label: "Піро: дозволено (UA)" },
-      { key: "pyro_no_pl", type: "textarea", label: "Pyro: zakazane (PL)" },
-      { key: "pyro_no_uk", type: "textarea", label: "Піро: заборонено (UA)" },
-      { key: "pyro_limited_pl", type: "textarea", label: "Pyro: z ograniczeniem (PL)" },
-      { key: "pyro_limited_uk", type: "textarea", label: "Піро: з обмеженням (UA)" },
-      { key: "firemode_auto_pl", type: "textarea", label: "Full-auto (PL)" },
-      { key: "firemode_auto_uk", type: "textarea", label: "Full-auto (UA)" },
-      { key: "firemode_semi_pl", type: "textarea", label: "Tylko semi (PL)" },
-      { key: "firemode_semi_uk", type: "textarea", label: "Лише semi (UA)" },
+      { key: "pyro_yes_pl", type: "textarea", label: { pl: "Pyro: dozwolone (PL)", en: "Pyro: allowed (PL)", uk: "Піро: дозволено (PL)" } },
+      { key: "pyro_yes_uk", type: "textarea", label: { pl: "Pyro: dozwolone (UA)", en: "Pyro: allowed (UA)", uk: "Піро: дозволено (UA)" } },
+      { key: "pyro_no_pl", type: "textarea", label: { pl: "Pyro: zakazane (PL)", en: "Pyro: forbidden (PL)", uk: "Піро: заборонено (PL)" } },
+      { key: "pyro_no_uk", type: "textarea", label: { pl: "Pyro: zakazane (UA)", en: "Pyro: forbidden (UA)", uk: "Піро: заборонено (UA)" } },
+      { key: "pyro_limited_pl", type: "textarea", label: { pl: "Pyro: z ograniczeniem (PL)", en: "Pyro: limited (PL)", uk: "Піро: з обмеженням (PL)" } },
+      { key: "pyro_limited_uk", type: "textarea", label: { pl: "Pyro: z ograniczeniem (UA)", en: "Pyro: limited (UA)", uk: "Піро: з обмеженням (UA)" } },
+      { key: "firemode_auto_pl", type: "textarea", label: { pl: "Full-auto (PL)", en: "Full-auto (PL)", uk: "Full-auto (PL)" } },
+      { key: "firemode_auto_uk", type: "textarea", label: { pl: "Full-auto (UA)", en: "Full-auto (UA)", uk: "Full-auto (UA)" } },
+      { key: "firemode_semi_pl", type: "textarea", label: { pl: "Tylko semi (PL)", en: "Semi only (PL)", uk: "Лише semi (PL)" } },
+      { key: "firemode_semi_uk", type: "textarea", label: { pl: "Tylko semi (UA)", en: "Semi only (UA)", uk: "Лише semi (UA)" } },
     ],
   },
   {
-    title: "Teksty bota — captcha / regulamin (PL/EN/UA)",
+    title: {
+      pl: "Teksty bota — captcha / regulamin (PL/EN/UA)",
+      en: "Bot texts — captcha / rules (PL/EN/UA)",
+      uk: "Тексти бота — капча / правила (PL/EN/UA)",
+    },
     fields: [
-      { key: "captcha_pl", type: "textarea", label: "Captcha — powitanie (PL)" },
-      { key: "captcha_en", type: "textarea", label: "Captcha — powitanie (EN)" },
-      { key: "captcha_uk", type: "textarea", label: "Captcha — powitanie (UA)" },
-      { key: "cap_ok_pl", type: "textarea", label: "Captcha OK (PL)" },
-      { key: "cap_ok_en", type: "textarea", label: "Captcha OK (EN)" },
-      { key: "cap_ok_uk", type: "textarea", label: "Captcha OK (UA)" },
-      { key: "cap_wrong_pl", type: "textarea", label: "Captcha błąd (PL)" },
-      { key: "cap_wrong_en", type: "textarea", label: "Captcha błąd (EN)" },
-      { key: "cap_wrong_uk", type: "textarea", label: "Captcha błąd (UA)" },
-      { key: "cap_expired_pl", type: "textarea", label: "Captcha czas minął (PL)" },
-      { key: "cap_expired_en", type: "textarea", label: "Captcha czas minął (EN)" },
-      { key: "cap_expired_uk", type: "textarea", label: "Captcha czas minął (UA)" },
-      { key: "faq_pl", type: "textarea", label: "Regulamin / FAQ (PL)" },
-      { key: "faq_en", type: "textarea", label: "Regulamin / FAQ (EN)" },
-      { key: "faq_uk", type: "textarea", label: "Regulamin / FAQ (UA)" },
+      { key: "captcha_pl", type: "textarea", label: { pl: "Captcha — powitanie (PL)", en: "Captcha — greeting (PL)", uk: "Капча — привітання (PL)" } },
+      { key: "captcha_en", type: "textarea", label: { pl: "Captcha — powitanie (EN)", en: "Captcha — greeting (EN)", uk: "Капча — привітання (EN)" } },
+      { key: "captcha_uk", type: "textarea", label: { pl: "Captcha — powitanie (UA)", en: "Captcha — greeting (UA)", uk: "Капча — привітання (UA)" } },
+      { key: "cap_ok_pl", type: "textarea", label: { pl: "Captcha OK (PL)", en: "Captcha OK (PL)", uk: "Капча OK (PL)" } },
+      { key: "cap_ok_en", type: "textarea", label: { pl: "Captcha OK (EN)", en: "Captcha OK (EN)", uk: "Капча OK (EN)" } },
+      { key: "cap_ok_uk", type: "textarea", label: { pl: "Captcha OK (UA)", en: "Captcha OK (UA)", uk: "Капча OK (UA)" } },
+      { key: "cap_wrong_pl", type: "textarea", label: { pl: "Captcha błąd (PL)", en: "Captcha error (PL)", uk: "Капча — помилка (PL)" } },
+      { key: "cap_wrong_en", type: "textarea", label: { pl: "Captcha błąd (EN)", en: "Captcha error (EN)", uk: "Капча — помилка (EN)" } },
+      { key: "cap_wrong_uk", type: "textarea", label: { pl: "Captcha błąd (UA)", en: "Captcha error (UA)", uk: "Капча — помилка (UA)" } },
+      { key: "cap_expired_pl", type: "textarea", label: { pl: "Captcha czas minął (PL)", en: "Captcha expired (PL)", uk: "Капча — час вийшов (PL)" } },
+      { key: "cap_expired_en", type: "textarea", label: { pl: "Captcha czas minął (EN)", en: "Captcha expired (EN)", uk: "Капча — час вийшов (EN)" } },
+      { key: "cap_expired_uk", type: "textarea", label: { pl: "Captcha czas minął (UA)", en: "Captcha expired (UA)", uk: "Капча — час вийшов (UA)" } },
+      { key: "faq_pl", type: "textarea", label: { pl: "Regulamin / FAQ (PL)", en: "Rules / FAQ (PL)", uk: "Правила / FAQ (PL)" } },
+      { key: "faq_en", type: "textarea", label: { pl: "Regulamin / FAQ (EN)", en: "Rules / FAQ (EN)", uk: "Правила / FAQ (EN)" } },
+      { key: "faq_uk", type: "textarea", label: { pl: "Regulamin / FAQ (UA)", en: "Rules / FAQ (UA)", uk: "Правила / FAQ (UA)" } },
     ],
   },
   {
-    title: "Ogólne",
+    title: { pl: "Ogólne", en: "General", uk: "Загальне" },
     fields: [
-      { key: "master_username", type: "text", label: "Master username (Telegram, bez @)" },
-      { key: "announce_chat_id", type: "text", label: "Announce chat_id (grupa)" },
-      { key: "announce_thread_id", type: "text", label: "Announce thread_id" },
-      { key: "chores_chat_id", type: "text", label: "Czek-lista chat_id (grupa adminów)" },
-      { key: "chores_thread_id", type: "text", label: "Czek-lista thread_id" },
-      { key: "chores_admin_mentions", type: "text", label: "Czek-lista — pingowani admini (@user, spacja/przecinek)" },
+      { key: "master_username", type: "text", label: { pl: "Master username (Telegram, bez @)", en: "Master username (Telegram, no @)", uk: "Master username (Telegram, без @)" } },
+      { key: "announce_chat_id", type: "text", label: { pl: "Announce chat_id (grupa)", en: "Announce chat_id (group)", uk: "Announce chat_id (група)" } },
+      { key: "announce_thread_id", type: "text", label: { pl: "Announce thread_id", en: "Announce thread_id", uk: "Announce thread_id" } },
+      { key: "chores_chat_id", type: "text", label: { pl: "Czek-lista chat_id (grupa adminów)", en: "Checklist chat_id (admin group)", uk: "Чек-лист chat_id (група адмінів)" } },
+      { key: "chores_thread_id", type: "text", label: { pl: "Czek-lista thread_id", en: "Checklist thread_id", uk: "Чек-лист thread_id" } },
+      { key: "chores_admin_mentions", type: "text", label: { pl: "Czek-lista — pingowani admini (@user, spacja/przecinek)", en: "Checklist — pinged admins (@user, space/comma)", uk: "Чек-лист — пінговані адміни (@user, пробіл/кома)" } },
     ],
   },
 ];

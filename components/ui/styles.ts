@@ -144,8 +144,8 @@ export const ui = {
   overlayIconBtn:
     "flex items-center justify-center rounded-full bg-white/10 text-neutral-50 transition hover:bg-white/20",
   fab:
-    "fixed bottom-4 right-4 z-40 flex items-center rounded-full bg-neutral-800 text-neutral-50 shadow-lg " +
-    "transition-colors hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200",
+    "fixed bottom-4 right-4 z-40 flex items-center rounded-full bg-neutral-100 text-neutral-900 shadow-lg " +
+    "transition-colors hover:bg-neutral-200",
 } as const;
 
 // ── Хелпери статус→бейдж (ADR-0025). Колір пігулки; дефолт невідомого — gray. ──

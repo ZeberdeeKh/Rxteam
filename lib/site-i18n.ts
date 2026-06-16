@@ -37,6 +37,13 @@ const SITE: Record<string, Dict> = {
     uk: "Неформальна спільнота поціновувачів ASG із Вроцлава.",
   },
 
+  // <meta name="description"> — слідує мові сайту (app/layout.tsx → generateMetadata).
+  meta_description: {
+    pl: "Społeczność ASG / Airsoft — Wrocław",
+    en: "ASG / Airsoft community — Wrocław",
+    uk: "Спільнота ASG / Airsoft — Wrocław",
+  },
+
   home_title: { pl: "RX Team", en: "RX Team", uk: "RX Team" },
   home_intro: {
     pl: "Strona w budowie. Wkrótce: najbliższa gra, kalendarz, ranking i Twój profil. 🪖",

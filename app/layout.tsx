@@ -7,18 +7,18 @@ import { getSessionContext } from "@/lib/session-player";
 import { isAdmin } from "@/lib/admin";
 import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
-import ThemeToggle from "@/components/ThemeToggle";
 import BugReport from "@/components/BugReport";
 import NavLink from "@/components/site/NavLink";
 import { ui, headerNavClass, headerAdminClass } from "@/components/ui";
 
-export const metadata: Metadata = {
-  title: "RX Team",
-  description: "ASG / Airsoft community — Wrocław",
-};
-
-// Уникаємо «спалаху» світлої теми: ставимо .dark ДО першого рендера за збереженим вибором.
-const themeInit = `(function(){try{var t=localStorage.getItem('rxteam-theme');var d=t?t==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`;
+// Опис слідує мові сайту (cookie rx_lang), тому генеруємо динамічно, а не статично.
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = getServerLang();
+  return {
+    title: "RX Team",
+    description: st(lang, "meta_description"),
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getServerLang();
@@ -54,7 +54,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
           rel="stylesheet"
         />
-        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
       </head>
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
@@ -96,7 +95,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 </NavLink>
               )}
               <span className="mx-1 h-5 w-px bg-gray-200" />
-              <ThemeToggle title={st(lang, "theme_toggle")} />
               <LangSwitcher current={lang} />
             </nav>
           </div>

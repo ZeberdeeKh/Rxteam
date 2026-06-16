@@ -175,7 +175,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
 
   return (
     <>
-      {/* Плаваюча кнопка (ui.fab — єдиний санкціонований dark:). neutral НЕ перемикається. */}
+      {/* Плаваюча кнопка (ui.fab). neutral — фіксована палітра, не залежить від теми. */}
       <button
         type="button"
         onClick={openModal}

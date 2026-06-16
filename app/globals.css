@@ -2,48 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Дизайн-токени перенесено з «Kalkulator». Світла тема — стандартна нейтраль Tailwind,
-   темна (html.dark) — інвертована палітра калькулятора. `gray`/`white` у tailwind.config
-   прив'язані до цих змінних, тому колір перемикається без dark:-варіантів. */
+/* Дизайн-токени перенесено з «Kalkulator». Тема ЛИШЕ темна (світлу прибрано) — палітра
+   калькулятора. `gray`/`white` у tailwind.config прив'язані до цих змінних, тому весь сайт
+   темний без dark:-варіантів на елементах. */
 :root {
-  color-scheme: light;
-
-  --c-white: #ffffff;
-  --c-gray-50: #fafafa;
-  --c-gray-100: #f5f5f5;
-  --c-gray-200: #e5e5e5;
-  --c-gray-300: #d4d4d4;
-  --c-gray-400: #a3a3a3;
-  --c-gray-500: #737373;
-  --c-gray-600: #525252;
-  --c-gray-700: #404040;
-  --c-gray-800: #262626;
-  --c-gray-900: #171717;
-  --c-gray-950: #0a0a0a;
-
-  /* Колір заголовків І логотипу — ЄДИНИЙ токен (хакі). Див. docs/DESIGN_SYSTEM.md. */
-  --c-brand-text: #545331;
-
-  /* Семантичні токени (статуси, бейджі, банери) — ПРИГЛУШЕНІ, без яскравих кольорів.
-     Перемикаються у html.dark на напівпрозорі тінти. */
-  --c-success-bg: #e7f0ea;
-  --c-success-fg: #44735a;
-  --c-success-soft: #4d7d62; /* текст дельт «+» */
-  --c-danger-bg: #f3e7e7;
-  --c-danger-fg: #9b5757;
-  --c-danger-soft: #a85c5c; /* текст дельт «−» */
-  --c-warning-bg: #f2ecdc;
-  --c-warning-fg: #876b3c;
-  --c-danger-solid: #dc2626; /* суцільна кнопка «Видалити» (насичений — це кнопка, не бейдж) */
-  --c-danger-solid-hover: #b91c1c;
-
-  /* Кнопка «action» — той самий хакі, що й заголовки/лого (--c-brand-text). */
-  --c-action-bg: #545331;
-  --c-action-bg-hover: #45442b;
-  --c-action-fg: #fafafa;
-}
-
-html.dark {
   color-scheme: dark;
 
   --c-white: #1f2126;   /* панелі: шапка, картки, інпути */
@@ -59,22 +21,22 @@ html.dark {
   --c-gray-900: #f5f6f8; /* основний текст */
   --c-gray-950: #ffffff;
 
-  /* Заголовки + логотип на темній — світла хакі (читабельно, єдиний колір). */
+  /* Колір заголовків І логотипу — ЄДИНИЙ токен (світла хакі). Див. docs/DESIGN_SYSTEM.md. */
   --c-brand-text: #9d9b66;
 
-  /* Семантика на темному — напівпрозорі фони + приглушені літери (без «кислотних» плашок). */
+  /* Семантика — напівпрозорі фони + приглушені літери (без «кислотних» плашок). */
   --c-success-bg: rgba(125, 200, 165, 0.12);
   --c-success-fg: #9bc2ac;
-  --c-success-soft: #9bc2ac;
+  --c-success-soft: #9bc2ac; /* текст дельт «+» */
   --c-danger-bg: rgba(216, 140, 140, 0.12);
   --c-danger-fg: #cb9a9a;
-  --c-danger-soft: #cb9a9a;
+  --c-danger-soft: #cb9a9a; /* текст дельт «−» */
   --c-warning-bg: rgba(212, 184, 130, 0.12);
   --c-warning-fg: #cab488;
-  --c-danger-solid: #d24d4d; /* трохи приглушений червоний — пасує темній палітрі */
+  --c-danger-solid: #d24d4d; /* суцільна кнопка «Видалити» (приглушений червоний під темну палітру) */
   --c-danger-solid-hover: #be3f3f;
 
-  /* Кнопка «action» на темній — світла хакі (як заголовки), текст темний для контрасту. */
+  /* Кнопка «action» — світла хакі (як заголовки), текст темний для контрасту. */
   --c-action-bg: #9d9b66;
   --c-action-bg-hover: #b8b78d;
   --c-action-fg: #1f1f13;
@@ -84,12 +46,9 @@ html, body {
   font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
 }
 
-html.dark body {
-  background: #17181c;
-}
-
 body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+  @apply text-gray-900 antialiased;
+  background: #17181c; /* фон сторінки — темніший за панелі (gray-50) */
 }
 
 /* Плавна поява фото в галереї (ротація надлишку + первинне завантаження). */

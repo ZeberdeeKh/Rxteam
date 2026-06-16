@@ -33,8 +33,8 @@ export default async function AdminSettings({
       <form action={saveSettings} className="space-y-3">
         {SETTINGS_GROUPS.map((g) => (
           <Collapsible
-            key={g.title}
-            summary={<span className={ui.cardTitle}>{g.title}</span>}
+            key={g.title.en}
+            summary={<span className={ui.cardTitle}>{g.title[lang]}</span>}
             right={<span className={ui.meta}>{g.fields.length}</span>}
           >
             <div className="grid gap-4 sm:grid-cols-2">
@@ -46,7 +46,7 @@ export default async function AdminSettings({
                     className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm"
                   >
                     <span className={ui.label}>
-                      {f.label} <code className={ui.metaFaint}>{f.key}</code>
+                      {f.label[lang]} <code className={ui.metaFaint}>{f.key}</code>
                     </span>
                     <input
                       type="checkbox"
@@ -58,7 +58,7 @@ export default async function AdminSettings({
                 ) : (
                   <label key={f.key} className="block text-sm">
                     <span className={`mb-1 ${ui.label}`}>
-                      {f.label} <code className={ui.metaFaint}>{f.key}</code>
+                      {f.label[lang]} <code className={ui.metaFaint}>{f.key}</code>
                     </span>
                     {f.type === "textarea" ? (
                       <textarea
