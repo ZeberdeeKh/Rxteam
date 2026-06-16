@@ -110,7 +110,7 @@ export const ui = {
   warnText: "text-[var(--c-warning-fg)]",
   metaFaint: "text-xs text-gray-400",
   price: "text-sm font-semibold text-[var(--c-brand-text)]",
-  wordmark: "rx-chamfer-fill [--cut:10px] inline-block bg-[var(--c-primary)] px-4 py-1 font-display text-[2.34rem] font-extrabold uppercase leading-none tracking-wide text-black",
+  wordmark: "rx-chamfer-fill [--cut:6px] inline-block bg-[var(--c-primary)] px-3 py-1 font-display text-lg font-extrabold uppercase leading-none tracking-wide text-black",
   emptyState: "border border-dashed border-gray-300 p-5 text-sm text-gray-500",
 
   // Ширини центрованих сторінок (ADR-0024): narrow=форма/діалог, prose=стаття/кабінет, wide=контент
