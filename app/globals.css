@@ -61,6 +61,14 @@ html, body {
   font-family: "Mulish", ui-sans-serif, system-ui, sans-serif;
 }
 
+/* Резервуємо місце під смугу прокрутки з ОБОХ боків. Без цього на Windows
+   класичний скролбар (~15px) забирає ширину справа лише на довгих сторінках,
+   і центрована колонка (mx-auto) зміщується вліво — контент «стрибає» між
+   сторінками зі скролом і без. both-edges тримає його строго по центру. */
+html {
+  scrollbar-gutter: stable both-edges;
+}
+
 body {
   @apply text-gray-900 antialiased;
   min-height: 100vh;
