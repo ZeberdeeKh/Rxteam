@@ -4,7 +4,7 @@ import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
 import { SOCIALS } from "@/lib/social";
 import { saveSocial } from "@/app/admin/actions";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +45,7 @@ export default async function AdminSocial({
           </div>
         </fieldset>
 
-        <button type="submit" className={buttonClass("primary", "md")}>
+        <button type="submit" className={btn("action", "md")}>
           {st(lang, "adm_save")}
         </button>
       </form>

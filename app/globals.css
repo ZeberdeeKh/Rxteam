@@ -31,6 +31,8 @@
   --c-danger-soft: #dc2626; /* red-600 — текст дельт «−» */
   --c-warning-bg: #fef3c7; /* amber-100 */
   --c-warning-fg: #b45309; /* amber-700 */
+  --c-danger-solid: #dc2626; /* суцільна кнопка «Видалити» (red-600) */
+  --c-danger-solid-hover: #b91c1c; /* red-700 */
 }
 
 html.dark {
@@ -58,6 +60,8 @@ html.dark {
   --c-danger-soft: #fca5a5;
   --c-warning-bg: rgba(251, 191, 36, 0.14);
   --c-warning-fg: #fcd34d;
+  --c-danger-solid: #d24d4d; /* трохи приглушений червоний — пасує темній палітрі */
+  --c-danger-solid-hover: #be3f3f;
 }
 
 html, body {

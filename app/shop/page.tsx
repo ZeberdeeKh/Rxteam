@@ -13,7 +13,7 @@ import {
   type Rank,
 } from "@/lib/economy";
 import { buyItem, buyRank } from "@/app/shop/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -112,7 +112,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   {player && (
                     <form action={buyItem}>
                       <input type="hidden" name="itemId" value={it.id} />
-                      <button type="submit" disabled={!affordable} className={buttonClass("primary", "md")}>
+                      <button type="submit" disabled={!affordable} className={btn("action", "md")}>
                         {st(lang, "shop_buy")}
                       </button>
                     </form>
@@ -162,7 +162,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                     ) : isNext && player ? (
                       <form action={buyRank}>
                         <input type="hidden" name="rank" value={r} />
-                        <button type="submit" disabled={!affordable} className={buttonClass("primary", "md")}>
+                        <button type="submit" disabled={!affordable} className={btn("action", "md")}>
                           {st(lang, "shop_buy")}
                         </button>
                       </form>

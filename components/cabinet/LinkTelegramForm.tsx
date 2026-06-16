@@ -3,12 +3,12 @@
 import { useFormState, useFormStatus } from "react-dom";
 import { linkTelegram, type LinkState } from "@/app/cabinet/actions";
 import { st, type Lang } from "@/lib/site-i18n";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className={buttonClass("primary")}>
+    <button type="submit" disabled={pending} className={btn("action")}>
       {pending ? "…" : label}
     </button>
   );

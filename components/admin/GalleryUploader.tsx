@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { st, type Lang } from "@/lib/site-i18n";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 // Ліміт = ліміт bucket-а `gallery` у Supabase (1 МБ на файл). Тримати синхронно з route.ts.
 const MAX_BYTES = 1 * 1024 * 1024;
@@ -84,7 +84,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         <button
           type="submit"
           disabled={status === "uploading"}
-          className={buttonClass("primary", "md")}
+          className={btn("action", "md")}
         >
           {status === "uploading" ? st(lang, "adm_gallery_uploading") : st(lang, "adm_btn_upload")}
         </button>

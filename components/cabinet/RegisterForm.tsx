@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import { registerForGame } from "@/app/cabinet/actions";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 // Форма запису на гру: оренда + транспорт (own/need) + (для own) звідки + вільні місця.
 // returnTo — куди повернути після сабміту (/cabinet за дефолтом або /games).
@@ -69,7 +69,7 @@ export default function RegisterForm({
         </div>
       )}
 
-      <button type="submit" className={buttonClass("primary", "md")}>
+      <button type="submit" className={btn("action", "md")}>
         {st(lang, "btn_register")}
       </button>
     </form>

@@ -5,7 +5,7 @@ import { requirePerm } from "@/lib/admin";
 import { listGamesAdmin, listLocations } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { createGame } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -81,7 +81,7 @@ export default async function AdminGames({
               <textarea name="scenario_uk" rows={2} className={inputCls} />
             </label>
             <div className="sm:col-span-2">
-              <button type="submit" className={buttonClass("primary", "md")}>
+              <button type="submit" className={btn("action", "md")}>
                 {st(lang, "adm_btn_create")}
               </button>
             </div>

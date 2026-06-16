@@ -16,7 +16,7 @@ import RegisterForm from "@/components/cabinet/RegisterForm";
 import CheckinButton from "@/components/cabinet/CheckinButton";
 import GameCard from "@/components/site/GameCard";
 import { createStandalone, saveCallsign, unregisterFromGame } from "@/app/cabinet/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -79,7 +79,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           <h2 className={ui.cardTitle}>{st(lang, "standalone_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
           <form action={createStandalone} className="mt-3">
-            <button type="submit" className={buttonClass("secondary", "md")}>
+            <button type="submit" className={btn("action", "md")}>
               {st(lang, "standalone_btn")}
             </button>
           </form>
@@ -111,7 +111,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               placeholder={st(lang, "callsign_ph")}
               className={`${ui.input} flex-1`}
             />
-            <button type="submit" className={buttonClass("primary", "md")}>
+            <button type="submit" className={btn("action", "md")}>
               {st(lang, "callsign_btn")}
             </button>
           </form>
@@ -228,7 +228,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                     {g.canUnregister && (
                       <form action={unregisterFromGame}>
                         <input type="hidden" name="gameId" value={g.id} />
-                        <button type="submit" className={buttonClass("danger", "md")}>
+                        <button type="submit" className={btn("delete", "md")}>
                           {st(lang, "btn_unregister")}
                         </button>
                       </form>

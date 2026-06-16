@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getAdmin, hasPerm } from "@/lib/admin";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -21,17 +21,17 @@ export default async function AdminExportPage() {
       <h1 className={ui.pageTitle}>{st(lang, "adm_nav_export")}</h1>
       <div className="flex flex-wrap gap-2">
         {canPlayers && (
-          <a href="/admin/export/players" className={buttonClass("secondary", "sm")}>
+          <a href="/admin/export/players" className={btn("action", "sm")}>
             {st(lang, "adm_export_players")}
           </a>
         )}
         {canGames && (
-          <a href="/admin/export/registrations" className={buttonClass("secondary", "sm")}>
+          <a href="/admin/export/registrations" className={btn("action", "sm")}>
             {st(lang, "adm_export_regs")}
           </a>
         )}
         {canCheckin && (
-          <a href="/admin/export/checkins" className={buttonClass("secondary", "sm")}>
+          <a href="/admin/export/checkins" className={btn("action", "sm")}>
             {st(lang, "adm_export_checkins")}
           </a>
         )}

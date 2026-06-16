@@ -13,30 +13,7 @@
 //   display 3xl · pageTitle 2xl · sectionTitle lg · cardTitle base · body sm · meta xs
 // ─────────────────────────────────────────────────────────────────────────────
 
-// ── Кнопки ──
-export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
-export type ButtonSize = "sm" | "md";
-
-const BTN_BASE =
-  "inline-flex items-center justify-center gap-1.5 rounded-md font-medium uppercase tracking-wide transition " +
-  "disabled:opacity-60 disabled:pointer-events-none focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40";
-
-const BTN_VARIANT: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-neutral-50 hover:bg-brand-dark shadow-sm",
-  secondary: "border border-gray-300 text-gray-700 hover:border-brand hover:text-brand",
-  ghost: "text-gray-700 hover:bg-brand/10 hover:text-brand",
-  danger: "border border-red-300 text-red-700 hover:bg-red-50",
-};
-
-const BTN_SIZE: Record<ButtonSize, string> = {
-  sm: "px-2.5 py-1 text-xs",
-  md: "px-4 py-2 text-sm",
-};
-
-/** Клас для будь-якого «кнопкового» елемента (button / Link / a). */
-export function buttonClass(variant: ButtonVariant = "primary", size: ButtonSize = "md"): string {
-  return `${BTN_BASE} ${BTN_VARIANT[variant]} ${BTN_SIZE[size]}`;
-}
+// Кнопки винесено в окремий модуль — див. ./buttons.ts (рівно 2 типи: action / delete).
 
 // ── Бейджі (pill) ──
 // Семантичні кольори (green/red/amber) беруться з CSS-змінних — приглушуються на темній темі.

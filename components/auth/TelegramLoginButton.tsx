@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { buttonClass } from "@/components/ui";
+import { btn } from "@/components/ui";
 
 // Дані, які Telegram повертає після авторизації (підписані полем hash).
 type TgUser = Record<string, string | number>;
@@ -22,7 +22,7 @@ declare global {
 const SCRIPT_ID = "telegram-widget-js";
 const SCRIPT_SRC = "https://telegram.org/js/telegram-widget.js?22";
 
-// Власна кнопка входу через Telegram у стилі форми (buttonClass "primary").
+// Власна кнопка входу через Telegram у стилі форми (btn "primary").
 // Кнопку малюємо ми, а авторизацію відкриває ОФІЦІЙНИЙ скрипт віджета через
 // window.Telegram.Login.auth — той самий popup, що й офіційна синя кнопка.
 // Результат приходить у callback (postMessage, БЕЗ hash-фрагмента), далі
@@ -67,7 +67,7 @@ export default function TelegramLoginButton({ botId, label }: { botId: string; l
       type="button"
       onClick={login}
       disabled={!ready}
-      className={`${buttonClass("primary")} w-full`}
+      className={`${btn("action")} w-full`}
     >
       <TelegramIcon />
       {label}

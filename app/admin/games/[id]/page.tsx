@@ -6,7 +6,7 @@ import { requirePerm, getAdmin, hasPerm } from "@/lib/admin";
 import { getGameDetail } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { cancelGame, manualCheckin, markNoShow } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +44,7 @@ export default async function AdminGameDetail({
         {game.status === "announced" && (
           <form action={cancelGame}>
             <input type="hidden" name="gameId" value={game.id} />
-            <button type="submit" className={buttonClass("danger", "sm")}>
+            <button type="submit" className={btn("delete", "sm")}>
               {st(lang, "adm_btn_cancel_game")}
             </button>
           </form>
@@ -105,7 +105,7 @@ export default async function AdminGameDetail({
                             <form action={manualCheckin}>
                               <input type="hidden" name="gameId" value={game.id} />
                               <input type="hidden" name="playerId" value={r.playerId} />
-                              <button type="submit" className={buttonClass("primary", "sm")}>
+                              <button type="submit" className={btn("action", "sm")}>
                                 {st(lang, "adm_btn_checkin")}
                               </button>
                             </form>
@@ -113,7 +113,7 @@ export default async function AdminGameDetail({
                               <form action={markNoShow}>
                                 <input type="hidden" name="gameId" value={game.id} />
                                 <input type="hidden" name="playerId" value={r.playerId} />
-                                <button type="submit" className={buttonClass("danger", "sm")}>
+                                <button type="submit" className={btn("delete", "sm")}>
                                   {st(lang, "adm_btn_noshow")}
                                 </button>
                               </form>

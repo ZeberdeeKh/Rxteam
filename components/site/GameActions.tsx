@@ -3,7 +3,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
 import RegisterForm from "@/components/cabinet/RegisterForm";
 import { unregisterFromGame } from "@/app/cabinet/actions";
-import { buttonClass, badgeClass } from "@/components/ui";
+import { btn, badgeClass } from "@/components/ui";
 
 // Дії над грою на публічній /games (слот children у GameCard).
 // Перевикористовує RegisterForm/unregisterFromGame з кабінету (returnTo="/games").
@@ -52,7 +52,7 @@ export default function GameActions({
           <form action={unregisterFromGame}>
             <input type="hidden" name="gameId" value={gameId} />
             <input type="hidden" name="returnTo" value="/games" />
-            <button type="submit" className={buttonClass("danger", "md")}>
+            <button type="submit" className={btn("delete", "md")}>
               {st(lang, "btn_unregister")}
             </button>
           </form>

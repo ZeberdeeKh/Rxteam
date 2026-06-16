@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { AdminPlayer } from "@/lib/admin-data";
 import { adjustPoints, setPlayerCallsign, togglePatch, makeAdmin } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass, Collapsible } from "@/components/ui";
+import { ui, btn, badgeClass, Collapsible } from "@/components/ui";
 
 // Список гравців (адмінка): пошук по будь-якому слову + компактний рядок,
 // що розгортає панель дій по кліку. Серверні екшени викликаються з форм напряму.
@@ -107,7 +107,7 @@ export default function PlayersAdmin({
                         className={`${ui.inputSm} w-28`}
                         required
                       />
-                      <button type="submit" className={buttonClass("primary", "sm")}>
+                      <button type="submit" className={btn("action", "sm")}>
                         {st(lang, "adm_btn_adjust")}
                       </button>
                     </form>
@@ -115,14 +115,14 @@ export default function PlayersAdmin({
                     <form action={setPlayerCallsign} className="flex items-center gap-1">
                       <input type="hidden" name="playerId" value={p.id} />
                       <input name="callsign" defaultValue={p.callsign ?? ""} className={`${ui.inputSm} w-28`} />
-                      <button type="submit" className={buttonClass("secondary", "sm")}>
+                      <button type="submit" className={btn("action", "sm")}>
                         {st(lang, "adm_btn_callsign")}
                       </button>
                     </form>
 
                     <form action={togglePatch}>
                       <input type="hidden" name="playerId" value={p.id} />
-                      <button type="submit" className={buttonClass("secondary", "sm")}>
+                      <button type="submit" className={btn("action", "sm")}>
                         {st(lang, "adm_btn_patch")}
                       </button>
                     </form>
@@ -131,7 +131,7 @@ export default function PlayersAdmin({
                     {isMaster && !p.is_master && !p.is_admin && (
                       <form action={makeAdmin}>
                         <input type="hidden" name="playerId" value={p.id} />
-                        <button type="submit" className={buttonClass("primary", "sm")}>
+                        <button type="submit" className={btn("action", "sm")}>
                           {st(lang, "adm_make_admin")}
                         </button>
                       </form>

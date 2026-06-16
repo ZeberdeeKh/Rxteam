@@ -3,7 +3,7 @@ import { st } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listGalleryMedia } from "@/lib/admin-data";
 import { toggleGalleryMedia, deleteGalleryMedia } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 import GalleryUploader from "@/components/admin/GalleryUploader";
 
 export const dynamic = "force-dynamic";
@@ -40,13 +40,13 @@ export default async function AdminGallery({ searchParams }: { searchParams: { s
                 <div className="flex gap-2">
                   <form action={toggleGalleryMedia}>
                     <input type="hidden" name="id" value={p.id} />
-                    <button type="submit" className={buttonClass("secondary", "sm")}>
+                    <button type="submit" className={btn("action", "sm")}>
                       {st(lang, p.status === "hidden" ? "adm_btn_show" : "adm_btn_hide")}
                     </button>
                   </form>
                   <form action={deleteGalleryMedia}>
                     <input type="hidden" name="id" value={p.id} />
-                    <button type="submit" className={buttonClass("danger", "sm")}>
+                    <button type="submit" className={btn("delete", "sm")}>
                       {st(lang, "adm_btn_delete")}
                     </button>
                   </form>

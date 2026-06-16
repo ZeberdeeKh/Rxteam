@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useFormState, useFormStatus } from "react-dom";
 import { signIn, signUp, type AuthState } from "@/app/auth/actions";
 import { st, type Lang } from "@/lib/site-i18n";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
@@ -12,7 +12,7 @@ function SubmitButton({ label }: { label: string }) {
     <button
       type="submit"
       disabled={pending}
-      className={`${buttonClass("primary")} w-full`}
+      className={`${btn("action")} w-full`}
     >
       {pending ? "…" : label}
     </button>
@@ -24,7 +24,7 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
   const [state, formAction] = useFormState<AuthState, FormData>(action, {});
 
   const title = mode === "login" ? "auth_login_title" : "auth_register_title";
-  const btn = mode === "login" ? "auth_login_btn" : "auth_register_btn";
+  const submitKey = mode === "login" ? "auth_login_btn" : "auth_register_btn";
   const switchKey = mode === "login" ? "auth_to_register" : "auth_to_login";
   const switchHref = mode === "login" ? "/register" : "/login";
 
@@ -67,11 +67,11 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
 
         {state?.error && <p className={ui.alertErr}>{st(lang, state.error)}</p>}
 
-        <SubmitButton label={st(lang, btn)} />
+        <SubmitButton label={st(lang, submitKey)} />
       </form>
 
       <div className="mt-6 border-t border-gray-200 pt-4">
-        <Link href={switchHref} className={`${buttonClass("secondary")} w-full`}>
+        <Link href={switchHref} className={`${btn("action")} w-full`}>
           {st(lang, switchKey)}
         </Link>
       </div>

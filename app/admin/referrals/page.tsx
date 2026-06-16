@@ -4,7 +4,7 @@ import { requirePerm } from "@/lib/admin";
 import { listReferrals } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { setReferralStatus } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -60,14 +60,14 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="confirmed" />
-                          <button type="submit" className={buttonClass("primary", "sm")}>
+                          <button type="submit" className={btn("action", "sm")}>
                             {st(lang, "adm_btn_confirm")}
                           </button>
                         </form>
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="rejected" />
-                          <button type="submit" className={buttonClass("danger", "sm")}>
+                          <button type="submit" className={btn("delete", "sm")}>
                             {st(lang, "adm_btn_reject")}
                           </button>
                         </form>

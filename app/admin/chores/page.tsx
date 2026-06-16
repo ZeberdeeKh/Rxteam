@@ -3,7 +3,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import { requireMaster } from "@/lib/admin";
 import { listChoreTemplates } from "@/lib/admin-data";
 import { createChore, updateChore, deleteChore } from "@/app/admin/actions";
-import { ui, buttonClass } from "@/components/ui";
+import { ui, btn } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -57,7 +57,7 @@ export default async function AdminChores({
             <input name="note" className={ui.input} />
           </label>
           <div className="flex items-end sm:col-span-12">
-            <button type="submit" className={buttonClass("primary", "md")}>
+            <button type="submit" className={btn("action", "md")}>
               {st(lang, "adm_btn_create")}
             </button>
           </div>
@@ -99,7 +99,7 @@ export default async function AdminChores({
                   {st(lang, "adm_chore_active")}
                 </label>
                 <div className="flex items-center gap-2 sm:col-span-12">
-                  <button type="submit" className={buttonClass("secondary", "sm")}>
+                  <button type="submit" className={btn("action", "sm")}>
                     {st(lang, "adm_btn_save")}
                   </button>
                 </div>
@@ -107,7 +107,7 @@ export default async function AdminChores({
 
               <form action={deleteChore} className="mt-2 border-t border-gray-100 pt-2">
                 <input type="hidden" name="id" value={it.id} />
-                <button type="submit" className={buttonClass("danger", "sm")}>
+                <button type="submit" className={btn("delete", "sm")}>
                   {st(lang, "adm_btn_delete")}
                 </button>
               </form>

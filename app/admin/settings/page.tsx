@@ -4,7 +4,7 @@ import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
 import { SETTINGS_GROUPS, SETTING_DEFAULTS } from "@/lib/admin-settings";
 import { saveSettings } from "@/app/admin/actions";
-import { ui, buttonClass, Collapsible } from "@/components/ui";
+import { ui, btn, Collapsible } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -88,7 +88,7 @@ export default async function AdminSettings({
           </Collapsible>
         ))}
 
-        <button type="submit" className={buttonClass("primary", "md")}>
+        <button type="submit" className={btn("action", "md")}>
           {st(lang, "adm_save")}
         </button>
       </form>

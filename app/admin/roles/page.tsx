@@ -3,7 +3,7 @@ import { st } from "@/lib/site-i18n";
 import { requireMaster, ALL_PERMS } from "@/lib/admin";
 import { listPlayers } from "@/lib/admin-data";
 import { saveRoles } from "@/app/admin/actions";
-import { ui, buttonClass, badgeClass, Collapsible } from "@/components/ui";
+import { ui, btn, badgeClass, Collapsible } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +66,7 @@ export default async function AdminRoles({
                   </label>
                 ))}
                 {!p.is_master && (
-                  <button type="submit" className={`ml-auto ${buttonClass("primary", "sm")}`}>
+                  <button type="submit" className={`ml-auto ${btn("action", "sm")}`}>
                     {st(lang, "adm_btn_save_roles")}
                   </button>
                 )}
