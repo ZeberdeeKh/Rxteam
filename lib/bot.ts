@@ -781,6 +781,7 @@ bot.command("profile", async (ctx) => {
     callsign: p.callsign ?? tr(lang, "callsign_unset"),
     tg: p.tg_username ? "@" + p.tg_username : "—",
     rank: rankStr,
+    patch: p.has_patch ? tr(lang, "patch_yes") : tr(lang, "patch_no"),
     games: p.games_played ?? 0,
     earned: p.points_earned ?? 0,
     balance: p.points_balance ?? 0,

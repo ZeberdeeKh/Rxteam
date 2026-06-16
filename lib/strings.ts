@@ -15,15 +15,17 @@ const S: Record<string, Dict> = {
     uk: "✅ Мову встановлено: українська.",
   },
   profile: {
-    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nStopień: {rank}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
-    en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nRank: {rank}\nGames played: {games}\n⭐ Earned: {earned}\n💰 Balance: {balance}\n🎯 Reliability: {reliability}",
-    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nЗвання: {rank}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
+    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nStopień: {rank}\nNaszywka: {patch}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
+    en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nRank: {rank}\nPatch: {patch}\nGames played: {games}\n⭐ Earned: {earned}\n💰 Balance: {balance}\n🎯 Reliability: {reliability}",
+    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nЗвання: {rank}\nНашивка: {patch}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
   },
   no_patch_label: {
     pl: "brak (potrzebny patch)",
     en: "none (patch needed)",
     uk: "немає (потрібен патч)",
   },
+  patch_yes: { pl: "✅ jest", en: "✅ yes", uk: "✅ є" },
+  patch_no: { pl: "❌ brak", en: "❌ no", uk: "❌ немає" },
   callsign_unset: {
     pl: "nie ustawiony (podasz przy pierwszej rejestracji)",
     en: "not set (you'll enter it at first sign-up)",
