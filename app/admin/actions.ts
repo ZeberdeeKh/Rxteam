@@ -451,6 +451,64 @@ export async function markFulfilled(formData: FormData) {
   backShop("?fulfilled=1");
 }
 
+// ── Ачівки (майстер) ──
+const backAch = (q: string) => redirect(`/admin/achievements${q}`);
+
+const ACH_TIERS = ["easy", "mid", "hard"];
+
+// Поля ачівки з форми (спільні для створення і правки; без code — він окремо).
+function parseAchievement(formData: FormData) {
+  const tier = String(formData.get("tier") ?? "mid").trim();
+  return {
+    title_pl: String(formData.get("title_pl") ?? "").trim() || null,
+    title_en: String(formData.get("title_en") ?? "").trim() || null,
+    title_uk: String(formData.get("title_uk") ?? "").trim() || null,
+    tier: ACH_TIERS.includes(tier) ? tier : "mid",
+    enabled: formData.get("enabled") === "on",
+  };
+}
+
+export async function createAchievement(formData: FormData) {
+  await requireMaster();
+  const code = String(formData.get("code") ?? "").trim().toLowerCase();
+  const ach = parseAchievement(formData);
+  // Код — первинний ключ: лише латиниця/цифри/підкреслення. Назва — хоча б одна.
+  if (!/^[a-z0-9_]+$/.test(code) || (!ach.title_pl && !ach.title_en && !ach.title_uk)) {
+    backAch("?err=fields");
+  }
+  const { error } = await supabase.from("achievements").insert({ code, ...ach });
+  if (error) backAch("?err=dup"); // конфлікт коду (PK)
+  revalidatePath("/admin/achievements");
+  backAch("?created=1");
+}
+
+export async function updateAchievement(formData: FormData) {
+  await requireMaster();
+  const code = String(formData.get("code") ?? "").trim();
+  const ach = parseAchievement(formData);
+  if (!code || (!ach.title_pl && !ach.title_en && !ach.title_uk)) backAch("?err=fields");
+  await supabase.from("achievements").update(ach).eq("code", code);
+  revalidatePath("/admin/achievements");
+  backAch("?saved=1");
+}
+
+export async function deleteAchievement(formData: FormData) {
+  await requireMaster();
+  const code = String(formData.get("code") ?? "").trim();
+  if (!code) backAch("");
+  // player_achievements.code → achievements.code (RESTRICT). Якщо ачівку вже
+  // здобули — не видаляємо (втратили б історію й бали), а просимо вимкнути.
+  const { data: used } = await supabase
+    .from("player_achievements")
+    .select("id")
+    .eq("code", code)
+    .limit(1);
+  if ((used ?? []).length > 0) backAch("?err=inuse");
+  await supabase.from("achievements").delete().eq("code", code);
+  revalidatePath("/admin/achievements");
+  backAch("?deleted=1");
+}
+
 // ── Фото-галерея (право gallery) ──
 // Перемикає видимість фото (visible ↔ hidden) без видалення файлу.
 export async function toggleGalleryMedia(formData: FormData) {

@@ -369,3 +369,72 @@ export async function listPurchasesAdmin(limit = 200): Promise<AdminPurchase[]> 
     };
   });
 }
+
+// ── Ачівки (адмінка) ──
+export type AdminAchievement = {
+  code: string;
+  title_pl: string | null;
+  title_en: string | null;
+  title_uk: string | null;
+  tier: string; // easy | mid | hard (визначає бали через settings)
+  enabled: boolean;
+  earnedCount: number; // скільки гравців уже здобули (блокує видалення)
+};
+
+// Каталог ачівок для адмінки: усі, зокрема вимкнені, з лічильником здобуттів.
+export async function listAchievementsAdmin(): Promise<AdminAchievement[]> {
+  const [{ data: achs }, { data: earned }] = await Promise.all([
+    supabase
+      .from("achievements")
+      .select("code, title_pl, title_en, title_uk, tier, enabled")
+      .order("code", { ascending: true }),
+    supabase.from("player_achievements").select("code"),
+  ]);
+  const counts = new Map<string, number>();
+  for (const r of (earned ?? []) as { code: string }[]) {
+    counts.set(r.code, (counts.get(r.code) ?? 0) + 1);
+  }
+  return ((achs ?? []) as any[]).map((a) => ({
+    code: a.code as string,
+    title_pl: a.title_pl ?? null,
+    title_en: a.title_en ?? null,
+    title_uk: a.title_uk ?? null,
+    tier: (a.tier as string) ?? "mid",
+    enabled: !!a.enabled,
+    earnedCount: counts.get(a.code as string) ?? 0,
+  }));
+}
+
+export type AdminPlayerAchievement = {
+  id: number;
+  code: string;
+  created_at: string;
+  callsign: string | null;
+  name: string | null;
+  achTitle: { pl: string | null; en: string | null; uk: string | null } | null;
+};
+
+// Журнал здобутих ачівок: новіші — згори.
+export async function listPlayerAchievementsAdmin(limit = 200): Promise<AdminPlayerAchievement[]> {
+  const { data } = await supabase
+    .from("player_achievements")
+    .select(
+      "id, code, created_at, players(callsign, name), achievements(title_pl, title_en, title_uk)",
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r: any) => {
+    const p = Array.isArray(r.players) ? r.players[0] : r.players;
+    const a = Array.isArray(r.achievements) ? r.achievements[0] : r.achievements;
+    return {
+      id: r.id as number,
+      code: r.code as string,
+      created_at: r.created_at as string,
+      callsign: p?.callsign ?? null,
+      name: p?.name ?? null,
+      achTitle: a
+        ? { pl: a.title_pl ?? null, en: a.title_en ?? null, uk: a.title_uk ?? null }
+        : null,
+    };
+  });
+}

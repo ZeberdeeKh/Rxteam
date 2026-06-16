@@ -697,6 +697,35 @@ const SITE: Record<string, Dict> = {
   adm_shop_status_done: { pl: "Wydano", en: "Handed over", uk: "Видано" },
   adm_shop_mark_done: { pl: "Wydano", en: "Hand over", uk: "Видати" },
 
+  // Ачівки (адмінка)
+  adm_nav_achievements: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" },
+  adm_ach_add: { pl: "Nowe osiągnięcie", en: "New achievement", uk: "Нова ачівка" },
+  adm_ach_empty: { pl: "Brak osiągnięć.", en: "No achievements yet.", uk: "Немає ачівок." },
+  adm_ach_disabled: { pl: "wyłączone", en: "disabled", uk: "вимкнено" },
+  adm_ach_code: { pl: "Kod (unikalny)", en: "Code (unique)", uk: "Код (унікальний)" },
+  adm_ach_tier: { pl: "Poziom", en: "Tier", uk: "Рівень" },
+  adm_ach_tier_easy: { pl: "łatwe", en: "easy", uk: "легка" },
+  adm_ach_tier_mid: { pl: "średnie", en: "mid", uk: "середня" },
+  adm_ach_tier_hard: { pl: "trudne", en: "hard", uk: "складна" },
+  adm_ach_enabled: { pl: "Włączone", en: "Enabled", uk: "Увімкнено" },
+  adm_ach_earned_hint: {
+    pl: "Zdobyte przez graczy — wyłącz zamiast usuwać.",
+    en: "Earned by players — disable instead of deleting.",
+    uk: "Здобуто гравцями — вимкни замість видалення.",
+  },
+  adm_ach_log_title: { pl: "Zdobyte osiągnięcia", en: "Earned achievements", uk: "Здобуті ачівки" },
+  adm_ach_log_empty: { pl: "Nikt jeszcze nic nie zdobył.", en: "Nothing earned yet.", uk: "Ще нічого не здобуто." },
+  adm_ach_col_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
+  adm_ach_col_ach: { pl: "Osiągnięcie", en: "Achievement", uk: "Ачівка" },
+  adm_ach_col_code: { pl: "Kod", en: "Code", uk: "Код" },
+  adm_ach_col_date: { pl: "Data", en: "Date", uk: "Дата" },
+  adm_ach_err_dup: { pl: "Taki kod już istnieje.", en: "That code already exists.", uk: "Такий код уже існує." },
+  adm_ach_err_inuse: {
+    pl: "Osiągnięcie jest już zdobyte — wyłącz je zamiast usuwać.",
+    en: "Achievement already earned — disable it instead of deleting.",
+    uk: "Ачівку вже здобуто — вимкни її замість видалення.",
+  },
+
   adm_games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_game_create: { pl: "Nowa gra", en: "New game", uk: "Нова гра" },
   adm_no_locations: {
