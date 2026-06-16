@@ -45,7 +45,7 @@ const back = (q: string) => redirect(`/cabinet${q}`);
 
 // Куди повертати після дії: /cabinet (дефолт) або /games — за полем returnTo форми.
 // Дозволяємо лише власні шляхи (захист від open-redirect).
-const RETURN_PATHS = new Set(["/cabinet", "/games"]);
+const RETURN_PATHS = new Set(["/cabinet", "/games", "/my-games"]);
 function backTo(formData: FormData, q: string): never {
   const rt = String(formData.get("returnTo") ?? "");
   const base = RETURN_PATHS.has(rt) ? rt : "/cabinet";
@@ -120,6 +120,7 @@ export async function registerForGame(formData: FormData) {
 
   revalidatePath("/cabinet");
   revalidatePath("/games");
+  revalidatePath("/my-games");
   backTo(formData, "?reg=1");
 }
 
@@ -142,6 +143,7 @@ export async function unregisterFromGame(formData: FormData) {
     .eq("player_id", player.id);
   revalidatePath("/cabinet");
   revalidatePath("/games");
+  revalidatePath("/my-games");
   backTo(formData, "?unreg=1");
 }
 
@@ -153,7 +155,7 @@ export async function webCheckin(formData: FormData) {
   const gameId = Number(formData.get("gameId"));
   const lat = Number(formData.get("lat"));
   const lng = Number(formData.get("lng"));
-  if (!Number.isFinite(gameId) || !Number.isFinite(lat) || !Number.isFinite(lng)) back("?err=geo");
+  if (!Number.isFinite(gameId) || !Number.isFinite(lat) || !Number.isFinite(lng)) backTo(formData, "?err=geo");
 
   const { data: game } = await supabase
     .from("games")
@@ -168,7 +170,7 @@ export async function webCheckin(formData: FormData) {
     now < new Date(game.checkin_from).getTime() ||
     now > new Date(game.checkin_to).getTime()
   ) {
-    back("?err=checkin_window");
+    backTo(formData, "?err=checkin_window");
   }
 
   // Має бути реєстрація (registered/no_show) — не пускаємо чек-ін без запису.
@@ -178,11 +180,11 @@ export async function webCheckin(formData: FormData) {
     .eq("game_id", gameId)
     .eq("player_id", player.id)
     .maybeSingle();
-  if (!reg || (reg.status !== "registered" && reg.status !== "no_show")) back("?err=not_registered");
+  if (!reg || (reg.status !== "registered" && reg.status !== "no_show")) backTo(formData, "?err=not_registered");
 
   const gl = (game as any).locations;
   const dist = Math.round(distanceMeters(lat, lng, gl.lat, gl.lng));
-  if (dist > gl.radius_m) back("?err=too_far");
+  if (dist > gl.radius_m) backTo(formData, "?err=too_far");
 
   const { data: existing } = await supabase
     .from("checkins")
@@ -190,7 +192,7 @@ export async function webCheckin(formData: FormData) {
     .eq("game_id", gameId)
     .eq("player_id", player.id)
     .maybeSingle();
-  if (existing) back("?err=checkin_already");
+  if (existing) backTo(formData, "?err=checkin_already");
 
   const earlyMin = Math.floor((now - new Date(game!.checkin_from).getTime()) / 60000);
   await performCheckin({
@@ -210,5 +212,6 @@ export async function webCheckin(formData: FormData) {
   });
 
   revalidatePath("/cabinet");
-  back("?checkin=1");
+  revalidatePath("/my-games");
+  backTo(formData, "?checkin=1");
 }

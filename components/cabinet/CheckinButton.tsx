@@ -6,7 +6,16 @@ import { webCheckin } from "@/app/cabinet/actions";
 import { btn, ui } from "@/components/ui";
 
 // Веб-чек-ін: бере геолокацію браузера → кладе lat/lng у форму → сабмітить серверну дію.
-export default function CheckinButton({ gameId, lang }: { gameId: number; lang: Lang }) {
+// returnTo — куди повернути після чек-іну (/cabinet за дефолтом або /my-games).
+export default function CheckinButton({
+  gameId,
+  lang,
+  returnTo,
+}: {
+  gameId: number;
+  lang: Lang;
+  returnTo?: string;
+}) {
   const [status, setStatus] = useState<"idle" | "locating" | "error">("idle");
 
   function onClick(e: React.MouseEvent<HTMLButtonElement>) {
@@ -31,6 +40,7 @@ export default function CheckinButton({ gameId, lang }: { gameId: number; lang: 
   return (
     <form action={webCheckin}>
       <input type="hidden" name="gameId" value={gameId} />
+      {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
       <input type="hidden" name="lat" />
       <input type="hidden" name="lng" />
       <button

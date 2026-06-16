@@ -4,18 +4,13 @@ import { st, type Lang } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-player";
 import { getReliability } from "@/lib/economy";
 import {
-  getCabinetGames,
   getPointLog,
   getPlayerAchievements,
-  type CabinetGame,
   type PlayerAch,
 } from "@/lib/site-data";
 import { formatGameWhen } from "@/lib/games";
 import LinkTelegramForm from "@/components/cabinet/LinkTelegramForm";
-import RegisterForm from "@/components/cabinet/RegisterForm";
-import CheckinButton from "@/components/cabinet/CheckinButton";
-import GameCard from "@/components/site/GameCard";
-import { createStandalone, saveCallsign, unregisterFromGame } from "@/app/cabinet/actions";
+import { createStandalone, saveCallsign } from "@/app/cabinet/actions";
 import { ui, btn, badgeClass, OrDivider, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -35,13 +30,6 @@ function successKey(f: Flags): string | null {
 
 function achTitle(a: PlayerAch, lang: Lang): string {
   return (lang === "pl" ? a.title_pl : lang === "uk" ? a.title_uk : a.title_en) ?? a.code;
-}
-
-function regStatusLabel(g: CabinetGame, lang: Lang): string | null {
-  if (g.regStatus === "registered") return st(lang, "regst_registered");
-  if (g.regStatus === "cancelled") return st(lang, "regst_cancelled");
-  if (g.regStatus === "no_show") return st(lang, "regst_no_show");
-  return null;
 }
 
 export default async function CabinetPage({ searchParams }: { searchParams: Flags }) {
@@ -110,9 +98,8 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
     );
   }
 
-  const [rel, games, log, achs] = await Promise.all([
+  const [rel, log, achs] = await Promise.all([
     getReliability(player.id),
-    getCabinetGames(player.id),
     getPointLog(player.id, lang),
     getPlayerAchievements(player.id),
   ]);
@@ -170,67 +157,6 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               </li>
             ))}
           </ul>
-        )}
-      </section>
-
-      {/* Мої ігри */}
-      <section>
-        <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "mygames_title")}</h2>
-        {games.length === 0 ? (
-          <p className={ui.emptyState}>{st(lang, "mygames_empty")}</p>
-        ) : (
-          <div className="space-y-4">
-            {games.map((g) => {
-              const label = regStatusLabel(g, lang);
-              return (
-                <GameCard key={g.id} game={g} lang={lang}>
-                  <div className="flex flex-wrap items-center gap-3">
-                    {label && (
-                      <span
-                        className={badgeClass(
-                          g.regStatus === "registered"
-                            ? "green"
-                            : g.regStatus === "no_show"
-                              ? "red"
-                              : "gray",
-                        )}
-                      >
-                        {label}
-                      </span>
-                    )}
-                    {g.checkedIn && (
-                      <span className={`text-xs font-medium ${ui.posText}`}>
-                        {st(lang, "game_checked_in")}
-                      </span>
-                    )}
-
-                    {g.checkinOpen && <CheckinButton gameId={g.id} lang={lang} />}
-
-                    {g.canUnregister && (
-                      <form action={unregisterFromGame}>
-                        <input type="hidden" name="gameId" value={g.id} />
-                        <button type="submit" className={btn("delete")}>
-                          {st(lang, "btn_unregister")}
-                        </button>
-                      </form>
-                    )}
-
-                    {g.regStatus === "registered" && !g.canUnregister && !g.checkinOpen && (
-                      <span className={ui.metaFaint}>
-                        {st(lang, "cancel_locked_info")}
-                      </span>
-                    )}
-                  </div>
-
-                  {g.canRegister && (
-                    <div className="mt-3">
-                      <RegisterForm gameId={g.id} lang={lang} />
-                    </div>
-                  )}
-                </GameCard>
-              );
-            })}
-          </div>
         )}
       </section>
 

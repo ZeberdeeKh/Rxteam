@@ -74,6 +74,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_shop")}
                   </NavLink>
+                  <NavLink href="/my-games" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
+                    {st(lang, "nav_mygames")}
+                  </NavLink>
                   <NavLink href="/cabinet" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_cabinet")}
                   </NavLink>
