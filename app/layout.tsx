@@ -9,7 +9,7 @@ import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 import BugReport from "@/components/BugReport";
 import NavLink from "@/components/site/NavLink";
-import { ui, headerNavClass, headerAdminClass } from "@/components/ui";
+import { ui, headerNavClass, headerAdminClass, Logo } from "@/components/ui";
 
 // Опис слідує мові сайту (cookie rx_lang), тому генеруємо динамічно, а не статично.
 export async function generateMetadata(): Promise<Metadata> {
@@ -61,9 +61,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-3">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
-            {/* Логотип = «RX Team» на тактичній плашці зі зрізаними кутами (rx-chamfer-fill). */}
+            {/* Логотип — компонент Logo (варіанти A–D, перемикач LOGO_VARIANT у Logo.tsx). */}
             <Link href="/" className="inline-flex" aria-label="RX Team">
-              <span className={ui.wordmark}>RX&nbsp;Team</span>
+              <Logo />
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>

@@ -13,6 +13,7 @@ export type { ButtonKind } from "./buttons";
 export { Button } from "./Button";
 export { default as SpotlightCard } from "./SpotlightCard";
 export { default as Reveal } from "./Reveal";
+export { default as Logo } from "./Logo";
 export { default as Collapsible } from "./Collapsible";
 export { default as Modal } from "./Modal";
 export { default as Drawer } from "./Drawer";
