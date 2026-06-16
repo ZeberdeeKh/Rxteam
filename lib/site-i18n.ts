@@ -552,7 +552,6 @@ const SITE: Record<string, Dict> = {
   adm_err_fields: { pl: "Uzupełnij pola.", en: "Fill in the fields.", uk: "Заповни поля." },
 
   adm_nav_settings: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
-  adm_nav_social: { pl: "Sociale", en: "Socials", uk: "Соцмережі" },
   adm_nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_nav_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
   adm_nav_referrals: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },

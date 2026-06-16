@@ -16,7 +16,9 @@ import { REPLICA_CODES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
 
 const back2 = (q: string) => redirect(`/admin/locations${q}`);
 
-// ── Налаштування (майстер) ──
+// ── Налаштування + соцмережі (майстер) ──
+// Соцмережі раніше були окремим розділом /admin/social — тепер це секція в «Налаштуваннях»,
+// тому зберігаємо їх у тій самій дії (лінки виводяться на лендінгу → revalidate "/").
 export async function saveSettings(formData: FormData) {
   await requireMaster();
   for (const key of TOGGLE_KEYS) {
@@ -26,20 +28,13 @@ export async function saveSettings(formData: FormData) {
     const v = formData.get(key);
     if (v !== null) await setSetting(key, String(v));
   }
-  revalidatePath("/admin/settings");
-  redirect("/admin/settings?saved=1");
-}
-
-// ── Соцмережі (майстер) ──
-export async function saveSocial(formData: FormData) {
-  await requireMaster();
   for (const s of SOCIALS) {
     const v = formData.get(s.settingKey);
     if (v !== null) await setSetting(s.settingKey, String(v).trim());
   }
-  revalidatePath("/admin/social");
-  revalidatePath("/"); // лендінг показує лінки
-  redirect("/admin/social?saved=1");
+  revalidatePath("/admin/settings");
+  revalidatePath("/"); // лендінг показує соц-лінки
+  redirect("/admin/settings?saved=1");
 }
 
 // ── Ігри (право games) ──

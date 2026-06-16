@@ -170,8 +170,7 @@
 
 | Дія | Гейт | Рядок | Результат |
 |-----|------|-------|-----------|
-| `saveSettings` | master | `:18` | `settings` ← TOGGLE/VALUE keys → `?saved=1` |
-| `saveSocial` | master | `:32` | `SOCIALS` settingKeys → `?saved=1` |
+| `saveSettings` | master | `:20` | `settings` ← TOGGLE/VALUE keys + `SOCIALS` settingKeys → `?saved=1` |
 | `createGame` | `games` | `:44` | валідація → UTC-вікна → insert `games` `announced` → `?created=1`/`?err=fields` |
 | `cancelGame` | `games` | `:78` | `games.status='cancelled'` + каскад registered→cancelled → `?cancelled=1` |
 | `createLocation` | `games` | `:118` | insert `locations` (+`parseLimits`) → `?created=1` |

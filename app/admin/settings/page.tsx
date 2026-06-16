@@ -3,6 +3,7 @@ import { st } from "@/lib/site-i18n";
 import { requireMaster } from "@/lib/admin";
 import { getAllSettings } from "@/lib/settings";
 import { SETTINGS_GROUPS, SETTING_DEFAULTS } from "@/lib/admin-settings";
+import { SOCIALS } from "@/lib/social";
 import { saveSettings } from "@/app/admin/actions";
 import { ui, btn, Collapsible } from "@/components/ui";
 
@@ -81,6 +82,29 @@ export default async function AdminSettings({
             </div>
           </Collapsible>
         ))}
+
+        {/* Соцмережі: лінки для лендінгу (раніше окремий розділ /admin/social). */}
+        <Collapsible
+          summary={<span className={ui.cardTitle}>{st(lang, "adm_social_title")}</span>}
+          right={<span className={ui.meta}>{SOCIALS.length}</span>}
+        >
+          <div className="grid gap-4 sm:grid-cols-2">
+            {SOCIALS.map((s) => (
+              <label key={s.settingKey} className="block text-sm">
+                <span className={`mb-1 ${ui.label}`}>
+                  {s.label} <code className={ui.metaFaint}>{s.settingKey}</code>
+                </span>
+                <input
+                  type="url"
+                  name={s.settingKey}
+                  defaultValue={values[s.settingKey] ?? ""}
+                  placeholder={s.defaultUrl || "https://…"}
+                  className={inputCls}
+                />
+              </label>
+            ))}
+          </div>
+        </Collapsible>
 
         <button type="submit" className={btn("action")}>
           {st(lang, "adm_save")}

@@ -145,7 +145,7 @@ CTA з «→» — той самий `ui.link` + стрілка в тексті.
 | `ui.panel` | `rounded-lg bg-gray-100 px-3 py-2 text-sm text-gray-600` (підказка/нотатка) |
 
 **Не вписувати поверхню вручну.** Зараз `rounded-lg border … bg-white p-5` скопійовано в
-[shop ShopTile](../../app/shop/page.tsx#L84), [social fieldset](../../app/admin/social/page.tsx#L27),
+[shop ShopTile](../../app/shop/page.tsx#L84),
 а в [roles](../../app/admin/roles/page.tsx#L79) «поплило» на `bg-gray-50 p-4`. Усе — через `ui.card`/`ui.cardHover`.
 
 **Картка-список** (рядки з роздільниками, як історія балів [cabinet](../../app/cabinet/page.tsx#L247)):
