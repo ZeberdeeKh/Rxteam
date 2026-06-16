@@ -28,7 +28,7 @@ export type SiteGame = {
 };
 
 const GAME_COLS =
-  "id, title, start_at, gather_at, capacity, status, scenario_pl, scenario_uk, locations(name, map_url, lat, lng, replica_types, pyro, pyro_note, fire_mode)";
+  "id, title, start_at, gather_at, capacity, status, scenario_pl, scenario_uk, locations(name, map_url, lat, lng, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk)";
 
 // Нормалізує вкладену локацію (Supabase повертає масив/обʼєкт залежно від звʼязку).
 function normLoc(row: any): SiteLocation | null {
@@ -44,7 +44,8 @@ function normLimits(row: any): LocationLimits | null {
   return {
     replicaTypes: l.replica_types ?? [],
     pyro: l.pyro ?? "no",
-    pyroNote: l.pyro_note ?? null,
+    pyroNotePl: l.pyro_note_pl ?? null,
+    pyroNoteUk: l.pyro_note_uk ?? null,
     fireMode: l.fire_mode ?? "semi",
   };
 }
@@ -72,8 +73,11 @@ function buildGameAnnouncement(
       capacity: row.capacity ?? null,
       replicaTypes: loc.replica_types ?? [],
       pyro: loc.pyro ?? "no",
-      pyroNote: loc.pyro_note ?? null,
+      pyroNotePl: loc.pyro_note_pl ?? null,
+      pyroNoteUk: loc.pyro_note_uk ?? null,
       fireMode: loc.fire_mode ?? "semi",
+      paymentPl: loc.payment_pl ?? null,
+      paymentUk: loc.payment_uk ?? null,
     },
     settings,
   );

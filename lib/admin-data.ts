@@ -266,15 +266,18 @@ export type AdminLocation = {
   map_url: string | null;
   replica_types: string[]; // допущені типи реплік (коди з lib/replicas.ts)
   pyro: string; // yes | no | limited
-  pyro_note: string | null; // уточнення для «з обмеженням»
+  pyro_note_pl: string | null; // уточнення піро (PL) для анонсу
+  pyro_note_uk: string | null; // уточнення піро (UA) для анонсу
   fire_mode: string; // auto | semi
+  payment_pl: string | null; // текст блоку «Оплата» (PL) для анонсу
+  payment_uk: string | null; // текст блоку «Оплата» (UA) для анонсу
   gameCount: number; // у скількох іграх використана (для блокування видалення)
 };
 
 export async function listLocationsFull(): Promise<AdminLocation[]> {
   const { data: locs } = await supabase
     .from("locations")
-    .select("id, name, lat, lng, radius_m, map_url, replica_types, pyro, pyro_note, fire_mode")
+    .select("id, name, lat, lng, radius_m, map_url, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk")
     .order("name", { ascending: true });
   const rows = locs ?? [];
   if (!rows.length) return [];
@@ -294,8 +297,11 @@ export async function listLocationsFull(): Promise<AdminLocation[]> {
     map_url: (l.map_url as string) ?? null,
     replica_types: ((l as any).replica_types as string[]) ?? [],
     pyro: ((l as any).pyro as string) ?? "no",
-    pyro_note: ((l as any).pyro_note as string) ?? null,
+    pyro_note_pl: ((l as any).pyro_note_pl as string) ?? null,
+    pyro_note_uk: ((l as any).pyro_note_uk as string) ?? null,
     fire_mode: ((l as any).fire_mode as string) ?? "semi",
+    payment_pl: ((l as any).payment_pl as string) ?? null,
+    payment_uk: ((l as any).payment_uk as string) ?? null,
     gameCount: used.get(l.id as number) ?? 0,
   }));
 }

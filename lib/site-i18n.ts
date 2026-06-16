@@ -621,9 +621,18 @@ const SITE: Record<string, Dict> = {
     en: "Note (for “limited”)",
     uk: "Уточнення (для «з обмеженням»)",
   },
+  adm_loc_pyro_note_pl: { pl: "Tekst PL", en: "PL text", uk: "Текст PL" },
+  adm_loc_pyro_note_uk: { pl: "Tekst UA", en: "UA text", uk: "Текст UA" },
   adm_loc_firemode: { pl: "Tryb ognia", en: "Fire mode", uk: "Режим вогню" },
   adm_fire_auto: { pl: "Full-auto + semi", en: "Full-auto + semi", uk: "Full-auto + semi" },
   adm_fire_semi: { pl: "Tylko semi", en: "Semi only", uk: "Лише semi" },
+  adm_loc_payment: {
+    pl: "Płatność (do anonsu, przed disclaimerem)",
+    en: "Payment (for the announcement, before the disclaimer)",
+    uk: "Оплата (для анонсу, перед disclaimer)",
+  },
+  adm_loc_payment_pl: { pl: "Tekst PL", en: "PL text", uk: "Текст PL" },
+  adm_loc_payment_uk: { pl: "Tekst UA", en: "UA text", uk: "Текст UA" },
 
   // ── Чек-лист підготовки до гри (Етап 13, майстер) ──
   adm_chores_title: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" },

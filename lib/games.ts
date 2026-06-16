@@ -98,15 +98,20 @@ export type GameForAnnounce = {
   // Ліміти конкретної локації (підставляються автоматично).
   replicaTypes: string[]; // які типи реплік допущені на локації
   pyro: string; // yes | no | limited
-  pyroNote: string | null; // уточнення для «з обмеженням»
+  pyroNotePl: string | null; // уточнення піро (PL) для анонсу «з обмеженням»
+  pyroNoteUk: string | null; // уточнення піро (UA) для анонсу «з обмеженням»
   fireMode: string; // auto | semi
+  // Блок «Оплата» для анонсу (per-location, двомовний). null/'' → не виводиться.
+  paymentPl: string | null;
+  paymentUk: string | null;
 };
 
 // Ліміти локації, потрібні для блоку лімітів (підмножина GameForAnnounce).
 export type LocationLimits = {
   replicaTypes: string[]; // які типи реплік допущені на локації
   pyro: string; // yes | no | limited
-  pyroNote: string | null; // уточнення для «з обмеженням»
+  pyroNotePl: string | null; // уточнення піро (PL) для анонсу «з обмеженням»
+  pyroNoteUk: string | null; // уточнення піро (UA) для анонсу «з обмеженням»
   fireMode: string; // auto | semi
 };
 
@@ -126,7 +131,8 @@ export function buildLimits(lang: "pl" | "uk", g: LocationLimits, s: Record<stri
   }
   const pyroKey = `pyro_${g.pyro}_${lang}`;
   const pyroMsg = s[pyroKey] || LIMIT_SETTING_DEFAULTS[pyroKey];
-  if (pyroMsg) lines.push(g.pyro === "limited" && g.pyroNote ? `${pyroMsg} ${g.pyroNote}` : pyroMsg);
+  const pyroNote = lang === "pl" ? g.pyroNotePl : g.pyroNoteUk;
+  if (pyroMsg) lines.push(g.pyro === "limited" && pyroNote ? `${pyroMsg} ${pyroNote}` : pyroMsg);
   const fmKey = `firemode_${g.fireMode}_${lang}`;
   const fmMsg = s[fmKey] || LIMIT_SETTING_DEFAULTS[fmKey];
   if (fmMsg) lines.push(fmMsg);
@@ -155,6 +161,9 @@ export function buildAnnouncement(g: GameForAnnounce, s: Record<string, string>)
     }
     const lim = buildLimits(lang, g, s);
     if (lim) parts.push("", lim);
+    // Блок «Оплата» локації — одразу перед Disclaimer (per-location, тому з g, не з settings).
+    const payment = lang === "pl" ? g.paymentPl : g.paymentUk;
+    if (payment) parts.push("", payment);
     if (s[`ann_disclaimer_${lang}`]) parts.push("", s[`ann_disclaimer_${lang}`]);
     return parts.join("\n");
   };

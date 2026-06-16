@@ -52,10 +52,19 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
         </div>
       </fieldset>
 
-      <label className="col-span-full text-sm sm:col-span-6">
-        <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_pyro_note")}</span>
-        <input name="pyro_note" defaultValue={loc?.pyro_note ?? ""} className={ui.input} />
-      </label>
+      <fieldset className="col-span-full rounded-md border border-gray-200 p-3 sm:col-span-6">
+        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_pyro_note")}</legend>
+        <div className="grid gap-2">
+          <label className="text-sm">
+            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_pyro_note_pl")}</span>
+            <input name="pyro_note_pl" defaultValue={loc?.pyro_note_pl ?? ""} className={ui.input} />
+          </label>
+          <label className="text-sm">
+            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_pyro_note_uk")}</span>
+            <input name="pyro_note_uk" defaultValue={loc?.pyro_note_uk ?? ""} className={ui.input} />
+          </label>
+        </div>
+      </fieldset>
 
       <fieldset className="col-span-full rounded-md border border-gray-200 p-3">
         <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_firemode")}</legend>
@@ -72,6 +81,30 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
               {st(lang, `adm_fire_${v}`)}
             </label>
           ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="col-span-full rounded-md border border-gray-200 p-3">
+        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_payment")}</legend>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="text-sm">
+            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_payment_pl")}</span>
+            <textarea
+              name="payment_pl"
+              rows={3}
+              defaultValue={loc?.payment_pl ?? ""}
+              className={ui.input}
+            />
+          </label>
+          <label className="text-sm">
+            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_payment_uk")}</span>
+            <textarea
+              name="payment_uk"
+              rows={3}
+              defaultValue={loc?.payment_uk ?? ""}
+              className={ui.input}
+            />
+          </label>
         </div>
       </fieldset>
     </>

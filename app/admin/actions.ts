@@ -97,7 +97,8 @@ function mapUrl(lat: number, lng: number) {
   return `https://maps.google.com/?q=${lat},${lng}`;
 }
 
-// Ліміти локації з форми: допущені типи реплік, стан піро (+уточнення), режим вогню.
+// Поля локації для анонсу: допущені типи реплік, піро (+уточнення), режим вогню,
+// а також двомовний текст блоку «Оплата» (per-location, виводиться перед disclaimer).
 function parseLimits(formData: FormData) {
   const replica_types = formData
     .getAll("replica_types")
@@ -107,8 +108,11 @@ function parseLimits(formData: FormData) {
   const pyro = (PYRO_STATES as readonly string[]).includes(pyroRaw) ? pyroRaw : "no";
   const fireRaw = String(formData.get("fire_mode") ?? "semi");
   const fire_mode = (FIRE_MODES as readonly string[]).includes(fireRaw) ? fireRaw : "semi";
-  const pyro_note = String(formData.get("pyro_note") ?? "").trim() || null;
-  return { replica_types, pyro, pyro_note, fire_mode };
+  const pyro_note_pl = String(formData.get("pyro_note_pl") ?? "").trim() || null;
+  const pyro_note_uk = String(formData.get("pyro_note_uk") ?? "").trim() || null;
+  const payment_pl = String(formData.get("payment_pl") ?? "").trim() || null;
+  const payment_uk = String(formData.get("payment_uk") ?? "").trim() || null;
+  return { replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk };
 }
 
 export async function createLocation(formData: FormData) {
