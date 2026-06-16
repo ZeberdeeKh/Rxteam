@@ -1,122 +1,21 @@
-# RX Team — Стандарт дизайну (єдине джерело)
+# RX Team — Стандарт дизайну
 
-Будь-яка зміна UI (кнопки, заголовки, шилдики/бейджі, кольори, шрифти) робиться
-**суворо за цим документом**. Не хардкодимо стилі по сторінках — лише через `@/components/ui`.
+> 📦 **Документ розгорнуто в набір.** Стандарт став ширшим (кольори, відступи, розкладка,
+> форми, стани, модалки, іконки), тож живе тепер у папці:
 
-Реалізація в коді:
-- `components/ui/styles.ts` — типографіка, бейджі, поверхні, поля, таблиці, банери, меню.
-- `components/ui/buttons.ts` — кнопки (рівно 2 типи).
-- `app/globals.css` — усі кольори як CSS-змінні + світла/темна теми.
+## → [docs/design-system/](design-system/README.md)
 
----
-
-## 1. Шрифт і розміри
-
-Шрифт — **Montserrat** (ваги 400/500/600/700/800).
-
-Дозволені РІВНІ — лише ці. Інших розмірів не вводимо. Заголовки — у ВЕРХНЬОМУ
-РЕГІСТРІ, колір `--c-brand-text` (той самий, що й логотип).
-
-| Рівень (`ui.*`) | Призначення | Розмір/стиль |
-|---|---|---|
-| `display` | головний герой-заголовок | `text-2xl font-bold uppercase` |
-| `pageTitle` | заголовок сторінки | `text-xl font-bold uppercase` |
-| `sectionTitle` | заголовок секції/блоку | `text-base font-semibold uppercase` |
-| `cardTitle` | назва картки/елемента (ігри, позивні — без uppercase) | `text-base font-semibold` |
-| `body` / `bodyStrong` / `muted` / `label` | текст і підписи | `text-sm` |
-| `meta` | дрібний/допоміжний | `text-xs` |
-
-Дозволені розміри шрифту: `text-2xl, text-xl, text-base, text-sm, text-xs`. Інші — ні.
-
----
-
-## 2. Кольори (всі — CSS-змінні в `globals.css`)
-
-### Бренд (хакі, фіксований — НЕ перемикається з темою)
-`brand` 50…950 (DEFAULT `#6b6a3c`). Лише для ФОНІВ / меж / акцентів
-(`bg-brand`, `bg-brand/10`, `border-brand`, `accent-brand`) — **НЕ для тексту**.
-
-### `--c-brand-text` — ЄДИНИЙ «зелений» (хакі) на весь текст сайту
-Один токен для ВСЬОГО хакі-тексту, без винятків:
-- логотип;
-- усі заголовки (`display` / `pageTitle` / `sectionTitle`);
-- посилання (`text-[var(--c-brand-text)] hover:underline`);
-- текст пунктів меню (шапка + підменю) — активних і hover;
-- бренд-бейджі (Майстер, ачівки);
-- заливка кнопок `action` (через `--c-action-*`, текст контрастний).
-
-Світла тема `#545331`, темна `#9d9b66`. Ніде не хардкодимо `text-brand` /
-`text-brand-dark` / `text-brand-light` — лише `text-[var(--c-brand-text)]`.
-
-### Поверхні/текст (перемикаються світла↔темна)
-`gray-50…950`, `white` прив'язані до `--c-gray-*`. Темна тема працює БЕЗ `dark:`-варіантів.
-Не додавай `dark:` для кольору — використовуй сірі токени.
-
-### Семантика (статуси/бейджі/банери) — ПРИГЛУШЕНА
-`success` / `danger` / `warning`, кожна має `-bg` (фон) і `-fg` (текст), плюс `-soft` для
-тексту дельт. Світла — м'які пастелі, темна — напівпрозорі тінти. **Без яскравих кольорів**
-(ніяких чистих `green-500` / `red-500` тощо).
-`--c-danger-solid` — насичений червоний ЛИШЕ для кнопки `delete` (це кнопка, не бейдж).
-
----
-
-## 3. Кнопки — `buttons.ts` (РІВНО 2 типи)
-
-**УСІ кнопки мають однаковий шрифт, розмір шрифту і висоту.** Змінюється ЛИШЕ
-ширина — залежно від довжини тексту. Розмірних варіантів (`sm`/`md`) НЕМАЄ:
-велика «Створити» і маленька «Зберегти» — заборонено, вони однакові.
-
-Єдина відмінність між кнопками — ТИП (колір):
-
-- **`action`** — створення / збереження / підтвердження / будь-яка позитивна дія
-  (той самий хакі, що й заголовки: `--c-action-*` = `--c-brand-text`, текст контрастний).
-- **`delete`** — видалення / скасування (червоний `--c-danger-solid`).
-
-**Жодних** `secondary` / `ghost` / `outline` і жодних розмірів.
-
-```tsx
-btn("action")            // клас для <button> / <a> / <Link>
-btn("delete")
-<Button kind="action">…</Button>
-```
-
----
-
-## 4. Шилдики / бейджі — `badgeClass()`
-
-Єдина форма пігулки: `rounded-full px-2 py-0.5 text-xs font-medium`. Кольори — приглушені
-(із семантичних змінних), **не яскраві**.
-
-| Колір | Де використовується |
+| Документ | Про що |
 |---|---|
-| `brand` | Майстер, ачівки |
-| `green` | Адмін, гра «announced», «registered» |
-| `gray` | Гравець, «hidden» |
-| `red` | гра «cancelled», «no_show» |
-| `amber` | попередження |
+| [design-system/README.md](design-system/README.md) | Принципи + карта + реєстр відкритих рішень |
+| [design-system/01-foundations.md](design-system/01-foundations.md) | Типографіка, колір/теми, відступи, ширини, радіуси, тіні, z-index |
+| [design-system/02-components.md](design-system/02-components.md) | Кнопки, посилання, бейджі, форми, картки, таблиці, навігація, банери, модалки |
+| [design-system/03-patterns.md](design-system/03-patterns.md) | Розкладка сторінок, ритм, ряд дій, рецепти форм, фідбек, адаптивність |
+| [design-system/04-content-and-icons.md](design-system/04-content-and-icons.md) | Тексти, i18n, формати, політика емодзі |
+| [design-system/05-exceptions.md](design-system/05-exceptions.md) | Санкціоновані винятки |
+| [design-system/tokens-reference.md](design-system/tokens-reference.md) | Довідник усіх токенів |
+| [design-system/CONTRIBUTING.md](design-system/CONTRIBUTING.md) | Як змінювати систему + чек-лист PR |
 
-```tsx
-badgeClass("brand" | "green" | "gray" | "red" | "amber")
-```
+Технічні рішення (чому саме так) — [docs/architecture/adr/](architecture/adr/README.md).
 
-Не хардкодимо плашки по сторінках — лише `badgeClass()`.
-
----
-
-## 5. Меню — `headerNavClass` / `headerAdminClass` / `subNavClass`
-Пункти меню (шапка + підменю адмінки) — `uppercase tracking-wide`, активний підсвічений.
-
-## 6. Поверхні / поля / таблиці / списки
-- Картка: `ui.card` / `ui.cardHover`. Поле: `ui.input` / `ui.inputSm`.
-- Банери: `ui.alertOk` / `ui.alertErr` / `ui.alertWarn`.
-- Таблиця: `ui.tableWrap` + `ui.table` + `ui.thead`/`ui.th` + `ui.tbody`/`ui.td`.
-- Списки: `ui.listStack`; сторінка: `ui.pageStack`. Згортувані рядки — `Collapsible`.
-
----
-
-## 7. Правила розкладки
-- **Не дублюй активний пункт меню заголовком сторінки.** Якщо пункт підменю підсвічений
-  (напр. «Гравці»), окремий великий `<h1>` з тим самим словом НЕ потрібен.
-- Доступ до стилів — лише через `@/components/ui` (`ui`, `btn`, `badgeClass`, `Collapsible`).
-- Однотипні списки (гравці, ролі, групи налаштувань) — згортувані рядки `Collapsible`,
-  симетричні, однакові поля/відступи.
+Реалізація в коді: [styles.ts](../components/ui/styles.ts) · [buttons.ts](../components/ui/buttons.ts) · [globals.css](../app/globals.css).
