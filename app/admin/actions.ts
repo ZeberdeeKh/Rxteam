@@ -8,6 +8,8 @@ import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
 import { TOGGLE_KEYS, VALUE_KEYS } from "@/lib/admin-settings";
 import { SOCIALS } from "@/lib/social";
 import { makeUtc, computeWindows } from "@/lib/games";
+import { announceGame } from "@/lib/game-announce";
+import { Api } from "grammy";
 import { performCheckin } from "@/lib/checkins";
 import { setCallsignForPlayer } from "@/lib/site-player";
 import { REPLICA_CODES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
@@ -57,21 +59,36 @@ export async function createGame(formData: FormData) {
   const startUtc = makeUtc(date, start);
   const w = computeWindows(gatherUtc, startUtc);
 
-  await supabase.from("games").insert({
-    location_id: locationId,
-    title: String(formData.get("title") ?? "").trim() || null,
-    scenario_pl: String(formData.get("scenario_pl") ?? "").trim() || null,
-    scenario_uk: String(formData.get("scenario_uk") ?? "").trim() || null,
-    gather_at: gatherUtc,
-    start_at: startUtc,
-    reg_closes_at: w.reg_closes_at,
-    cancel_deadline: w.cancel_deadline,
-    checkin_from: w.checkin_from,
-    checkin_to: w.checkin_to,
-    capacity,
-    status: "announced",
-  });
+  const { data: game } = await supabase
+    .from("games")
+    .insert({
+      location_id: locationId,
+      title: String(formData.get("title") ?? "").trim() || null,
+      scenario_pl: String(formData.get("scenario_pl") ?? "").trim() || null,
+      scenario_uk: String(formData.get("scenario_uk") ?? "").trim() || null,
+      gather_at: gatherUtc,
+      start_at: startUtc,
+      reg_closes_at: w.reg_closes_at,
+      cancel_deadline: w.cancel_deadline,
+      checkin_from: w.checkin_from,
+      checkin_to: w.checkin_to,
+      capacity,
+      status: "announced",
+    })
+    .select("id")
+    .single();
   revalidatePath("/admin/games");
+
+  // Той самий шлях, що й /newgame у боті: анонс у «Анонси» + чек-лист у адмін-групу.
+  // Best-effort — збій постингу не має ламати створення гри (гра вже в БД). У server
+  // action немає ctx, тому даємо власний grammy Api на BOT_TOKEN (lib/game-announce.ts).
+  if (game) {
+    try {
+      await announceGame(new Api(process.env.BOT_TOKEN!), game.id);
+    } catch (e) {
+      console.error("createGame: announceGame failed", e);
+    }
+  }
   redirect("/admin/games?created=1");
 }
 

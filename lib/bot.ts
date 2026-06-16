@@ -46,8 +46,9 @@ import {
   formatWhen,
   distanceMeters,
 } from "./games";
-import { postChoreRun, toggleChoreClaim, refreshChoreMessage } from "./chores";
+import { toggleChoreClaim, refreshChoreMessage } from "./chores";
 import { notifyAdminsRental } from "./notify";
+import { announceGame, REG_BTN } from "./game-announce";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
@@ -179,8 +180,6 @@ bot.on("chat_member", async (ctx) => {
     await recordMemberSeen(tgId);
   }
 });
-
-const REG_BTN = "✅ Записатись / Sign up";
 
 // Право адміна (майстер має всі права).
 function hasPerm(p: any, perm: string): boolean {
@@ -1938,23 +1937,10 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
 }
 
 async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>) {
-  const chatId = await getSetting("announce_chat_id");
-  if (!chatId) {
-    await clearState(ctx.from!.id);
-    await ctx.reply(tr(lang, "gamenew_no_topic"));
-    return;
-  }
-  const threadId = await getSetting("announce_thread_id");
   const gatherUtc = makeUtc(data.date, data.gather);
   const startUtc = makeUtc(data.date, data.start);
   const w = computeWindows(gatherUtc, startUtc);
   const capacity: number | null = data.capacity ?? null;
-
-  const { data: loc } = await supabase
-    .from("locations")
-    .select("*")
-    .eq("id", data.locationId)
-    .single();
 
   const { data: game } = await supabase
     .from("games")
@@ -1972,64 +1958,26 @@ async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>)
       capacity,
       status: "announced",
     })
-    .select("*")
+    .select("id")
     .single();
 
-  const settings = await getAllSettings();
-  const text = buildAnnouncement(
-    {
-      title: data.title,
-      lat: loc!.lat,
-      lng: loc!.lng,
-      mapUrl: loc!.map_url,
-      gatherUtc,
-      startUtc,
-      scenarioPl: data.scenarioPl,
-      scenarioUk: data.scenarioUk,
-      count: 0,
-      capacity,
-      replicaTypes: loc!.replica_types ?? [],
-      pyro: loc!.pyro ?? "no",
-      pyroNotePl: loc!.pyro_note_pl ?? null,
-      pyroNoteUk: loc!.pyro_note_uk ?? null,
-      fireMode: loc!.fire_mode ?? "semi",
-      paymentPl: loc!.payment_pl ?? null,
-      paymentUk: loc!.payment_uk ?? null,
-    },
-    settings,
-  );
-  const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${ctx.me.username}?start=g${game!.id}`);
-
   await clearState(ctx.from!.id);
-  try {
-    const msg = await ctx.api.sendMessage(Number(chatId), text, {
-      reply_markup: kb,
-      ...(threadId ? { message_thread_id: Number(threadId) } : {}),
-    });
-    await supabase
-      .from("games")
-      .update({
-        announce_chat_id: Number(chatId),
-        announce_thread_id: threadId ? Number(threadId) : null,
-        announce_message_id: msg.message_id,
-      })
-      .eq("id", game!.id);
-  } catch (e) {
-    console.error("announcement post failed", e);
+  if (!game) {
     await ctx.reply(tr(lang, "gamenew_announce_failed"));
     return;
   }
 
-  // Чек-лист підготовки до гри в адмін-групу (Етап 13) — не має ламати анонс.
-  try {
-    await postChoreRun(ctx.api, game!.id);
-  } catch (e) {
-    console.error("postChoreRun failed", e);
+  // Анонс у «Анонси» + чек-лист у адмін-групу — спільний шлях із сайтом (createGame),
+  // щоб результат не залежав від способу створення гри (lib/game-announce.ts).
+  const res = await announceGame(ctx.api, game.id);
+  if (!res.ok) {
+    await ctx.reply(tr(lang, res.reason === "no_announce_chat" ? "gamenew_no_topic" : "gamenew_announce_failed"));
+    return;
   }
 
   await ctx.reply(
     tr(lang, "gamenew_done", {
-      id: game!.id,
+      id: game.id,
       when: formatWhen(gatherUtc),
       regclose: formatWhen(w.reg_closes_at),
     }),
