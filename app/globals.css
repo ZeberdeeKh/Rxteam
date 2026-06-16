@@ -148,6 +148,25 @@ body {
           mask: url("/icons/arrow-top-right.svg") center / contain no-repeat;
 }
 
+/* Поява секцій при прокручуванні вниз (scroll-reveal, у дусі ab3). Керує компонент Reveal. */
+.rx-reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+.rx-reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .rx-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 /* Плавна поява фото в галереї (ротація надлишку + первинне завантаження). */
 @keyframes rxFade {
   from {

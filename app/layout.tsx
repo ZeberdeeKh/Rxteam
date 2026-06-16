@@ -57,8 +57,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-3">
+        <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
+          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-5">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
             <Link href="/" className="flex items-baseline gap-2" aria-label="RX Team">

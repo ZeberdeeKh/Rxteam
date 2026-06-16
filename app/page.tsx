@@ -4,12 +4,13 @@ import { st } from "@/lib/site-i18n";
 import { getNextGame, getRanking, getGalleryPhotos } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
-import { ui, GLYPH } from "@/components/ui";
+import { ui, GLYPH, Reveal } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
 
 // Лендінг (публічний, одна сторінка): «Про нас» + галерея + герой + найближча гра + рейтинг + соцмережі (внизу).
+// Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
 export default async function Home() {
   const lang = getServerLang();
   const [next, ranking, settings, galleryPhotos] = await Promise.all([
@@ -39,83 +40,93 @@ export default async function Home() {
   return (
     <div className="space-y-10">
       {/* Про нас (перший модуль на сторінці) */}
-      <section>
-        <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
-        <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
-      </section>
+      <Reveal>
+        <section>
+          <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
+          <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
+        </section>
+      </Reveal>
 
       {/* Галерея (мозаїка, без заголовка/підпису) */}
       {showGallery && (
-        <section>
-          <GalleryGrid
-            photos={galleryPhotos}
-            closeLabel={st(lang, "gallery_close")}
-            prevLabel={st(lang, "gallery_prev")}
-            nextLabel={st(lang, "gallery_next")}
-          />
-        </section>
+        <Reveal>
+          <section>
+            <GalleryGrid
+              photos={galleryPhotos}
+              closeLabel={st(lang, "gallery_close")}
+              prevLabel={st(lang, "gallery_prev")}
+              nextLabel={st(lang, "gallery_next")}
+            />
+          </section>
+        </Reveal>
       )}
 
       {/* Найближча гра */}
-      <section>
-        <h2 className={ui.sectionTitle}>{st(lang, "home_next_title")}</h2>
-        {next ? (
-          <div className={`mt-3 ${ui.card}`}>
-            <div className="flex items-baseline justify-between gap-3">
-              <Link href="/games" className={`${ui.cardTitle} hover:text-[var(--c-brand-text)]`}>
-                {next.title ?? "ASG"}
-              </Link>
-              {next.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
-            </div>
-            <div className={`mt-2 ${ui.body}`}>
-              {GLYPH.date} {formatGameWhen(next.gather_at ?? next.start_at, lang)}
-            </div>
-            <div className={ui.body}>
-              {GLYPH.place} {next.location?.name ?? st(lang, "games_tbd_loc")}
-              {next.location?.map_url && (
-                <>
-                  {" · "}
-                  <a
-                    href={next.location.map_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={ui.link}
-                  >
-                    {st(lang, "games_map")}
-                  </a>
-                </>
-              )}
-            </div>
-
-            {(scenario || limits) && (
-              <div className="mt-3 space-y-2 border-t border-gray-100 pt-3">
-                {scenario && <p className={`whitespace-pre-line ${ui.body}`}>{scenario}</p>}
-                {limits && <p className={`whitespace-pre-line ${ui.muted}`}>{limits}</p>}
+      <Reveal>
+        <section>
+          <h2 className={ui.sectionTitle}>{st(lang, "home_next_title")}</h2>
+          {next ? (
+            <div className={`mt-3 ${ui.card}`}>
+              <div className="flex items-baseline justify-between gap-3">
+                <Link href="/games" className={`${ui.cardTitle} hover:text-[var(--c-brand-text)]`}>
+                  {next.title ?? "ASG"}
+                </Link>
+                {next.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
               </div>
-            )}
+              <div className={`mt-2 ${ui.body}`}>
+                {GLYPH.date} {formatGameWhen(next.gather_at ?? next.start_at, lang)}
+              </div>
+              <div className={ui.body}>
+                {GLYPH.place} {next.location?.name ?? st(lang, "games_tbd_loc")}
+                {next.location?.map_url && (
+                  <>
+                    {" · "}
+                    <a
+                      href={next.location.map_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={ui.link}
+                    >
+                      {st(lang, "games_map")}
+                    </a>
+                  </>
+                )}
+              </div>
 
-            <Link href="/games" className={`mt-3 inline-block ${ui.link}`}>
-              {st(lang, "home_cta_games")} →
-            </Link>
-          </div>
-        ) : (
-          <p className={`mt-3 ${ui.emptyState}`}>{st(lang, "home_next_none")}</p>
-        )}
-      </section>
+              {(scenario || limits) && (
+                <div className="mt-3 space-y-2 border-t border-gray-100 pt-3">
+                  {scenario && <p className={`whitespace-pre-line ${ui.body}`}>{scenario}</p>}
+                  {limits && <p className={`whitespace-pre-line ${ui.muted}`}>{limits}</p>}
+                </div>
+              )}
+
+              <Link href="/games" className={`mt-3 inline-block ${ui.link}`}>
+                {st(lang, "home_cta_games")} →
+              </Link>
+            </div>
+          ) : (
+            <p className={`mt-3 ${ui.emptyState}`}>{st(lang, "home_next_none")}</p>
+          )}
+        </section>
+      </Reveal>
 
       {/* Рейтинг (на лендінгу, замість окремої сторінки в меню) */}
-      <section id="ranking" className="scroll-mt-20">
-        <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
-        <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
-        <RankingTable rows={ranking} lang={lang} />
-        {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
-      </section>
+      <Reveal>
+        <section id="ranking" className="scroll-mt-20">
+          <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
+          <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
+          <RankingTable rows={ranking} lang={lang} />
+          {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
+        </section>
+      </Reveal>
 
       {/* Соцмережі (окремий модуль, найнижче на сторінці) */}
-      <section>
-        <h2 className={ui.sectionTitle}>{st(lang, "home_social_title")}</h2>
-        <SocialLinks settings={settings} lang={lang} />
-      </section>
+      <Reveal>
+        <section>
+          <h2 className={ui.sectionTitle}>{st(lang, "home_social_title")}</h2>
+          <SocialLinks settings={settings} lang={lang} />
+        </section>
+      </Reveal>
     </div>
   );
 }
