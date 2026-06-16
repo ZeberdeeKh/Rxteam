@@ -669,6 +669,7 @@ const SITE: Record<string, Dict> = {
   },
   adm_chore_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
   adm_chore_active: { pl: "Aktywna", en: "Active", uk: "Активний" },
+  adm_chore_hidden: { pl: "Nieaktywna", en: "Inactive", uk: "Неактивний" },
   adm_chore_empty: { pl: "Brak pozycji.", en: "No items.", uk: "Немає пунктів." },
 
   // ── 6.4 Магазин за бали (майстер) ──
@@ -716,6 +717,7 @@ const SITE: Record<string, Dict> = {
   adm_btn_create: { pl: "Utwórz", en: "Create", uk: "Створити" },
   adm_btn_cancel_game: { pl: "Odwołaj", en: "Cancel", uk: "Скасувати" },
   adm_open: { pl: "Otwórz", en: "Open", uk: "Відкрити" },
+  adm_close: { pl: "Zamknij", en: "Close", uk: "Закрити" },
   adm_col_status: { pl: "Status", en: "Status", uk: "Статус" },
   adm_col_reg: { pl: "Zapisani", en: "Registered", uk: "Записані" },
   adm_col_checkins: { pl: "Check-iny", en: "Check-ins", uk: "Чек-іни" },

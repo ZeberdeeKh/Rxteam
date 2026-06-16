@@ -111,6 +111,19 @@ body {
 .rx-collapse > summary::-webkit-details-marker {
   display: none;
 }
+/* Бокова панель (<div class="rx-drawer">): плавно висувається справа при відкритті. */
+@keyframes rxSlideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.rx-drawer {
+  animation: rxSlideIn 0.2s ease-out;
+}
+
 .rx-collapse[open] > summary .rx-chevron {
   transform: rotate(180deg);
 }

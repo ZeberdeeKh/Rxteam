@@ -13,5 +13,7 @@ export type { ButtonKind } from "./buttons";
 export { Button } from "./Button";
 export { default as Collapsible } from "./Collapsible";
 export { default as Modal } from "./Modal";
+export { default as Drawer } from "./Drawer";
+export { default as CreateDrawer } from "./CreateDrawer";
 export { default as OrDivider } from "./OrDivider";
 export { GLYPH } from "./glyphs";

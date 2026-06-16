@@ -34,7 +34,7 @@ export default async function AdminSettings({
         {SETTINGS_GROUPS.map((g) => (
           <Collapsible
             key={g.title}
-            summary={<span className={ui.sectionTitle}>{g.title}</span>}
+            summary={<span className={ui.cardTitle}>{g.title}</span>}
             right={<span className={ui.meta}>{g.fields.length}</span>}
           >
             <div className="grid gap-4 sm:grid-cols-2">

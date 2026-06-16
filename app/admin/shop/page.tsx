@@ -9,7 +9,7 @@ import {
   deleteShopItem,
   markFulfilled,
 } from "@/app/admin/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass, GLYPH, Collapsible, CreateDrawer } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -97,49 +97,68 @@ export default async function AdminShop({
 
   return (
     <div className={ui.pageStack}>
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {/* Кнопка відкриває бокову панель із формою нового товару. */}
+        <CreateDrawer
+          label={st(lang, "adm_shop_add")}
+          title={st(lang, "adm_shop_add")}
+          closeLabel={st(lang, "adm_close")}
+          className="sm:max-w-3xl"
+        >
+          <form action={createShopItem} className="grid items-end gap-3 sm:grid-cols-12">
+            <ShopItemFields lang={lang} />
+            <div className="flex items-end sm:col-span-12">
+              <button type="submit" className={btn("action")}>
+                {st(lang, "adm_btn_create")}
+              </button>
+            </div>
+          </form>
+        </CreateDrawer>
+      </div>
+
       {ok && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
       {searchParams.err === "fields" && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
 
-      {/* Новий товар */}
-      <section className={ui.card}>
-        <h2 className={`mb-3 ${ui.cardTitle}`}>{st(lang, "adm_shop_add")}</h2>
-        <form action={createShopItem} className="grid items-end gap-3 sm:grid-cols-12">
-          <ShopItemFields lang={lang} />
-          <div className="flex items-end sm:col-span-12">
-            <button type="submit" className={btn("action")}>
-              {st(lang, "adm_btn_create")}
-            </button>
-          </div>
-        </form>
-      </section>
-
-      {/* Список товарів (правка + видалення) */}
+      {/* Список товарів — компактні рядки, що розгортають форму правки (як меню «Гравці»). */}
       {items.length === 0 ? (
         <p className={ui.muted}>{st(lang, "adm_shop_empty")}</p>
       ) : (
         <div className={ui.listStack}>
           {items.map((it) => (
-            <div key={it.id} className={ui.card}>
-              <form action={updateShopItem} className="grid items-end gap-3 sm:grid-cols-12">
-                <input type="hidden" name="id" value={it.id} />
-                <ShopItemFields lang={lang} item={it} />
-                <div className="flex items-center gap-2 sm:col-span-12">
-                  <button type="submit" className={btn("action")}>
+            <Collapsible
+              key={it.id}
+              right={!it.active ? <span className={badgeClass("gray")}>{st(lang, "adm_shop_hidden")}</span> : null}
+              summary={
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className={ui.cardTitle}>
+                    {pickTitle({ pl: it.title_pl, en: it.title_en, uk: it.title_uk }, lang)}
+                  </span>
+                  <span className={ui.metaFaint}>
+                    {it.cost} {GLYPH.balance}
+                  </span>
+                </div>
+              }
+            >
+              <div className="space-y-3">
+                <form action={updateShopItem} id={`shop-${it.id}`} className="grid items-end gap-3 sm:grid-cols-12">
+                  <input type="hidden" name="id" value={it.id} />
+                  <ShopItemFields lang={lang} item={it} />
+                </form>
+
+                {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити». */}
+                <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
+                  <button type="submit" form={`shop-${it.id}`} className={btn("action")}>
                     {st(lang, "adm_btn_save")}
                   </button>
-                  {!it.active && (
-                    <span className={badgeClass("gray")}>{st(lang, "adm_shop_hidden")}</span>
-                  )}
+                  <form action={deleteShopItem}>
+                    <input type="hidden" name="id" value={it.id} />
+                    <button type="submit" className={btn("delete")}>
+                      {st(lang, "adm_btn_delete")}
+                    </button>
+                  </form>
                 </div>
-              </form>
-
-              <form action={deleteShopItem} className="mt-2 border-t border-gray-100 pt-2">
-                <input type="hidden" name="id" value={it.id} />
-                <button type="submit" className={btn("delete")}>
-                  {st(lang, "adm_btn_delete")}
-                </button>
-              </form>
-            </div>
+              </div>
+            </Collapsible>
           ))}
         </div>
       )}

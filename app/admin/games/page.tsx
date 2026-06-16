@@ -1,11 +1,11 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listGamesAdmin, listLocations } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { createGame } from "@/app/admin/actions";
-import { ui, btn, gameStatusBadge } from "@/components/ui";
+import { ui, btn, gameStatusBadge, Collapsible, CreateDrawer } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -21,114 +21,103 @@ export default async function AdminGames({
 
   return (
     <div className={ui.pageStack}>
-      {searchParams.created && (
-        <p className={ui.alertOk}>{st(lang, "adm_done")}</p>
-      )}
-      {searchParams.cancelled && (
-        <p className={ui.alertOk}>{st(lang, "adm_done")}</p>
-      )}
-      {searchParams.err && (
-        <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>
-      )}
-
-      {/* Нова гра */}
-      <section className={ui.card}>
-        <h2 className={`mb-3 ${ui.cardTitle}`}>{st(lang, "adm_game_create")}</h2>
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {/* Нова гра: кнопка відкриває бокову панель із формою. Без локацій — підказка замість кнопки. */}
         {locations.length === 0 ? (
-          <p className={ui.muted}>{st(lang, "adm_no_locations")}</p>
+          <p className={ui.panel}>{st(lang, "adm_no_locations")}</p>
         ) : (
-          <form action={createGame} className="grid gap-3 sm:grid-cols-2">
-            <label className="text-sm">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_location")}</span>
-              <select name="locationId" className={inputCls} required>
-                {locations.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_title")}</span>
-              <input name="title" className={inputCls} />
-            </label>
-            <label className="text-sm">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_date")}</span>
-              <input name="date" type="date" required className={inputCls} />
-            </label>
-            <div className="grid grid-cols-2 gap-3">
+          <CreateDrawer
+            label={st(lang, "adm_game_create")}
+            title={st(lang, "adm_game_create")}
+            closeLabel={st(lang, "adm_close")}
+          >
+            <form action={createGame} className="grid gap-3 sm:grid-cols-2">
               <label className="text-sm">
-                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_gather")}</span>
-                <input name="gather" type="time" required className={inputCls} />
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_location")}</span>
+                <select name="locationId" className={inputCls} required>
+                  {locations.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="text-sm">
-                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_start")}</span>
-                <input name="start" type="time" required className={inputCls} />
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_title")}</span>
+                <input name="title" className={inputCls} />
               </label>
-            </div>
-            <label className="text-sm">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_capacity")}</span>
-              <input name="capacity" type="number" min={0} defaultValue={0} className={inputCls} />
-            </label>
-            <label className="text-sm sm:col-span-2">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_scenario_pl")}</span>
-              <textarea name="scenario_pl" rows={2} className={inputCls} />
-            </label>
-            <label className="text-sm sm:col-span-2">
-              <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_scenario_uk")}</span>
-              <textarea name="scenario_uk" rows={2} className={inputCls} />
-            </label>
-            <div className="sm:col-span-2">
-              <button type="submit" className={btn("action")}>
-                {st(lang, "adm_btn_create")}
-              </button>
-            </div>
-          </form>
+              <label className="text-sm">
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_date")}</span>
+                <input name="date" type="date" required className={inputCls} />
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <label className="text-sm">
+                  <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_gather")}</span>
+                  <input name="gather" type="time" required className={inputCls} />
+                </label>
+                <label className="text-sm">
+                  <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_start")}</span>
+                  <input name="start" type="time" required className={inputCls} />
+                </label>
+              </div>
+              <label className="text-sm">
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_capacity")}</span>
+                <input name="capacity" type="number" min={0} defaultValue={0} className={inputCls} />
+              </label>
+              <label className="text-sm sm:col-span-2">
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_scenario_pl")}</span>
+                <textarea name="scenario_pl" rows={2} className={inputCls} />
+              </label>
+              <label className="text-sm sm:col-span-2">
+                <span className={`mb-1 ${ui.label}`}>{st(lang, "adm_f_scenario_uk")}</span>
+                <textarea name="scenario_uk" rows={2} className={inputCls} />
+              </label>
+              <div className="sm:col-span-2">
+                <button type="submit" className={btn("action")}>
+                  {st(lang, "adm_btn_create")}
+                </button>
+              </div>
+            </form>
+          </CreateDrawer>
         )}
-      </section>
+      </div>
 
-      {/* Список ігор */}
-      <section>
-        <div className={`overflow-x-auto ${ui.tableWrap} bg-white`}>
-          <table className={ui.table}>
-            <thead className={ui.thead}>
-              <tr>
-                <th className={ui.th}>{st(lang, "games_label_when")}</th>
-                <th className={ui.th}>{st(lang, "adm_f_title")}</th>
-                <th className={ui.th}>{st(lang, "adm_col_status")}</th>
-                <th className={`${ui.th} text-right`}>{st(lang, "adm_col_reg")}</th>
-                <th className={`${ui.th} text-right`}>{st(lang, "adm_col_checkins")}</th>
-                <th className={ui.th} />
-              </tr>
-            </thead>
-            <tbody className={ui.tbody}>
-              {games.map((g) => (
-                <tr key={g.id}>
-                  <td className={`whitespace-nowrap ${ui.td}`}>
-                    {formatGameWhen(g.gather_at ?? g.start_at, lang)}
-                  </td>
-                  <td className={ui.td}>
-                    {g.title ?? "ASG"}
-                    <span className="ml-1 text-xs text-gray-400">{g.location_name ?? ""}</span>
-                  </td>
-                  <td className={ui.td}>
-                    <span className={gameStatusBadge(g.status)}>
-                      {statusText(lang, "gamest", g.status)}
-                    </span>
-                  </td>
-                  <td className={`${ui.td} text-right tabular-nums`}>{g.regCount}</td>
-                  <td className={`${ui.td} text-right tabular-nums`}>{g.checkinCount}</td>
-                  <td className={`${ui.td} text-right`}>
-                    <Link href={`/admin/games/${g.id}`} className={ui.link}>
-                      {st(lang, "adm_open")}
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      {searchParams.created && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
+      {searchParams.cancelled && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
+      {searchParams.err && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
+
+      {/* Список ігор — компактні рядки, що розгортають деталі й кнопку «Відкрити» (як меню «Гравці»). */}
+      {games.length === 0 ? (
+        <p className={ui.muted}>{st(lang, "adm_empty")}</p>
+      ) : (
+        <div className={ui.listStack}>
+          {games.map((g) => (
+            <Collapsible
+              key={g.id}
+              right={
+                <span className={gameStatusBadge(g.status)}>{statusText(lang, "gamest", g.status)}</span>
+              }
+              summary={
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className={ui.cardTitle}>{g.title ?? "ASG"}</span>
+                  <span className={ui.metaFaint}>{formatGameWhen(g.gather_at ?? g.start_at, lang)}</span>
+                  {g.location_name && <span className={ui.metaFaint}>{g.location_name}</span>}
+                </div>
+              }
+            >
+              <div className="space-y-3">
+                <div className={ui.meta}>
+                  {st(lang, "adm_col_reg")}: <b>{g.regCount}</b> · {st(lang, "adm_col_checkins")}:{" "}
+                  <b>{g.checkinCount}</b>
+                </div>
+                <Link href={`/admin/games/${g.id}`} className={btn("action")}>
+                  {st(lang, "adm_open")}
+                </Link>
+              </div>
+            </Collapsible>
+          ))}
         </div>
-      </section>
+      )}
     </div>
   );
 }

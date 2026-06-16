@@ -4,7 +4,7 @@ import { requirePerm } from "@/lib/admin";
 import { listLocationsFull, type AdminLocation } from "@/lib/admin-data";
 import { createLocation, updateLocation, deleteLocation } from "@/app/admin/actions";
 import { REPLICA_TYPES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
-import { ui, btn, GLYPH } from "@/components/ui";
+import { ui, btn, badgeClass, GLYPH, Collapsible, CreateDrawer } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -142,67 +142,89 @@ export default async function AdminLocations({
 
   return (
     <div className={ui.pageStack}>
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        {/* Кнопка відкриває бокову панель із формою нової локації. */}
+        <CreateDrawer
+          label={st(lang, "adm_loc_add")}
+          title={st(lang, "adm_loc_add")}
+          closeLabel={st(lang, "adm_close")}
+          className="sm:max-w-3xl"
+        >
+          <form action={createLocation} className="space-y-4">
+            <TopFields lang={lang} />
+            <LimitControls lang={lang} />
+            <button type="submit" className={btn("action")}>
+              {st(lang, "adm_btn_create")}
+            </button>
+          </form>
+        </CreateDrawer>
+      </div>
+
       {ok && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
       {searchParams.err === "inuse" && <p className={ui.alertErr}>{st(lang, "adm_loc_inuse")}</p>}
       {searchParams.err === "fields" && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
 
-      {/* Нова локація */}
-      <section className={ui.card}>
-        <h2 className={`mb-4 ${ui.cardTitle}`}>{st(lang, "adm_loc_add")}</h2>
-        <form action={createLocation} className="space-y-4">
-          <TopFields lang={lang} />
-          <LimitControls lang={lang} />
-          <button type="submit" className={btn("action")}>
-            {st(lang, "adm_btn_create")}
-          </button>
-        </form>
-      </section>
-
-      {/* Список локацій (правка + видалення) */}
+      {/* Список локацій — компактні рядки, що розгортають форму правки (як меню «Гравці»). */}
       {locations.length === 0 ? (
         <p className={ui.muted}>{st(lang, "adm_loc_empty")}</p>
       ) : (
         <div className={ui.listStack}>
           {locations.map((l) => (
-            <div key={l.id} className={`${ui.card} space-y-4`}>
-              {/* Форма правки. Кнопка «Зберегти» лежить нижче й прив'язана через form={id}. */}
-              <form action={updateLocation} id={`loc-${l.id}`} className="space-y-4">
-                <input type="hidden" name="id" value={l.id} />
-                <TopFields lang={lang} loc={l} />
-                <LimitControls lang={lang} loc={l} />
-              </form>
-
-              {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити». */}
-              <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
-                <button type="submit" form={`loc-${l.id}`} className={btn("action")}>
-                  {st(lang, "adm_btn_save")}
-                </button>
-                <form action={deleteLocation}>
+            <Collapsible
+              key={l.id}
+              right={
+                l.gameCount > 0 ? (
+                  <span className={badgeClass("gray")}>
+                    {l.gameCount} {GLYPH.game}
+                  </span>
+                ) : null
+              }
+              summary={
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <span className={ui.cardTitle}>{l.name}</span>
+                  <span className={ui.metaFaint}>
+                    {l.lat}, {l.lng}
+                  </span>
+                </div>
+              }
+            >
+              <div className="space-y-4">
+                {/* Форма правки. Кнопка «Зберегти» лежить нижче й прив'язана через form={id}. */}
+                <form action={updateLocation} id={`loc-${l.id}`} className="space-y-4">
                   <input type="hidden" name="id" value={l.id} />
-                  <button
-                    type="submit"
-                    disabled={l.gameCount > 0}
-                    title={l.gameCount > 0 ? st(lang, "adm_loc_inuse") : undefined}
-                    className={btn("delete")}
-                  >
-                    {st(lang, "adm_btn_delete")}
-                  </button>
+                  <TopFields lang={lang} loc={l} />
+                  <LimitControls lang={lang} loc={l} />
                 </form>
-                {l.map_url && (
-                  <a
-                    href={l.map_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`text-sm ${ui.link}`}
-                  >
-                    {st(lang, "games_map")}
-                  </a>
-                )}
-                <span className="ml-auto text-xs text-gray-400">
-                  {l.gameCount > 0 ? `${st(lang, "adm_col_reg")}: ${l.gameCount} ${GLYPH.game}` : ""}
-                </span>
+
+                {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити». */}
+                <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
+                  <button type="submit" form={`loc-${l.id}`} className={btn("action")}>
+                    {st(lang, "adm_btn_save")}
+                  </button>
+                  <form action={deleteLocation}>
+                    <input type="hidden" name="id" value={l.id} />
+                    <button
+                      type="submit"
+                      disabled={l.gameCount > 0}
+                      title={l.gameCount > 0 ? st(lang, "adm_loc_inuse") : undefined}
+                      className={btn("delete")}
+                    >
+                      {st(lang, "adm_btn_delete")}
+                    </button>
+                  </form>
+                  {l.map_url && (
+                    <a
+                      href={l.map_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`text-sm ${ui.link}`}
+                    >
+                      {st(lang, "games_map")}
+                    </a>
+                  )}
+                </div>
               </div>
-            </div>
+            </Collapsible>
           ))}
         </div>
       )}
