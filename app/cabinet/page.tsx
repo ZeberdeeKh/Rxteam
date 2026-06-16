@@ -51,7 +51,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   // ── unlinked: прив'язка TG або standalone-профіль ──
   if (ctx.state === "unlinked") {
     return (
-      <div className={`${ui.widthNarrow} ${ui.pageStack}`}>
+      <div className={`${ui.widthWide} ${ui.pageStack}`}>
         {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
         {banners}
         <LinkTelegramForm lang={lang} />
@@ -75,7 +75,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   // Немає позивного (standalone щойно створений / бот-профіль без позивного) → форма позивного.
   if (!player.callsign) {
     return (
-      <div className={`${ui.widthNarrow} ${ui.pageStack}`}>
+      <div className={`${ui.widthWide} ${ui.pageStack}`}>
         {banners}
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
@@ -105,7 +105,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   ]);
 
   return (
-    <div className={`${ui.widthProse} ${ui.pageStack}`}>
+    <div className={`${ui.widthWide} ${ui.pageStack}`}>
       {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
       {banners}
 

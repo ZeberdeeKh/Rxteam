@@ -43,7 +43,7 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
   const games = await getCabinetGames(ctx.player.id);
 
   return (
-    <div className={`${ui.widthProse} ${ui.pageStack}`}>
+    <div className={`${ui.widthWide} ${ui.pageStack}`}>
       {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
       {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
 
