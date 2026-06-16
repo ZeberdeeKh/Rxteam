@@ -52,7 +52,7 @@ export default function SocialLinks({
             <div
               key={s.key}
               aria-disabled="true"
-              className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-gray-300 bg-white p-4 text-gray-400"
+              className="flex flex-col items-center gap-2 border border-dashed border-gray-300 bg-white p-4 text-gray-400"
             >
               {inner}
               <span className="text-xs">{st(lang, "social_soon")}</span>
@@ -66,7 +66,7 @@ export default function SocialLinks({
             href={s.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex flex-col items-center gap-2 rounded-lg border border-gray-200 bg-white p-4 text-gray-700 transition hover:-translate-y-0.5 hover:shadow-sm ${BRAND_HOVER[s.key]}`}
+            className={`flex flex-col items-center gap-2 border border-gray-200 bg-white p-4 text-gray-700 transition hover:border-brand ${BRAND_HOVER[s.key]}`}
           >
             {inner}
           </a>

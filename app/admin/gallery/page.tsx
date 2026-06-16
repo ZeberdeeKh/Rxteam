@@ -30,7 +30,7 @@ export default async function AdminGallery({ searchParams }: { searchParams: { s
                 src={p.public_url}
                 alt={p.caption ?? ""}
                 loading="lazy"
-                className="aspect-square w-full rounded-md object-cover"
+                className="aspect-square w-full object-cover"
               />
               <div className="flex items-center justify-between gap-2">
                 <span className={badgeClass(p.status === "hidden" ? "gray" : "green")}>

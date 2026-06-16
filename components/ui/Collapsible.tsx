@@ -21,7 +21,7 @@ export default function Collapsible({
   className?: string;
 }) {
   return (
-    <details open={defaultOpen} className={`rx-collapse rounded-lg border border-gray-200 bg-white ${className}`}>
+    <details open={defaultOpen} className={`rx-collapse border border-gray-200 bg-white ${className}`}>
       <summary className="flex cursor-pointer select-none items-center gap-3 px-4 py-3 transition hover:bg-gray-50">
         <div className="min-w-0 flex-1">{summary}</div>
         {right}

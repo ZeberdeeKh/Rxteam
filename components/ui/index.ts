@@ -11,6 +11,7 @@ export type { BadgeColor } from "./styles";
 export { btn } from "./buttons";
 export type { ButtonKind } from "./buttons";
 export { Button } from "./Button";
+export { default as SpotlightCard } from "./SpotlightCard";
 export { default as Collapsible } from "./Collapsible";
 export { default as Modal } from "./Modal";
 export { default as Drawer } from "./Drawer";

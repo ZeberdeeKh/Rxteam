@@ -240,7 +240,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         {log.length === 0 ? (
           <p className={ui.emptyState}>{st(lang, "hist_empty")}</p>
         ) : (
-          <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white text-sm">
+          <ul className="divide-y divide-gray-100 border border-gray-200 bg-white text-sm">
             {log.map((row, i) => (
               <li key={i} className="flex items-center justify-between gap-3 px-4 py-2">
                 <div>

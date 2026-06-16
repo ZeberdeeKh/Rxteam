@@ -2,53 +2,150 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Дизайн-токени перенесено з «Kalkulator». Тема ЛИШЕ темна (світлу прибрано) — палітра
-   калькулятора. `gray`/`white` у tailwind.config прив'язані до цих змінних, тому весь сайт
+/* Дизайн-токени — мілітарний стиль ab3.army (Етап AB3). Тема ЛИШЕ темна.
+   `gray`/`white` у tailwind.config прив'язані до цих змінних, тому весь сайт
    темний без dark:-варіантів на елементах. */
 :root {
   color-scheme: dark;
 
-  --c-white: #1f2126;   /* панелі: шапка, картки, інпути */
-  --c-gray-50: #24262c;
-  --c-gray-100: #2a2c33;
-  --c-gray-200: #383b43; /* бордери, hover-поверхні */
-  --c-gray-300: #474b54;
-  --c-gray-400: #8b909b;
-  --c-gray-500: #a2a7b1;
-  --c-gray-600: #bcc0c8;
+  /* ── Поверхні — оливково-чорні (ab3) ── */
+  --c-white: #11131d;    /* панелі: шапка, картки, інпути */
+  --c-gray-50: #131722;
+  --c-gray-100: #171b27; /* секції/панелі-підкладки */
+  --c-gray-200: #2a2f3a; /* бордери, hover-поверхні */
+  --c-gray-300: #3a4150;
+  --c-gray-400: #6b7280;
+  --c-gray-500: #9aa0ab;
+  --c-gray-600: #b7b7b7; /* ab3 light-grey */
   --c-gray-700: #d2d5db;
   --c-gray-800: #e6e8ec;
-  --c-gray-900: #f5f6f8; /* основний текст */
+  --c-gray-900: #ffffff; /* основний текст — білий (ab3) */
   --c-gray-950: #ffffff;
 
-  /* Колір заголовків І логотипу — ЄДИНИЙ токен (світла хакі). Див. docs/DESIGN_SYSTEM.md. */
-  --c-brand-text: #9d9b66;
+  /* ── Бренд — ПОМАРАНЧЕВИЙ (раніше хакі) ── */
+  --c-primary: #f6921e;        /* orange-500 */
+  --c-primary-hover: #f08407;  /* яскравий ховер */
+  --c-primary-deep: #e16709;   /* orange-600 */
+  --c-primary-fg: #000000;     /* текст на заливці solid-кнопки */
 
-  /* Семантика — напівпрозорі фони + приглушені літери (без «кислотних» плашок). */
-  --c-success-bg: rgba(125, 200, 165, 0.12);
-  --c-success-fg: #9bc2ac;
-  --c-success-soft: #9bc2ac; /* текст дельт «+» */
-  --c-danger-bg: rgba(216, 140, 140, 0.12);
-  --c-danger-fg: #cb9a9a;
-  --c-danger-soft: #cb9a9a; /* текст дельт «−» */
-  --c-warning-bg: rgba(212, 184, 130, 0.12);
-  --c-warning-fg: #cab488;
-  --c-danger-solid: #d24d4d; /* суцільна кнопка «Видалити» (приглушений червоний під темну палітру) */
-  --c-danger-solid-hover: #be3f3f;
+  /* Акценти */
+  --c-beige: #d6b588;
+  --c-dark-green: #111a0b;
 
-  /* Кнопка «action» — світла хакі (як заголовки), текст темний для контрасту. */
-  --c-action-bg: #9d9b66;
-  --c-action-bg-hover: #b8b78d;
-  --c-action-fg: #1f1f13;
+  /* Колір заголовків І логотипу — ЄДИНИЙ токен (тепер помаранч). Див. docs/DESIGN_SYSTEM.md. */
+  --c-brand-text: #f6921e;
+
+  /* ── Семантика — яскрава (ab3), краще читається як акцент на темному ── */
+  --c-success-bg: rgba(76, 175, 80, 0.14);
+  --c-success-fg: #4caf50;
+  --c-success-soft: #4caf50; /* текст дельт «+» */
+  --c-danger-bg: rgba(255, 107, 107, 0.14);
+  --c-danger-fg: #ff6b6b;
+  --c-danger-soft: #ff6b6b;  /* текст дельт «−» */
+  --c-warning-bg: rgba(214, 181, 136, 0.16);
+  --c-warning-fg: #d6b588;   /* беж */
+  --c-danger-solid: #ff6b6b; /* суцільна кнопка «Видалити» */
+  --c-danger-solid-hover: #d84d4d;
+
+  /* Кнопка «action» — тепер SOLID помаранч, текст чорний для контрасту. */
+  --c-action-bg: #f6921e;
+  --c-action-bg-hover: #f08407;
+  --c-action-fg: #000000;
+
+  /* Spotlight для карток (радіус і колір сяйва за курсором). */
+  --spotlight-size: 400px;
+  --spotlight-color: rgba(246, 146, 30, 0.18);
 }
 
 html, body {
-  font-family: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  font-family: "Mulish", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   @apply text-gray-900 antialiased;
-  background: #17181c; /* фон сторінки — темніший за панелі (gray-50) */
+  min-height: 100vh;
+  /* Темний градієнт ab3. `--page-photo` — гачок під фото-фон пізніше (за замовч. none). */
+  background:
+    var(--page-photo, none),
+    linear-gradient(5.61deg, #070e0e 4.02%, #11131d 89.98%);
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ТАКТИЧНІ ПОВЕРХНІ ab3 — зрізані кути (chamfer), насічки (notch), spotlight.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* 1) Базова зрізана картка: зрізи top-left + bottom-right по --cut.
+   clip-path обрізає й бордер, тому «рамку» малюємо нижнім шаром (::before),
+   що визирає на 1px з-під фону. */
+.rx-chamfer {
+  --cut: 14px;
+  --bd: var(--c-gray-200); /* колір рамки */
+  --bg: var(--c-white);    /* фон картки */
+  position: relative;
+  background: var(--bg);
+  clip-path: polygon(
+    0 var(--cut), var(--cut) 0, 100% 0,
+    100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%
+  );
+}
+.rx-chamfer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  margin: -1px; /* 1px назовні з усіх боків → видима смужка-рамка */
+  background: var(--bd);
+  clip-path: polygon(
+    0 var(--cut), var(--cut) 0, 100% 0,
+    100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%
+  );
+}
+
+/* 2) Варіант із насічками по боках (notch-card ab3). */
+.rx-notch {
+  --bg: var(--c-white);
+  position: relative;
+  background: var(--bg);
+  clip-path: polygon(
+    0 0, 100% 0, 100% 60.06%, 95.37% 63.96%, 100% 67.86%, 100% 100%,
+    0 100%, 0 67.86%, 4.63% 63.96%, 0 60.06%, 0 0
+  );
+}
+
+/* 3) Spotlight за курсором (ставимо на картку; --mx/--my оновлює SpotlightCard). */
+.rx-spotlight {
+  position: relative;
+  overflow: hidden;
+}
+.rx-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: radial-gradient(
+    var(--spotlight-size, 400px) circle at var(--mx, 50%) var(--my, 50%),
+    var(--spotlight-color, rgba(246, 146, 30, 0.18)),
+    transparent 60%
+  );
+}
+.rx-spotlight:hover::after {
+  opacity: 1;
+}
+
+/* Трейлінг-стрілка для кнопок: додати клас `btn-arrow` на елемент. */
+.btn-arrow::after {
+  content: "";
+  width: 0.875rem;
+  height: 0.875rem;
+  background-color: currentColor;
+  -webkit-mask: url("/icons/arrow-top-right.svg") center / contain no-repeat;
+          mask: url("/icons/arrow-top-right.svg") center / contain no-repeat;
 }
 
 /* Плавна поява фото в галереї (ротація надлишку + первинне завантаження). */

@@ -43,7 +43,7 @@ export default async function AdminSettings({
                   // Тоглі — рядок «лейбл + перемикач» праворуч (рівні картки однакової висоти).
                   <label
                     key={f.key}
-                    className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm"
+                    className="flex items-center justify-between gap-3 border border-gray-200 px-3 py-2 text-sm"
                   >
                     <span className={ui.label}>
                       {f.label[lang]} <code className={ui.metaFaint}>{f.key}</code>
