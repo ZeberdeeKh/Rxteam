@@ -58,14 +58,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
-          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-5">
+          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-7">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
             <Link href="/" className="flex items-baseline gap-2" aria-label="RX Team">
               <span className={ui.wordmark}>
                 RX&nbsp;Team
               </span>
-              <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
             </Link>
             <nav className="flex items-center gap-1 text-sm">
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
