@@ -84,11 +84,16 @@ export const ui = {
 
   // Таблиці / списки (квадратні)
   tableWrap: "overflow-x-auto overflow-hidden border border-gray-200 bg-white",
+  // Обгортка таблиці зі зрізаними кутами (як картка «Найближча гра»).
+  // Скрол виносимо на ВНУТРІШНІЙ div, бо overflow тут обрізав би рамку-підкладку (::before).
+  tableWrapCut: "rx-chamfer",
   table: "w-full text-sm",
   thead: "bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500",
-  th: "px-3 py-2 text-left",
+  // Стандартна висота рядка = 36px (h-9): БЕЗ вертикального паддінгу, вирівнювання по центру.
+  // Так компактна кнопка btn(kind,"sm") (теж 36px) заповнює клітинку рівно, не роздуваючи рядок.
+  th: "h-9 px-3 text-left align-middle",
   tbody: "divide-y divide-gray-200",
-  td: "px-3 py-2 text-gray-700",
+  td: "h-9 px-3 align-middle text-gray-700",
 
   // Банери (семантика з CSS-змінних — яскраві ab3, квадратні)
   alertOk: "bg-[var(--c-success-bg)] px-3 py-2 text-sm text-[var(--c-success-fg)]",

@@ -51,14 +51,14 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="confirmed" />
-                          <button type="submit" className={btn("action")}>
+                          <button type="submit" className={btn("action", "sm")}>
                             {st(lang, "adm_btn_confirm")}
                           </button>
                         </form>
                         <form action={setReferralStatus}>
                           <input type="hidden" name="refId" value={r.id} />
                           <input type="hidden" name="status" value="rejected" />
-                          <button type="submit" className={btn("delete")}>
+                          <button type="submit" className={btn("delete", "sm")}>
                             {st(lang, "adm_btn_reject")}
                           </button>
                         </form>

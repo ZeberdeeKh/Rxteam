@@ -1,7 +1,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Кнопки RX Team — ЄДИНЕ джерело стилів кнопок. Стиль ab3.army:
 // КВАДРАТНІ (rounded-none), ПЛОСКІ (shadow-none), UPPERCASE, шрифт display (Oswald),
-// рамка 2px. Однакова висота для всіх; ширина залежить лише від тексту.
+// рамка 2px. Ширина залежить лише від тексту.
 //
 // Типи (ТІЛЬКИ колір/заливка різні):
 //   • "outline"  дефолт-стиль ab3: прозорий фон + помаранчева рамка, ховер — яскравіший помаранч;
@@ -9,19 +9,34 @@
 //   • "delete"   деструктив: SOLID червоний;
 //   • "ghost"    тиха другорядна дія (cancel): без рамки/заливки, ховер — помаранч.
 //
+// Розміри (висота):
+//   • "md"  стандарт: адаптивна висота (≈36px моб / 42px десктоп). Форми, головні CTA.
+//   • "sm"  компакт: фіксовані 36px (h-9) — рівно під висоту рядка таблиці/списку (ui.td/th).
+//           Для другорядних дій ПОРУЧ ІЗ РЯДКАМИ, щоб рядок не виростав.
+//
 // Опційна трейлінг-стрілка: додай клас `btn-arrow` (<Button className="btn-arrow">).
-// Не хардкодимо стилі кнопок по сторінках — завжди btn(kind) або <Button kind>.
+// Не хардкодимо стилі кнопок по сторінках — завжди btn(kind, size) або <Button kind size>.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export type ButtonKind = "outline" | "action" | "delete" | "ghost";
+export type ButtonSize = "md" | "sm";
 
-// Спільна основа: квадрат, плоско, uppercase, display-шрифт, рамка 2px, однакова висота.
+// Спільна основа (без висоти/паддінгу/розміру тексту — це задає BTN_SIZE):
+// квадрат, плоско, uppercase, display-шрифт, рамка 2px.
 const BTN_BASE =
-  "inline-flex items-center justify-center gap-2 rounded-none border-2 px-5 py-2.5 md:py-3 " +
-  "font-display text-xs font-bold uppercase leading-none tracking-wide shadow-none " +
-  "transition-[color,background-color,border-color] duration-300 ease-in-out md:text-sm " +
+  "inline-flex items-center justify-center gap-2 rounded-none border-2 " +
+  "font-display font-bold uppercase leading-none tracking-wide shadow-none " +
+  "transition-[color,background-color,border-color] duration-300 ease-in-out " +
   "disabled:opacity-50 disabled:pointer-events-none focus:outline-none " +
   "focus-visible:ring-2 focus-visible:ring-brand/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--c-white)]";
+
+// Висота + горизонтальний паддінг + розмір тексту — єдина різниця між розмірами.
+const BTN_SIZE: Record<ButtonSize, string> = {
+  // Стандарт: адаптивна висота (≈36px моб / 42px десктоп).
+  md: "px-5 py-2.5 text-xs md:py-3 md:text-sm",
+  // Компакт: фіксовані 36px (h-9) під висоту рядка; текст завжди text-xs.
+  sm: "h-9 px-3 text-xs",
+};
 
 // Колір/заливка — єдина різниця між типами.
 const BTN_KIND: Record<ButtonKind, string> = {
@@ -43,6 +58,6 @@ const BTN_KIND: Record<ButtonKind, string> = {
 };
 
 /** Клас для будь-якого «кнопкового» елемента (button / Link / a). */
-export function btn(kind: ButtonKind = "action"): string {
-  return `${BTN_BASE} ${BTN_KIND[kind]}`;
+export function btn(kind: ButtonKind = "action", size: ButtonSize = "md"): string {
+  return `${BTN_BASE} ${BTN_SIZE[size]} ${BTN_KIND[kind]}`;
 }

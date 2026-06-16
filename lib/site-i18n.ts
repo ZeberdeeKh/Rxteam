@@ -598,19 +598,9 @@ const SITE: Record<string, Dict> = {
 
   adm_settings_title: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
-  adm_settings_hint: {
-    pl: "Puste pole = używana jest wartość domyślna (pokazana szarym tekstem). Wpisz coś, aby ją nadpisać.",
-    en: "Empty field = the default value is used (shown in grey). Type to override it.",
-    uk: "Порожнє поле = використовується стандартне значення (показане сірим). Введи текст, щоб перекрити.",
-  },
 
   // ── Соцмережі (майстер) ──
   adm_social_title: { pl: "Sociale (linki)", en: "Socials (links)", uk: "Соцмережі (посилання)" },
-  adm_social_hint: {
-    pl: "Linki pokazywane na stronie głównej (sekcja „O nas”). Puste pole = blok pokazany jako „wkrótce”.",
-    en: "Links shown on the landing page (the “About us” section). Empty field = the block is shown as “soon”.",
-    uk: "Посилання показуються на головній (блок «Про нас»). Порожнє поле = блок показується як «скоро».",
-  },
 
   // ── 6.4 Локації ──
   adm_nav_locations: { pl: "Lokalizacje", en: "Locations", uk: "Локації" },
@@ -763,11 +753,6 @@ const SITE: Record<string, Dict> = {
   adm_empty: { pl: "Brak danych.", en: "No data.", uk: "Немає даних." },
 
   adm_rental_title: { pl: "Zgłoszenia wynajmu", en: "Rental requests", uk: "Заявки на оренду" },
-  adm_rental_note: {
-    pl: "Lista podglądowa. Status (zajęty/opłacony) prowadź poza systemem.",
-    en: "Read-only list. Track status (occupied/paid) outside the system.",
-    uk: "Список лише для перегляду. Статус (зайнято/оплачено) веди поза системою.",
-  },
 
   adm_joins_title: { pl: "Wnioski do grupy (shield)", en: "Group join requests", uk: "Заявки в групу" },
   adm_joins_note: {
@@ -779,11 +764,6 @@ const SITE: Record<string, Dict> = {
   adm_roles_title: { pl: "Role adminów", en: "Admin roles", uk: "Ролі адмінів" },
   adm_master: { pl: "Master", en: "Master", uk: "Майстер" },
   adm_btn_save_roles: { pl: "Zapisz role", en: "Save roles", uk: "Зберегти ролі" },
-  adm_roles_help: {
-    pl: "Zaznacz uprawnienia i kliknij „Zapisz role”. Każde uprawnienie czyni gracza adminem; odznacz wszystkie i zapisz — wraca do roli zwykłego gracza.",
-    en: "Tick permissions and click “Save roles”. Any permission makes the player an admin; clear them all and save to demote back to a regular player.",
-    uk: "Відмітьте права й натисніть «Зберегти ролі». Будь-яке право робить гравця адміном; зніміть усі й збережіть — і він знову звичайний гравець.",
-  },
   adm_role_admin: { pl: "Admin", en: "Admin", uk: "Адмін" },
   adm_role_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
   adm_make_admin: { pl: "Zrób adminem", en: "Make admin", uk: "Зробити адміном" },

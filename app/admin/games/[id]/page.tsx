@@ -105,7 +105,7 @@ export default async function AdminGameDetail({
                             <form action={manualCheckin}>
                               <input type="hidden" name="gameId" value={game.id} />
                               <input type="hidden" name="playerId" value={r.playerId} />
-                              <button type="submit" className={btn("action")}>
+                              <button type="submit" className={btn("action", "sm")}>
                                 {st(lang, "adm_btn_checkin")}
                               </button>
                             </form>
@@ -113,7 +113,7 @@ export default async function AdminGameDetail({
                               <form action={markNoShow}>
                                 <input type="hidden" name="gameId" value={game.id} />
                                 <input type="hidden" name="playerId" value={r.playerId} />
-                                <button type="submit" className={btn("delete")}>
+                                <button type="submit" className={btn("delete", "sm")}>
                                   {st(lang, "adm_btn_noshow")}
                                 </button>
                               </form>

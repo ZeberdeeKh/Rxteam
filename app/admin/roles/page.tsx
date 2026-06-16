@@ -22,9 +22,6 @@ export default async function AdminRoles({
 
   return (
     <div className={ui.pageStack}>
-      <p className={ui.panel}>
-        {st(lang, "adm_roles_help")}
-      </p>
       {searchParams.saved && (
         <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>
       )}

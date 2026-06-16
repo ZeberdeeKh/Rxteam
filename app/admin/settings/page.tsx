@@ -26,9 +26,6 @@ export default async function AdminSettings({
       {searchParams.saved && (
         <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>
       )}
-      <p className={ui.panel}>
-        {st(lang, "adm_settings_hint")}
-      </p>
 
       <form action={saveSettings} className="space-y-3">
         {SETTINGS_GROUPS.map((g) => (

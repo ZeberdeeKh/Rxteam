@@ -21,7 +21,6 @@ export default async function AdminSocial({
   return (
     <div className={ui.pageStack}>
       {searchParams.saved && <p className={ui.alertOk}>{st(lang, "adm_saved")}</p>}
-      <p className={ui.panel}>{st(lang, "adm_social_hint")}</p>
 
       <form action={saveSocial} className="space-y-8">
         <fieldset className={ui.card}>

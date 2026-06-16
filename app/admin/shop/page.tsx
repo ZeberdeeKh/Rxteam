@@ -198,7 +198,7 @@ export default async function AdminShop({
                           <span className={badgeClass("amber")}>
                             {st(lang, "adm_shop_status_pending")}
                           </span>
-                          <button type="submit" className={btn("action")}>
+                          <button type="submit" className={btn("action", "sm")}>
                             {st(lang, "adm_shop_mark_done")}
                           </button>
                         </form>

@@ -9,7 +9,7 @@ export {
 } from "./styles";
 export type { BadgeColor } from "./styles";
 export { btn } from "./buttons";
-export type { ButtonKind } from "./buttons";
+export type { ButtonKind, ButtonSize } from "./buttons";
 export { Button } from "./Button";
 export { default as SpotlightCard } from "./SpotlightCard";
 export { default as Reveal } from "./Reveal";
