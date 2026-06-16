@@ -47,7 +47,7 @@ export function headerAdminClass(active: boolean): string {
 }
 
 const NAV_SUB_BASE =
-  "inline-flex items-center justify-center px-2.5 py-1 font-display text-xs font-semibold uppercase tracking-wide transition-colors duration-300";
+  "inline-flex items-center justify-center px-2.5 py-1 font-display text-sm font-semibold uppercase tracking-wide transition-colors duration-300";
 /** Підпункт підменю адмінки. */
 export function subNavClass(active: boolean): string {
   return active
