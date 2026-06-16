@@ -187,7 +187,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center">
           <IconBug size={18} />
         </span>
-        <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm font-bold uppercase tracking-wide transition-all duration-300 group-hover:max-w-[260px]">
+        <span className="max-w-0 overflow-hidden whitespace-nowrap text-sm uppercase tracking-wide transition-all duration-300 group-hover:max-w-[260px]">
           <span className="pr-4">{labels.button}</span>
         </span>
       </button>
