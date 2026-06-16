@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import type { ReactNode } from "react";
+import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
 import { featureEnabled } from "@/lib/settings";
@@ -40,12 +41,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
   const errKey = errVal ? `shop_err_${errVal}` : null;
 
   if (!enabled) {
-    return (
-      <div className="space-y-4">
-        <h1 className={ui.pageTitle}>{st(lang, "shop_title")}</h1>
-        <p className="text-sm text-gray-500">{st(lang, "shop_disabled")}</p>
-      </div>
-    );
+    return <p className="text-sm text-gray-500">{st(lang, "shop_disabled")}</p>;
   }
 
   const [player, items, economyOn] = await Promise.all([
@@ -68,12 +64,41 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       )
     : [];
 
+  // Єдина картка-плитка для будь-якого товару (бонус або звання): назва зверху,
+  // підпис, а внизу — рядок «ціна + дія/статус». Усі товари виглядають однаково.
+  function ShopTile({
+    title,
+    subtitle,
+    cost,
+    highlight = false,
+    children,
+  }: {
+    title: string;
+    subtitle?: string | null;
+    cost?: string;
+    highlight?: boolean;
+    children: ReactNode;
+  }) {
+    return (
+      <article
+        className={`flex flex-col rounded-lg border bg-white p-5 ${
+          highlight ? "border-brand" : "border-gray-200"
+        }`}
+      >
+        <h3 className={ui.cardTitle}>{title}</h3>
+        {subtitle && <p className="mt-1 text-sm text-gray-600">{subtitle}</p>}
+        <div className="mt-auto flex items-center justify-between gap-3 pt-4">
+          <span className="text-sm font-semibold text-[var(--c-brand-text)]">{cost ?? ""}</span>
+          {children}
+        </div>
+      </article>
+    );
+  }
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className={ui.pageTitle}>{st(lang, "shop_title")}</h1>
-        <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_intro")}</p>
-      </div>
+      {/* Опис магазину (без дубль-заголовка — назва вже у підсвіченому пункті меню). */}
+      <p className="text-sm text-gray-500">{st(lang, "shop_intro")}</p>
 
       {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
       {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
@@ -91,50 +116,48 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         </p>
       )}
 
-      {items.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
-          {st(lang, "shop_empty")}
-        </p>
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {items.map((it) => {
-            const affordable = !!player && balance >= it.cost;
-            const desc = itemDesc(it, lang);
-            return (
-              <article
-                key={it.id}
-                className="flex flex-col rounded-lg border border-gray-200 bg-white p-5"
-              >
-                <h3 className="text-base font-semibold text-gray-900">{itemTitle(it, lang)}</h3>
-                {desc && <p className="mt-1 flex-1 text-sm text-gray-600">{desc}</p>}
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <span className="text-sm font-semibold text-[var(--c-brand-text)]">{it.cost} 💰</span>
+      {/* Група: Бонуси */}
+      <section className="space-y-3">
+        <h2 className={ui.sectionTitle}>{st(lang, "shop_items_title")}</h2>
+        {items.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
+            {st(lang, "shop_empty")}
+          </p>
+        ) : (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((it) => {
+              const affordable = !!player && balance >= it.cost;
+              return (
+                <ShopTile
+                  key={it.id}
+                  title={itemTitle(it, lang)}
+                  subtitle={itemDesc(it, lang)}
+                  cost={`${it.cost} 💰`}
+                >
                   {player && (
                     <form action={buyItem}>
                       <input type="hidden" name="itemId" value={it.id} />
-                      <button type="submit" disabled={!affordable} className={btn("action", "md")}>
+                      <button type="submit" disabled={!affordable} className={btn("action", "sm")}>
                         {st(lang, "shop_buy")}
                       </button>
                     </form>
                   )}
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      )}
+                </ShopTile>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
-      {/* Звання за бали — купівля наступного (правила як у боті /rank). */}
+      {/* Група: Звання (купівля наступного, правила як у боті /rank) */}
       {economyOn && (
         <section className="space-y-3">
-          <div>
-            <h2 className={ui.sectionTitle}>{st(lang, "shop_ranks_title")}</h2>
-            <p className="mt-1 text-sm text-gray-500">{st(lang, "shop_ranks_intro")}</p>
-          </div>
+          <h2 className={ui.sectionTitle}>{st(lang, "shop_ranks_title")}</h2>
+          <p className="-mt-1 text-sm text-gray-500">{st(lang, "shop_ranks_intro")}</p>
 
           {player && !hasPatch && <p className={ui.alertWarn}>{st(lang, "shop_rank_need_patch")}</p>}
 
-          <div className="space-y-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {RANKS.map((r, i) => {
               const cost = rankCosts[i] ?? 0;
               const owned = hasPatch && i <= currentIdx;
@@ -142,35 +165,27 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
               const isNext = hasPatch && r === nextR;
               const affordable = isNext && balance >= cost;
               return (
-                <div
+                <ShopTile
                   key={r}
-                  className={`flex items-center justify-between gap-3 rounded-lg border bg-white p-4 ${
-                    isCurrent ? "border-brand" : "border-gray-200"
-                  }`}
+                  title={r}
+                  cost={i === 0 ? st(lang, "shop_rank_free") : `${cost} 💰`}
+                  highlight={isCurrent}
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{r}</p>
-                    <p className="text-xs text-gray-500">
-                      {i === 0 ? st(lang, "shop_rank_free") : `${cost} 💰`}
-                    </p>
-                  </div>
-                  <div className="shrink-0">
-                    {isCurrent ? (
-                      <span className={badgeClass("brand")}>{st(lang, "shop_rank_current")}</span>
-                    ) : owned ? (
-                      <span className={badgeClass("green")}>{st(lang, "shop_rank_owned")}</span>
-                    ) : isNext && player ? (
-                      <form action={buyRank}>
-                        <input type="hidden" name="rank" value={r} />
-                        <button type="submit" disabled={!affordable} className={btn("action", "md")}>
-                          {st(lang, "shop_buy")}
-                        </button>
-                      </form>
-                    ) : i === 0 ? null : (
-                      <span className="text-xs text-gray-400">🔒</span>
-                    )}
-                  </div>
-                </div>
+                  {isCurrent ? (
+                    <span className={badgeClass("brand")}>{st(lang, "shop_rank_current")}</span>
+                  ) : owned ? (
+                    <span className={badgeClass("green")}>{st(lang, "shop_rank_owned")}</span>
+                  ) : isNext && player ? (
+                    <form action={buyRank}>
+                      <input type="hidden" name="rank" value={r} />
+                      <button type="submit" disabled={!affordable} className={btn("action", "sm")}>
+                        {st(lang, "shop_buy")}
+                      </button>
+                    </form>
+                  ) : i === 0 ? null : (
+                    <span className="text-xs text-gray-400">🔒</span>
+                  )}
+                </ShopTile>
               );
             })}
           </div>

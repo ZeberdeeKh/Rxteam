@@ -36,6 +36,11 @@
   --c-warning-fg: #876b3c;
   --c-danger-solid: #dc2626; /* суцільна кнопка «Видалити» (насичений — це кнопка, не бейдж) */
   --c-danger-solid-hover: #b91c1c;
+
+  /* Кнопка «action» — той самий хакі, що й заголовки/лого (--c-brand-text). */
+  --c-action-bg: #545331;
+  --c-action-bg-hover: #45442b;
+  --c-action-fg: #fafafa;
 }
 
 html.dark {
@@ -68,6 +73,11 @@ html.dark {
   --c-warning-fg: #cab488;
   --c-danger-solid: #d24d4d; /* трохи приглушений червоний — пасує темній палітрі */
   --c-danger-solid-hover: #be3f3f;
+
+  /* Кнопка «action» на темній — світла хакі (як заголовки), текст темний для контрасту. */
+  --c-action-bg: #9d9b66;
+  --c-action-bg-hover: #b8b78d;
+  --c-action-fg: #1f1f13;
 }
 
 html, body {

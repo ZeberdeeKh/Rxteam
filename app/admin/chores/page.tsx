@@ -69,8 +69,8 @@ export default async function AdminChores({
       ) : (
         <div className={ui.listStack}>
           {items.map((it) => (
-            <div key={it.id} className={ui.card}>
-              <form action={updateChore} className="grid items-end gap-3 sm:grid-cols-12">
+            <div key={it.id} className={`${ui.card} space-y-3`}>
+              <form action={updateChore} id={`chore-${it.id}`} className="grid items-end gap-3 sm:grid-cols-12">
                 <input type="hidden" name="id" value={it.id} />
                 <label className="text-sm sm:col-span-3">
                   <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_kind")}</span>
@@ -88,7 +88,7 @@ export default async function AdminChores({
                   <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_note")}</span>
                   <input name="note" defaultValue={it.note ?? ""} className={ui.input} />
                 </label>
-                <label className="inline-flex items-center gap-1.5 text-sm sm:col-span-2">
+                <label className="inline-flex items-center gap-1.5 text-sm sm:col-span-12">
                   <input
                     type="checkbox"
                     name="active"
@@ -97,19 +97,20 @@ export default async function AdminChores({
                   />
                   {st(lang, "adm_chore_active")}
                 </label>
-                <div className="flex items-center gap-2 sm:col-span-12">
-                  <button type="submit" className={btn("action", "sm")}>
-                    {st(lang, "adm_btn_save")}
-                  </button>
-                </div>
               </form>
 
-              <form action={deleteChore} className="mt-2 border-t border-gray-100 pt-2">
-                <input type="hidden" name="id" value={it.id} />
-                <button type="submit" className={btn("delete", "sm")}>
-                  {st(lang, "adm_btn_delete")}
+              {/* Єдиний рівний ряд дій: action «Зберегти» + delete «Видалити» (однаковий розмір). */}
+              <div className="flex flex-wrap items-center gap-2 border-t border-gray-200 pt-3">
+                <button type="submit" form={`chore-${it.id}`} className={btn("action", "sm")}>
+                  {st(lang, "adm_btn_save")}
                 </button>
-              </form>
+                <form action={deleteChore}>
+                  <input type="hidden" name="id" value={it.id} />
+                  <button type="submit" className={btn("delete", "sm")}>
+                    {st(lang, "adm_btn_delete")}
+                  </button>
+                </form>
+              </div>
             </div>
           ))}
         </div>

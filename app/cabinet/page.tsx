@@ -64,10 +64,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   if (ctx.state === "unlinked") {
     return (
       <div className="mx-auto max-w-lg space-y-6">
-        <div>
-          <h1 className={ui.pageTitle}>{st(lang, "cabinet_title")}</h1>
-          <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>
-        </div>
+        {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
         {banners}
         <LinkTelegramForm lang={lang} />
         <div className="flex items-center gap-3 text-xs uppercase text-gray-400">
@@ -95,9 +92,6 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   if (!player.callsign) {
     return (
       <div className="mx-auto max-w-lg space-y-6">
-        <h1 className={ui.pageTitle}>
-          {st(lang, "cabinet_title")}
-        </h1>
         {banners}
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
@@ -129,12 +123,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
   return (
     <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className={ui.pageTitle}>
-          {st(lang, "cabinet_title")}
-        </h1>
-        {ctx.email && <p className="mt-2 text-sm text-gray-500">{ctx.email}</p>}
-      </div>
+      {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
       {banners}
 
       {/* Профіль */}

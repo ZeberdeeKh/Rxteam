@@ -21,9 +21,12 @@ const BTN_BASE =
   "shadow-sm transition disabled:opacity-50 disabled:pointer-events-none " +
   "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 focus-visible:ring-offset-white";
 
-// Колір — єдина різниця між типами. Обидва суцільні, світлий текст.
+// Колір — єдина різниця між типами. Обидва суцільні; «action» бере той самий хакі,
+// що й заголовки/лого (--c-action-* = --c-brand-text), із контрастним текстом.
 const BTN_KIND: Record<ButtonKind, string> = {
-  action: "bg-brand text-neutral-50 hover:bg-brand-dark focus-visible:ring-brand/50",
+  action:
+    "bg-[var(--c-action-bg)] text-[var(--c-action-fg)] hover:bg-[var(--c-action-bg-hover)] " +
+    "focus-visible:ring-brand/50",
   delete:
     "bg-[var(--c-danger-solid)] text-neutral-50 hover:bg-[var(--c-danger-solid-hover)] " +
     "focus-visible:ring-[var(--c-danger-solid)]/50",
