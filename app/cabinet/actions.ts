@@ -6,6 +6,8 @@ import { getAuthUser } from "@/lib/supabase-server";
 import { featureEnabled } from "@/lib/settings";
 import { redeemLinkCode } from "@/lib/identities";
 import { supabase } from "@/lib/supabase";
+import { getSessionContext } from "@/lib/session-player";
+import { notifyAdminsRental } from "@/lib/notify";
 import {
   getSessionPlayer,
   createStandalonePlayerForSession,
@@ -70,7 +72,8 @@ export async function saveCallsign(formData: FormData) {
 
 // Запис на гру (рег відкрита до reg_closes_at = збір −9год).
 export async function registerForGame(formData: FormData) {
-  const player = await getSessionPlayer();
+  const ctx = await getSessionContext();
+  const player = ctx.state === "linked" ? ctx.player : null;
   if (!player) redirect("/login");
   if (!player.callsign) backTo(formData, "?err=need_callsign");
 
@@ -82,7 +85,8 @@ export async function registerForGame(formData: FormData) {
   if (game!.reg_closes_at && new Date(game!.reg_closes_at).getTime() < Date.now()) backTo(formData, "?err=reg_closed");
   if (game!.capacity && (await registeredCount(gameId)) >= game!.capacity) backTo(formData, "?err=game_full");
 
-  const transport = formData.get("transport") === "own" ? "own" : "need";
+  const tRaw = formData.get("transport");
+  const transport = tRaw === "own" ? "own" : tRaw === "skip" ? null : "need";
   const needsRental = formData.get("needs_rental") === "on";
   const fromPlace = transport === "own" ? String(formData.get("from_place") ?? "").trim() || null : null;
   const freeSeatsRaw = Number(formData.get("free_seats"));
@@ -101,6 +105,19 @@ export async function registerForGame(formData: FormData) {
     },
     { onConflict: "game_id,player_id" },
   );
+
+  // Оренда: повідомити адмінів у ТГ із контактом орендаря (TG-лінк або email сайт-юзера).
+  if (needsRental) {
+    await notifyAdminsRental({
+      callsign: player.callsign,
+      name: player.name,
+      tgUserId: player.tg_user_id,
+      tgUsername: player.tg_username,
+      email: ctx.state === "linked" ? ctx.email : null,
+      game,
+    });
+  }
+
   revalidatePath("/cabinet");
   revalidatePath("/games");
   backTo(formData, "?reg=1");

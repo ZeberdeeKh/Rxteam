@@ -47,6 +47,7 @@ import {
   distanceMeters,
 } from "./games";
 import { postChoreRun, toggleChoreClaim, refreshChoreMessage } from "./chores";
+import { notifyAdminsRental } from "./notify";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
@@ -2184,28 +2185,18 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
   );
   if (data.needsRental) {
     await ctx.reply(tr(p.lang as Lang, "rental_noted"));
-    await notifyAdminsRental(p, game);
+    await notifyAdminsRental({
+      callsign: p.callsign,
+      name: p.name,
+      tgUserId: p.tg_user_id,
+      tgUsername: p.tg_username,
+      email: null,
+      game,
+    });
   }
   if (data.transport === "own") {
     await ctx.reply(tr(p.lang as Lang, "myride_hint"));
   }
 }
 
-async function notifyAdminsRental(p: any, game: any) {
-  const { data: admins } = await supabase
-    .from("players")
-    .select("tg_user_id, lang")
-    .eq("is_admin", true);
-  const when = game ? formatWhen(game.gather_at ?? game.start_at) : "";
-  for (const a of admins ?? []) {
-    if (!a.tg_user_id) continue;
-    const text = tr((a.lang as Lang) ?? "uk", "admin_rental_notify", {
-      callsign: p.callsign ?? p.name ?? "?",
-      title: game?.title ?? "ASG",
-      when,
-    });
-    try {
-      await bot.api.sendMessage(a.tg_user_id, text);
-    } catch {}
-  }
-}
+// notifyAdminsRental переїхав у lib/notify.ts (спільний для сайту й бота, з контактом орендаря).

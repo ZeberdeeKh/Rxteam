@@ -16,7 +16,7 @@ export default function RegisterForm({
   lang: Lang;
   returnTo?: string;
 }) {
-  const [transport, setTransport] = useState<"need" | "own">("need");
+  const [transport, setTransport] = useState<"need" | "own" | "skip">("skip");
   const inputCls = ui.input;
 
   return (
@@ -52,6 +52,17 @@ export default function RegisterForm({
             className={ui.radio}
           />
           {st(lang, "reg_transport_own")}
+        </label>
+        <label className="flex items-center gap-2 text-sm text-gray-700">
+          <input
+            type="radio"
+            name="transport"
+            value="skip"
+            checked={transport === "skip"}
+            onChange={() => setTransport("skip")}
+            className={ui.radio}
+          />
+          {st(lang, "reg_transport_skip")}
         </label>
       </fieldset>
 
