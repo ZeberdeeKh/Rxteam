@@ -32,7 +32,7 @@ export function badgeClass(color: BadgeColor = "gray"): string {
 
 // ── Навігація (активний стан — підсвічування поточного пункту) ──
 // Пункти меню — у ВЕРХНЬОМУ РЕГІСТРІ (як кнопки й заголовки).
-const NAV_HEADER_BASE = "rounded-md px-2.5 py-1.5 text-sm uppercase tracking-wide transition";
+const NAV_HEADER_BASE = "rounded-md px-2.5 py-1 text-xs uppercase tracking-wide transition";
 /** Посилання верхнього меню шапки. */
 export function headerNavClass(active: boolean): string {
   return active

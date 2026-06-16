@@ -62,7 +62,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
             <Link href="/" className="flex items-baseline gap-2" aria-label="RX Team">
-              <span className="text-lg font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]">
+              <span className="text-xl font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]">
                 RX&nbsp;Team
               </span>
               <span className="hidden text-xs text-gray-500 sm:inline">{st(lang, "brand_tagline")}</span>
