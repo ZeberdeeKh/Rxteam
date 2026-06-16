@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Lang } from "@/lib/site-i18n";
+import { ui, btn } from "@/components/ui";
 
 // Фіча «Повідомити про помилку» — перенесено з «Kalkulator», адаптовано під стек RX Team
 // (Telegram через BOT_TOKEN на сервері, без Redis). Плаваюча кнопка + модалка + статус-машина.
+// Стилі — на дизайн-системі (ADR-0028): btn(action/ghost), ui.input, ui.iconBtn, ui.fab,
+// ui.successIconCircle, ui.negText, --c-brand-text. Власний оверлей збережено (data-bug-ignore).
 
 export interface BugLabels {
   button: string;
@@ -172,14 +175,14 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
 
   return (
     <>
-      {/* Плаваюча кнопка: темна «пігулка» вдень, світла вночі. neutral НЕ перемикається. */}
+      {/* Плаваюча кнопка (ui.fab — єдиний санкціонований dark:). neutral НЕ перемикається. */}
       <button
         type="button"
         onClick={openModal}
         data-bug-ignore
         title={labels.button}
         aria-label={labels.button}
-        className="group fixed bottom-4 right-4 z-40 flex items-center rounded-full bg-neutral-800 text-neutral-50 shadow-lg transition-colors hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className={`group ${ui.fab}`}
       >
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center">
           <IconBug size={18} />
@@ -200,27 +203,23 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
             if (e.target === e.currentTarget && pressOnBackdrop.current && !sending) closeModal();
           }}
         >
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto bg-white shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-2xl">
             {status.kind === "success" ? (
               <div className="flex flex-col items-center gap-3 p-8 text-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50">
+                <div className={`h-12 w-12 ${ui.successIconCircle}`}>
                   <IconCheck size={28} />
                 </div>
-                <h3 className="text-sm font-bold text-gray-800">{labels.success}</h3>
-                <p className="max-w-xs text-xs font-normal text-gray-500">{labels.successHint}</p>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="mt-3 bg-brand-600 px-6 py-2 text-sm font-bold uppercase tracking-wide text-neutral-50 shadow-sm transition-colors hover:bg-brand-500"
-                >
+                <h3 className={ui.bodyStrong}>{labels.success}</h3>
+                <p className={`max-w-xs ${ui.meta}`}>{labels.successHint}</p>
+                <button type="button" onClick={closeModal} className={`mt-3 ${btn("action")}`}>
                   {labels.close}
                 </button>
               </div>
             ) : (
               <>
                 <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4">
-                  <h3 className="flex items-center gap-2 text-sm font-bold text-gray-800">
-                    <span className="text-brand-600">
+                  <h3 className={`flex items-center gap-2 ${ui.bodyStrong}`}>
+                    <span className="text-[var(--c-brand-text)]">
                       <IconBug size={16} />
                     </span>
                     {labels.title}
@@ -228,7 +227,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                   <button
                     onClick={closeModal}
                     disabled={sending}
-                    className="p-1 text-gray-400 hover:bg-gray-100 disabled:opacity-40"
+                    className={ui.iconBtn}
                     aria-label={labels.cancel}
                   >
                     <IconX size={18} />
@@ -241,14 +240,14 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={labels.descriptionPlaceholder}
                     rows={4}
-                    className="w-full resize-none border border-gray-300 bg-white px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className={`${ui.input} resize-none`}
                   />
                   <input
                     type="text"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={labels.emailOptional}
-                    className="w-full border border-gray-300 bg-white px-3 py-2 text-xs text-gray-700 placeholder-gray-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                    className={ui.input}
                   />
 
                   <div className="space-y-2">
@@ -263,17 +262,15 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                       <button
                         type="button"
                         onClick={() => fileInputRef.current?.click()}
-                        className="flex w-full items-center justify-center gap-2 border border-dashed border-gray-300 px-3 py-2 text-xs font-bold uppercase tracking-wide text-gray-700 transition-colors hover:bg-gray-50"
+                        className={`${btn("ghost")} w-full`}
                       >
-                        <span className="text-gray-500">
-                          <IconPaperclip />
-                        </span>
+                        <IconPaperclip />
                         {labels.attachScreenshot}
                       </button>
                     ) : (
                       <div className="space-y-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={screenshot} alt="" className="w-full border border-gray-200" />
+                        <img src={screenshot} alt="" className="w-full rounded-md border border-gray-200" />
                         <div className="flex items-center justify-between gap-2 text-xs text-gray-600">
                           <span className="truncate">{fileName}</span>
                           <button
@@ -284,7 +281,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                               setFileError(null);
                             }}
                             aria-label={labels.removeScreenshot}
-                            className="flex flex-shrink-0 items-center gap-1 text-gray-400 transition-colors hover:text-rose-600"
+                            className="flex flex-shrink-0 items-center gap-1 text-gray-400 transition-colors hover:text-[var(--c-danger-fg)]"
                           >
                             <IconTrash />
                           </button>
@@ -292,30 +289,22 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                       </div>
                     )}
                     {fileError ? (
-                      <p className="text-xs font-normal text-rose-600">{fileError}</p>
+                      <p className={`text-xs ${ui.negText}`}>{fileError}</p>
                     ) : (
-                      !screenshot && <p className="text-xs font-normal text-gray-400">{labels.screenshotHint}</p>
+                      !screenshot && <p className={ui.metaFaint}>{labels.screenshotHint}</p>
                     )}
                   </div>
 
                   {status.kind === "error" && (
-                    <p className="text-xs font-normal text-rose-600">{labels.error}</p>
+                    <p className={`text-xs ${ui.negText}`}>{labels.error}</p>
                   )}
                 </div>
 
                 <div className="flex items-center justify-end gap-2 border-t border-gray-200 px-5 py-3">
-                  <button
-                    onClick={closeModal}
-                    disabled={sending}
-                    className="px-4 py-2 text-sm font-bold uppercase tracking-wide text-gray-600 transition-colors hover:bg-gray-200 hover:text-gray-800 disabled:opacity-40"
-                  >
+                  <button onClick={closeModal} disabled={sending} className={btn("ghost")}>
                     {labels.cancel}
                   </button>
-                  <button
-                    onClick={submit}
-                    disabled={!canSend}
-                    className="flex items-center gap-1.5 bg-brand-600 px-4 py-2 text-sm font-bold uppercase tracking-wide text-neutral-50 shadow-sm transition-colors hover:bg-brand-500 disabled:opacity-40"
-                  >
+                  <button onClick={submit} disabled={!canSend} className={btn("action")}>
                     {sending ? <IconSpinner /> : <IconBug size={14} />}
                     {labels.send}
                   </button>

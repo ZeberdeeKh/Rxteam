@@ -4,7 +4,7 @@ import { st } from "@/lib/site-i18n";
 import { getNextGame, getRanking, getGalleryPhotos } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
-import { ui } from "@/components/ui";
+import { ui, GLYPH } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
@@ -68,10 +68,10 @@ export default async function Home() {
               {next.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
             </div>
             <div className={`mt-2 ${ui.body}`}>
-              📅 {formatGameWhen(next.gather_at ?? next.start_at, lang)}
+              {GLYPH.date} {formatGameWhen(next.gather_at ?? next.start_at, lang)}
             </div>
             <div className={ui.body}>
-              📍 {next.location?.name ?? st(lang, "games_tbd_loc")}
+              {GLYPH.place} {next.location?.name ?? st(lang, "games_tbd_loc")}
               {next.location?.map_url && (
                 <>
                   {" · "}
@@ -79,7 +79,7 @@ export default async function Home() {
                     href={next.location.map_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[var(--c-brand-text)] hover:underline"
+                    className={ui.link}
                   >
                     {st(lang, "games_map")}
                   </a>
@@ -94,17 +94,12 @@ export default async function Home() {
               </div>
             )}
 
-            <Link
-              href="/games"
-              className="mt-3 inline-block text-sm font-medium text-[var(--c-brand-text)] hover:underline"
-            >
+            <Link href="/games" className={`mt-3 inline-block ${ui.link}`}>
               {st(lang, "home_cta_games")} →
             </Link>
           </div>
         ) : (
-          <p className="mt-3 rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
-            {st(lang, "home_next_none")}
-          </p>
+          <p className={`mt-3 ${ui.emptyState}`}>{st(lang, "home_next_none")}</p>
         )}
       </section>
 

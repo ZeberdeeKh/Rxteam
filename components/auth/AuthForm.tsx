@@ -29,7 +29,7 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
   const switchHref = mode === "login" ? "/register" : "/login";
 
   return (
-    <div className="mx-auto max-w-sm">
+    <div className={ui.widthNarrow}>
       <h1 className={ui.pageTitle}>{st(lang, title)}</h1>
 
       <form action={formAction} className="mt-6 space-y-4">
@@ -71,7 +71,7 @@ export default function AuthForm({ mode, lang }: { mode: "login" | "register"; l
       </form>
 
       <div className="mt-6 border-t border-gray-200 pt-4">
-        <Link href={switchHref} className={`${btn("action")} w-full`}>
+        <Link href={switchHref} className={`block text-center ${ui.link}`}>
           {st(lang, switchKey)}
         </Link>
       </div>

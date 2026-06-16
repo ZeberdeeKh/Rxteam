@@ -59,7 +59,7 @@ export default async function AdminRoles({
                       value={perm}
                       defaultChecked={Array.isArray(p.admin_perms) && p.admin_perms.includes(perm)}
                       disabled={p.is_master}
-                      className="h-4 w-4 accent-brand"
+                      className={ui.checkbox}
                     />
                     {perm}
                   </label>
@@ -76,12 +76,12 @@ export default async function AdminRoles({
       </div>
 
       {/* Легенда дозволів — пояснення для суперадміна, за що відповідає кожен прапорець. */}
-      <section className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm">
-        <h2 className={`mb-2 ${ui.cardTitle}`}>{st(lang, "adm_perms_legend_title")}</h2>
+      <section className={`${ui.card} text-sm`}>
+        <h2 className={`mb-3 ${ui.cardTitle}`}>{st(lang, "adm_perms_legend_title")}</h2>
         <ul className="space-y-1.5 text-gray-600">
           {ALL_PERMS.map((perm) => (
             <li key={perm} className="flex flex-wrap gap-x-2">
-              <code className="font-mono font-semibold text-[var(--c-brand-text)]">{perm}</code>
+              <code className="font-semibold text-[var(--c-brand-text)]">{perm}</code>
               <span>— {st(lang, `adm_perm_${perm}`)}</span>
             </li>
           ))}

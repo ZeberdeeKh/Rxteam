@@ -59,7 +59,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
   const errKey = errVal ? `err_${errVal}` : null;
 
   return (
-    <div className="space-y-10">
+    <div className={ui.pageStack}>
       <h1 className={ui.pageTitle}>{st(lang, "games_title")}</h1>
 
       {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
@@ -74,7 +74,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
             {actions(next.id)}
           </GameCard>
         ) : (
-          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
+          <p className={ui.emptyState}>
             {st(lang, "games_none_upcoming")}
           </p>
         )}
@@ -106,7 +106,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
             ))}
           </div>
         ) : (
-          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
+          <p className={ui.emptyState}>
             {st(lang, "games_none_past")}
           </p>
         )}

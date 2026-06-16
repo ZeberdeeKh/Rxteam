@@ -25,7 +25,7 @@ export default function RegisterForm({
       {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
       <label className="flex items-center gap-2 text-sm text-gray-700">
-        <input type="checkbox" name="needs_rental" className="h-4 w-4 accent-brand" />
+        <input type="checkbox" name="needs_rental" className={ui.checkbox} />
         {st(lang, "reg_rental_q")}
       </label>
 
@@ -38,7 +38,7 @@ export default function RegisterForm({
             value="need"
             checked={transport === "need"}
             onChange={() => setTransport("need")}
-            className="accent-brand"
+            className={ui.radio}
           />
           {st(lang, "reg_transport_need")}
         </label>
@@ -49,7 +49,7 @@ export default function RegisterForm({
             value="own"
             checked={transport === "own"}
             onChange={() => setTransport("own")}
-            className="accent-brand"
+            className={ui.radio}
           />
           {st(lang, "reg_transport_own")}
         </label>

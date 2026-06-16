@@ -1,11 +1,11 @@
 ﻿import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
+import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listGamesAdmin, listLocations } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { createGame } from "@/app/admin/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { ui, btn, gameStatusBadge } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -112,22 +112,14 @@ export default async function AdminGames({
                     <span className="ml-1 text-xs text-gray-400">{g.location_name ?? ""}</span>
                   </td>
                   <td className={ui.td}>
-                    <span
-                      className={badgeClass(
-                        g.status === "announced"
-                          ? "green"
-                          : g.status === "cancelled"
-                            ? "red"
-                            : "gray",
-                      )}
-                    >
-                      {g.status}
+                    <span className={gameStatusBadge(g.status)}>
+                      {statusText(lang, "gamest", g.status)}
                     </span>
                   </td>
                   <td className={`${ui.td} text-right tabular-nums`}>{g.regCount}</td>
                   <td className={`${ui.td} text-right tabular-nums`}>{g.checkinCount}</td>
                   <td className={`${ui.td} text-right`}>
-                    <Link href={`/admin/games/${g.id}`} className="text-[var(--c-brand-text)] hover:underline">
+                    <Link href={`/admin/games/${g.id}`} className={ui.link}>
                       {st(lang, "adm_open")}
                     </Link>
                   </td>

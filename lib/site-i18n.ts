@@ -377,6 +377,20 @@ const SITE: Record<string, Dict> = {
   regst_registered: { pl: "Zapisany", en: "Signed up", uk: "Записаний" },
   regst_cancelled: { pl: "Wypisany", en: "Cancelled", uk: "Відписаний" },
   regst_no_show: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },
+  // Статуси гри (адмін-пігулки) — ADR-0025
+  gamest_announced: { pl: "Ogłoszona", en: "Announced", uk: "Анонсована" },
+  gamest_cancelled: { pl: "Odwołana", en: "Cancelled", uk: "Скасована" },
+  gamest_draft: { pl: "Szkic", en: "Draft", uk: "Чернетка" },
+  gamest_finished: { pl: "Zakończona", en: "Finished", uk: "Завершена" },
+  // Статуси заявки на вступ (анти-бот шилд)
+  joinst_passed: { pl: "Zaliczona", en: "Passed", uk: "Пройдено" },
+  joinst_pending: { pl: "Oczekuje", en: "Pending", uk: "Очікує" },
+  joinst_failed: { pl: "Niezaliczona", en: "Failed", uk: "Не пройдено" },
+  joinst_declined: { pl: "Odrzucona", en: "Declined", uk: "Відхилено" },
+  // Статуси реферала — ADR-0025
+  refst_confirmed: { pl: "Potwierdzony", en: "Confirmed", uk: "Підтверджено" },
+  refst_rejected: { pl: "Odrzucony", en: "Rejected", uk: "Відхилено" },
+  refst_pending: { pl: "Oczekuje", en: "Pending", uk: "Очікує" },
   game_checked_in: { pl: "✅ Check-in zaliczony", en: "✅ Checked in", uk: "✅ Чек-ін є" },
   reg_locked_info: {
     pl: "Rejestracja zamknięta",
@@ -848,6 +862,12 @@ export function st(lang: Lang, key: string, vars?: Record<string, string | numbe
   let s = (SITE[key] && (SITE[key][lang] ?? SITE[key].en)) ?? key;
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.split(`{${k}}`).join(String(v));
   return s;
+}
+
+// Безпечна локалізація статусу для пігулок: fallback на сирий статус, якщо ключа немає (ADR-0025).
+export function statusText(lang: Lang, prefix: string, status: string): string {
+  const d = SITE[`${prefix}_${status}`];
+  return (d && (d[lang] ?? d.en)) ?? status;
 }
 
 // Вибір мови сайту: cookie має пріоритет, далі Accept-Language, далі uk.

@@ -1,10 +1,10 @@
 ﻿import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
+import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listReferrals } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { setReferralStatus } from "@/app/admin/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { ui, btn, referralStatusBadge } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -38,16 +38,8 @@ export default async function AdminReferrals({ searchParams }: { searchParams: {
                   <td className={`${ui.td} font-medium text-gray-900`}>{r.inviter}</td>
                   <td className={ui.td}>{r.invited}</td>
                   <td className={ui.td}>
-                    <span
-                      className={badgeClass(
-                        r.status === "confirmed"
-                          ? "green"
-                          : r.status === "rejected"
-                            ? "red"
-                            : "amber",
-                      )}
-                    >
-                      {r.status}
+                    <span className={referralStatusBadge(r.status)}>
+                      {statusText(lang, "refst", r.status)}
                     </span>
                     <span className="ml-2 text-xs text-gray-400">
                       {formatGameWhen(r.created_at, lang)}

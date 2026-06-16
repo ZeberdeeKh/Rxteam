@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
+import { ui } from "@/components/ui";
 
 // Повний текст анонсу гри (той самий, що бот постить у Телеграм).
 // Довгий двомовний текст → згортка «Показати повністю / Згорнути».
@@ -11,7 +12,7 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
 
   return (
     <div className="mt-3 border-t border-gray-100 pt-3">
-      <h4 className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">
+      <h4 className={`mb-1 ${ui.legend}`}>
         {st(lang, "games_announce_heading")}
       </h4>
       <div
@@ -25,7 +26,7 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className="mt-1 text-xs font-medium text-[var(--c-brand-text)] hover:underline"
+          className={`mt-1 text-xs ${ui.link}`}
         >
           {st(lang, open ? "games_show_less" : "games_show_more")}
         </button>

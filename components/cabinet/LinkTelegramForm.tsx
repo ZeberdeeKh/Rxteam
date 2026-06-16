@@ -34,7 +34,7 @@ export default function LinkTelegramForm({ lang }: { lang: Lang }) {
             required
             autoComplete="off"
             maxLength={8}
-            className={`mt-1 w-40 uppercase tracking-widest ${ui.input}`}
+            className={`mt-1 w-40 uppercase tracking-wide ${ui.input}`}
           />
         </div>
         <SubmitButton label={st(lang, "link_btn")} />

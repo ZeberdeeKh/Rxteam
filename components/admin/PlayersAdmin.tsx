@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { AdminPlayer } from "@/lib/admin-data";
 import { adjustPoints, setPlayerCallsign, togglePatch, makeAdmin } from "@/app/admin/actions";
-import { ui, btn, badgeClass, Collapsible } from "@/components/ui";
+import { ui, btn, badgeClass, Collapsible, GLYPH } from "@/components/ui";
 
 // Список гравців (адмінка): пошук по будь-якому слову + компактний рядок,
 // що розгортає панель дій по кліку. Серверні екшени викликаються з форм напряму.
@@ -84,7 +84,7 @@ export default function PlayersAdmin({
                   <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                     <span className={ui.cardTitle}>{p.callsign ?? "—"}</span>
                     {p.name && <span className="text-sm text-gray-500">{p.name}</span>}
-                    {p.tg_username && <span className="text-xs text-gray-400">@{p.tg_username}</span>}
+                    {p.tg_username && <span className={ui.metaFaint}>@{p.tg_username}</span>}
                   </div>
                 }
               >
@@ -93,7 +93,7 @@ export default function PlayersAdmin({
                   <div className={ui.meta}>
                     {st(lang, "adm_earned")}: <b>{p.points_earned}</b> · {st(lang, "adm_balance")}:{" "}
                     <b>{p.points_balance}</b> · {st(lang, "adm_games_n")}: <b>{p.games_played}</b>
-                    {p.has_patch ? ` · 🎖️ ${p.rank ?? "Recruit"}` : ""}
+                    {p.has_patch ? ` · ${GLYPH.rank} ${p.rank ?? "Recruit"}` : ""}
                   </div>
 
                   {/* Дії — однакові розміри полів і кнопок, рівне вирівнювання */}

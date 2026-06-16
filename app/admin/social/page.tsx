@@ -24,13 +24,13 @@ export default async function AdminSocial({
       <p className={ui.panel}>{st(lang, "adm_social_hint")}</p>
 
       <form action={saveSocial} className="space-y-8">
-        <fieldset className="rounded-lg border border-gray-200 bg-white p-5">
-          <legend className={`px-1 ${ui.sectionTitle}`}>{st(lang, "adm_social_title")}</legend>
+        <fieldset className={ui.card}>
+          <h2 className={ui.sectionTitle}>{st(lang, "adm_social_title")}</h2>
           <div className="mt-3 grid gap-4 sm:grid-cols-2">
             {SOCIALS.map((s) => (
               <label key={s.settingKey} className="block text-sm">
                 <span className={`mb-1 ${ui.label}`}>
-                  {s.label} <code className="text-xs text-gray-400">{s.settingKey}</code>
+                  {s.label} <code className={ui.metaFaint}>{s.settingKey}</code>
                 </span>
                 <input
                   type="url"

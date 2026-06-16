@@ -46,19 +46,19 @@ export default async function AdminSettings({
                     className="flex items-center justify-between gap-3 rounded-md border border-gray-200 px-3 py-2 text-sm"
                   >
                     <span className={ui.label}>
-                      {f.label} <code className="text-xs text-gray-400">{f.key}</code>
+                      {f.label} <code className={ui.metaFaint}>{f.key}</code>
                     </span>
                     <input
                       type="checkbox"
                       name={f.key}
                       defaultChecked={isOn(f.key)}
-                      className="h-4 w-4 shrink-0 accent-brand"
+                      className={`${ui.checkbox} shrink-0`}
                     />
                   </label>
                 ) : (
                   <label key={f.key} className="block text-sm">
                     <span className={`mb-1 ${ui.label}`}>
-                      {f.label} <code className="text-xs text-gray-400">{f.key}</code>
+                      {f.label} <code className={ui.metaFaint}>{f.key}</code>
                     </span>
                     {f.type === "textarea" ? (
                       <textarea

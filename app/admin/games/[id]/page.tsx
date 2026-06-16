@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
+import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm, getAdmin, hasPerm } from "@/lib/admin";
 import { getGameDetail } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
@@ -27,7 +27,7 @@ export default async function AdminGameDetail({
 
   return (
     <div className={ui.pageStack}>
-      <Link href="/admin/games" className="text-sm text-[var(--c-brand-text)] hover:underline">
+      <Link href="/admin/games" className={`text-sm ${ui.link}`}>
         {st(lang, "adm_back")}
       </Link>
 
@@ -38,7 +38,7 @@ export default async function AdminGameDetail({
           </h1>
           <p className={`mt-1 ${ui.muted}`}>
             {formatGameWhen(game.gather_at ?? game.start_at, lang)} · {game.location_name ?? "—"} ·{" "}
-            <span className="font-medium">{game.status}</span>
+            <span className="font-medium">{statusText(lang, "gamest", game.status)}</span>
           </p>
         </div>
         {game.status === "announced" && (
@@ -70,7 +70,7 @@ export default async function AdminGameDetail({
                         {r.callsign ?? r.name ?? `#${r.playerId}`}
                       </span>
                       {r.needs_rental && (
-                        <span className="ml-2 text-xs text-amber-600">{st(lang, "adm_rental_flag")}</span>
+                        <span className={`ml-2 text-xs ${ui.warnText}`}>{st(lang, "adm_rental_flag")}</span>
                       )}
                       {r.transport && (
                         <span className="ml-2 text-xs text-gray-400">
@@ -91,7 +91,7 @@ export default async function AdminGameDetail({
                               : "gray",
                         )}
                       >
-                        {r.status}
+                        {statusText(lang, "regst", r.status)}
                       </span>
                     </td>
                     <td className={`${ui.td} text-right`}>

@@ -16,7 +16,7 @@ import RegisterForm from "@/components/cabinet/RegisterForm";
 import CheckinButton from "@/components/cabinet/CheckinButton";
 import GameCard from "@/components/site/GameCard";
 import { createStandalone, saveCallsign, unregisterFromGame } from "@/app/cabinet/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass, OrDivider, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -63,15 +63,11 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   // ── unlinked: прив'язка TG або standalone-профіль ──
   if (ctx.state === "unlinked") {
     return (
-      <div className="mx-auto max-w-lg space-y-6">
+      <div className={`${ui.widthNarrow} ${ui.pageStack}`}>
         {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
         {banners}
         <LinkTelegramForm lang={lang} />
-        <div className="flex items-center gap-3 text-xs uppercase text-gray-400">
-          <span className="h-px flex-1 bg-gray-200" />
-          {st(lang, "or_divider")}
-          <span className="h-px flex-1 bg-gray-200" />
-        </div>
+        <OrDivider>{st(lang, "or_divider")}</OrDivider>
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "standalone_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
@@ -91,7 +87,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   // Немає позивного (standalone щойно створений / бот-профіль без позивного) → форма позивного.
   if (!player.callsign) {
     return (
-      <div className="mx-auto max-w-lg space-y-6">
+      <div className={`${ui.widthNarrow} ${ui.pageStack}`}>
         {banners}
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
@@ -122,41 +118,41 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   ]);
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className={`${ui.widthProse} ${ui.pageStack}`}>
       {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
       {banners}
 
       {/* Профіль */}
       <section className={ui.card}>
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+        <h2 className={`mb-3 ${ui.legend}`}>
           {st(lang, "prof_section")}
         </h2>
         <dl className="grid grid-cols-2 gap-y-3 text-sm sm:grid-cols-3">
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_callsign")}</dt>
-            <dd className="font-medium text-gray-900">{player.callsign}</dd>
+            <dt className={ui.meta}>{st(lang, "prof_callsign")}</dt>
+            <dd className={ui.bodyStrong}>{player.callsign}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_rank")}</dt>
-            <dd className="font-medium text-gray-900">
+            <dt className={ui.meta}>{st(lang, "prof_rank")}</dt>
+            <dd className={ui.bodyStrong}>
               {player.has_patch ? player.rank ?? "Recruit" : st(lang, "prof_no_rank")}
             </dd>
           </div>
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_reliability")}</dt>
-            <dd className="font-medium text-gray-900">{rel.pct === null ? "—" : `${rel.pct}%`}</dd>
+            <dt className={ui.meta}>{st(lang, "prof_reliability")}</dt>
+            <dd className={ui.bodyStrong}>{rel.pct === null ? "—" : `${rel.pct}%`}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_earned")}</dt>
-            <dd className="font-medium text-gray-900">{player.points_earned ?? 0} ⭐</dd>
+            <dt className={ui.meta}>{st(lang, "prof_earned")}</dt>
+            <dd className={ui.bodyStrong}>{player.points_earned ?? 0} {GLYPH.points}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_balance")}</dt>
-            <dd className="font-medium text-gray-900">{player.points_balance ?? 0} 💰</dd>
+            <dt className={ui.meta}>{st(lang, "prof_balance")}</dt>
+            <dd className={ui.bodyStrong}>{player.points_balance ?? 0} {GLYPH.balance}</dd>
           </div>
           <div>
-            <dt className="text-gray-500">{st(lang, "prof_games")}</dt>
-            <dd className="font-medium text-gray-900">{player.games_played ?? 0}</dd>
+            <dt className={ui.meta}>{st(lang, "prof_games")}</dt>
+            <dd className={ui.bodyStrong}>{player.games_played ?? 0}</dd>
           </div>
         </dl>
       </section>
@@ -165,12 +161,12 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "ach_title")}</h2>
         {achs.length === 0 ? (
-          <p className="text-sm text-gray-500">{st(lang, "ach_empty")}</p>
+          <p className={ui.emptyState}>{st(lang, "ach_empty")}</p>
         ) : (
           <ul className="flex flex-wrap gap-2">
             {achs.map((a) => (
               <li key={a.code} className={badgeClass("brand")} title={formatGameWhen(a.created_at, lang)}>
-                🎖️ {achTitle(a, lang)}
+                {GLYPH.rank} {achTitle(a, lang)}
               </li>
             ))}
           </ul>
@@ -181,7 +177,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "mygames_title")}</h2>
         {games.length === 0 ? (
-          <p className="text-sm text-gray-500">{st(lang, "mygames_empty")}</p>
+          <p className={ui.emptyState}>{st(lang, "mygames_empty")}</p>
         ) : (
           <div className="space-y-4">
             {games.map((g) => {
@@ -220,7 +216,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                     )}
 
                     {g.regStatus === "registered" && !g.canUnregister && !g.checkinOpen && (
-                      <span className="text-xs text-gray-400">
+                      <span className={ui.metaFaint}>
                         {st(lang, "cancel_locked_info")}
                       </span>
                     )}
@@ -242,14 +238,14 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "hist_title")}</h2>
         {log.length === 0 ? (
-          <p className="text-sm text-gray-500">{st(lang, "hist_empty")}</p>
+          <p className={ui.emptyState}>{st(lang, "hist_empty")}</p>
         ) : (
           <ul className="divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white text-sm">
             {log.map((row, i) => (
               <li key={i} className="flex items-center justify-between gap-3 px-4 py-2">
                 <div>
                   <span className="text-gray-700">{st(lang, `reason_${row.reason}`)}</span>
-                  <span className="ml-2 text-xs text-gray-400">
+                  <span className={`ml-2 ${ui.metaFaint}`}>
                     {formatGameWhen(row.created_at, lang)}
                   </span>
                   {row.itemTitle && (

@@ -84,7 +84,7 @@ export const ui = {
     "focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand",
 
   // Таблиці / списки
-  tableWrap: "overflow-hidden rounded-lg border border-gray-200",
+  tableWrap: "overflow-x-auto overflow-hidden rounded-lg border border-gray-200 bg-white",
   table: "w-full text-sm",
   thead: "bg-gray-50 text-xs font-semibold uppercase tracking-wide text-gray-500",
   th: "px-3 py-2 text-left",
@@ -105,4 +105,68 @@ export const ui = {
   // Розкладка
   pageStack: "space-y-6",
   listStack: "space-y-3",
+
+  // ── Додано рефакторингом (ADR-0023 / 0025 / 0026) ──
+  // Посилання / текст
+  link: "text-[var(--c-brand-text)] hover:underline",
+  warnText: "text-[var(--c-warning-fg)]",
+  metaFaint: "text-xs text-gray-400",
+  price: "text-sm font-semibold text-[var(--c-brand-text)]",
+  wordmark: "text-xl font-extrabold uppercase tracking-wide text-[var(--c-brand-text)]",
+  emptyState: "rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500",
+
+  // Ширини центрованих сторінок (ADR-0024): narrow=форма/діалог, prose=стаття/кабінет, wide=контент
+  widthNarrow: "mx-auto w-full max-w-md",
+  widthProse: "mx-auto w-full max-w-2xl",
+  widthWide: "mx-auto w-full max-w-[66rem]",
+
+  // Поля форм
+  fieldLabel: "mb-1 block text-sm font-medium text-gray-700",
+  legend: "px-1 text-xs font-semibold uppercase tracking-wide text-gray-500",
+  fieldBox: "rounded-md border border-gray-200 p-3",
+  checkbox: "h-4 w-4 accent-brand",
+  radio: "h-4 w-4 accent-brand",
+  fileInput:
+    "block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 " +
+    "file:bg-[var(--c-action-bg)] file:px-3 file:py-1.5 file:text-[var(--c-action-fg)] hover:file:bg-[var(--c-action-bg-hover)]",
+
+  // Поверхні
+  listCard: "divide-y divide-gray-100 rounded-lg border border-gray-200 bg-white",
+  successIconCircle:
+    "flex items-center justify-center rounded-full bg-[var(--c-success-bg)] text-[var(--c-success-fg)]",
+
+  // Іконкові / overlay / FAB кнопки
+  iconBtn:
+    "flex h-7 w-7 items-center justify-center rounded text-gray-500 transition hover:bg-gray-200 " +
+    "hover:text-gray-800 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
+  overlayBtn:
+    "rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-white/20",
+  overlayIconBtn:
+    "flex items-center justify-center rounded-full bg-white/10 text-neutral-50 transition hover:bg-white/20",
+  fab:
+    "fixed bottom-4 right-4 z-40 flex items-center rounded-full bg-neutral-800 text-neutral-50 shadow-lg " +
+    "transition-colors hover:bg-neutral-700 dark:bg-neutral-100 dark:text-neutral-900 dark:hover:bg-neutral-200",
 } as const;
+
+// ── Хелпери статус→бейдж (ADR-0025). Колір пігулки; дефолт невідомого — gray. ──
+// Текст пігулки локалізується окремо через st(lang, `gamest_*`/`regst_*`).
+export function gameStatusBadge(status: string): string {
+  const color: BadgeColor =
+    status === "announced" || status === "registered"
+      ? "green"
+      : status === "cancelled" || status === "no_show"
+        ? "red"
+        : "gray";
+  return badgeClass(color);
+}
+export function referralStatusBadge(status: string): string {
+  const color: BadgeColor =
+    status === "confirmed" || status === "passed"
+      ? "green"
+      : status === "rejected"
+        ? "red"
+        : status === "pending"
+          ? "amber"
+          : "gray";
+  return badgeClass(color);
+}

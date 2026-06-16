@@ -1,12 +1,12 @@
 import { st, type Lang } from "@/lib/site-i18n";
 import type { RankingRow } from "@/lib/site-data";
-import { ui } from "@/components/ui";
+import { ui, GLYPH } from "@/components/ui";
 
 // Таблиця рейтингу (топ гравців). Показується на лендінгу.
 export default function RankingTable({ rows, lang }: { rows: RankingRow[]; lang: Lang }) {
   if (rows.length === 0) {
     return (
-      <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
+      <p className={ui.emptyState}>
         {st(lang, "ranking_empty")}
       </p>
     );
@@ -33,7 +33,7 @@ export default function RankingTable({ rows, lang }: { rows: RankingRow[]; lang:
               </td>
               <td className={ui.td}>{r.has_patch ? r.rank ?? "Recruit" : "—"}</td>
               <td className={`${ui.td} text-right tabular-nums text-gray-900`}>
-                {r.points_earned} ⭐
+                {r.points_earned} {GLYPH.points}
               </td>
               <td className={`${ui.td} text-right tabular-nums`}>{r.games_played}</td>
             </tr>

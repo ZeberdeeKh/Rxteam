@@ -1,5 +1,5 @@
 ﻿import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
+import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listJoinChallenges } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
@@ -44,7 +44,7 @@ export default async function AdminJoins() {
                             : "gray",
                       )}
                     >
-                      {r.status}
+                      {statusText(lang, "joinst", r.status)}
                     </span>
                   </td>
                   <td className={`whitespace-nowrap ${ui.td} text-gray-500`}>

@@ -14,7 +14,7 @@ import {
   type Rank,
 } from "@/lib/economy";
 import { buyItem, buyRank } from "@/app/shop/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -80,15 +80,11 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
     children: ReactNode;
   }) {
     return (
-      <article
-        className={`flex flex-col rounded-lg border bg-white p-5 ${
-          highlight ? "border-brand" : "border-gray-200"
-        }`}
-      >
+      <article className={`flex flex-col ${highlight ? ui.cardHover : ui.card}`}>
         <h3 className={ui.cardTitle}>{title}</h3>
         {subtitle && <p className="mt-1 text-sm text-gray-600">{subtitle}</p>}
         <div className="mt-auto flex items-center justify-between gap-3 pt-4">
-          <span className="text-sm font-semibold text-[var(--c-brand-text)]">{cost ?? ""}</span>
+          <span className={ui.price}>{cost ?? ""}</span>
           {children}
         </div>
       </article>
@@ -105,7 +101,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
 
       {player ? (
         <p className="text-sm text-gray-600">
-          {st(lang, "shop_balance")}: <span className="font-semibold">{balance} 💰</span>
+          {st(lang, "shop_balance")}: <span className="font-semibold">{balance} {GLYPH.balance}</span>
         </p>
       ) : (
         <p className={ui.alertWarn}>
@@ -120,9 +116,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       <section className="space-y-3">
         <h2 className={ui.sectionTitle}>{st(lang, "shop_items_title")}</h2>
         {items.length === 0 ? (
-          <p className="rounded-lg border border-dashed border-gray-300 p-5 text-sm text-gray-500">
-            {st(lang, "shop_empty")}
-          </p>
+          <p className={ui.emptyState}>{st(lang, "shop_empty")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((it) => {
@@ -132,7 +126,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                   key={it.id}
                   title={itemTitle(it, lang)}
                   subtitle={itemDesc(it, lang)}
-                  cost={`${it.cost} 💰`}
+                  cost={`${it.cost} ${GLYPH.balance}`}
                 >
                   {player && (
                     <form action={buyItem}>
@@ -168,7 +162,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                 <ShopTile
                   key={r}
                   title={r}
-                  cost={i === 0 ? st(lang, "shop_rank_free") : `${cost} 💰`}
+                  cost={i === 0 ? st(lang, "shop_rank_free") : `${cost} ${GLYPH.balance}`}
                   highlight={isCurrent}
                 >
                   {isCurrent ? (
@@ -183,7 +177,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                       </button>
                     </form>
                   ) : i === 0 ? null : (
-                    <span className="text-xs text-gray-400">🔒</span>
+                    <span className={ui.metaFaint}>{GLYPH.locked}</span>
                   )}
                 </ShopTile>
               );

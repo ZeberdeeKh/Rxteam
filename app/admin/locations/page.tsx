@@ -4,7 +4,7 @@ import { requirePerm } from "@/lib/admin";
 import { listLocationsFull, type AdminLocation } from "@/lib/admin-data";
 import { createLocation, updateLocation, deleteLocation } from "@/app/admin/actions";
 import { REPLICA_TYPES, PYRO_STATES, FIRE_MODES } from "@/lib/replicas";
-import { ui, btn } from "@/components/ui";
+import { ui, btn, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
@@ -15,12 +15,12 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
   const types = loc?.replica_types ?? [];
   const pyro = loc?.pyro ?? "no";
   const fire = loc?.fire_mode ?? "semi";
-  const box = "rounded-md border border-gray-200 p-3";
+  const box = ui.fieldBox;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
       <fieldset className={`${box} sm:col-span-2`}>
-        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_replicas")}</legend>
+        <legend className={ui.legend}>{st(lang, "adm_loc_replicas")}</legend>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           {REPLICA_TYPES.map((t) => (
             <label key={t.code} className="inline-flex items-center gap-1.5 text-sm">
@@ -29,7 +29,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
                 name="replica_types"
                 value={t.code}
                 defaultChecked={types.includes(t.code)}
-                className="h-4 w-4 accent-brand"
+                className={ui.checkbox}
               />
               {lang === "uk" ? t.uk : lang === "pl" ? t.pl : t.en}
             </label>
@@ -39,7 +39,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
 
       {/* Піротехніка і Режим вогню — дві рівні половинки (однакова висота, симетрично). */}
       <fieldset className={box}>
-        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_pyro")}</legend>
+        <legend className={ui.legend}>{st(lang, "adm_loc_pyro")}</legend>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           {PYRO_STATES.map((v) => (
             <label key={v} className="inline-flex items-center gap-1.5 text-sm">
@@ -48,7 +48,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
                 name="pyro"
                 value={v}
                 defaultChecked={pyro === v}
-                className="h-4 w-4 accent-brand"
+                className={ui.radio}
               />
               {st(lang, `adm_pyro_${v}`)}
             </label>
@@ -57,7 +57,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
       </fieldset>
 
       <fieldset className={box}>
-        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_firemode")}</legend>
+        <legend className={ui.legend}>{st(lang, "adm_loc_firemode")}</legend>
         <div className="flex flex-wrap gap-x-4 gap-y-2">
           {FIRE_MODES.map((v) => (
             <label key={v} className="inline-flex items-center gap-1.5 text-sm">
@@ -66,7 +66,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
                 name="fire_mode"
                 value={v}
                 defaultChecked={fire === v}
-                className="h-4 w-4 accent-brand"
+                className={ui.radio}
               />
               {st(lang, `adm_fire_${v}`)}
             </label>
@@ -75,7 +75,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
       </fieldset>
 
       <fieldset className={`${box} sm:col-span-2`}>
-        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_pyro_note")}</legend>
+        <legend className={ui.legend}>{st(lang, "adm_loc_pyro_note")}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
             <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_pyro_note_pl")}</span>
@@ -89,7 +89,7 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
       </fieldset>
 
       <fieldset className={`${box} sm:col-span-2`}>
-        <legend className={`px-1 ${ui.meta}`}>{st(lang, "adm_loc_payment")}</legend>
+        <legend className={ui.legend}>{st(lang, "adm_loc_payment")}</legend>
         <div className="grid gap-3 sm:grid-cols-2">
           <label className="text-sm">
             <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_loc_payment_pl")}</span>
@@ -193,13 +193,13 @@ export default async function AdminLocations({
                     href={l.map_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm text-[var(--c-brand-text)] hover:underline"
+                    className={`text-sm ${ui.link}`}
                   >
                     {st(lang, "games_map")}
                   </a>
                 )}
                 <span className="ml-auto text-xs text-gray-400">
-                  {l.gameCount > 0 ? `${st(lang, "adm_col_reg")}: ${l.gameCount} 🎮` : ""}
+                  {l.gameCount > 0 ? `${st(lang, "adm_col_reg")}: ${l.gameCount} ${GLYPH.game}` : ""}
                 </span>
               </div>
             </div>

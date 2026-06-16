@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import { ui } from "@/components/ui";
+
 // Перемикач світла/темна. Вибір зберігається в localStorage('rxteam-theme').
 // Початковий клас .dark ставить інлайн-скрипт у layout (без «спалаху»); тут лише синхронізуємо стан.
 export default function ThemeToggle({ title }: { title: string }) {
@@ -29,7 +31,7 @@ export default function ThemeToggle({ title }: { title: string }) {
       title={title}
       aria-label={title}
       aria-pressed={dark}
-      className="flex h-7 w-7 items-center justify-center rounded text-gray-500 transition hover:bg-gray-200 hover:text-gray-800"
+      className={ui.iconBtn}
     >
       {/* До монтування показуємо нейтральну іконку, щоб уникнути неузгодженості SSR. */}
       {mounted && dark ? (

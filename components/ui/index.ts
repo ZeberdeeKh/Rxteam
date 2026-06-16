@@ -1,6 +1,17 @@
-export { ui, badgeClass, headerNavClass, headerAdminClass, subNavClass } from "./styles";
+export {
+  ui,
+  badgeClass,
+  headerNavClass,
+  headerAdminClass,
+  subNavClass,
+  gameStatusBadge,
+  referralStatusBadge,
+} from "./styles";
 export type { BadgeColor } from "./styles";
 export { btn } from "./buttons";
 export type { ButtonKind } from "./buttons";
 export { Button } from "./Button";
 export { default as Collapsible } from "./Collapsible";
+export { default as Modal } from "./Modal";
+export { default as OrDivider } from "./OrDivider";
+export { GLYPH } from "./glyphs";

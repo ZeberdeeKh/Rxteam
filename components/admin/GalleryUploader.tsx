@@ -66,7 +66,7 @@ export default function GalleryUploader({ lang }: { lang: Lang }) {
         multiple
         required
         onChange={onPick}
-        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-md file:border-0 file:bg-[var(--c-action-bg)] file:px-3 file:py-1.5 file:text-[var(--c-action-fg)] hover:file:bg-[var(--c-action-bg-hover)]"
+        className={ui.fileInput}
       />
       <input
         type="text"

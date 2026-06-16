@@ -10,7 +10,7 @@
 // Не хардкодимо стилі кнопок по сторінках — завжди btn(kind) або <Button kind>.
 // ─────────────────────────────────────────────────────────────────────────────
 
-export type ButtonKind = "action" | "delete";
+export type ButtonKind = "action" | "delete" | "ghost";
 
 // Спільна основа — однакова висота/шрифт/розмір шрифту для ВСІХ кнопок.
 // Горизонтальний padding фіксований, тож ширина залежить тільки від тексту.
@@ -28,6 +28,10 @@ const BTN_KIND: Record<ButtonKind, string> = {
   delete:
     "bg-[var(--c-danger-solid)] text-neutral-50 hover:bg-[var(--c-danger-solid-hover)] " +
     "focus-visible:ring-[var(--c-danger-solid)]/50",
+  // «ghost» — нейтральна/другорядна дія (cancel, «прикріпити»): без заливки й тіні, тихий (ADR-0026).
+  ghost:
+    "bg-transparent text-gray-600 shadow-none hover:bg-gray-100 hover:text-gray-800 " +
+    "focus-visible:ring-brand/40",
 };
 
 /** Клас для будь-якого «кнопкового» елемента (button / Link / a). */

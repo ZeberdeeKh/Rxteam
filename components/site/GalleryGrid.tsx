@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ui } from "@/components/ui";
 import type { GalleryPhoto } from "@/lib/site-data";
 
 // Різнорозмірна мозаїка, що складається в ЧІТКИЙ прямокутник cols×ROWS:
@@ -191,7 +192,7 @@ export default function GalleryGrid({
               e.stopPropagation();
               go(-1);
             }}
-            className="absolute left-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-neutral-50 hover:bg-white/20 sm:left-4"
+            className={`${ui.overlayIconBtn} absolute left-2 top-1/2 h-11 w-11 -translate-y-1/2 text-2xl sm:left-4`}
           >
             ‹
           </button>
@@ -211,7 +212,7 @@ export default function GalleryGrid({
               e.stopPropagation();
               go(1);
             }}
-            className="absolute right-2 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-2xl text-neutral-50 hover:bg-white/20 sm:right-4"
+            className={`${ui.overlayIconBtn} absolute right-2 top-1/2 h-11 w-11 -translate-y-1/2 text-2xl sm:right-4`}
           >
             ›
           </button>
@@ -219,7 +220,7 @@ export default function GalleryGrid({
           <button
             type="button"
             onClick={close}
-            className="absolute right-3 top-3 rounded-md bg-white/10 px-3 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 hover:bg-white/20"
+            className={`${ui.overlayBtn} absolute right-3 top-3`}
           >
             {closeLabel}
           </button>

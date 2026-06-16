@@ -43,7 +43,7 @@ export default function GameCard({
                   href={game.location.map_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[var(--c-brand-text)] hover:underline"
+                  className={ui.link}
                 >
                   {st(lang, "games_map")}
                 </a>

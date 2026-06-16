@@ -56,7 +56,7 @@ function ShopItemFields({ lang, item }: { lang: Lang; item?: ShopItem }) {
           type="checkbox"
           name="active"
           defaultChecked={item?.active ?? true}
-          className="h-4 w-4 accent-brand"
+          className={ui.checkbox}
         />
         <span className={ui.meta}>{st(lang, "adm_shop_active")}</span>
       </label>

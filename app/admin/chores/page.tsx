@@ -40,19 +40,19 @@ export default async function AdminChores({
         <h2 className={`mb-3 ${ui.cardTitle}`}>{st(lang, "adm_chore_add")}</h2>
         <form action={createChore} className="grid items-end gap-3 sm:grid-cols-12">
           <label className="text-sm sm:col-span-3">
-            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_kind")}</span>
+            <span className={ui.fieldLabel}>{st(lang, "adm_chore_kind")}</span>
             <KindSelect lang={lang} />
           </label>
           <label className="text-sm sm:col-span-6">
-            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_label")}</span>
+            <span className={ui.fieldLabel}>{st(lang, "adm_chore_label")}</span>
             <input name="label" required className={ui.input} />
           </label>
           <label className="text-sm sm:col-span-3">
-            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_sort")}</span>
+            <span className={ui.fieldLabel}>{st(lang, "adm_chore_sort")}</span>
             <input name="sort_order" type="number" defaultValue={0} className={ui.input} />
           </label>
           <label className="text-sm sm:col-span-12">
-            <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_note")}</span>
+            <span className={ui.fieldLabel}>{st(lang, "adm_chore_note")}</span>
             <input name="note" className={ui.input} />
           </label>
           <div className="flex items-end sm:col-span-12">
@@ -73,19 +73,19 @@ export default async function AdminChores({
               <form action={updateChore} id={`chore-${it.id}`} className="grid items-end gap-3 sm:grid-cols-12">
                 <input type="hidden" name="id" value={it.id} />
                 <label className="text-sm sm:col-span-3">
-                  <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_kind")}</span>
+                  <span className={ui.fieldLabel}>{st(lang, "adm_chore_kind")}</span>
                   <KindSelect lang={lang} value={it.kind} />
                 </label>
                 <label className="text-sm sm:col-span-5">
-                  <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_label")}</span>
+                  <span className={ui.fieldLabel}>{st(lang, "adm_chore_label")}</span>
                   <input name="label" defaultValue={it.label} required className={ui.input} />
                 </label>
                 <label className="text-sm sm:col-span-2">
-                  <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_sort")}</span>
+                  <span className={ui.fieldLabel}>{st(lang, "adm_chore_sort")}</span>
                   <input name="sort_order" type="number" defaultValue={it.sort_order} className={ui.input} />
                 </label>
                 <label className="text-sm sm:col-span-12">
-                  <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_chore_note")}</span>
+                  <span className={ui.fieldLabel}>{st(lang, "adm_chore_note")}</span>
                   <input name="note" defaultValue={it.note ?? ""} className={ui.input} />
                 </label>
                 <label className="inline-flex items-center gap-1.5 text-sm sm:col-span-12">
@@ -93,7 +93,7 @@ export default async function AdminChores({
                     type="checkbox"
                     name="active"
                     defaultChecked={it.active}
-                    className="h-4 w-4 accent-brand"
+                    className={ui.checkbox}
                   />
                   {st(lang, "adm_chore_active")}
                 </label>

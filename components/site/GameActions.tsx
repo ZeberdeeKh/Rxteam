@@ -3,7 +3,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
 import RegisterForm from "@/components/cabinet/RegisterForm";
 import { unregisterFromGame } from "@/app/cabinet/actions";
-import { btn, badgeClass } from "@/components/ui";
+import { ui, btn, badgeClass } from "@/components/ui";
 
 // Дії над грою на публічній /games (слот children у GameCard).
 // Перевикористовує RegisterForm/unregisterFromGame з кабінету (returnTo="/games").
@@ -25,7 +25,7 @@ export default function GameActions({
   if (!loggedIn) {
     return (
       <p className="text-sm text-gray-500">
-        <Link href="/login" className="font-medium text-[var(--c-brand-text)] hover:underline">
+        <Link href="/login" className={ui.link}>
           {st(lang, "games_login_to_register")}
         </Link>
       </p>
@@ -36,7 +36,7 @@ export default function GameActions({
   if (!hasCallsign) {
     return (
       <p className="text-sm text-gray-500">
-        <Link href="/cabinet" className="font-medium text-[var(--c-brand-text)] hover:underline">
+        <Link href="/cabinet" className={ui.link}>
           {st(lang, "games_need_callsign")}
         </Link>
       </p>
