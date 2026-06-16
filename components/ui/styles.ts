@@ -148,10 +148,11 @@ export const ui = {
   // Кругла overlay-іконка над фото — лишається КРУГЛОЮ свідомо.
   overlayIconBtn:
     "flex items-center justify-center rounded-full bg-white/10 text-neutral-50 transition hover:bg-white/20",
-  // FAB (плаваюча кнопка баг-репорту) — лишається КРУГЛОЮ свідомо.
+  // FAB (плаваюча кнопка баг-репорту) — зрізані кути (chamfer-fill), плоска, у спільному стилі ab3.
+  // Без shadow: clip-path однаково обрізав би box-shadow, а ab3 — плоский. Кольори — як у action-кнопки.
   fab:
-    "fixed bottom-4 right-4 z-40 flex items-center rounded-full bg-neutral-100 text-neutral-900 shadow-lg " +
-    "transition-colors hover:bg-neutral-200",
+    "fixed bottom-4 right-4 z-40 flex items-center rx-chamfer-fill [--cut:8px] bg-[var(--c-primary)] text-[var(--c-primary-fg)] " +
+    "transition-colors hover:bg-[var(--c-primary-hover)]",
 } as const;
 
 // ── Хелпери статус→бейдж (ADR-0025). Колір пігулки; дефолт невідомого — gray. ──
