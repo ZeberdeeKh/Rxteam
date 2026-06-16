@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 
-// Універсальна модалка-оверлей (ADR-0026). Бекдроп + центрований контейнер (rounded-lg).
+// Універсальна модалка-оверлей (ADR-0026). Бекдроп + центрований контейнер (квадратний).
 // Закриття: клік по бекдропу (лише якщо натиск ПОЧАВСЯ на бекдропі) + Esc.
 // Вміст (шапка/тіло/футер) передається як children — структуру задає викликач.
 export default function Modal({
@@ -41,7 +41,7 @@ export default function Modal({
         if (closeOnBackdrop && e.target === e.currentTarget && pressOnBackdrop.current) onClose();
       }}
     >
-      <div className={`max-h-[90vh] w-full overflow-y-auto rounded-lg bg-white shadow-2xl ${className}`}>
+      <div className={`max-h-[90vh] w-full overflow-y-auto bg-white shadow-2xl ${className}`}>
         {children}
       </div>
     </div>

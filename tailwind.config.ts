@@ -1,8 +1,9 @@
 import type { Config } from "tailwindcss";
 
-// Дизайн перенесено з «Kalkulator» (Етап 7): бренд хакі + шрифт Montserrat. Тема ЛИШЕ темна
-// (світлу прибрано): палітри `gray` та `white` прив'язані до CSS-змінних (globals.css :root),
-// що тепер тримають темні значення — тож увесь сайт темний без dark:-варіантів.
+// Дизайн перенесено на мілітарний стиль ab3.army (Етап AB3, 2026-06-16):
+// помаранчевий PRIMARY (#f6921e), оливково-чорні фони, ПОВНІСТЮ КВАДРАТНІ елементи
+// (borderRadius-шкала = 0, крім `full` для службових кружечків), плоский вигляд.
+// Тема ЛИШЕ темна: палітри `gray`/`white` прив'язані до CSS-змінних (globals.css :root).
 // `neutral` — фіксована світла палітра для тексту на кольорових кнопках (text-neutral-50).
 const config: Config = {
   content: [
@@ -12,23 +13,35 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Бренд — хакі (мілітарі-оливковий), пасує тематиці ASG/Airsoft. DEFAULT/dark/light —
-        // аліаси, щоб наявні класи bg-brand / text-brand-dark / hover:bg-brand-dark працювали без правок.
+        // PRIMARY — помаранчевий ab3. Головний акцент: CTA, заголовки, лого, активні стани.
+        primary: {
+          DEFAULT: "#f6921e",
+          hover: "#f08407", // яскравіший ховер (як inline в ab3)
+          deep: "#e16709",  // orange-600
+          fg: "#000000",    // текст на заливці solid-кнопки
+          500: "#f6921e",
+          600: "#e16709",
+        },
+        // Акценти: беж/хакі (другорядний) + оливка для темних поверхонь.
+        beige: "#d6b588",
+        olive: { dark: "#111a0b", base: "#1a1a1a" },
+        // АЛІАС `brand` → тепер дивиться на помаранч, щоб наявні класи
+        // bg-brand / ring-brand / hover:border-brand / accent-brand не ламались до повної міграції.
         brand: {
-          DEFAULT: "#6b6a3c", // brand-600
-          dark: "#545331",    // brand-700
-          light: "#9d9b66",   // brand-400
-          50: "#f6f6f1",
-          100: "#e9e9da",
-          200: "#d3d3b6",
-          300: "#b8b78d",
-          400: "#9d9b66",
-          500: "#83814b",
-          600: "#6b6a3c",
-          700: "#545331",
-          800: "#45442b",
-          900: "#3b3a27",
-          950: "#1f1f13",
+          DEFAULT: "#f6921e",
+          dark: "#e16709",
+          light: "#f6921e",
+          50: "#fff4e6",
+          100: "#ffe2bf",
+          200: "#ffcd8f",
+          300: "#fbb45c",
+          400: "#f6921e",
+          500: "#f6921e",
+          600: "#e16709",
+          700: "#c0590a",
+          800: "#974607",
+          900: "#6f3405",
+          950: "#3a1b02",
         },
         // Поверхні/текст сайту — темні значення з CSS-змінних (globals.css :root).
         white: "var(--c-white)",
@@ -61,7 +74,23 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Montserrat", "ui-sans-serif", "system-ui", "sans-serif"],
+        // Тіло — Mulish (як в ab3). Заголовки/кнопки — Oswald (вільний мілітарний аналог;
+        // офіційний UAF Sans НЕ беремо — це шрифт ЗСУ, а RX — страйкбол).
+        sans: ["Mulish", "ui-sans-serif", "system-ui", "sans-serif"],
+        display: ["Oswald", "ui-sans-serif", "system-ui", "sans-serif"],
+      },
+      borderRadius: {
+        // Квадратний вигляд ab3: уся шкала = 0px (будь-який залишковий rounded-* → 0).
+        // `full` лишаємо для свідомо круглих службових елементів (FAB, кругла icon-кнопка).
+        none: "0px",
+        sm: "0px",
+        DEFAULT: "0px",
+        md: "0px",
+        lg: "0px",
+        xl: "0px",
+        "2xl": "0px",
+        "3xl": "0px",
+        full: "9999px",
       },
     },
   },

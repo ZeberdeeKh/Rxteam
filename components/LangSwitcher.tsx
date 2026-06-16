@@ -22,7 +22,7 @@ export default function LangSwitcher({ current }: { current: Lang }) {
       onChange={onChange}
       disabled={pending}
       aria-label={LANG_LABEL[current]}
-      className="cursor-pointer rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 transition hover:border-brand focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-60"
+      className="cursor-pointer border border-gray-300 bg-white px-2 py-1 text-sm text-gray-700 transition hover:border-brand focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand disabled:opacity-60"
     >
       {SITE_LANGS.map((l) => (
         <option key={l} value={l}>

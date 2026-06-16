@@ -203,7 +203,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
             if (e.target === e.currentTarget && pressOnBackdrop.current && !sending) closeModal();
           }}
         >
-          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-white shadow-2xl">
+          <div className="max-h-[90vh] w-full max-w-md overflow-y-auto bg-white shadow-2xl">
             {status.kind === "success" ? (
               <div className="flex flex-col items-center gap-3 p-8 text-center">
                 <div className={`h-12 w-12 ${ui.successIconCircle}`}>
@@ -270,7 +270,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                     ) : (
                       <div className="space-y-2">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={screenshot} alt="" className="w-full rounded-md border border-gray-200" />
+                        <img src={screenshot} alt="" className="w-full border border-gray-200" />
                         <div className="flex items-center justify-between gap-2 text-xs text-gray-600">
                           <span className="truncate">{fileName}</span>
                           <button

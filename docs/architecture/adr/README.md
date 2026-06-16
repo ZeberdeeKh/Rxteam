@@ -11,15 +11,16 @@
 
 | # | Рішення |
 |---|---|
-| [0001](0001-montserrat-sole-font-family.md) | Montserrat — єдиний шрифт |
+| [0001](0001-montserrat-sole-font-family.md) | Montserrat — єдиний шрифт ⟶ *перекрито [0029](0029-ab3-military-restyle.md): Oswald + Mulish* |
 | [0002](0002-restricted-type-scale.md) | Обмежена типографічна шкала: 6 рівнів, 5 розмірів |
 | [0003](0003-uppercase-brand-headings.md) | Заголовки/меню/кнопки — UPPERCASE; cardTitle — виняток |
-| [0004](0004-single-brand-text-token.md) | Єдиний токен `--c-brand-text` для всього хакі-тексту |
-| [0005](0005-khaki-military-brand-palette.md) | Хакі/мілітарі палітра — лише фони/акценти |
+| [0004](0004-single-brand-text-token.md) | Єдиний токен `--c-brand-text` для всього хакі-тексту ⟶ *перекрито [0029](0029-ab3-military-restyle.md): тепер помаранч* |
+| [0005](0005-khaki-military-brand-palette.md) | Хакі/мілітарі палітра — лише фони/акценти ⟶ *перекрито [0029](0029-ab3-military-restyle.md): primary помаранч, хакі → акцент* |
 | [0006](0006-dark-theme-via-css-variables.md) | Темна тема через CSS-змінні, без `dark:` |
 | [0007](0007-dark-variant-exception-bugreport-fab.md) | Єдиний виняток `dark:` — FAB BugReport |
-| [0008](0008-exactly-two-button-kinds.md) | Типи кнопок: action / delete (доповнено [0026](0026-icon-overlay-fab-and-modal.md): +`ghost`) |
-| [0009](0009-muted-semantic-colors.md) | Лише приглушені семантичні кольори |
+| [0008](0008-exactly-two-button-kinds.md) | Типи кнопок: action / delete (доповнено [0026](0026-icon-overlay-fab-and-modal.md): +`ghost`) ⟶ *перекрито [0029](0029-ab3-military-restyle.md): 4 типи, квадрат/плоско* |
+| [0009](0009-muted-semantic-colors.md) | Лише приглушені семантичні кольори ⟶ *перекрито [0029](0029-ab3-military-restyle.md): яскрава ab3-семантика* |
+| [0029](0029-ab3-military-restyle.md) | **Мілітарний рестайл ab3**: помаранч + квадрат (radius 0) + chamfer-картки + градієнт-фон |
 | [0010](0010-tokens-only-styling.md) | Стилі лише через токени `@/components/ui` |
 | [0011](0011-no-component-library.md) | Без сторонньої UI-бібліотеки |
 | [0012](0012-collapsible-native-details.md) | Згортувані на нативному `<details>` |
