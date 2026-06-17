@@ -90,6 +90,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_site_link", type: "toggle", label: { pl: "Łączenie konta z TG", en: "Link account with TG", uk: "Прив'язка акаунта до TG" } },
       { key: "feature_chores", type: "toggle", label: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" } },
       { key: "feature_announce_count", type: "toggle", label: { pl: "Licznik graczy w anonsie", en: "Player counter in announcement", uk: "Лічильник гравців в анонсі" } },
+      { key: "feature_media_guard", type: "toggle", label: { pl: "Strażnik tematu „tylko media”", en: "Media-only topic guard", uk: "Гард гілки «тільки медіа»" } },
     ],
   },
   {
@@ -190,6 +191,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "master_username", type: "text", label: { pl: "Master username (Telegram, bez @)", en: "Master username (Telegram, no @)", uk: "Master username (Telegram, без @)" } },
       { key: "announce_chat_id", type: "text", label: { pl: "Announce chat_id (grupa)", en: "Announce chat_id (group)", uk: "Announce chat_id (група)" } },
       { key: "announce_thread_id", type: "text", label: { pl: "Announce thread_id", en: "Announce thread_id", uk: "Announce thread_id" } },
+      { key: "media_chat_id", type: "text", label: { pl: "Media chat_id (grupa)", en: "Media chat_id (group)", uk: "Media chat_id (група)" } },
+      { key: "media_thread_id", type: "text", label: { pl: "Media thread_id", en: "Media thread_id", uk: "Media thread_id" } },
       { key: "chores_chat_id", type: "text", label: { pl: "Czek-lista chat_id (grupa adminów)", en: "Checklist chat_id (admin group)", uk: "Чек-лист chat_id (група адмінів)" } },
       { key: "chores_thread_id", type: "text", label: { pl: "Czek-lista thread_id", en: "Checklist thread_id", uk: "Чек-лист thread_id" } },
       { key: "chores_admin_mentions", type: "text", label: { pl: "Czek-lista — pingowani admini (@user, spacja/przecinek)", en: "Checklist — pinged admins (@user, space/comma)", uk: "Чек-лист — пінговані адміни (@user, пробіл/кома)" } },

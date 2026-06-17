@@ -673,6 +673,23 @@ const S: Record<string, Dict> = {
     en: "🔇 You've been muted in the RX Team group for 1 hour. Reason: repeated messages in the «Game announcements» topic, which is for bot announcements only. In an hour you'll be able to post in other topics again.",
     uk: "🔇 Тебе заглушено в групі RX Team на 1 годину. Причина: повторні повідомлення в топіку «Анонси ігор», куди пише лише бот. Через годину знову зможеш писати в інших топіках.",
   },
+
+  // гілка «тільки медіа» — повідомлення в приват порушнику (ескалація: попередження → попередження → мут)
+  media_guard_warn: {
+    pl: "🖼 Ten temat (RX Team) jest tylko na zdjęcia, wideo i pliki — bez dyskusji. Zasady:\n✅ Zdjęcie z opisem — OK\n✅ Zdjęcie/plik jako dokument — OK\n✅ Wideo — OK\n❌ Sam tekst — usuwany\n\nTwoja wiadomość została usunięta. Chcesz to omówić? Pisz w temacie «Zalew» (flood). Kolejna wiadomość tekstowa tutaj = ostatnie ostrzeżenie, a potem wyciszenie w grupie na 1 godzinę.",
+    en: "🖼 This topic (RX Team) is for photos, videos and files only — no chatter. Rules:\n✅ Photo with a caption — OK\n✅ Photo/file as a document — OK\n✅ Video — OK\n❌ Plain text — removed\n\nYour message was deleted. Want to discuss it? Use the «Zalew» (flood) topic. Another text message here = a last warning, then a 1-hour mute in the group.",
+    uk: "🖼 Ця гілка (RX Team) — лише для фото, відео й файлів, без обговорень. Правила:\n✅ Фото з описом — ОК\n✅ Фото/файл документом — ОК\n✅ Відео — ОК\n❌ Самий текст — видаляється\n\nТвоє повідомлення видалено. Хочеш це обговорити? Пиши в гілці «Zalew» (флуд). Наступне текстове повідомлення тут = останнє попередження, а потім мут у групі на 1 годину.",
+  },
+  media_guard_warn2: {
+    pl: "⚠️ Drugie (ostatnie) ostrzeżenie. Ten temat jest tylko na zdjęcia/wideo/pliki — dyskusje pisz w temacie «Zalew» (flood). Następna wiadomość tekstowa tutaj = wyciszenie w grupie na 1 godzinę.",
+    en: "⚠️ Second (final) warning. This topic is for photos/videos/files only — take discussions to the «Zalew» (flood) topic. Your next text message here = a 1-hour mute in the group.",
+    uk: "⚠️ Друге (останнє) попередження. Ця гілка — лише для фото/відео/файлів, обговорення пиши в гілці «Zalew» (флуд). Наступне текстове повідомлення тут = мут у групі на 1 годину.",
+  },
+  media_guard_muted: {
+    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 1 godzinę. Powód: powtarzające się wiadomości tekstowe w temacie tylko-media (zdjęcia/wideo/pliki). Dyskusje pisz w temacie «Zalew» (flood). Za godzinę znów napiszesz w innych tematach.",
+    en: "🔇 You've been muted in the RX Team group for 1 hour. Reason: repeated text messages in the media-only topic (photos/videos/files). Take discussions to the «Zalew» (flood) topic. In an hour you'll be able to post in other topics again.",
+    uk: "🔇 Тебе заглушено в групі RX Team на 1 годину. Причина: повторні текстові повідомлення в гілці «тільки медіа» (фото/відео/файли). Обговорення пиши в гілці «Zalew» (флуд). Через годину знову зможеш писати в інших гілках.",
+  },
 };
 
 // Двомовний (PL/UA) пост переможця лотереї у топік.

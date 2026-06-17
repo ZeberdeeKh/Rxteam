@@ -167,6 +167,129 @@ bot.use(async (ctx, next) => {
   await next();
 });
 
+// ─── Гард топіка «тільки медіа»: лишаємо фото/відео/документ; решту (текст тощо) видаляємо ───
+// Адміни групи й майстер — виняток (можуть писати текст). Ескалація: 1-ше порушення → пояснення
+// правил у приват; 2-ге → повторне попередження; 3-тє і кожне наступне → мут у групі на 1 год.
+// Лічильник — media_violations.
+const MEDIA_MUTE_SECONDS = 60 * 60; // 1 година
+
+async function guardMediaTopic(ctx: Context): Promise<boolean> {
+  const msg = ctx.message;
+  const chat = ctx.chat;
+  if (!msg || !chat) return false;
+  if (chat.type !== "group" && chat.type !== "supergroup") return false;
+  if (!(await featureEnabled("media_guard"))) return false;
+
+  const guardChatId = await getSetting("media_chat_id");
+  if (!guardChatId || String(chat.id) !== guardChatId) return false;
+  const guardThreadId = await getSetting("media_thread_id");
+  const guardGeneral = (await getSetting("media_guard_general")) === "true";
+  if (!guardThreadId && !guardGeneral) return false; // гілку не налаштовано
+  const inTarget = guardThreadId
+    ? String(msg.message_thread_id ?? "") === guardThreadId
+    : !msg.message_thread_id;
+  if (!inTarget) return false;
+
+  const m = msg as any;
+  // Дозволені типи: фото / відео / документ (з підписом чи без). Підпис іде разом із медіа.
+  if (m.photo || m.video || m.document) return false; // це медіа — пропускаємо
+
+  // Службові повідомлення (вступ/вихід/піни) не чіпаємо — лише контент без медіа видаляємо.
+  const hasContent =
+    m.text || m.caption || m.audio || m.voice || m.sticker || m.animation ||
+    m.video_note || m.contact || m.location || m.venue || m.poll || m.dice || m.game || m.story;
+  if (!hasContent) return false;
+
+  // Анонімно від імені групи / сам бот — не чіпаємо.
+  const from = ctx.from;
+  if (ctx.senderChat?.id === chat.id) return false;
+  if (from && from.id === ctx.me.id) return false;
+
+  // Виняток: майстер (БД) і адміни групи (creator/administrator) можуть писати текст.
+  let player: any = null;
+  if (from) {
+    player = await getPlayerByTg(from.id);
+    if (player?.is_master) return false;
+    try {
+      const mem = await ctx.api.getChatMember(chat.id, from.id);
+      if (mem.status === "creator" || mem.status === "administrator") return false;
+    } catch (e) {
+      console.error("media guard: getChatMember failed", e);
+    }
+  }
+
+  // Видаляємо не-медіа повідомлення (бот — адмін із can_delete_messages).
+  try {
+    await ctx.api.deleteMessage(chat.id, msg.message_id);
+  } catch (e) {
+    console.error("media guard: delete failed", e);
+  }
+
+  // Лічильник/покарання — лише для звичайного користувача (не канал, не бот).
+  if (!from || from.is_bot) return true;
+
+  const { data: row } = await supabase
+    .from("media_violations")
+    .select("count")
+    .eq("tg_user_id", from.id)
+    .maybeSingle();
+  const violations = (row?.count ?? 0) + 1;
+  await supabase.from("media_violations").upsert(
+    { tg_user_id: from.id, count: violations, last_at: new Date().toISOString() },
+    { onConflict: "tg_user_id" },
+  );
+
+  const lang = (player?.lang as Lang) ?? "uk";
+
+  if (violations === 1) {
+    // Перше порушення — пояснення правил у приват.
+    try {
+      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn"));
+    } catch {}
+    return true;
+  }
+  if (violations === 2) {
+    // Друге — повторне (останнє) попередження.
+    try {
+      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn2"));
+    } catch {}
+    return true;
+  }
+
+  // 3-тє і кожне наступне — мут у групі на годину + пояснення в приват.
+  try {
+    await ctx.api.restrictChatMember(
+      chat.id,
+      from.id,
+      {
+        can_send_messages: false,
+        can_send_audios: false,
+        can_send_documents: false,
+        can_send_photos: false,
+        can_send_videos: false,
+        can_send_video_notes: false,
+        can_send_voice_notes: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+      },
+      { until_date: Math.floor(Date.now() / 1000) + MEDIA_MUTE_SECONDS },
+    );
+  } catch (e) {
+    console.error("media guard: restrict failed", e);
+  }
+  try {
+    await bot.api.sendMessage(from.id, tr(lang, "media_guard_muted"));
+  } catch {}
+  return true;
+}
+
+// Гілка «тільки медіа»: лишаємо фото/відео/документ, решту видаляємо.
+bot.use(async (ctx, next) => {
+  if (await guardMediaTopic(ctx)) return; // видалили — далі не обробляємо
+  await next();
+});
+
 // Апдейти chat_member: вступ/вихід учасників (потрібен allowed_updates: chat_member).
 bot.on("chat_member", async (ctx) => {
   const upd = ctx.chatMember;
@@ -909,6 +1032,49 @@ bot.command("setchores", async (ctx) => {
       (threadId ? `\nthread_id: ${threadId}` : "") +
       `\n\nТепер при анонсі гри сюди прилітатиме інтерактивний список завдань.`,
   );
+});
+
+// Прив'язка гілки «тільки медіа»: лишаємо фото/відео/документ, текстові — видаляємо.
+// Виконати в потрібному топіку (або в General) від імені адміна групи.
+bot.command("setmedia", async (ctx) => {
+  if (ctx.chat.type === "private") {
+    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
+    await ctx.reply(tr(actorLang, "sethere_group_only"));
+    return;
+  }
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+  const threadId = ctx.message?.message_thread_id;
+  await setSetting("media_chat_id", String(ctx.chat.id));
+  await setSetting("media_thread_id", threadId ? String(threadId) : "");
+  // Без thread_id → це головна тема «General» форуму (її повідомлення без thread_id).
+  await setSetting("media_guard_general", threadId ? "false" : "true");
+  if (threadId) {
+    await ctx.reply(
+      `✅ Гілку «тільки медіа» збережено.\n` +
+        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
+        `Тут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.`,
+    );
+  } else {
+    await ctx.reply(
+      `✅ Збережено: гілка «тільки медіа» — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\n` +
+        `chat_id: ${ctx.chat.id}\n\n` +
+        `Тут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.`,
+    );
+  }
 });
 
 // Тогл пункту чек-листа: вільно → взяв; мій → звільнив; чужий → «вже взяв …».
