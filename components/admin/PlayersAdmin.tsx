@@ -128,10 +128,11 @@ export default function PlayersAdmin({
                       </button>
                     </form>
 
+                    {/* Видати / забрати патч — підпис і колір залежать від поточного стану. */}
                     <form action={togglePatch}>
                       <input type="hidden" name="playerId" value={p.id} />
-                      <button type="submit" className={btn("action")}>
-                        {st(lang, "adm_btn_patch")}
+                      <button type="submit" className={btn(p.has_patch ? "delete" : "action")}>
+                        {st(lang, p.has_patch ? "adm_btn_patch_take" : "adm_btn_patch_give")}
                       </button>
                     </form>
 

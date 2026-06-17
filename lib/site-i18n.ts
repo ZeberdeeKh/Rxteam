@@ -836,6 +836,8 @@ const SITE: Record<string, Dict> = {
   adm_btn_adjust: { pl: "Koryguj", en: "Adjust", uk: "Корекція" },
   adm_delta_ph: { pl: "±punkty", en: "±points", uk: "±бали" },
   adm_btn_patch: { pl: "Patch ↔", en: "Patch ↔", uk: "Patch ↔" },
+  adm_btn_patch_give: { pl: "Wydaj patch", en: "Give patch", uk: "Видати патч" },
+  adm_btn_patch_take: { pl: "Zabierz patch", en: "Take patch", uk: "Забрати патч" },
   adm_btn_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
   adm_players_search_ph: {
     pl: "Szukaj gracza — pseudonim, imię, @telegram…",

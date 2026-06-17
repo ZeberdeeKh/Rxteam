@@ -307,7 +307,7 @@ export async function setPlayerCallsign(formData: FormData) {
 }
 
 export async function togglePatch(formData: FormData) {
-  await requirePerm("players");
+  const me = await requirePerm("players");
   const playerId = Number(formData.get("playerId"));
   const { data: p } = await supabase
     .from("players")
@@ -318,6 +318,14 @@ export async function togglePatch(formData: FormData) {
   const patch: Record<string, unknown> = { has_patch: next };
   if (next && !p?.rank) patch.rank = "Recruit"; // вхідне звання з патчем
   await supabase.from("players").update(patch).eq("id", playerId);
+  // Видача патча закриває відкритий запит (handed) — щоб у кабінеті не лишалось «на розгляді».
+  if (next) {
+    await supabase
+      .from("patch_requests")
+      .update({ status: "handed", decided_at: new Date().toISOString(), decided_by: me.id })
+      .eq("player_id", playerId)
+      .in("status", ["requested", "approved"]);
+  }
   revalidatePath("/admin/players");
   redirect("/admin/players?patch=1");
 }
