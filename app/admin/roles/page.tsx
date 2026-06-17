@@ -1,11 +1,55 @@
 ﻿import { getServerLang } from "@/lib/server-lang";
-import { st } from "@/lib/site-i18n";
+import { st, type Lang } from "@/lib/site-i18n";
 import { requireMaster, ALL_PERMS } from "@/lib/admin";
 import { listPlayers } from "@/lib/admin-data";
 import { saveRoles } from "@/app/admin/actions";
 import { ui, btn, badgeClass, Collapsible } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
+
+// Інфо-піктограма з підказкою (hover/focus) — пояснення дозволів. Без JS: чистий CSS group-hover.
+// Рендериться як останній пункт у відкритому рядку редагування ролей.
+function PermInfo({ lang }: { lang: Lang }) {
+  return (
+    <span className="group relative inline-flex items-center">
+      <button
+        type="button"
+        aria-label={st(lang, "adm_perms_legend_title")}
+        className="cursor-help text-gray-400 transition-colors hover:text-[var(--c-brand-text)]"
+      >
+        <svg
+          className="h-5 w-5"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden
+        >
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="16" x2="12" y2="12" />
+          <line x1="12" y1="8" x2="12.01" y2="8" />
+        </svg>
+      </button>
+      <div
+        role="tooltip"
+        className="invisible absolute bottom-full right-0 z-20 mb-2 w-80 max-w-[85vw] border border-gray-200 bg-white p-3 text-left text-sm text-gray-600 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+      >
+        <p className="mb-2 text-sm font-semibold text-gray-800">{st(lang, "adm_perms_legend_title")}</p>
+        <ul className="space-y-1">
+          {ALL_PERMS.map((perm) => (
+            <li key={perm}>
+              <span className="font-semibold text-[var(--c-brand-text)]">{st(lang, `adm_nav_${perm}`)}</span>
+              {" — "}
+              {st(lang, `adm_perm_${perm}`)}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </span>
+  );
+}
 
 export default async function AdminRoles({
   searchParams,
@@ -61,29 +105,19 @@ export default async function AdminRoles({
                     {st(lang, `adm_nav_${perm}`)}
                   </label>
                 ))}
-                {!p.is_master && (
-                  <button type="submit" className={`ml-auto ${btn("action")}`}>
-                    {st(lang, "adm_btn_save_roles")}
-                  </button>
-                )}
+                <div className="ml-auto flex items-center gap-3">
+                  {!p.is_master && (
+                    <button type="submit" className={btn("action")}>
+                      {st(lang, "adm_btn_save_roles")}
+                    </button>
+                  )}
+                  <PermInfo lang={lang} />
+                </div>
               </form>
             </Collapsible>
           );
         })}
       </div>
-
-      {/* Легенда дозволів — пояснення для суперадміна, за що відповідає кожен прапорець. */}
-      <section className={`${ui.card} text-sm`}>
-        <h2 className={`mb-3 ${ui.cardTitle}`}>{st(lang, "adm_perms_legend_title")}</h2>
-        <ul className="space-y-1.5 text-gray-600">
-          {ALL_PERMS.map((perm) => (
-            <li key={perm} className="flex flex-wrap gap-x-2">
-              <code className="font-semibold text-[var(--c-brand-text)]">{perm}</code>
-              <span>— {st(lang, `adm_perm_${perm}`)}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
     </div>
   );
 }
