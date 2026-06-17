@@ -1377,6 +1377,8 @@ bot.command("patch", async (ctx) => {
   await ctx.reply(msg, { reply_markup: kb });
 });
 
+// Крок 1 натискання: показуємо детальне пояснення (донат, бонуси, ціна) + кнопку
+// «Підтвердити запит». Заявка НЕ створюється і адмін НЕ сповіщається — лише на patchconfirm.
 bot.callbackQuery("patchreq", async (ctx) => {
   await ctx.answerCallbackQuery();
   const p = await ensurePlayer(ctx.from);
@@ -1397,11 +1399,45 @@ bot.callbackQuery("patchreq", async (ctx) => {
     );
     return;
   }
-  const { data: reqRow } = await supabase
+  const price = await getSetting("patch_price_zl");
+  let msg = tr(lang, "patch_benefits");
+  if (price) msg += "\n\n" + tr(lang, "patch_price_line", { price });
+  msg += "\n\n" + tr(lang, "patch_confirm_hint");
+  const kb = new InlineKeyboard().text(tr(lang, "btn_patch_confirm"), "patchconfirm");
+  await ctx.editMessageText(msg, { reply_markup: kb });
+});
+
+// Крок 2 (повторне натискання): тут реально створюємо заявку та сповіщаємо адмінів.
+bot.callbackQuery("patchconfirm", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  if (p.has_patch) {
+    await ctx.editMessageText(tr(lang, "patch_status_have"));
+    return;
+  }
+  const { data: open } = await supabase
+    .from("patch_requests")
+    .select("id, status")
+    .eq("player_id", p.id)
+    .in("status", ["requested", "approved"])
+    .maybeSingle();
+  if (open) {
+    await ctx.editMessageText(
+      open.status === "approved" ? tr(lang, "patch_approved_waiting") : tr(lang, "patch_pending"),
+    );
+    return;
+  }
+  const { data: reqRow, error } = await supabase
     .from("patch_requests")
     .insert({ player_id: p.id, status: "requested" })
     .select("id")
     .single();
+  if (error || !reqRow) {
+    // 23505 (унікальний індекс) = гонка/подвійне натискання: відкрита заявка вже є.
+    await ctx.editMessageText(tr(lang, "patch_pending"));
+    return;
+  }
   await ctx.editMessageText(tr(lang, "patch_request_sent"));
 
   const who = p.callsign ?? p.name ?? "?";
@@ -1410,8 +1446,8 @@ bot.callbackQuery("patchreq", async (ctx) => {
     if (!a.tg_user_id) continue;
     const al = (a.lang as Lang) ?? "uk";
     const kb = new InlineKeyboard()
-      .text(tr(al, "btn_approve"), `patchok:${reqRow!.id}`)
-      .text(tr(al, "btn_reject"), `patchno:${reqRow!.id}`);
+      .text(tr(al, "btn_approve"), `patchok:${reqRow.id}`)
+      .text(tr(al, "btn_reject"), `patchno:${reqRow.id}`);
     try {
       await bot.api.sendMessage(a.tg_user_id, tr(al, "patch_admin_notify", { who }), {
         reply_markup: kb,

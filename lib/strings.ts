@@ -377,6 +377,22 @@ const S: Record<string, Dict> = {
     uk: "🎖 Патч RX Team = членство.\nЗ патчем: 100% балів і можна купувати звання (Recruit → Scout → Squad Leader → Team Leader).\nБез патча бали капають на 15% менше, а звання купити не можна.\nПатч платний, видається на грі.",
   },
   patch_price_line: { pl: "Cena: {price} zł", en: "Price: {price} zł", uk: "Ціна: {price} zł" },
+  // Крок 2 (patchreq): детальне пояснення перед повторним підтвердженням заявки.
+  patch_benefits: {
+    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwszy stopień w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Stopień w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
+    en: "🎖 The RX Team patch is your membership in the community.\n\nThe patch fee is a donation toward the RX Team community (games, gear, events) — not just a payment for an item.\n\nWhat the patch gives you:\n• Your first rank in the group — Recruit (then: Scout → Squad Leader → Team Leader).\n• 100% of points for attending games and events — without the patch you earn 15% less.\n• Entry into prize raffles — we often hold them only among patch holders.\n• Your rank in the group affects your role and function as a player at milsim games.\n\nThe patch is handed to you in person at a game.",
+    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перше звання в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Звання в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
+  },
+  patch_confirm_hint: {
+    pl: "Naciśnij „Potwierdź prośbę” jeszcze raz — wyślemy zgłoszenie do admina do zatwierdzenia.",
+    en: "Tap \"Confirm request\" once more — we'll send your application to an admin for approval.",
+    uk: "Натисни «Підтвердити запит» ще раз — і ми надішлемо заявку адміну на схвалення.",
+  },
+  btn_patch_confirm: {
+    pl: "✅ Potwierdź prośbę",
+    en: "✅ Confirm request",
+    uk: "✅ Підтвердити запит",
+  },
   btn_patch_request: {
     pl: "🎖 Złóż prośbę o patch",
     en: "🎖 Request the patch",

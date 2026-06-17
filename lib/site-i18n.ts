@@ -197,6 +197,19 @@ const SITE: Record<string, Dict> = {
     en: "⏳ Request under review",
     uk: "⏳ Запит на розгляді",
   },
+  // Бокова панель із поясненням патча (донат, бонуси) + повторне підтвердження.
+  patch_drawer_title: { pl: "Prośba o patch", en: "Patch request", uk: "Запит на патч" },
+  patch_benefits_site: {
+    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwszy stopień w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Stopień w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
+    en: "🎖 The RX Team patch is your membership in the community.\n\nThe patch fee is a donation toward the RX Team community (games, gear, events) — not just a payment for an item.\n\nWhat the patch gives you:\n• Your first rank in the group — Recruit (then: Scout → Squad Leader → Team Leader).\n• 100% of points for attending games and events — without the patch you earn 15% less.\n• Entry into prize raffles — we often hold them only among patch holders.\n• Your rank in the group affects your role and function as a player at milsim games.\n\nThe patch is handed to you in person at a game.",
+    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перше звання в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Звання в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
+  },
+  patch_price_line_site: {
+    pl: "Wsparcie społeczności: {price} zł",
+    en: "Community donation: {price} zł",
+    uk: "Внесок на розвиток спільноти: {price} zł",
+  },
+  patch_confirm_btn: { pl: "Potwierdź prośbę", en: "Confirm request", uk: "Підтвердити запит" },
   cab_patch_requested: {
     pl: "✅ Prośba o patch wysłana. Admin skontaktuje się i wyda patch na grze.",
     en: "✅ Patch request sent. An admin will reach out and hand it to you at a game.",

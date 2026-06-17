@@ -10,8 +10,9 @@ import {
 } from "@/lib/site-data";
 import { formatGameWhen } from "@/lib/games";
 import LinkTelegramForm from "@/components/cabinet/LinkTelegramForm";
+import PatchRequestDrawer from "@/components/site/PatchRequestDrawer";
 import { createStandalone, saveCallsign, requestPatch } from "@/app/cabinet/actions";
-import { featureEnabled } from "@/lib/settings";
+import { featureEnabled, getSetting } from "@/lib/settings";
 import { supabase } from "@/lib/supabase";
 import { ui, btn, badgeClass, OrDivider, GLYPH } from "@/components/ui";
 
@@ -114,6 +115,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
   // Патч: показуємо наявність/відсутність; якщо немає — кнопка запиту (з дедупом «на розгляді»).
   const patchEnabled = await featureEnabled("patch");
   let patchPending = false;
+  let patchPrice: string | null = null;
   if (patchEnabled && !player.has_patch) {
     const { data: open } = await supabase
       .from("patch_requests")
@@ -123,6 +125,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       .limit(1)
       .maybeSingle();
     patchPending = !!open;
+    patchPrice = await getSetting("patch_price_zl");
   }
 
   return (
@@ -167,11 +170,15 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                 (patchPending ? (
                   <p className={`mt-1 ${ui.meta}`}>{st(lang, "patch_under_review")}</p>
                 ) : (
-                  <form action={requestPatch} className="mt-1">
-                    <button type="submit" className={btn("action", "sm")}>
-                      {st(lang, "patch_request_btn")}
-                    </button>
-                  </form>
+                  <PatchRequestDrawer
+                    triggerLabel={st(lang, "patch_request_btn")}
+                    title={st(lang, "patch_drawer_title")}
+                    benefits={st(lang, "patch_benefits_site")}
+                    priceLine={patchPrice ? st(lang, "patch_price_line_site", { price: patchPrice }) : null}
+                    confirmLabel={st(lang, "patch_confirm_btn")}
+                    closeLabel={st(lang, "adm_close")}
+                    action={requestPatch}
+                  />
                 ))}
             </div>
           )}
