@@ -116,7 +116,6 @@ export default async function Home() {
           <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
           <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
           <RankingTable rows={ranking} lang={lang} />
-          {ranking.length > 0 && <p className={`mt-2 ${ui.meta}`}>{st(lang, "ranking_note_top")}</p>}
         </section>
       </Reveal>
 

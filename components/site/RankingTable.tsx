@@ -28,17 +28,17 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
   return (
     <div className={ui.tableWrapCut}>
       <div className="overflow-x-auto">
-        {/* table-fixed: позиція вузька (6%) + невеликий відступ; чотири колонки даних
-            рівні (по 18%); ачівки — остання й трохи ширша (22%), бо їх кількість різна. */}
+        {/* table-fixed: # вузька (4%); чотири колонки даних рівні (по 18%), усі ліворуч —
+            щоб відступи між ними були однакові; ачівки — остання й трохи ширша (24%). */}
         <table className={`${ui.table} table-fixed`}>
           <thead className={ui.thead}>
             <tr>
-              <th className={`${ui.th} w-[6%]`}>{st(lang, "ranking_col_pos")}</th>
+              <th className={`${ui.th} w-[4%]`}>{st(lang, "ranking_col_pos")}</th>
               <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_player")}</th>
               <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_rank")}</th>
-              <th className={`${ui.th} w-[18%] text-right`}>{st(lang, "ranking_col_earned")}</th>
-              <th className={`${ui.th} w-[18%] text-right`}>{st(lang, "ranking_col_games")}</th>
-              <th className={`${ui.th} w-[22%]`}>{st(lang, "ranking_col_ach")}</th>
+              <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_earned")}</th>
+              <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_games")}</th>
+              <th className={`${ui.th} w-[24%]`}>{st(lang, "ranking_col_ach")}</th>
             </tr>
           </thead>
           <tbody className={ui.tbody}>
@@ -49,10 +49,10 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                   {r.callsign ?? st(lang, "ranking_anon")}
                 </td>
                 <td className={`${ui.td} truncate`}>{r.has_patch ? r.rank ?? "Recruit" : "—"}</td>
-                <td className={`${ui.td} text-right tabular-nums text-gray-900`}>
+                <td className={`${ui.td} tabular-nums text-gray-900`}>
                   {r.points_earned} {GLYPH.points}
                 </td>
-                <td className={`${ui.td} text-right tabular-nums`}>{r.games_played}</td>
+                <td className={`${ui.td} tabular-nums`}>{r.games_played}</td>
                 {/* Остання колонка — здобуті ачівки (кількість різна → іконки переносяться). */}
                 <td className={`${ui.td} !h-auto py-1.5`}>
                   {r.achievements.length > 0 ? (

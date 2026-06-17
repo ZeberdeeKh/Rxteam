@@ -262,9 +262,9 @@ const SITE: Record<string, Dict> = {
   // ── 6.1 Рейтинг ──
   ranking_title: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
   ranking_intro: {
-    pl: "Najlepsi gracze według „zarobione łącznie”.",
-    en: "Top players by total points earned.",
-    uk: "Найкращі гравці за «зароблено всього».",
+    pl: "Pierwsza dziesiątka graczy według „zarobionych punktów łącznie”.",
+    en: "Top ten players by total points earned.",
+    uk: "Перша десятка гравців за «зароблено всього балів».",
   },
   ranking_col_pos: { pl: "#", en: "#", uk: "#" },
   ranking_col_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
