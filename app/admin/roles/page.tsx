@@ -34,7 +34,7 @@ function PermInfo({ lang }: { lang: Lang }) {
       </button>
       <div
         role="tooltip"
-        className="invisible absolute bottom-full right-0 z-20 mb-2 w-80 max-w-[85vw] border border-gray-200 bg-white p-3 text-left text-sm text-gray-600 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
+        className="invisible absolute top-full right-0 z-20 mt-2 w-80 max-w-[85vw] border border-gray-200 bg-white p-3 text-left text-sm text-gray-600 opacity-0 transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100"
       >
         <p className="mb-2 text-sm font-semibold text-gray-800">{st(lang, "adm_perms_legend_title")}</p>
         <ul className="space-y-1">
@@ -106,12 +106,12 @@ export default async function AdminRoles({
                   </label>
                 ))}
                 <div className="ml-auto flex items-center gap-3">
+                  <PermInfo lang={lang} />
                   {!p.is_master && (
                     <button type="submit" className={btn("action")}>
                       {st(lang, "adm_btn_save_roles")}
                     </button>
                   )}
-                  <PermInfo lang={lang} />
                 </div>
               </form>
             </Collapsible>
