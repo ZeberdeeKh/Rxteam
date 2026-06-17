@@ -28,17 +28,17 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
   return (
     <div className={ui.tableWrapCut}>
       <div className="overflow-x-auto">
-        {/* table-fixed: усі колонки даних рівні (w-1/6), позиція вузька (w-1/12),
-            ачівки — остання й ширша (w-1/4), бо їх кількість у кожного різна. */}
+        {/* table-fixed: позиція вузька (6%) + невеликий відступ; чотири колонки даних
+            рівні (по 18%); ачівки — остання й трохи ширша (22%), бо їх кількість різна. */}
         <table className={`${ui.table} table-fixed`}>
           <thead className={ui.thead}>
             <tr>
-              <th className={`${ui.th} w-1/12`}>{st(lang, "ranking_col_pos")}</th>
-              <th className={`${ui.th} w-1/6`}>{st(lang, "ranking_col_player")}</th>
-              <th className={`${ui.th} w-1/6`}>{st(lang, "ranking_col_rank")}</th>
-              <th className={`${ui.th} w-1/6 text-right`}>{st(lang, "ranking_col_earned")}</th>
-              <th className={`${ui.th} w-1/6 text-right`}>{st(lang, "ranking_col_games")}</th>
-              <th className={`${ui.th} w-1/4`}>{st(lang, "ranking_col_ach")}</th>
+              <th className={`${ui.th} w-[6%]`}>{st(lang, "ranking_col_pos")}</th>
+              <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_player")}</th>
+              <th className={`${ui.th} w-[18%]`}>{st(lang, "ranking_col_rank")}</th>
+              <th className={`${ui.th} w-[18%] text-right`}>{st(lang, "ranking_col_earned")}</th>
+              <th className={`${ui.th} w-[18%] text-right`}>{st(lang, "ranking_col_games")}</th>
+              <th className={`${ui.th} w-[22%]`}>{st(lang, "ranking_col_ach")}</th>
             </tr>
           </thead>
           <tbody className={ui.tbody}>
