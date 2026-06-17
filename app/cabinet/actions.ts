@@ -7,7 +7,7 @@ import { featureEnabled } from "@/lib/settings";
 import { redeemLinkCode } from "@/lib/identities";
 import { supabase } from "@/lib/supabase";
 import { getSessionContext } from "@/lib/session-player";
-import { notifyAdminsRental } from "@/lib/notify";
+import { notifyAdminsRental, notifyAdminsPatchRequest } from "@/lib/notify";
 import {
   getSessionPlayer,
   createStandalonePlayerForSession,
@@ -68,6 +68,36 @@ export async function saveCallsign(formData: FormData) {
   if (!res.ok) back(`?err=callsign_${res.reason}`);
   revalidatePath("/cabinet");
   back("?callsign=1");
+}
+
+// Запит на патч із кабінету. Дзеркалить /patch у боті: та сама вставка/статус, дедуп, сповіщення.
+export async function requestPatch() {
+  const player = await getSessionPlayer();
+  if (!player) redirect("/login");
+  if (!(await featureEnabled("patch"))) back("?err=patch_off");
+  if (player.has_patch) back("?err=patch_has");
+
+  // Дедуп: відкритий запит (requested|approved) блокує новий — як у боті.
+  const { data: open } = await supabase
+    .from("patch_requests")
+    .select("status")
+    .eq("player_id", player.id)
+    .in("status", ["requested", "approved"])
+    .limit(1)
+    .maybeSingle();
+  if (open) back("?err=patch_pending");
+
+  // Партійний UNIQUE-індекс (etap24) ловить гонку подвійного сабміту: 23505 = вже є відкритий запит.
+  const { error } = await supabase
+    .from("patch_requests")
+    .insert({ player_id: player.id, status: "requested" });
+  if (error) back(error.code === "23505" ? "?err=patch_pending" : "?err=generic");
+
+  // Best-effort: ті самі отримувачі (getAdminsWithPerm("patch")) і текст, що в боті.
+  await notifyAdminsPatchRequest(player.callsign ?? player.name ?? "?");
+
+  revalidatePath("/cabinet");
+  back("?patch_requested=1");
 }
 
 // Запис на гру (рег відкрита до reg_closes_at = збір −9год).

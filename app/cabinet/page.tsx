@@ -10,7 +10,9 @@ import {
 } from "@/lib/site-data";
 import { formatGameWhen } from "@/lib/games";
 import LinkTelegramForm from "@/components/cabinet/LinkTelegramForm";
-import { createStandalone, saveCallsign } from "@/app/cabinet/actions";
+import { createStandalone, saveCallsign, requestPatch } from "@/app/cabinet/actions";
+import { featureEnabled } from "@/lib/settings";
+import { supabase } from "@/lib/supabase";
 import { ui, btn, badgeClass, OrDivider, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -25,6 +27,7 @@ function successKey(f: Flags): string | null {
   if (f.reg) return "cab_reg_ok";
   if (f.unreg) return "cab_unreg_ok";
   if (f.checkin) return "cab_checkin_ok";
+  if (f.patch_requested) return "cab_patch_requested";
   return null;
 }
 
@@ -108,6 +111,20 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
     getPlayerAchievements(player.id),
   ]);
 
+  // Патч: показуємо наявність/відсутність; якщо немає — кнопка запиту (з дедупом «на розгляді»).
+  const patchEnabled = await featureEnabled("patch");
+  let patchPending = false;
+  if (patchEnabled && !player.has_patch) {
+    const { data: open } = await supabase
+      .from("patch_requests")
+      .select("status")
+      .eq("player_id", player.id)
+      .in("status", ["requested", "approved"])
+      .limit(1)
+      .maybeSingle();
+    patchPending = !!open;
+  }
+
   return (
     <div className={`${ui.widthWide} ${ui.pageStack}`}>
       {ctx.email && <p className="text-sm text-gray-500">{ctx.email}</p>}
@@ -129,6 +146,24 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               {player.has_patch ? player.rank ?? "Recruit" : st(lang, "prof_no_rank")}
             </dd>
           </div>
+          {patchEnabled && (
+            <div>
+              <dt className={ui.meta}>{st(lang, "prof_patch")}</dt>
+              <dd className={ui.bodyStrong}>
+                {player.has_patch ? st(lang, "patch_yes_site") : st(lang, "patch_no_site")}
+              </dd>
+              {!player.has_patch &&
+                (patchPending ? (
+                  <p className={`mt-1 ${ui.meta}`}>{st(lang, "patch_under_review")}</p>
+                ) : (
+                  <form action={requestPatch} className="mt-1">
+                    <button type="submit" className={btn("action", "sm")}>
+                      {st(lang, "patch_request_btn")}
+                    </button>
+                  </form>
+                ))}
+            </div>
+          )}
           <div>
             <dt className={ui.meta}>{st(lang, "prof_reliability")}</dt>
             <dd className={ui.bodyStrong}>{rel.pct === null ? "—" : `${rel.pct}%`}</dd>

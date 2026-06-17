@@ -186,6 +186,33 @@ const SITE: Record<string, Dict> = {
   prof_games: { pl: "Rozegrane gry", en: "Games played", uk: "Зіграно ігор" },
   prof_no_rank: { pl: "brak (potrzebny patch)", en: "none (patch needed)", uk: "немає (потрібен патч)" },
 
+  // Патч у кабінеті (запит на нашивку)
+  prof_patch: { pl: "Naszywka", en: "Patch", uk: "Нашивка" },
+  patch_yes_site: { pl: "✅ jest", en: "✅ yes", uk: "✅ є" },
+  patch_no_site: { pl: "❌ brak", en: "❌ no", uk: "❌ немає" },
+  patch_request_btn: { pl: "Złóż prośbę o patch", en: "Request patch", uk: "Подати запит на патч" },
+  patch_under_review: {
+    pl: "⏳ Prośba w trakcie rozpatrywania",
+    en: "⏳ Request under review",
+    uk: "⏳ Запит на розгляді",
+  },
+  cab_patch_requested: {
+    pl: "✅ Prośba o patch wysłana. Admin skontaktuje się i wyda patch na grze.",
+    en: "✅ Patch request sent. An admin will reach out and hand it to you at a game.",
+    uk: "✅ Заявку на патч надіслано. Адмін зв'яжеться і видасть патч на грі.",
+  },
+  err_patch_pending: {
+    pl: "Masz już otwartą prośbę o patch.",
+    en: "You already have an open patch request.",
+    uk: "У тебе вже є відкритий запит на патч.",
+  },
+  err_patch_has: { pl: "Masz już patch.", en: "You already have the patch.", uk: "У тебе вже є патч." },
+  err_patch_off: {
+    pl: "Funkcja patcha jest wyłączona.",
+    en: "Patch feature is off.",
+    uk: "Функцію патча вимкнено.",
+  },
+
   // ── 6.1 Лендінг ──
   home_hero_sub: {
     pl: "Społeczność ASG we Wrocławiu. Gry, ranking i Twój profil w jednym miejscu.",

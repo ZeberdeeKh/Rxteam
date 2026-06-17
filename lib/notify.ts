@@ -83,6 +83,17 @@ export async function notifyAdminsPurchase(opts: {
   }
 }
 
+// Сповіщення адмінів про запит на патч із сайту (best-effort; ті самі отримувачі й текст, що в боті).
+// Підтвердження/відхилення — у боті (patchok/patchno); сайт-DM лише сповіщає (без inline-кнопок).
+export async function notifyAdminsPatchRequest(who: string) {
+  const admins = await getAdminsWithPerm("patch");
+  for (const a of admins ?? []) {
+    if (!a.tg_user_id) continue;
+    const text = tr((a.lang as Lang) ?? "uk", "patch_admin_notify", { who });
+    await sendTg(a.tg_user_id as number, text);
+  }
+}
+
 // Сповіщення адмінів про реєстрацію з ОРЕНДОЮ (викликається і з сайту, і з бота — lib/bot.ts).
 // Додає явний контакт орендаря: TG-лінк (t.me/username або tg://user?id=) чи email (сайт-юзери).
 export async function notifyAdminsRental(opts: {
