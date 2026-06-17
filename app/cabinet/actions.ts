@@ -88,13 +88,21 @@ export async function requestPatch() {
   if (open) back("?err=patch_pending");
 
   // Партійний UNIQUE-індекс (etap24) ловить гонку подвійного сабміту: 23505 = вже є відкритий запит.
-  const { error } = await supabase
+  const { data: row, error } = await supabase
     .from("patch_requests")
-    .insert({ player_id: player.id, status: "requested" });
+    .insert({ player_id: player.id, status: "requested" })
+    .select("id")
+    .single();
   if (error) back(error.code === "23505" ? "?err=patch_pending" : "?err=generic");
 
-  // Best-effort: ті самі отримувачі (getAdminsWithPerm("patch")) і текст, що в боті.
-  await notifyAdminsPatchRequest(player.callsign ?? player.name ?? "?");
+  // Best-effort: ті самі отримувачі (getAdminsWithPerm("patch")) і текст, що в боті,
+  // + посилання на чат із гравцем і кнопки підтвердження/відхилення.
+  await notifyAdminsPatchRequest({
+    id: row!.id,
+    who: player.callsign ?? player.name ?? "?",
+    tgUserId: player.tg_user_id,
+    tgUsername: player.tg_username,
+  });
 
   revalidatePath("/cabinet");
   back("?patch_requested=1");

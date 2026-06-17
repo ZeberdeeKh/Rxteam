@@ -6,12 +6,16 @@ import type { Lang } from "./i18n";
 
 const TG = `https://api.telegram.org/bot${process.env.BOT_TOKEN}`;
 
-async function sendTg(chatId: number, text: string) {
+async function sendTg(chatId: number, text: string, replyMarkup?: unknown) {
   try {
     await fetch(`${TG}/sendMessage`, {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ chat_id: chatId, text }),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
+      }),
     });
   } catch {}
 }
@@ -83,14 +87,34 @@ export async function notifyAdminsPurchase(opts: {
   }
 }
 
-// Сповіщення адмінів про запит на патч із сайту (best-effort; ті самі отримувачі й текст, що в боті).
-// Підтвердження/відхилення — у боті (patchok/patchno); сайт-DM лише сповіщає (без inline-кнопок).
-export async function notifyAdminsPatchRequest(who: string) {
+// Сповіщення адмінів про запит на патч із сайту (best-effort; ті самі отримувачі, що в боті).
+// Додаємо посилання на чат із гравцем + inline-кнопки підтвердження/відхилення (patchok/patchno —
+// їх обробляє той самий бот за токеном, тож кнопки робочі й для DM із сайту).
+export async function notifyAdminsPatchRequest(req: {
+  id: number;
+  who: string;
+  tgUserId?: number | null;
+  tgUsername?: string | null;
+}) {
   const admins = await getAdminsWithPerm("patch");
+  const contactLine = req.tgUsername
+    ? `\n👤 https://t.me/${req.tgUsername}`
+    : req.tgUserId
+      ? `\n👤 tg://user?id=${req.tgUserId}`
+      : "";
   for (const a of admins ?? []) {
     if (!a.tg_user_id) continue;
-    const text = tr((a.lang as Lang) ?? "uk", "patch_admin_notify", { who });
-    await sendTg(a.tg_user_id as number, text);
+    const lang = (a.lang as Lang) ?? "uk";
+    const text = tr(lang, "patch_admin_notify", { who: req.who }) + contactLine;
+    const reply_markup = {
+      inline_keyboard: [
+        [
+          { text: tr(lang, "btn_approve"), callback_data: `patchok:${req.id}` },
+          { text: tr(lang, "btn_reject"), callback_data: `patchno:${req.id}` },
+        ],
+      ],
+    };
+    await sendTg(a.tg_user_id as number, text, reply_markup);
   }
 }
 

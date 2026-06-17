@@ -150,7 +150,18 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
             <div>
               <dt className={ui.meta}>{st(lang, "prof_patch")}</dt>
               <dd className={ui.bodyStrong}>
-                {player.has_patch ? st(lang, "patch_yes_site") : st(lang, "patch_no_site")}
+                {player.has_patch ? (
+                  <>
+                    {st(lang, "patch_yes_site")}
+                    {player.patch_at && (
+                      <span className={`ml-1 ${ui.metaFaint}`}>
+                        {st(lang, "patch_since")} {formatGameWhen(player.patch_at, lang)}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  st(lang, "patch_no_site")
+                )}
               </dd>
               {!player.has_patch &&
                 (patchPending ? (

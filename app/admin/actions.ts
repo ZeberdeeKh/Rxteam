@@ -315,7 +315,7 @@ export async function togglePatch(formData: FormData) {
     .eq("id", playerId)
     .single();
   const next = !p?.has_patch;
-  const patch: Record<string, unknown> = { has_patch: next };
+  const patch: Record<string, unknown> = { has_patch: next, patch_at: next ? new Date().toISOString() : null };
   if (next && !p?.rank) patch.rank = "Recruit"; // вхідне звання з патчем
   await supabase.from("players").update(patch).eq("id", playerId);
   // Видача патча закриває відкритий запит (handed) — щоб у кабінеті не лишалось «на розгляді».

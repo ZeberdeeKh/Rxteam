@@ -1340,7 +1340,7 @@ bot.callbackQuery(/^patchhand:(\d+)$/, async (ctx) => {
     .eq("id", req.id);
   await supabase
     .from("players")
-    .update({ has_patch: true, rank: target?.rank ?? "Recruit" })
+    .update({ has_patch: true, rank: target?.rank ?? "Recruit", patch_at: new Date().toISOString() })
     .eq("id", req.player_id);
   const who = target?.callsign ?? target?.name ?? "?";
   await ctx.editMessageText(tr(al, "patch_admin_handed", { who }));

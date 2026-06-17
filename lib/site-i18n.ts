@@ -189,6 +189,7 @@ const SITE: Record<string, Dict> = {
   // Патч у кабінеті (запит на нашивку)
   prof_patch: { pl: "Naszywka", en: "Patch", uk: "Нашивка" },
   patch_yes_site: { pl: "✅ jest", en: "✅ yes", uk: "✅ є" },
+  patch_since: { pl: "otrzymano", en: "received", uk: "отримано" },
   patch_no_site: { pl: "❌ brak", en: "❌ no", uk: "❌ немає" },
   patch_request_btn: { pl: "Złóż prośbę o patch", en: "Request patch", uk: "Подати запит на патч" },
   patch_under_review: {
