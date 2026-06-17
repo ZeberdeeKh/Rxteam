@@ -137,13 +137,19 @@ export async function grantAchievement(
     meta: code,
     hasPatch,
   });
-  return {
+  const result: GrantedAch = {
     code,
     title_pl: ach.title_pl,
     title_en: ach.title_en,
     title_uk: ach.title_uk,
     points: delta,
   };
+  // Єдина точка сповіщення для ВСІХ шляхів видачі (чек-ін, реферал, ручна видача, лотерея).
+  // Best-effort DM у Telegram — не кидає, no-op для веб-only гравців. Імпорт тут (а не зверху)
+  // тримає граф ацикличним: economy → notify-achievement → {strings, supabase, settings}.
+  const { notifyAchievement } = await import("./notify-achievement");
+  await notifyAchievement(playerId, result);
+  return result;
 }
 
 // Визначає й видає ачівки за чек-ін. gamesPlayedAfter — нове значення games_played.

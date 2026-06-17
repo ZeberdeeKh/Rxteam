@@ -485,6 +485,12 @@ const S: Record<string, Dict> = {
     en: "🏅 Achievement unlocked: {title} (+{points} pts)",
     uk: "🏅 Ачівку відкрито: {title} (+{points} б.)",
   },
+  // DM при здобутті ачівки (будь-який шлях видачі) + посилання на свої ачівки на сайті
+  ach_earned_dm: {
+    pl: "🎖️ Zdobyłeś osiągnięcie «{title}» (+{points} pkt)\nZobacz wszystkie swoje osiągnięcia na stronie: {url}",
+    en: "🎖️ You earned the achievement «{title}» (+{points} pts)\nSee all your achievements on the site: {url}",
+    uk: "🎖️ Ти отримав ачівку «{title}» (+{points} б.)\nДивись усі свої ачівки на сайті: {url}",
+  },
 
   // реферали — /ref
   ref_off: {

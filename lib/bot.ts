@@ -29,7 +29,6 @@ import {
   RANK_COST_FALLBACK,
   grantCheckinAchievements,
   grantAchievement,
-  type GrantedAch,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr, POLL_QUESTION, pollWinnerText, lotteryWinnerText } from "./strings";
@@ -186,17 +185,6 @@ function hasPerm(p: any, perm: string): boolean {
   return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes(perm));
 }
 const canCheckin = (p: any) => hasPerm(p, "checkin");
-
-// Надсилає гравцю повідомлення про відкриті ачівки (мовою гравця).
-async function sendAchievements(chatId: number | null, lang: Lang, granted: GrantedAch[]) {
-  if (!chatId) return;
-  for (const g of granted) {
-    const title = lang === "pl" ? g.title_pl : lang === "en" ? g.title_en : g.title_uk;
-    try {
-      await bot.api.sendMessage(chatId, tr(lang, "ach_unlocked", { title: title ?? g.code, points: g.points }));
-    } catch {}
-  }
-}
 
 // ─────────────────────────────── Команди ───────────────────────────────
 
@@ -422,10 +410,9 @@ bot.command("lottery", async (ctx) => {
   }
 
   const eligible = await eligibleReliable(q.start.toISO()!, q.end.toISO()!);
-  // Ачівка Iron Discipline усім, хто без неявок за квартал.
+  // Ачівка Iron Discipline усім, хто без неявок за квартал (DM шле grantAchievement).
   for (const e of eligible) {
-    const ach = await grantAchievement(e.id, "iron_discipline", null, !!e.has_patch);
-    if (ach) await sendAchievements(e.tg_user_id, (e.lang as Lang) ?? "uk", [ach]);
+    await grantAchievement(e.id, "iron_discipline", null, !!e.has_patch);
   }
   if (!eligible.length) {
     await supabase.from("season_runs").insert({ quarter: q.label, winner_id: null, eligible_count: 0 });
@@ -757,7 +744,7 @@ async function confirmReferral(invited: any, gameId: number, gamesPlayedAfter: n
         }),
       );
     } catch {}
-    if (res.ach) await sendAchievements(res.inviter.tg_user_id, ilang, [res.ach]);
+    // Ачівку «recruiter» інвайтеру шле сам grantAchievement (усередині confirmReferralCore).
   }
 }
 
@@ -1178,14 +1165,13 @@ bot.callbackQuery(/^acheckp:(\d+):(\d+)$/, async (ctx) => {
     .eq("game_id", gameId)
     .eq("player_id", playerId);
   await ctx.editMessageText(tr(lang, "mc_done", { who }));
-  const granted = await grantCheckinAchievements({
+  await grantCheckinAchievements({
     playerId,
     gameId,
     gamesPlayedAfter: (target?.games_played ?? 0) + 1,
     hasPatch: !!target?.has_patch,
     earlyMinutes: null,
   });
-  await sendAchievements(target?.tg_user_id ?? null, (target?.lang as Lang) ?? "uk", granted);
   if (target) await confirmReferral(target, gameId, (target.games_played ?? 0) + 1);
 });
 
@@ -1926,14 +1912,13 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
   await clearState(ctx.from!.id);
   await ctx.reply(tr(lang, "checkin_done"), { reply_markup: { remove_keyboard: true } });
   const earlyMin = Math.floor((now - new Date(game.checkin_from).getTime()) / 60000);
-  const granted = await grantCheckinAchievements({
+  await grantCheckinAchievements({
     playerId: p.id,
     gameId,
     gamesPlayedAfter: (p.games_played ?? 0) + 1,
     hasPatch: !!p.has_patch,
     earlyMinutes: earlyMin,
   });
-  await sendAchievements(p.tg_user_id, lang, granted);
   await confirmReferral(p, gameId, (p.games_played ?? 0) + 1);
 }
 
