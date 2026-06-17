@@ -15,6 +15,18 @@ function achTitle(a: RankAch, lang: Lang): string {
   );
 }
 
+// Локалізований опис ачівки (за що дається) для підказки; null, якщо опису немає.
+function achDesc(a: RankAch, lang: Lang): string | null {
+  return (lang === "pl" ? a.description_pl : lang === "uk" ? a.description_uk : a.description_en) ?? null;
+}
+
+// Підказка при наведенні: назва + опис (новий рядок), або лише назва, якщо опису немає.
+function achTip(a: RankAch, lang: Lang): string {
+  const title = achTitle(a, lang);
+  const desc = achDesc(a, lang);
+  return desc ? `${title}\n${desc}` : title;
+}
+
 // Таблиця рейтингу (топ гравців). Показується на лендінгу.
 export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]; lang: Lang }) {
   if (rows.length === 0) {
@@ -59,6 +71,7 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                     <div className="flex flex-wrap items-center gap-1">
                       {r.achievements.map((a) => {
                         const title = achTitle(a, lang);
+                        const tip = achTip(a, lang); // назва + опис у підказці при наведенні
                         return a.thumbnail_svg ? (
                           // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
                           // eslint-disable-next-line @next/next/no-img-element
@@ -66,11 +79,11 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                             key={a.code}
                             src={a.thumbnail_svg}
                             alt={title}
-                            title={title}
+                            title={tip}
                             className="h-5 w-5 object-contain"
                           />
                         ) : (
-                          <span key={a.code} title={title} className="text-sm leading-none">
+                          <span key={a.code} title={tip} className="text-sm leading-none">
                             {GLYPH.rank}
                           </span>
                         );

@@ -192,22 +192,27 @@ export async function getRanking(limit = 10): Promise<RankingRow[]> {
   return (data ?? []) as RankingRow[];
 }
 
-// Здобута ачівка для рейтингу (іконка + локалізована назва як підказка).
+// Здобута ачівка для рейтингу (іконка + локалізована назва й опис як підказка).
 export type RankAch = {
   code: string;
   title_pl: string | null;
   title_en: string | null;
   title_uk: string | null;
+  description_pl: string | null;
+  description_en: string | null;
+  description_uk: string | null;
   thumbnail_svg: string | null;
 };
 
-// Bulk: здобуті ачівки для багатьох гравців одним запитом (player_id IN …), з назвами + мініатюрою.
+// Bulk: здобуті ачівки для багатьох гравців одним запитом (player_id IN …), з назвами, описом і мініатюрою.
 async function getPlayerAchievementsForMany(playerIds: number[]): Promise<Map<number, RankAch[]>> {
   const map = new Map<number, RankAch[]>();
   if (playerIds.length === 0) return map;
   const { data } = await supabase
     .from("player_achievements")
-    .select("player_id, code, achievements(title_pl, title_en, title_uk, thumbnail_svg)")
+    .select(
+      "player_id, code, achievements(title_pl, title_en, title_uk, description_pl, description_en, description_uk, thumbnail_svg)",
+    )
     .in("player_id", playerIds)
     .order("created_at", { ascending: false });
   for (const r of (data ?? []) as any[]) {
@@ -218,6 +223,9 @@ async function getPlayerAchievementsForMany(playerIds: number[]): Promise<Map<nu
       title_pl: a?.title_pl ?? null,
       title_en: a?.title_en ?? null,
       title_uk: a?.title_uk ?? null,
+      description_pl: a?.description_pl ?? null,
+      description_en: a?.description_en ?? null,
+      description_uk: a?.description_uk ?? null,
       thumbnail_svg: a?.thumbnail_svg ?? null,
     });
     map.set(r.player_id as number, arr);
