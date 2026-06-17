@@ -19,7 +19,8 @@ export default async function AdminGameDetail({
 }) {
   await requirePerm("games");
   const admin = (await getAdmin())!;
-  const canCheckin = hasPerm(admin, "checkin");
+  // Чек-ін злито з «games»: сторінка вже під requirePerm("games") → дозвіл завжди є.
+  const canCheckin = hasPerm(admin, "games");
   const lang = getServerLang();
 
   const game = await getGameDetail(Number(params.id));

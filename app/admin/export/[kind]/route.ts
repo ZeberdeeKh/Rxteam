@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { getSessionPlayer } from "@/lib/site-player";
-import { hasPerm, type AdminPerm } from "@/lib/admin";
+import { hasPerm } from "@/lib/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -17,19 +17,15 @@ function one<T>(v: T | T[] | null | undefined): T | null {
   return Array.isArray(v) ? (v[0] ?? null) : (v ?? null);
 }
 
-const PERM: Record<string, AdminPerm> = {
-  players: "players",
-  registrations: "games",
-  checkins: "checkin",
-};
+// Один дозвіл "export" керує всім субменю експорту.
+const KINDS = new Set(["players", "registrations", "checkins"]);
 
 export async function GET(_req: NextRequest, { params }: { params: { kind: string } }) {
   const kind = params.kind;
-  const perm = PERM[kind];
-  if (!perm) return new Response("Not found", { status: 404 });
+  if (!KINDS.has(kind)) return new Response("Not found", { status: 404 });
 
   const me = await getSessionPlayer();
-  if (!hasPerm(me, perm)) return new Response("Not found", { status: 404 });
+  if (!hasPerm(me, "export")) return new Response("Not found", { status: 404 });
 
   let csv = "";
   if (kind === "players") {

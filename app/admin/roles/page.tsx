@@ -58,7 +58,7 @@ export default async function AdminRoles({
                       disabled={p.is_master}
                       className={ui.checkbox}
                     />
-                    {perm}
+                    {st(lang, `adm_nav_${perm}`)}
                   </label>
                 ))}
                 {!p.is_master && (

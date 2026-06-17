@@ -1,6 +1,6 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
-import { requireMaster } from "@/lib/admin";
+import { requirePerm } from "@/lib/admin";
 import { listChoreTemplates } from "@/lib/admin-data";
 import { createChore, updateChore, deleteChore } from "@/app/admin/actions";
 import { ui, btn, badgeClass, Collapsible, CreateDrawer } from "@/components/ui";
@@ -47,7 +47,7 @@ export default async function AdminChores({
 }: {
   searchParams: { created?: string; saved?: string; deleted?: string; err?: string };
 }) {
-  await requireMaster();
+  await requirePerm("chores");
   const lang = getServerLang();
   const items = await listChoreTemplates();
   const ok = searchParams.created || searchParams.saved || searchParams.deleted;

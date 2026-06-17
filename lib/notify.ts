@@ -1,6 +1,7 @@
 import { supabase } from "./supabase";
 import { tr } from "./strings";
 import { formatWhen } from "./games";
+import { getAdminsWithPerm } from "./players";
 import type { Lang } from "./i18n";
 
 const TG = `https://api.telegram.org/bot${process.env.BOT_TOKEN}`;
@@ -68,12 +69,8 @@ export async function notifyAdminsPurchase(opts: {
 }) {
   const who = opts.playerCallsign ?? opts.playerName ?? "?";
 
-  // Кожному адміну — його мовою (pl/en/uk), як у notifyAdminsRental (lib/bot.ts).
-  const { data: admins } = await supabase
-    .from("players")
-    .select("tg_user_id, lang")
-    .eq("is_admin", true)
-    .not("tg_user_id", "is", null);
+  // Сповіщення про покупки — власникам дозволу "shop" (+ майстру), кожному його мовою (Етап 22).
+  const admins = await getAdminsWithPerm("shop");
 
   for (const a of admins ?? []) {
     if (!a.tg_user_id) continue;
@@ -109,11 +106,8 @@ export async function notifyAdminsRental(opts: {
         ? `\n✉️ ${opts.email}`
         : "";
 
-  const { data: admins } = await supabase
-    .from("players")
-    .select("tg_user_id, lang")
-    .eq("is_admin", true)
-    .not("tg_user_id", "is", null);
+  // Сповіщення про оренду — власникам дозволу "rental" (+ майстру) — Етап 22.
+  const admins = await getAdminsWithPerm("rental");
 
   for (const a of admins ?? []) {
     if (!a.tg_user_id) continue;

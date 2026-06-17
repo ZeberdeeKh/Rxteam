@@ -129,7 +129,7 @@ function parseLimits(formData: FormData) {
 }
 
 export async function createLocation(formData: FormData) {
-  await requirePerm("games");
+  await requirePerm("locations");
   const name = String(formData.get("name") ?? "").trim();
   const lat = Number(formData.get("lat"));
   const lng = Number(formData.get("lng"));
@@ -144,7 +144,7 @@ export async function createLocation(formData: FormData) {
 }
 
 export async function updateLocation(formData: FormData) {
-  await requirePerm("games");
+  await requirePerm("locations");
   const id = Number(formData.get("id"));
   const name = String(formData.get("name") ?? "").trim();
   const lat = Number(formData.get("lat"));
@@ -161,7 +161,7 @@ export async function updateLocation(formData: FormData) {
 }
 
 export async function deleteLocation(formData: FormData) {
-  await requirePerm("games");
+  await requirePerm("locations");
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) back2("");
   // Не видаляємо, якщо локація вже використана в іграх (FK + збереження історії).
@@ -175,7 +175,7 @@ export async function deleteLocation(formData: FormData) {
   back2("?deleted=1");
 }
 
-// ── Чек-лист підготовки до гри (Етап 13, майстер) ──
+// ── Чек-лист підготовки до гри (Етап 13, право chores) ──
 const backChores = (q: string) => redirect(`/admin/chores${q}`);
 
 function parseChoreKind(formData: FormData): "action" | "gear" | null {
@@ -184,7 +184,7 @@ function parseChoreKind(formData: FormData): "action" | "gear" | null {
 }
 
 export async function createChore(formData: FormData) {
-  await requireMaster();
+  await requirePerm("chores");
   const kind = parseChoreKind(formData);
   const label = String(formData.get("label") ?? "").trim();
   if (!kind || !label) backChores("?err=fields");
@@ -197,7 +197,7 @@ export async function createChore(formData: FormData) {
 }
 
 export async function updateChore(formData: FormData) {
-  await requireMaster();
+  await requirePerm("chores");
   const id = Number(formData.get("id"));
   const kind = parseChoreKind(formData);
   const label = String(formData.get("label") ?? "").trim();
@@ -215,7 +215,7 @@ export async function updateChore(formData: FormData) {
 }
 
 export async function deleteChore(formData: FormData) {
-  await requireMaster();
+  await requirePerm("chores");
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) backChores("");
   // Знімок пунктів зберігається в chore_run_items — видалення шаблону не чіпає минулі run.
@@ -224,9 +224,9 @@ export async function deleteChore(formData: FormData) {
   backChores("?deleted=1");
 }
 
-// ── Реєстрації / чек-іни наживо (право checkin) ──
+// ── Реєстрації / чек-іни наживо (право games) ──
 export async function manualCheckin(formData: FormData) {
-  await requirePerm("checkin");
+  await requirePerm("games");
   const gameId = Number(formData.get("gameId"));
   const playerId = Number(formData.get("playerId"));
   if (!Number.isFinite(gameId) || !Number.isFinite(playerId)) redirect("/admin/games");
@@ -258,7 +258,7 @@ export async function manualCheckin(formData: FormData) {
 }
 
 export async function markNoShow(formData: FormData) {
-  await requirePerm("checkin");
+  await requirePerm("games");
   const gameId = Number(formData.get("gameId"));
   const playerId = Number(formData.get("playerId"));
   if (Number.isFinite(gameId) && Number.isFinite(playerId)) {
@@ -413,7 +413,7 @@ function parseShopItem(formData: FormData) {
 }
 
 export async function createShopItem(formData: FormData) {
-  await requireMaster();
+  await requirePerm("shop");
   const item = parseShopItem(formData);
   // Потрібна хоча б одна назва, щоб товар не був безіменним.
   if (!item.title_pl && !item.title_en && !item.title_uk) backShop("?err=fields");
@@ -424,7 +424,7 @@ export async function createShopItem(formData: FormData) {
 }
 
 export async function updateShopItem(formData: FormData) {
-  await requireMaster();
+  await requirePerm("shop");
   const id = Number(formData.get("id"));
   const item = parseShopItem(formData);
   if (!Number.isFinite(id) || (!item.title_pl && !item.title_en && !item.title_uk)) {
@@ -437,7 +437,7 @@ export async function updateShopItem(formData: FormData) {
 }
 
 export async function deleteShopItem(formData: FormData) {
-  await requireMaster();
+  await requirePerm("shop");
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) backShop("");
   // purchases.item_id = ON DELETE SET NULL → видалення безпечне, історія лишається.
@@ -449,7 +449,7 @@ export async function deleteShopItem(formData: FormData) {
 
 // Позначити покупку виданою (журнал покупок).
 export async function markFulfilled(formData: FormData) {
-  await requireMaster();
+  await requirePerm("shop");
   const id = Number(formData.get("id"));
   if (!Number.isFinite(id)) backShop("");
   await supabase
@@ -484,7 +484,7 @@ function parseAchievement(formData: FormData) {
 }
 
 export async function createAchievement(formData: FormData) {
-  await requireMaster();
+  await requirePerm("achievements");
   const code = String(formData.get("code") ?? "").trim().toLowerCase();
   const ach = parseAchievement(formData);
   // Код — первинний ключ: лише латиниця/цифри/підкреслення. Назва — хоча б одна.
@@ -499,7 +499,7 @@ export async function createAchievement(formData: FormData) {
 }
 
 export async function updateAchievement(formData: FormData) {
-  await requireMaster();
+  await requirePerm("achievements");
   const code = String(formData.get("code") ?? "").trim();
   const ach = parseAchievement(formData);
   if (!code || (!ach.title_pl && !ach.title_en && !ach.title_uk)) backAch("?err=fields");
@@ -509,7 +509,7 @@ export async function updateAchievement(formData: FormData) {
 }
 
 export async function deleteAchievement(formData: FormData) {
-  await requireMaster();
+  await requirePerm("achievements");
   const code = String(formData.get("code") ?? "").trim();
   if (!code) backAch("");
   // player_achievements.code → achievements.code (RESTRICT). Якщо ачівку вже

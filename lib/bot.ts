@@ -184,7 +184,7 @@ bot.on("chat_member", async (ctx) => {
 function hasPerm(p: any, perm: string): boolean {
   return !!p.is_master || (Array.isArray(p.admin_perms) && p.admin_perms.includes(perm));
 }
-const canCheckin = (p: any) => hasPerm(p, "checkin");
+const canCheckin = (p: any) => hasPerm(p, "games");
 
 // ─────────────────────────────── Команди ───────────────────────────────
 

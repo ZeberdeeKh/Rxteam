@@ -1,6 +1,6 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
-import { requireMaster } from "@/lib/admin";
+import { requirePerm } from "@/lib/admin";
 import {
   listAchievementsAdmin,
   listPlayerAchievementsAdmin,
@@ -123,7 +123,7 @@ export default async function AdminAchievements({
     err?: string;
   };
 }) {
-  await requireMaster();
+  await requirePerm("achievements");
   const lang = getServerLang();
   const [items, log] = await Promise.all([
     listAchievementsAdmin(),

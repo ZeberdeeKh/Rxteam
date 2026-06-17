@@ -1,6 +1,6 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
-import { requireMaster } from "@/lib/admin";
+import { requirePerm } from "@/lib/admin";
 import { listShopItemsAdmin, listPurchasesAdmin } from "@/lib/admin-data";
 import type { ShopItem } from "@/lib/site-data";
 import {
@@ -88,7 +88,7 @@ export default async function AdminShop({
     err?: string;
   };
 }) {
-  await requireMaster();
+  await requirePerm("shop");
   const lang = getServerLang();
   const [items, orders] = await Promise.all([listShopItemsAdmin(), listPurchasesAdmin()]);
 

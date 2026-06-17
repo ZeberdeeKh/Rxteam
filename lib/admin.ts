@@ -2,16 +2,34 @@ import { notFound } from "next/navigation";
 import { getSessionPlayer, type SitePlayer } from "./site-player";
 
 // Гейт ролей адмінки (серверний). Майстер має всі права; інші — за admin_perms[].
-export type AdminPerm = "games" | "rental" | "checkin" | "referrals" | "players" | "joins" | "gallery";
+// Один дозвіл = один пункт субменю адмінки. Виняток (тільки майстер, не делегується):
+// «Налаштування» і «Ролі адмінів» — через них можна зламати конфіг / підвищити собі права.
+export type AdminPerm =
+  | "shop"
+  | "achievements"
+  | "games"
+  | "locations"
+  | "players"
+  | "referrals"
+  | "rental"
+  | "joins"
+  | "gallery"
+  | "chores"
+  | "export";
 
+// Порядок дзеркалить меню (adminNavLinks) — так виглядає список чекбоксів у «Ролях».
 export const ALL_PERMS: AdminPerm[] = [
+  "shop",
+  "achievements",
   "games",
-  "rental",
-  "checkin",
-  "referrals",
+  "locations",
   "players",
+  "referrals",
+  "rental",
   "joins",
   "gallery",
+  "chores",
+  "export",
 ];
 
 export function hasPerm(p: SitePlayer | null, perm: AdminPerm): boolean {

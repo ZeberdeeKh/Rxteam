@@ -851,19 +851,19 @@ const SITE: Record<string, Dict> = {
     uk: "Що означають дозволи",
   },
   adm_perm_games: {
-    pl: "tworzenie i odwoływanie gier, zarządzanie lokalizacjami.",
-    en: "create and cancel games, manage locations.",
-    uk: "створення й скасування ігор, керування локаціями.",
+    pl: "tworzenie i odwoływanie gier, odhaczanie obecności (check-in).",
+    en: "create and cancel games, mark attendance (check-in).",
+    uk: "створення й скасування ігор, відмічання присутності (чек-ін).",
+  },
+  adm_perm_locations: {
+    pl: "zarządzanie lokalizacjami gier.",
+    en: "manage game locations.",
+    uk: "керування локаціями ігор.",
   },
   adm_perm_rental: {
     pl: "podgląd zgłoszeń wynajmu sprzętu.",
     en: "view equipment rental requests.",
     uk: "перегляд заявок на оренду спорядження.",
-  },
-  adm_perm_checkin: {
-    pl: "ręczne odhaczanie obecności graczy, eksport check-inów.",
-    en: "manually mark player attendance, export check-ins.",
-    uk: "ручне відмічання присутності гравців, експорт чек-інів.",
   },
   adm_perm_referrals: {
     pl: "zatwierdzanie i odrzucanie poleceń.",
@@ -871,9 +871,9 @@ const SITE: Record<string, Dict> = {
     uk: "підтвердження й відхилення рефералів.",
   },
   adm_perm_players: {
-    pl: "korekta punktów/salda, patch, zmiana pseudonimu, eksport graczy.",
-    en: "adjust points/balance, patch, change callsign, export players.",
-    uk: "корекція балів/балансу, патч, зміна позивного, експорт гравців.",
+    pl: "korekta punktów/salda, patch, zmiana pseudonimu, przyznawanie osiągnięć.",
+    en: "adjust points/balance, patch, change callsign, grant achievements.",
+    uk: "корекція балів/балансу, патч, зміна позивного, видача ачівок.",
   },
   adm_perm_joins: {
     pl: "podgląd zgłoszeń dołączenia do grupy.",
@@ -884,6 +884,26 @@ const SITE: Record<string, Dict> = {
     pl: "wgrywanie i usuwanie zdjęć w galerii.",
     en: "upload and remove gallery photos.",
     uk: "завантаження й видалення фото в галереї.",
+  },
+  adm_perm_shop: {
+    pl: "zarządzanie sklepem za punkty, powiadomienia o zakupach.",
+    en: "manage the points shop, purchase notifications.",
+    uk: "керування магазином за бали, сповіщення про покупки.",
+  },
+  adm_perm_achievements: {
+    pl: "tworzenie i edycja osiągnięć.",
+    en: "create and edit achievements.",
+    uk: "створення й редагування ачівок.",
+  },
+  adm_perm_chores: {
+    pl: "checklista przygotowania do gry.",
+    en: "game preparation checklist.",
+    uk: "чек-лист підготовки до гри.",
+  },
+  adm_perm_export: {
+    pl: "eksport danych do CSV (gracze, rejestracje, check-iny).",
+    en: "export data to CSV (players, registrations, check-ins).",
+    uk: "експорт даних у CSV (гравці, реєстрації, чек-іни).",
   },
 
   adm_export: { pl: "Eksport CSV", en: "CSV export", uk: "Експорт CSV" },

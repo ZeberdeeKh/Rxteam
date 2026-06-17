@@ -134,7 +134,7 @@ export default async function AdminLocations({
 }: {
   searchParams: { created?: string; saved?: string; deleted?: string; err?: string };
 }) {
-  await requirePerm("games");
+  await requirePerm("locations");
   const lang = getServerLang();
   const locations = await listLocationsFull();
 
