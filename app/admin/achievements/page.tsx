@@ -29,6 +29,15 @@ const TIER_KEY: Record<string, "adm_ach_tier_easy" | "adm_ach_tier_mid" | "adm_a
 function AchievementFields({ lang, item }: { lang: Lang; item?: AdminAchievement }) {
   return (
     <>
+      <label className="flex items-center gap-2 text-sm sm:col-span-4 sm:pt-6">
+        <input
+          type="checkbox"
+          name="enabled"
+          defaultChecked={item?.enabled ?? true}
+          className={ui.checkbox}
+        />
+        <span className={ui.meta}>{st(lang, "adm_ach_enabled")}</span>
+      </label>
       <label className="text-sm sm:col-span-4">
         <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_code")}</span>
         <input
@@ -46,15 +55,6 @@ function AchievementFields({ lang, item }: { lang: Lang; item?: AdminAchievement
           <option value="mid">{st(lang, "adm_ach_tier_mid")}</option>
           <option value="hard">{st(lang, "adm_ach_tier_hard")}</option>
         </select>
-      </label>
-      <label className="flex items-center gap-2 text-sm sm:col-span-4 sm:pt-6">
-        <input
-          type="checkbox"
-          name="enabled"
-          defaultChecked={item?.enabled ?? true}
-          className={ui.checkbox}
-        />
-        <span className={ui.meta}>{st(lang, "adm_ach_enabled")}</span>
       </label>
 
       <label className="text-sm sm:col-span-4">
