@@ -83,12 +83,6 @@ function AchievementFields({ lang, item }: { lang: Lang; item?: AdminAchievement
           <option value="auto">{st(lang, "adm_ach_kind_auto")}</option>
         </select>
       </label>
-      <p className={`self-center ${ui.meta} sm:col-span-8`}>
-        {st(
-          lang,
-          (item?.kind ?? "manual") === "auto" ? "adm_ach_kind_auto_hint" : "adm_ach_kind_manual_hint",
-        )}
-      </p>
 
       <label className="text-sm sm:col-span-4">
         <span className={`mb-1 block ${ui.meta}`}>{st(lang, "adm_ach_desc_pl")}</span>
