@@ -158,10 +158,10 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               <dd className={ui.bodyStrong}>
                 {player.has_patch ? (
                   <>
-                    {st(lang, "patch_yes_site")}
+                    {st(lang, "patch_received")}
                     {player.patch_at && (
                       <span className={`ml-1 ${ui.metaFaint}`}>
-                        {st(lang, "patch_since")} {formatGameWhen(player.patch_at, lang)}
+                        {formatGameWhen(player.patch_at, lang)}
                       </span>
                     )}
                   </>

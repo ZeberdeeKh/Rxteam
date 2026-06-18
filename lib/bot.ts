@@ -43,6 +43,7 @@ import {
   buildAnnouncement,
   registeredCount,
   formatWhen,
+  formatGameWhen,
   distanceMeters,
 } from "./games";
 import { toggleChoreClaim, refreshChoreMessage } from "./chores";
@@ -891,7 +892,11 @@ bot.command("profile", async (ctx) => {
     callsign: p.callsign ?? tr(lang, "callsign_unset"),
     tg: p.tg_username ? "@" + p.tg_username : "—",
     rank: rankStr,
-    patch: p.has_patch ? tr(lang, "patch_yes") : tr(lang, "patch_no"),
+    patch: p.has_patch
+      ? p.patch_at
+        ? `${tr(lang, "patch_received")} ${formatGameWhen(p.patch_at, lang)}`
+        : tr(lang, "patch_yes")
+      : tr(lang, "patch_no"),
     games: p.games_played ?? 0,
     earned: p.points_earned ?? 0,
     balance: p.points_balance ?? 0,
@@ -899,6 +904,9 @@ bot.command("profile", async (ctx) => {
   });
   if (p.is_master) msg += "\n" + tr(lang, "badge_master");
   else if (p.is_admin) msg += "\n" + tr(lang, "badge_admin");
+  if (!p.has_patch && (await featureEnabled("patch"))) {
+    msg += "\n\n" + tr(lang, "patch_profile_hint");
+  }
   await ctx.reply(msg);
 });
 
@@ -1371,8 +1379,9 @@ bot.command("patch", async (ctx) => {
     return;
   }
   const price = await getSetting("patch_price_zl");
-  let msg = tr(lang, "patch_intro");
-  if (price) msg += "\n" + tr(lang, "patch_price_line", { price });
+  // Той самий опис, що й у кабінеті на сайті: адмін-текст patch_msg_* або дефолт patch_benefits.
+  let msg = (await getSetting(`patch_msg_${lang}`)) || tr(lang, "patch_benefits");
+  if (price) msg += "\n\n" + tr(lang, "patch_price_line", { price });
   const kb = new InlineKeyboard().text(tr(lang, "btn_patch_request"), "patchreq");
   await ctx.reply(msg, { reply_markup: kb });
 });
@@ -1399,11 +1408,8 @@ bot.callbackQuery("patchreq", async (ctx) => {
     );
     return;
   }
-  const price = await getSetting("patch_price_zl");
-  // Текст-пояснення редагується в адмінці (/admin/patches → patch_msg_*); порожнє → дефолт із i18n.
-  let msg = (await getSetting(`patch_msg_${lang}`)) || tr(lang, "patch_benefits");
-  if (price) msg += "\n\n" + tr(lang, "patch_price_line", { price });
-  msg += "\n\n" + tr(lang, "patch_confirm_hint");
+  // Опис уже показано на кроці /patch (як на сайті) — тут лише коротке прохання підтвердити.
+  const msg = tr(lang, "patch_confirm_hint");
   const kb = new InlineKeyboard().text(tr(lang, "btn_patch_confirm"), "patchconfirm");
   await ctx.editMessageText(msg, { reply_markup: kb });
 });

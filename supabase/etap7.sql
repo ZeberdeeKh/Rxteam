@@ -34,7 +34,7 @@ on conflict (key) do nothing;
 -- Заглушки-приклади (організатор відредагує/вимкне через адмінку 6.4).
 insert into shop_items (title_pl, title_en, title_uk, desc_pl, desc_en, desc_uk, cost, active, sort)
 select * from (values
-  ('[Przykład] Naszywka okolicznościowa', '[Example] Event patch', '[Приклад] Тематична нашивка',
+  ('[Przykład] Naszywka okolicznościowa', '[Example] Event patch', '[Приклад] Тематичний патч',
    'Pozycja przykładowa — uzupełni organizator.', 'Placeholder item — to be filled by the organizer.', 'Приклад — наповнить організатор.',
    50, true, 10),
   ('[Przykład] Zniżka na wynajem', '[Example] Rental discount', '[Приклад] Знижка на оренду',

@@ -6,7 +6,7 @@
   {"command":"myride","description":"Moja podwózka / Моя підвозка"},
   {"command":"profile","description":"Profil / Профіль"},
   {"command":"rank","description":"Ranga / Ранг"},
-  {"command":"patch","description":"Patch / Патч"},
+  {"command":"patch","description":"Naszywka / Патч"},
   {"command":"ref","description":"Polecenia / Реферали"},
   {"command":"linksite","description":"Połącz ze stroną / Привʼязати сайт"},
   {"command":"stats","description":"W liczbach / У цифрах"},

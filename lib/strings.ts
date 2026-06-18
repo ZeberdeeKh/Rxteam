@@ -17,15 +17,23 @@ const S: Record<string, Dict> = {
   profile: {
     pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nRanga: {rank}\nNaszywka: {patch}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
     en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nRank: {rank}\nPatch: {patch}\nGames played: {games}\n⭐ Earned: {earned}\n💰 Balance: {balance}\n🎯 Reliability: {reliability}",
-    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nРанг: {rank}\nНашивка: {patch}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
+    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nРанг: {rank}\nПатч: {patch}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
   },
   no_patch_label: {
-    pl: "brak (potrzebny patch)",
+    pl: "brak (potrzebna naszywka)",
     en: "none (patch needed)",
     uk: "немає (потрібен патч)",
   },
   patch_yes: { pl: "✅ jest", en: "✅ yes", uk: "✅ є" },
   patch_no: { pl: "❌ brak", en: "❌ no", uk: "❌ немає" },
+  // Наявність патча в /profile: «Отримано <дата>» (дата видачі — patch_at).
+  patch_received: { pl: "✅ Otrzymano", en: "✅ Received", uk: "✅ Отримано" },
+  // Підказка в /profile, коли патча ще немає — як подати заявку.
+  patch_profile_hint: {
+    pl: "ℹ️ Nie masz jeszcze naszywki. Złóż prośbę o jej wydanie komendą /patch",
+    en: "ℹ️ No patch yet. Request it with the /patch command",
+    uk: "ℹ️ Подати заявку на отримання патча можна командою /patch",
+  },
   callsign_unset: {
     pl: "nie ustawiony (podasz przy pierwszej rejestracji)",
     en: "not set (you'll enter it at first sign-up)",
@@ -367,19 +375,15 @@ const S: Record<string, Dict> = {
 
   // патч (членство) — /patch
   patch_off: {
-    pl: "Funkcja patcha jest teraz wyłączona.",
+    pl: "Funkcja naszywki jest teraz wyłączona.",
     en: "The patch feature is currently disabled.",
     uk: "Функція патча зараз вимкнена.",
   },
-  patch_intro: {
-    pl: "🎖 Patch RX Team = członkostwo.\nZ patchem: 100% punktów i możliwość kupowania rang (Recruit → Scout → Squad Leader → Team Leader).\nBez patcha punkty naliczają się o 15% mniej i rang kupić nie można.\nPatch jest płatny i wydawany na grze.",
-    en: "🎖 RX Team patch = membership.\nWith the patch: 100% of points and you can buy ranks (Recruit → Scout → Squad Leader → Team Leader).\nWithout it points accrue 15% lower and ranks are locked.\nThe patch is paid and handed to you at a game.",
-    uk: "🎖 Патч RX Team = членство.\nЗ патчем: 100% балів і можна купувати ранги (Recruit → Scout → Squad Leader → Team Leader).\nБез патча бали капають на 15% менше, а ранги купити не можна.\nПатч платний, видається на грі.",
-  },
-  patch_price_line: { pl: "Cena: {price} zł", en: "Price: {price} zł", uk: "Ціна: {price} zł" },
+  // Ціновий рядок — те саме формулювання, що в кабінеті на сайті (patch_price_line_site).
+  patch_price_line: { pl: "Wsparcie społeczności: {price} zł", en: "Community donation: {price} zł", uk: "Внесок на розвиток спільноти: {price} zł" },
   // Крок 2 (patchreq): детальне пояснення перед повторним підтвердженням заявки.
   patch_benefits: {
-    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwsza ranga w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Ranga w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
+    pl: "🎖 Naszywka RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt naszywki to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje naszywka:\n• Pierwsza ranga w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez naszywki nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy naszywki.\n• Ranga w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nNaszywka wydawana jest osobiście na grze.",
     en: "🎖 The RX Team patch is your membership in the community.\n\nThe patch fee is a donation toward the RX Team community (games, gear, events) — not just a payment for an item.\n\nWhat the patch gives you:\n• Your first rank in the group — Recruit (then: Scout → Squad Leader → Team Leader).\n• 100% of points for attending games and events — without the patch you earn 15% less.\n• Entry into prize raffles — we often hold them only among patch holders.\n• Your rank in the group affects your role and function as a player at milsim games.\n\nThe patch is handed to you in person at a game.",
     uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перший ранг в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Ранг в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
   },
@@ -394,32 +398,32 @@ const S: Record<string, Dict> = {
     uk: "✅ Підтвердити запит",
   },
   btn_patch_request: {
-    pl: "🎖 Złóż prośbę o patch",
+    pl: "🎖 Złóż prośbę o naszywkę",
     en: "🎖 Request the patch",
     uk: "🎖 Подати заявку на патч",
   },
   patch_status_have: {
-    pl: "✅ Masz już patch. Witaj w RX Team!",
+    pl: "✅ Masz już naszywkę. Witaj w RX Team!",
     en: "✅ You already have the patch. Welcome to RX Team!",
     uk: "✅ У тебе вже є патч. Вітаємо в RX Team!",
   },
   patch_pending: {
-    pl: "⏳ Twoja prośba o patch czeka na decyzję admina.",
+    pl: "⏳ Twoja prośba o naszywkę czeka na decyzję admina.",
     en: "⏳ Your patch request is awaiting an admin's decision.",
     uk: "⏳ Твоя заявка на патч очікує рішення адміна.",
   },
   patch_approved_waiting: {
-    pl: "✅ Prośba zatwierdzona — odbierzesz patch na najbliższej grze.",
+    pl: "✅ Prośba zatwierdzona — odbierzesz naszywkę na najbliższej grze.",
     en: "✅ Request approved — you'll get the patch at the next game.",
     uk: "✅ Заявку схвалено — отримаєш патч на найближчій грі.",
   },
   patch_request_sent: {
-    pl: "📨 Prośba o patch wysłana. Admin skontaktuje się i wyda patch na grze.",
+    pl: "📨 Prośba o naszywkę wysłana. Admin skontaktuje się i wyda naszywkę na grze.",
     en: "📨 Patch request sent. An admin will reach out and hand you the patch at a game.",
     uk: "📨 Заявку на патч надіслано. Адмін зв'яжеться і видасть патч на грі.",
   },
   patch_admin_notify: {
-    pl: "🎖 {who} prosi o patch. Zatwierdzić?",
+    pl: "🎖 {who} prosi o naszywkę. Zatwierdzić?",
     en: "🎖 {who} requests the patch. Approve?",
     uk: "🎖 {who} просить патч. Підтвердити?",
   },
@@ -429,12 +433,12 @@ const S: Record<string, Dict> = {
     uk: "Цю заявку вже оброблено.",
   },
   patch_admin_approved: {
-    pl: "✅ {who}: zatwierdzono. Po wydaniu patcha na grze naciśnij przycisk:",
+    pl: "✅ {who}: zatwierdzono. Po wydaniu naszywki na grze naciśnij przycisk:",
     en: "✅ {who}: approved. Once you hand the patch at a game, tap:",
     uk: "✅ {who}: підтверджено. Після видачі патча на грі натисни:",
   },
   patch_admin_handed: {
-    pl: "🎖 {who}: patch wydany, ranga Recruit.",
+    pl: "🎖 {who}: naszywka wydana, ranga Recruit.",
     en: "🎖 {who}: patch handed, rank Recruit.",
     uk: "🎖 {who}: патч видано, ранг Recruit.",
   },
@@ -443,17 +447,17 @@ const S: Record<string, Dict> = {
   btn_reject: { pl: "❌ Odrzuć", en: "❌ Reject", uk: "❌ Відхилити" },
   btn_handed: { pl: "🎖 Wydano na grze", en: "🎖 Handed at game", uk: "🎖 Видано на грі" },
   patch_you_approved: {
-    pl: "✅ Twoja prośba o patch zatwierdzona — odbierzesz go na najbliższej grze.",
+    pl: "✅ Twoja prośba o naszywkę zatwierdzona — odbierzesz ją na najbliższej grze.",
     en: "✅ Your patch request was approved — you'll get it at the next game.",
     uk: "✅ Твою заявку на патч схвалено — отримаєш його на найближчій грі.",
   },
   patch_you_rejected: {
-    pl: "❌ Twoja prośba o patch została odrzucona. Napisz do admina po szczegóły.",
+    pl: "❌ Twoja prośba o naszywkę została odrzucona. Napisz do admina po szczegóły.",
     en: "❌ Your patch request was rejected. Message an admin for details.",
     uk: "❌ Твою заявку на патч відхилено. Напиши адміну за деталями.",
   },
   patch_you_handed: {
-    pl: "🎖 Patch wydany! Witaj w RX Team. Ranga: Recruit. Od teraz 100% punktów. Rangi kupisz przez /rank.",
+    pl: "🎖 Naszywka wydana! Witaj w RX Team. Ranga: Recruit. Od teraz 100% punktów. Rangi kupisz przez /rank.",
     en: "🎖 Patch handed! Welcome to RX Team. Rank: Recruit. 100% points from now on. Buy ranks via /rank.",
     uk: "🎖 Патч видано! Вітаємо в RX Team. Ранг: Recruit. Відтепер 100% балів. Ранги купуються через /rank.",
   },
@@ -475,7 +479,7 @@ const S: Record<string, Dict> = {
     uk: "🎖 Ранг: {rank} — максимальний. 💰 Баланс: {balance} б.",
   },
   rank_need_patch: {
-    pl: "🎖 Ranga: brak — potrzebny patch.\n💰 Saldo: {balance} pkt\nRangi odblokujesz po otrzymaniu patcha: /patch",
+    pl: "🎖 Ranga: brak — potrzebna naszywka.\n💰 Saldo: {balance} pkt\nRangi odblokujesz po otrzymaniu naszywki: /patch",
     en: "🎖 Rank: none — patch required.\n💰 Balance: {balance} pts\nRanks unlock once you get the patch: /patch",
     uk: "🎖 Ранг: немає — потрібен патч.\n💰 Баланс: {balance} б.\nРанги відкриються після отримання патча: /patch",
   },

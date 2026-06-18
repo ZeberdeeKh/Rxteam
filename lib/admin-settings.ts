@@ -217,15 +217,15 @@ export const VALUE_KEYS = SETTINGS_GROUPS.flatMap((g) =>
 // SETTINGS_GROUPS, але зберігається окремою дією savePatchSettings.
 export const PATCH_SETTINGS_GROUPS: SettingGroup[] = [
   {
-    title: { pl: "Patch — funkcja i ceny", en: "Patch — feature & pricing", uk: "Патч — функція і ціни" },
+    title: { pl: "Naszywka — funkcja i ceny", en: "Patch — feature & pricing", uk: "Патч — функція і ціни" },
     fields: [
-      { key: "feature_patch", type: "toggle", label: { pl: "Patch (członkostwo)", en: "Patch (membership)", uk: "Патч (членство)" } },
-      { key: "patch_price_zl", type: "text", label: { pl: "Cena patcha (zł, gotówka)", en: "Patch price (zł, cash)", uk: "Ціна патча (zł, готівка)" } },
-      { key: "no_patch_multiplier", type: "number", label: { pl: "Mnożnik bez patcha (0–1)", en: "Multiplier without patch (0–1)", uk: "Множник без патча (0–1)" } },
+      { key: "feature_patch", type: "toggle", label: { pl: "Naszywka (członkostwo)", en: "Patch (membership)", uk: "Патч (членство)" } },
+      { key: "patch_price_zl", type: "text", label: { pl: "Cena naszywki (zł, gotówka)", en: "Patch price (zł, cash)", uk: "Ціна патча (zł, готівка)" } },
+      { key: "no_patch_multiplier", type: "number", label: { pl: "Mnożnik bez naszywki (0–1)", en: "Multiplier without patch (0–1)", uk: "Множник без патча (0–1)" } },
     ],
   },
   {
-    title: { pl: "Tekst objaśnienia patcha", en: "Patch explainer text", uk: "Текст-пояснення патча" },
+    title: { pl: "Tekst objaśnienia naszywki", en: "Patch explainer text", uk: "Текст-пояснення патча" },
     fields: [
       { key: "patch_msg_pl", type: "textarea", label: { pl: "Objaśnienie (PL)", en: "Explainer (PL)", uk: "Пояснення (PL)" } },
       { key: "patch_msg_en", type: "textarea", label: { pl: "Objaśnienie (EN)", en: "Explainer (EN)", uk: "Пояснення (EN)" } },
