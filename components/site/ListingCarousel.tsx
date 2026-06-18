@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type Lang } from "@/lib/site-i18n";
 import ListingCard from "./ListingCard";
 
@@ -15,12 +15,27 @@ type Listing = {
 
 // Горизонтальна карусель повноцінних карток (для тізера на лендінгу). Свайп на мобілці,
 // стрілки ‹ › на десктопі (scroll-snap). Картка — той самий ListingCard, що й у барахолці.
+// Стрілки показуємо ЛИШЕ коли стрічка переповнена (мало оголошень → стрілок немає).
 export default function ListingCarousel({ listings, lang }: { listings: Listing[]; lang: Lang }) {
   const ref = useRef<HTMLDivElement>(null);
+  const [overflow, setOverflow] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const check = () => setOverflow(el.scrollWidth > el.clientWidth + 4);
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [listings.length]);
+
   const scroll = (dir: number) => {
     const el = ref.current;
     if (el) el.scrollBy({ left: dir * Math.round(el.clientWidth * 0.85), behavior: "smooth" });
   };
+
+  const arrow = "absolute top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center border border-gray-300 bg-white text-lg text-gray-700 shadow-sm transition hover:bg-gray-50 sm:flex";
 
   return (
     <div className="relative">
@@ -32,22 +47,16 @@ export default function ListingCarousel({ listings, lang }: { listings: Listing[
         ))}
       </div>
 
-      <button
-        type="button"
-        aria-label="‹"
-        onClick={() => scroll(-1)}
-        className="absolute -left-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center border border-gray-300 bg-white text-lg text-gray-700 shadow-sm transition hover:bg-gray-50 sm:flex"
-      >
-        ‹
-      </button>
-      <button
-        type="button"
-        aria-label="›"
-        onClick={() => scroll(1)}
-        className="absolute -right-3 top-1/2 hidden h-9 w-9 -translate-y-1/2 items-center justify-center border border-gray-300 bg-white text-lg text-gray-700 shadow-sm transition hover:bg-gray-50 sm:flex"
-      >
-        ›
-      </button>
+      {overflow && (
+        <>
+          <button type="button" aria-label="‹" onClick={() => scroll(-1)} className={`${arrow} -left-3`}>
+            ‹
+          </button>
+          <button type="button" aria-label="›" onClick={() => scroll(1)} className={`${arrow} -right-3`}>
+            ›
+          </button>
+        </>
+      )}
     </div>
   );
 }
