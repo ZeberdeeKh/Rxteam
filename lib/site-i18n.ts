@@ -58,6 +58,8 @@ const SITE: Record<string, Dict> = {
   marketplace_expand: { pl: "Rozwiń", en: "Show more", uk: "Розгорнути" },
   marketplace_collapse: { pl: "Zwiń", en: "Show less", uk: "Згорнути" },
   home_cta_marketplace: { pl: "Zobacz więcej", en: "See more", uk: "Дивитись більше" },
+  marketplace_page_prev: { pl: "Poprzednia strona", en: "Previous page", uk: "Попередня сторінка" },
+  marketplace_page_next: { pl: "Następna strona", en: "Next page", uk: "Наступна сторінка" },
 
   // ── Адмінка: барахолка ──
   adm_nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },

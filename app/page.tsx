@@ -5,7 +5,7 @@ import {
   getNextGame,
   getRankingWithAchievements,
   getGalleryPhotos,
-  getMarketplaceListings,
+  getMarketplaceTeaser,
 } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
@@ -13,7 +13,7 @@ import { ui, GLYPH, Reveal, btn } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
-import ListingCard from "@/components/site/ListingCard";
+import ListingCarousel from "@/components/site/ListingCarousel";
 
 // Лендінг (публічний, одна сторінка): «Про нас» + галерея + герой + найближча гра + рейтинг + соцмережі (внизу).
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
@@ -24,7 +24,7 @@ export default async function Home() {
     getRankingWithAchievements(10),
     getAllSettings(),
     getGalleryPhotos(60),
-    getMarketplaceListings(3),
+    getMarketplaceTeaser(7),
   ]);
   const showGallery = settings.feature_gallery !== "false" && galleryPhotos.length > 0;
   const showMarket = settings.feature_marketplace !== "false" && market.length > 0;
@@ -123,10 +123,8 @@ export default async function Home() {
         <Reveal>
           <section>
             <h2 className={ui.sectionTitle}>{st(lang, "nav_marketplace")}</h2>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {market.map((l) => (
-                <ListingCard key={l.id} listing={l} lang={lang} />
-              ))}
+            <div className="mt-3">
+              <ListingCarousel listings={market} lang={lang} />
             </div>
             <div className="mt-4 text-center">
               <Link href="/marketplace" className={btn("outline")}>

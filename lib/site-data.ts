@@ -441,7 +441,11 @@ export async function getMarketplaceListings(limit = 60): Promise<MarketplaceLis
     .eq("status", "approved")
     .order("created_at", { ascending: false })
     .limit(limit);
-  return (data ?? []).map((r: any) => ({
+  return (data ?? []).map(mapListing);
+}
+
+function mapListing(r: any): MarketplaceListing {
+  return {
     id: r.id,
     photos: (r.photo_urls ?? []) as string[],
     description: r.description ?? null,
@@ -449,7 +453,40 @@ export async function getMarketplaceListings(limit = 60): Promise<MarketplaceLis
     sellerUsername: r.seller_tg_username ?? null,
     sellerDisplay: r.seller_display ?? null,
     createdAt: r.created_at,
-  }));
+  };
+}
+
+// Випадкові N схвалених оголошень — для тізера на лендінгу (карусель).
+export async function getMarketplaceTeaser(count = 7): Promise<MarketplaceListing[]> {
+  const { data } = await supabase
+    .from("marketplace_listings")
+    .select("id, photo_urls, description, price, seller_tg_username, seller_display, created_at")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(60);
+  const rows = (data ?? []).map(mapListing);
+  for (let i = rows.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [rows[i], rows[j]] = [rows[j], rows[i]];
+  }
+  return rows.slice(0, count);
+}
+
+// Сторінка барахолки з пагінацією (за замовчуванням 25 на сторінку) + загальна кількість.
+export async function getMarketplacePage(
+  page = 1,
+  perPage = 25,
+): Promise<{ listings: MarketplaceListing[]; total: number }> {
+  const from = (Math.max(1, page) - 1) * perPage;
+  const { data, count } = await supabase
+    .from("marketplace_listings")
+    .select("id, photo_urls, description, price, seller_tg_username, seller_display, created_at", {
+      count: "exact",
+    })
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .range(from, from + perPage - 1);
+  return { listings: (data ?? []).map(mapListing), total: count ?? 0 };
 }
 
 // Здобуті ачівки гравця (з назвами).
