@@ -50,7 +50,7 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
 
   return (
     <>
-      <article className={`flex flex-col ${ui.card}`}>
+      <article className={`flex h-full flex-col ${ui.card}`}>
         {photos[active] && (
           <button type="button" onClick={() => setIdx(active)} className="block w-full focus:outline-none">
             {/* eslint-disable-next-line @next/next/no-img-element */}
