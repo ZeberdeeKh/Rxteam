@@ -1,11 +1,11 @@
 import { supabase } from "./supabase";
 import { getSetting, featureEnabled } from "./settings";
 
-// Звання за порядком зростання (вхідне — Recruit, дається з патчем).
+// Ранги за порядком зростання (вхідний — Recruit, дається з патчем).
 export const RANKS = ["Recruit", "Scout", "Squad Leader", "Team Leader"] as const;
 export type Rank = (typeof RANKS)[number];
 
-// Ключі вартості наступних звань (Recruit — безкоштовне з патчем).
+// Ключі вартості наступних рангів (Recruit — безкоштовний з патчем).
 export const RANK_COST_KEY: Record<string, string> = {
   Scout: "rank_cost_scout",
   "Squad Leader": "rank_cost_squad",
@@ -26,7 +26,7 @@ export async function getPointValue(key: string, fallback: number): Promise<numb
   return Number.isFinite(n) ? n : fallback;
 }
 
-// Наступне звання після поточного (null якщо вже максимум).
+// Наступний ранг після поточного (null якщо вже максимум).
 export function nextRank(current: string | null): Rank | null {
   const idx = current ? RANKS.indexOf(current as Rank) : -1;
   return idx + 1 < RANKS.length ? RANKS[idx + 1] : null;

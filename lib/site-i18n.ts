@@ -149,9 +149,9 @@ const SITE: Record<string, Dict> = {
   // ── Лінк Telegram ──
   link_title: { pl: "Połącz z Telegramem", en: "Link Telegram", uk: "Прив'язати Telegram" },
   link_intro: {
-    pl: "Masz już profil w bocie? Połącz go, aby mieć wspólną historię, punkty i stopień.",
+    pl: "Masz już profil w bocie? Połącz go, aby mieć wspólną historię, punkty i rangę.",
     en: "Already have a profile in the bot? Link it to share history, points and rank.",
-    uk: "Уже маєш профіль у боті? Прив'яжи його, щоб історія, бали й звання були спільні.",
+    uk: "Уже маєш профіль у боті? Прив'яжи його, щоб історія, бали й ранги були спільні.",
   },
   link_how: {
     pl: "W bocie wpisz /linksite, skopiuj kod i wklej go poniżej (ważny 15 min).",
@@ -180,7 +180,7 @@ const SITE: Record<string, Dict> = {
 
   // ── Профіль (мінімум для 6.0) ──
   prof_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
-  prof_rank: { pl: "Stopień", en: "Rank", uk: "Звання" },
+  prof_rank: { pl: "Ranga", en: "Rank", uk: "Ранг" },
   prof_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
   prof_balance: { pl: "Saldo", en: "Balance", uk: "Баланс" },
   prof_games: { pl: "Rozegrane gry", en: "Games played", uk: "Зіграно ігор" },
@@ -200,9 +200,9 @@ const SITE: Record<string, Dict> = {
   // Бокова панель із поясненням патча (донат, бонуси) + повторне підтвердження.
   patch_drawer_title: { pl: "Prośba o patch", en: "Patch request", uk: "Запит на патч" },
   patch_benefits_site: {
-    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwszy stopień w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Stopień w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
+    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwsza ranga w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Ranga w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
     en: "🎖 The RX Team patch is your membership in the community.\n\nThe patch fee is a donation toward the RX Team community (games, gear, events) — not just a payment for an item.\n\nWhat the patch gives you:\n• Your first rank in the group — Recruit (then: Scout → Squad Leader → Team Leader).\n• 100% of points for attending games and events — without the patch you earn 15% less.\n• Entry into prize raffles — we often hold them only among patch holders.\n• Your rank in the group affects your role and function as a player at milsim games.\n\nThe patch is handed to you in person at a game.",
-    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перше звання в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Звання в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
+    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перший ранг в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Ранг в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
   },
   patch_price_line_site: {
     pl: "Wsparcie społeczności: {price} zł",
@@ -309,7 +309,7 @@ const SITE: Record<string, Dict> = {
   },
   ranking_col_pos: { pl: "#", en: "#", uk: "#" },
   ranking_col_player: { pl: "Gracz", en: "Player", uk: "Гравець" },
-  ranking_col_rank: { pl: "Stopień", en: "Rank", uk: "Звання" },
+  ranking_col_rank: { pl: "Ranga", en: "Rank", uk: "Ранг" },
   ranking_col_earned: { pl: "Zarobione", en: "Earned", uk: "Зароблено" },
   ranking_col_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   ranking_col_ach: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" },
@@ -483,7 +483,7 @@ const SITE: Record<string, Dict> = {
   reason_noshow: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },
   reason_friend: { pl: "Przyprowadzony znajomy", en: "Referred friend", uk: "Приведений друг" },
   reason_achievement: { pl: "Osiągnięcie", en: "Achievement", uk: "Ачівка" },
-  reason_rank_purchase: { pl: "Zakup stopnia", en: "Rank purchase", uk: "Купівля звання" },
+  reason_rank_purchase: { pl: "Zakup rangi", en: "Rank purchase", uk: "Купівля рангу" },
   reason_purchase: { pl: "Zakup w sklepie", en: "Shop purchase", uk: "Купівля в магазині" },
   reason_manual: { pl: "Korekta admina", en: "Admin adjustment", uk: "Корекція адміна" },
 
@@ -491,9 +491,9 @@ const SITE: Record<string, Dict> = {
   nav_shop: { pl: "Sklep", en: "Shop", uk: "Магазин" },
   shop_title: { pl: "Sklep za punkty", en: "Points shop", uk: "Магазин за бали" },
   shop_intro: {
-    pl: "Zdobywaj punkty na grach, eventach i za znajomych zaproszonych przez link polecający — a tutaj wymieniaj je na bonusy i stopnie.",
+    pl: "Zdobywaj punkty na grach, eventach i za znajomych zaproszonych przez link polecający — a tutaj wymieniaj je na bonusy i rangi.",
     en: "Earn points at games, special events and for friends invited via your referral link — then spend them here on perks and ranks.",
-    uk: "Заробляй бали на іграх, спеціальних подіях і за друзів, запрошених через реф-посилання, — а тут обмінюй їх на корисні бонуси та звання.",
+    uk: "Заробляй бали на іграх, спеціальних подіях і за друзів, запрошених через реф-посилання, — а тут обмінюй їх на корисні бонуси та ранги.",
   },
   shop_items_title: { pl: "Bonusy", en: "Perks", uk: "Бонуси" },
   shop_balance: { pl: "Twoje saldo", en: "Your balance", uk: "Твій баланс" },
@@ -536,12 +536,12 @@ const SITE: Record<string, Dict> = {
   },
   shop_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
 
-  // ── Звання в магазині (купівля наступного — правила як у боті /rank) ──
-  shop_ranks_title: { pl: "Stopnie", en: "Ranks", uk: "Звання" },
+  // ── Ранги в магазині (купівля наступного — правила як у боті /rank) ──
+  shop_ranks_title: { pl: "Rangi", en: "Ranks", uk: "Ранги" },
   shop_ranks_intro: {
-    pl: "Kupuj kolejne stopnie za punkty. Wymagany patch; stopnie zdobywasz po kolei.",
+    pl: "Kupuj kolejne rangi za punkty. Wymagany patch; rangi zdobywasz po kolei.",
     en: "Buy higher ranks with points. Patch required; ranks unlock one by one.",
-    uk: "Купуй вищі звання за бали. Потрібен патч; звання відкриваються по черзі.",
+    uk: "Купуй вищі ранги за бали. Потрібен патч; ранги відкриваються по черзі.",
   },
   shop_rank_free: {
     pl: "W zestawie z patchem",
@@ -551,34 +551,34 @@ const SITE: Record<string, Dict> = {
   shop_rank_current: { pl: "Aktualny", en: "Current", uk: "Поточне" },
   shop_rank_owned: { pl: "Zdobyty", en: "Owned", uk: "Отримано" },
   shop_rank_need_patch: {
-    pl: "Stopnie są dostępne po odebraniu patcha (członkostwo).",
+    pl: "Rangi są dostępne po odebraniu patcha (członkostwo).",
     en: "Ranks unlock once you receive the patch (membership).",
-    uk: "Звання доступні після отримання патча (членство).",
+    uk: "Ранги доступні після отримання патча (членство).",
   },
   shop_rank_bought_ok: {
-    pl: "🎉 Gratulacje! Masz nowy stopień.",
+    pl: "🎉 Gratulacje! Masz nową rangę.",
     en: "🎉 Congrats! You have a new rank.",
-    uk: "🎉 Вітаємо! У тебе нове звання.",
+    uk: "🎉 Вітаємо! У тебе новий ранг.",
   },
   shop_err_rank_need_patch: {
-    pl: "Najpierw odbierz patch, aby kupować stopnie.",
+    pl: "Najpierw odbierz patch, aby kupować rangi.",
     en: "Get the patch first to buy ranks.",
-    uk: "Спершу отримай патч, щоб купувати звання.",
+    uk: "Спершу отримай патч, щоб купувати ранги.",
   },
   shop_err_rank_max: {
-    pl: "Masz już najwyższy stopień.",
+    pl: "Masz już najwyższą rangę.",
     en: "You already have the top rank.",
-    uk: "У тебе вже максимальне звання.",
+    uk: "У тебе вже максимальний ранг.",
   },
   shop_err_rank_balance: {
-    pl: "Za mało punktów na ten stopień.",
+    pl: "Za mało punktów na tę rangę.",
     en: "Not enough points for this rank.",
-    uk: "Недостатньо балів на це звання.",
+    uk: "Недостатньо балів на цей ранг.",
   },
   shop_err_rank_changed: {
-    pl: "Stopień się zmienił — odśwież stronę.",
+    pl: "Ranga się zmieniła — odśwież stronę.",
     en: "Your rank changed — refresh the page.",
-    uk: "Звання змінилося — онови сторінку.",
+    uk: "Ранг змінився — онови сторінку.",
   },
   shop_err_rank_econ_off: {
     pl: "Ekonomia punktów jest wyłączona.",

@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Імпорт гравців із scripts/group-members.csv у таблицю players (Supabase).
 // НЕ деплоїться (виключено в tsconfig). Telegram НЕ потрібен — читає вже готовий CSV.
-// Додає ТІЛЬКИ нових (за tg_user_id); наявних гравців (позивні/бали/звання) не чіпає.
+// Додає ТІЛЬКИ нових (за tg_user_id); наявних гравців (позивні/бали/ранги) не чіпає.
 //
 // Запуск:  npx tsx scripts/import-members-csv.ts
 // (SUPABASE_URL / SUPABASE_SECRET_KEY беруться з .env автоматично)

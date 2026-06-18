@@ -11,7 +11,7 @@ create table if not exists players (
   lang          text default 'uk',        -- обрана мова інтерфейсу
   games_played  int  not null default 0,  -- реєстрація + чек-ін
   points_earned int  not null default 0,  -- «зароблено всього» (рейтинг, тільки вгору)
-  points_balance int not null default 0,  -- доступний баланс (витрачається на звання/бонуси)
+  points_balance int not null default 0,  -- доступний баланс (витрачається на ранги/бонуси)
   has_patch     boolean not null default false,
   rank          text,
   is_admin      boolean not null default false,

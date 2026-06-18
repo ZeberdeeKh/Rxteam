@@ -51,7 +51,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
   ]);
   const balance = player?.points_balance ?? 0;
 
-  // Звання: ладдер з цінами + поточне/наступне (правила як у боті /rank).
+  // Ранги: ладдер з цінами + поточний/наступний (правила як у боті /rank).
   const hasPatch = !!player?.has_patch;
   const current = player?.rank ?? "Recruit";
   const currentIdx = hasPatch ? RANKS.indexOf(current as Rank) : -1;
@@ -64,7 +64,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       )
     : [];
 
-  // Єдина картка-плитка для будь-якого товару (бонус або звання): назва зверху,
+  // Єдина картка-плитка для будь-якого товару (бонус або ранг): назва зверху,
   // підпис, а внизу — рядок «ціна + дія/статус». Усі товари виглядають однаково.
   function ShopTile({
     title,
@@ -143,7 +143,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         )}
       </section>
 
-      {/* Група: Звання (купівля наступного, правила як у боті /rank) */}
+      {/* Група: Ранги (купівля наступного, правила як у боті /rank) */}
       {economyOn && (
         <section className="space-y-3">
           <h2 className={ui.sectionTitle}>{st(lang, "shop_ranks_title")}</h2>

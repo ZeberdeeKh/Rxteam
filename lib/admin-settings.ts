@@ -106,7 +106,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
     ],
   },
   {
-    title: { pl: "Stopnie i patch", en: "Ranks and patch", uk: "Звання і патч" },
+    title: { pl: "Rangi i patch", en: "Ranks and patch", uk: "Ранги і патч" },
     fields: [
       { key: "rank_cost_scout", type: "number", label: { pl: "Koszt: Scout", en: "Cost: Scout", uk: "Ціна: Scout" } },
       { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },

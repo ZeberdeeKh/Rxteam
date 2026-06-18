@@ -1,6 +1,6 @@
 # DOCS_BOT — Telegram-бот
 
-Telegram-бот RX Team побудований на **grammY** і працює через webhook (`app/api/bot/route.ts`). Він виконує три головні ролі: **анти-бот шилд** (капча при заявці на вступ до групи), **ігровий цикл** гравця (ігри, чек-ін, профіль, реферали, нашивка, звання) та **зв'язок сайт↔Telegram** (`/linksite` + cookie `rx_tg_session`). Уся бізнес-логіка ходить у БД через service-role-клієнт `lib/supabase` (RLS вимкнено — див. `architecture/adr/0018-rls-off-server-side-authz.md`). Цей документ описує саме бот-підсистему; серверні дії та cron — у DOCS_BACKEND.md, схема таблиць — у DOCS_DATABASE.md, сесії й вхід — у DOCS_AUTH.md.
+Telegram-бот RX Team побудований на **grammY** і працює через webhook (`app/api/bot/route.ts`). Він виконує три головні ролі: **анти-бот шилд** (капча при заявці на вступ до групи), **ігровий цикл** гравця (ігри, чек-ін, профіль, реферали, нашивка, ранги) та **зв'язок сайт↔Telegram** (`/linksite` + cookie `rx_tg_session`). Уся бізнес-логіка ходить у БД через service-role-клієнт `lib/supabase` (RLS вимкнено — див. `architecture/adr/0018-rls-off-server-side-authz.md`). Цей документ описує саме бот-підсистему; серверні дії та cron — у DOCS_BACKEND.md, схема таблиць — у DOCS_DATABASE.md, сесії й вхід — у DOCS_AUTH.md.
 
 ## Архітектура та точки входу
 
@@ -59,12 +59,12 @@ BASE_URL=https://<app>.vercel.app BOT_TOKEN=... WEBHOOK_SECRET=... npm run set-w
 | Команда | Рядок | Призначення |
 |---------|-------|-------------|
 | `/start` | `lib/bot.ts:203` | Старт; розбирає payload `g<id>` (картка гри) і `ref<id>` (реферал) |
-| `/profile` | `lib/bot.ts:773` | Профіль: callsign, звання, ігри, бали, надійність |
+| `/profile` | `lib/bot.ts:773` | Профіль: callsign, ранг, ігри, бали, надійність |
 | `/games` | `lib/bot.ts:258` | Список найближчих анонсованих ігор (записатись/виписатись) |
 | `/checkin` | `lib/bot.ts:1042` | Чек-ін на гру (геолокація у вікні `checkin_from..checkin_to`) |
 | `/top` | `lib/bot.ts:800` | Топ-10 гравців + власне місце |
 | `/patch` | `lib/bot.ts:1193` | Запит на членську нашивку |
-| `/rank` | `lib/bot.ts:1369` | Поточне звання + купівля наступного (`economy`) |
+| `/rank` | `lib/bot.ts:1369` | Поточний ранг + купівля наступного (`economy`) |
 | `/ref` | `lib/bot.ts:220` | Реферальне посилання `?start=ref<id>` (потрібна ≥1 зіграна гра) |
 | `/drivers` | `lib/bot.ts:300` | Список водіїв (carpool) на гру |
 | `/myride` | `lib/bot.ts:589` | Керування власною поїздкою (водій) |
@@ -189,7 +189,7 @@ const answer = a + b;                           // правильна відпо
 | `lottery` | `/lottery` | `lib/bot.ts:406` |
 | `voting` | `/poll` | `lib/bot.ts:506` |
 | `patch` | `/patch` | `lib/bot.ts:1197` |
-| `economy` | купівля звання (`/rank`) | `lib/bot.ts:1373`, `1403` |
+| `economy` | купівля рангу (`/rank`) | `lib/bot.ts:1373`, `1403` |
 
 Налаштовуються в адмінці (`saveSettings`, perm master) — див. DOCS_BACKEND.md.
 

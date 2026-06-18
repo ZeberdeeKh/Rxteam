@@ -234,7 +234,7 @@ Key/value-store для feature-флагів (`feature_*`), параметрів 
 | `delta` | int NN | фактично (вже з множником 85% для заробітку) |
 | `reason` | text NN | `attend\|noshow\|friend\|achievement\|rank_purchase\|manual\|purchase` |
 | `game_id` | bigint FK→`games` ON DELETE SET NULL | |
-| `meta` | text | код ачівки/звання тощо |
+| `meta` | text | код ачівки/рангу тощо |
 | `created_at` | timestamptz | |
 
 Індекс по `player_id`. `no_patch_multiplier=0.85` (settings) застосовує 85%-й множник заробітку для гравців без патча (`supabase/etap3.sql:67`).

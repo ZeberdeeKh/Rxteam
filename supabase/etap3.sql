@@ -1,4 +1,4 @@
--- RX Team — Етап 3 (економіка: бали, патч, звання, ачівки)
+-- RX Team — Етап 3 (економіка: бали, патч, ранги, ачівки)
 -- Виконати в Supabase → SQL Editor ПІСЛЯ etap2.sql / etap2b.sql.
 -- Поля players.points_earned / points_balance / has_patch / rank уже є з etap2.sql.
 
@@ -9,7 +9,7 @@ create table if not exists point_log (
   delta      int  not null,                       -- фактично (вже з множником 85% для заробітку)
   reason     text not null,                       -- attend|noshow|friend|achievement|rank_purchase|manual
   game_id    bigint references games(id) on delete set null,
-  meta       text,                                -- код ачівки / звання тощо
+  meta       text,                                -- код ачівки / рангу тощо
   created_at timestamptz default now()
 );
 create index if not exists idx_point_log_player on point_log (player_id);

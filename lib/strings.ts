@@ -5,9 +5,9 @@ type Dict = Record<Lang, string>;
 // Переклади інтерфейсу (показуються мовою гравця). Підтримують {плейсхолдери}.
 const S: Record<string, Dict> = {
   start: {
-    pl: "🪖 Cześć, operatorze! To bot drużyny RX Team — twój sztab do gier ASG.\n\nCo potrafi bot:\n• 📅 Ogłoszenia gier trafiają na grupę. Tutaj, w bocie, zapisujesz się na grę i widzisz, kto jedzie.\n• ✅ Na miejscu robisz check-in po geolokalizacji — i dostajesz punkty za udział.\n• ⭐ Za punkty pniesz się w rankingu najlepszych graczy.\n• 🚗 Podwozisz innych albo szukasz miejsca w aucie (carpool).\n\n🌐 Więcej funkcji znajdziesz na naszej stronie rxteam.pl — zalogujesz się do niej przez Telegram.\n\nKomendy menu:\n/profile — twój profil: stopień, gry, punkty, niezawodność\n/games — nadchodzące gry (zapis / wypis)\n/checkin — check-in na grze (po geolokalizacji)\n/top — najlepsi gracze\n/ref — link polecający (zaproś znajomego)\n/drivers — kierowcy na grę\n/myride — zarządzanie swoim przejazdem (dla kierowców)\n/rules — zasady / FAQ\n/lang — zmień język\n/cancel — anuluj bieżące działanie\n\nPytania? Wpisz /rules. Powodzenia na polu! 🎯",
+    pl: "🪖 Cześć, operatorze! To bot drużyny RX Team — twój sztab do gier ASG.\n\nCo potrafi bot:\n• 📅 Ogłoszenia gier trafiają na grupę. Tutaj, w bocie, zapisujesz się na grę i widzisz, kto jedzie.\n• ✅ Na miejscu robisz check-in po geolokalizacji — i dostajesz punkty za udział.\n• ⭐ Za punkty pniesz się w rankingu najlepszych graczy.\n• 🚗 Podwozisz innych albo szukasz miejsca w aucie (carpool).\n\n🌐 Więcej funkcji znajdziesz na naszej stronie rxteam.pl — zalogujesz się do niej przez Telegram.\n\nKomendy menu:\n/profile — twój profil: ranga, gry, punkty, niezawodność\n/games — nadchodzące gry (zapis / wypis)\n/checkin — check-in na grze (po geolokalizacji)\n/top — najlepsi gracze\n/ref — link polecający (zaproś znajomego)\n/drivers — kierowcy na grę\n/myride — zarządzanie swoim przejazdem (dla kierowców)\n/rules — zasady / FAQ\n/lang — zmień język\n/cancel — anuluj bieżące działanie\n\nPytania? Wpisz /rules. Powodzenia na polu! 🎯",
     en: "🪖 Hey, operator! This is the RX Team bot — your HQ for ASG games.\n\nWhat the bot does:\n• 📅 Game announcements land in the group. Here in the bot you sign up for a game and see who's going.\n• ✅ On site you check in by geolocation — and earn points for attending.\n• ⭐ Points move you up the leaderboard.\n• 🚗 Offer a ride or grab a seat in someone's car (carpool).\n\n🌐 More features are on our site rxteam.pl — you can log in to it through Telegram.\n\nMenu commands:\n/profile — your profile: rank, games, points, reliability\n/games — upcoming games (sign up / withdraw)\n/checkin — check in at a game (by geolocation)\n/top — top players\n/ref — referral link (invite a friend)\n/drivers — drivers for a game\n/myride — manage your ride (for drivers)\n/rules — rules / FAQ\n/lang — change language\n/cancel — cancel current action\n\nQuestions? Hit /rules. Good luck on the field! 🎯",
-    uk: "🪖 Вітаю, бійцю! Це бот команди RX Team — твій штаб для ASG-ігор.\n\nЩо вміє бот:\n• 📅 Анонси ігор приходять у групу. Тут, у боті, ти реєструєшся на гру й бачиш, хто їде.\n• ✅ На місці робиш чек-ін за геолокацією — і отримуєш бали за участь.\n• ⭐ За бали ростеш у топі найкращих гравців.\n• 🚗 Підвозиш інших або шукаєш місце в чужому авто (карпул).\n\n🌐 Більше функцій — на нашому сайті rxteam.pl, увійти в нього можна через Телеграм.\n\nКоманди меню:\n/profile — твій профіль: звання, ігри, бали, надійність\n/games — найближчі ігри (записатись / виписатись)\n/checkin — чек-ін на грі (за геолокацією)\n/top — топ гравців\n/ref — реферальне посилання (запроси друга)\n/drivers — водії на гру\n/myride — керування своєю поїздкою (для водіїв)\n/rules — правила / FAQ\n/lang — змінити мову\n/cancel — скасувати поточну дію\n\nПитання? Тисни /rules. Удачі на полі! 🎯",
+    uk: "🪖 Вітаю, бійцю! Це бот команди RX Team — твій штаб для ASG-ігор.\n\nЩо вміє бот:\n• 📅 Анонси ігор приходять у групу. Тут, у боті, ти реєструєшся на гру й бачиш, хто їде.\n• ✅ На місці робиш чек-ін за геолокацією — і отримуєш бали за участь.\n• ⭐ За бали ростеш у топі найкращих гравців.\n• 🚗 Підвозиш інших або шукаєш місце в чужому авто (карпул).\n\n🌐 Більше функцій — на нашому сайті rxteam.pl, увійти в нього можна через Телеграм.\n\nКоманди меню:\n/profile — твій профіль: ранг, ігри, бали, надійність\n/games — найближчі ігри (записатись / виписатись)\n/checkin — чек-ін на грі (за геолокацією)\n/top — топ гравців\n/ref — реферальне посилання (запроси друга)\n/drivers — водії на гру\n/myride — керування своєю поїздкою (для водіїв)\n/rules — правила / FAQ\n/lang — змінити мову\n/cancel — скасувати поточну дію\n\nПитання? Тисни /rules. Удачі на полі! 🎯",
   },
   lang_set: {
     pl: "✅ Język ustawiony: polski.",
@@ -15,9 +15,9 @@ const S: Record<string, Dict> = {
     uk: "✅ Мову встановлено: українська.",
   },
   profile: {
-    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nStopień: {rank}\nNaszywka: {patch}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
+    pl: "👤 Profil\nImię: {name}\nPseudonim: {callsign}\nTG: {tg}\nRanga: {rank}\nNaszywka: {patch}\nRozegrane gry: {games}\n⭐ Zarobione: {earned}\n💰 Saldo: {balance}\n🎯 Niezawodność: {reliability}",
     en: "👤 Profile\nName: {name}\nCallsign: {callsign}\nTG: {tg}\nRank: {rank}\nPatch: {patch}\nGames played: {games}\n⭐ Earned: {earned}\n💰 Balance: {balance}\n🎯 Reliability: {reliability}",
-    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nЗвання: {rank}\nНашивка: {patch}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
+    uk: "👤 Профіль\nІм'я: {name}\nПозивний: {callsign}\nTG: {tg}\nРанг: {rank}\nНашивка: {patch}\nЗіграно ігор: {games}\n⭐ Зароблено: {earned}\n💰 Баланс: {balance}\n🎯 Надійність: {reliability}",
   },
   no_patch_label: {
     pl: "brak (potrzebny patch)",
@@ -372,16 +372,16 @@ const S: Record<string, Dict> = {
     uk: "Функція патча зараз вимкнена.",
   },
   patch_intro: {
-    pl: "🎖 Patch RX Team = członkostwo.\nZ patchem: 100% punktów i możliwość kupowania stopni (Recruit → Scout → Squad Leader → Team Leader).\nBez patcha punkty naliczają się o 15% mniej i stopni kupić nie można.\nPatch jest płatny i wydawany na grze.",
+    pl: "🎖 Patch RX Team = członkostwo.\nZ patchem: 100% punktów i możliwość kupowania rang (Recruit → Scout → Squad Leader → Team Leader).\nBez patcha punkty naliczają się o 15% mniej i rang kupić nie można.\nPatch jest płatny i wydawany na grze.",
     en: "🎖 RX Team patch = membership.\nWith the patch: 100% of points and you can buy ranks (Recruit → Scout → Squad Leader → Team Leader).\nWithout it points accrue 15% lower and ranks are locked.\nThe patch is paid and handed to you at a game.",
-    uk: "🎖 Патч RX Team = членство.\nЗ патчем: 100% балів і можна купувати звання (Recruit → Scout → Squad Leader → Team Leader).\nБез патча бали капають на 15% менше, а звання купити не можна.\nПатч платний, видається на грі.",
+    uk: "🎖 Патч RX Team = членство.\nЗ патчем: 100% балів і можна купувати ранги (Recruit → Scout → Squad Leader → Team Leader).\nБез патча бали капають на 15% менше, а ранги купити не можна.\nПатч платний, видається на грі.",
   },
   patch_price_line: { pl: "Cena: {price} zł", en: "Price: {price} zł", uk: "Ціна: {price} zł" },
   // Крок 2 (patchreq): детальне пояснення перед повторним підтвердженням заявки.
   patch_benefits: {
-    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwszy stopień w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Stopień w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
+    pl: "🎖 Patch RX Team — to Twoje członkostwo we wspólnocie.\n\nKoszt patcha to darowizna na rozwój wspólnoty RX Team (gry, sprzęt, wydarzenia), a nie zwykła opłata za rzecz.\n\nCo daje patch:\n• Pierwsza ranga w grupie — Recruit (dalej: Scout → Squad Leader → Team Leader).\n• 100% punktów za udział w grach i wydarzeniach — bez patcha nalicza się o 15% mniej.\n• Udział w losowaniach nagród — często losujemy je tylko wśród posiadaczy patcha.\n• Ranga w grupie wpływa na Twoją rolę i funkcję jako gracza na grach milsim.\n\nPatch wydawany jest osobiście na grze.",
     en: "🎖 The RX Team patch is your membership in the community.\n\nThe patch fee is a donation toward the RX Team community (games, gear, events) — not just a payment for an item.\n\nWhat the patch gives you:\n• Your first rank in the group — Recruit (then: Scout → Squad Leader → Team Leader).\n• 100% of points for attending games and events — without the patch you earn 15% less.\n• Entry into prize raffles — we often hold them only among patch holders.\n• Your rank in the group affects your role and function as a player at milsim games.\n\nThe patch is handed to you in person at a game.",
-    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перше звання в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Звання в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
+    uk: "🎖 Патч RX Team — це твоє членство у спільноті.\n\nВартість патча — це донат на розвиток спільноти RX Team (ігри, реквізит, події), а не просто оплата за річ.\n\nЩо дає патч:\n• Перший ранг в групі — Recruit (далі: Scout → Squad Leader → Team Leader).\n• 100% балів за відвідування ігор і подій — без патча нараховується на 15% менше.\n• Участь у розіграшах призів — ми часто розігруємо їх лише серед власників патча.\n• Ранг в групі впливає на твою роль і функцію як гравця на мілсім-іграх.\n\nПатч видається особисто на грі.",
   },
   patch_confirm_hint: {
     pl: "Naciśnij „Potwierdź prośbę” jeszcze raz — wyślemy zgłoszenie do admina do zatwierdzenia.",
@@ -434,9 +434,9 @@ const S: Record<string, Dict> = {
     uk: "✅ {who}: підтверджено. Після видачі патча на грі натисни:",
   },
   patch_admin_handed: {
-    pl: "🎖 {who}: patch wydany, stopień Recruit.",
+    pl: "🎖 {who}: patch wydany, ranga Recruit.",
     en: "🎖 {who}: patch handed, rank Recruit.",
-    uk: "🎖 {who}: патч видано, звання Recruit.",
+    uk: "🎖 {who}: патч видано, ранг Recruit.",
   },
   patch_admin_rejected: { pl: "❌ {who}: odrzucono.", en: "❌ {who}: rejected.", uk: "❌ {who}: відхилено." },
   btn_approve: { pl: "✅ Zatwierdź", en: "✅ Approve", uk: "✅ Підтвердити" },
@@ -453,31 +453,31 @@ const S: Record<string, Dict> = {
     uk: "❌ Твою заявку на патч відхилено. Напиши адміну за деталями.",
   },
   patch_you_handed: {
-    pl: "🎖 Patch wydany! Witaj w RX Team. Stopień: Recruit. Od teraz 100% punktów. Stopnie kupisz przez /rank.",
+    pl: "🎖 Patch wydany! Witaj w RX Team. Ranga: Recruit. Od teraz 100% punktów. Rangi kupisz przez /rank.",
     en: "🎖 Patch handed! Welcome to RX Team. Rank: Recruit. 100% points from now on. Buy ranks via /rank.",
-    uk: "🎖 Патч видано! Вітаємо в RX Team. Звання: Recruit. Відтепер 100% балів. Звання купуються через /rank.",
+    uk: "🎖 Патч видано! Вітаємо в RX Team. Ранг: Recruit. Відтепер 100% балів. Ранги купуються через /rank.",
   },
 
-  // звання — /rank
+  // ранги — /rank
   econ_off: {
     pl: "Ekonomia jest teraz wyłączona.",
     en: "The economy is currently disabled.",
     uk: "Економіка зараз вимкнена.",
   },
   rank_with_next: {
-    pl: "🎖 Stopień: {rank}\n💰 Saldo: {balance} pkt\nNastępny: {next} — koszt {cost} pkt",
+    pl: "🎖 Ranga: {rank}\n💰 Saldo: {balance} pkt\nNastępna: {next} — koszt {cost} pkt",
     en: "🎖 Rank: {rank}\n💰 Balance: {balance} pts\nNext: {next} — cost {cost} pts",
-    uk: "🎖 Звання: {rank}\n💰 Баланс: {balance} б.\nНаступне: {next} — ціна {cost} б.",
+    uk: "🎖 Ранг: {rank}\n💰 Баланс: {balance} б.\nНаступний: {next} — ціна {cost} б.",
   },
   rank_max: {
-    pl: "🎖 Stopień: {rank} — maksymalny. 💰 Saldo: {balance} pkt",
+    pl: "🎖 Ranga: {rank} — maksymalna. 💰 Saldo: {balance} pkt",
     en: "🎖 Rank: {rank} — top rank. 💰 Balance: {balance} pts",
-    uk: "🎖 Звання: {rank} — максимальне. 💰 Баланс: {balance} б.",
+    uk: "🎖 Ранг: {rank} — максимальний. 💰 Баланс: {balance} б.",
   },
   rank_need_patch: {
-    pl: "🎖 Stopień: brak — potrzebny patch.\n💰 Saldo: {balance} pkt\nStopnie odblokujesz po otrzymaniu patcha: /patch",
+    pl: "🎖 Ranga: brak — potrzebny patch.\n💰 Saldo: {balance} pkt\nRangi odblokujesz po otrzymaniu patcha: /patch",
     en: "🎖 Rank: none — patch required.\n💰 Balance: {balance} pts\nRanks unlock once you get the patch: /patch",
-    uk: "🎖 Звання: немає — потрібен патч.\n💰 Баланс: {balance} б.\nЗвання відкриються після отримання патча: /patch",
+    uk: "🎖 Ранг: немає — потрібен патч.\n💰 Баланс: {balance} б.\nРанги відкриються після отримання патча: /patch",
   },
   btn_buy_rank: {
     pl: "⬆️ Kup: {next} ({cost})",
@@ -485,14 +485,14 @@ const S: Record<string, Dict> = {
     uk: "⬆️ Купити: {next} ({cost})",
   },
   rank_not_enough: {
-    pl: "Brakuje {need} pkt do stopnia {next}.",
+    pl: "Brakuje {need} pkt do rangi {next}.",
     en: "You need {need} more pts for {next}.",
-    uk: "Бракує {need} б. до звання {next}.",
+    uk: "Бракує {need} б. до рангу {next}.",
   },
   rank_bought: {
-    pl: "🎉 Gratulacje! Nowy stopień: {rank}. 💰 Saldo: {balance} pkt",
+    pl: "🎉 Gratulacje! Nowa ranga: {rank}. 💰 Saldo: {balance} pkt",
     en: "🎉 Congrats! New rank: {rank}. 💰 Balance: {balance} pts",
-    uk: "🎉 Вітаємо! Нове звання: {rank}. 💰 Баланс: {balance} б.",
+    uk: "🎉 Вітаємо! Новий ранг: {rank}. 💰 Баланс: {balance} б.",
   },
 
   // ачівки

@@ -22,7 +22,7 @@
 // ── Поведінка ──
 //   • за замовчуванням DRY RUN: лише читає учасників і пише scripts/group-members.csv;
 //   • з WRITE_DB=1 — ДОДАЄ в таблицю players ТІЛЬКИ нових (за tg_user_id),
-//     наявних гравців (їх позивні/бали/звання) не чіпає.
+//     наявних гравців (їх позивні/бали/ранги) не чіпає.
 
 import { TelegramClient } from "telegram";
 import { StringSession } from "telegram/sessions";
