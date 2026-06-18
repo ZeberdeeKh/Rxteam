@@ -76,11 +76,9 @@ const SITE: Record<string, Dict> = {
 
   // 1) Правила гри — безпека, чесна гра, спорядження.
   faq_game_q: { pl: "Zasady gry", en: "Game rules", uk: "Правила гри" },
-  faq_game_a: {
-    pl: '🥽 Ochrona oczu OBOWIĄZKOWA przez całą grę.\n🚩 "Trafiony" — podnosisz rękę / czerwoną szmatkę i idziesz do respawnu.\n🤝 Fair play — zaliczaj trafienia.\n🎒 Zabierz: replikę + akumulator/gaz, kulki, ochronę oczu/twarzy, ubranie na pogodę, wodę.\n🆕 Nie masz sprzętu? Jest wypożyczalnia — zaznacz przy rejestracji w bocie.',
-    en: '🥽 Eye protection is MANDATORY for the whole game.\n🚩 "Hit" — raise your hand / red rag and walk to respawn.\n🤝 Fair play — call your hits.\n🎒 Bring: replica + battery/gas, BBs, eye/face protection, weather-appropriate clothes, water.\n🆕 No gear? Rental is available — mark it during registration in the bot.',
-    uk: '🥽 Захист очей ОБОВ\'ЯЗКОВИЙ протягом усієї гри.\n🚩 "Поранений" — піднімаєш руку / червону ганчірку і йдеш у респ.\n🤝 Чесна гра — зараховуй влучання.\n🎒 Візьми: привід + акумулятор/газ, кулі, захист очей/обличчя, одяг по погоді, воду.\n🆕 Немає спорядження? Є оренда — познач при реєстрації в боті.',
-  },
+  // УВАГА: тексти відповідей «Правила гри» та «Telegram» більше НЕ зберігаються тут.
+  // RulesFaq бере їх із settings.faq_<lang> — єдине джерело з ботом (/rules).
+  // Редагувати в Settings → «Правила / FAQ», не в коді. Тут лишаються лише заголовки.
 
   // 2) Ліміти потужності — значення per-replica підставляються з settings (RulesFaq).
   faq_limits_q: { pl: "Limity mocy", en: "Power limits", uk: "Ліміти потужності" },
@@ -101,11 +99,8 @@ const SITE: Record<string, Dict> = {
     en: "Telegram communication rules",
     uk: "Правила спілкування в Telegram",
   },
-  faq_tg_a: {
-    pl: "💬 Zalew — luźny czat off-topic. Bez spamu i reklam.\n\n🛒 Kupię/Sprzedam (Giełda) — ZDJĘCIE + opis (cena, stan, kontakt). Chcesz, by ogłoszenie trafiło na stronę RX Team? Dodaj #promo w opisie i miej naszywkę → po akceptacji admina ląduje ZA DARMO na Giełdzie na 30 dni. Bez naszywki — odmowa.\n\n📣 Zapowiedzi gier — TYLKO bot, posty graczy są usuwane.\n\n📷 Zdjęcia i filmy z gier — TYLKO foto/wideo. Tekst bez mediów jest usuwany.\n\n⚠️ Łamanie zasad = automatyczne, rosnące wyciszenie.",
-    en: "💬 Flood — free off-topic chat. No spam or ads.\n\n🛒 Buy/Sell (Marketplace) — PHOTO + description (price, condition, contact). Want your listing on the RX Team site? Add #promo in the caption and have a patch → after an admin approves it, it's FREE on the Marketplace for 30 days. Without a patch — rejected.\n\n📣 Game announcements — BOT ONLY, player posts are deleted.\n\n📷 Game photos & videos — photos/videos ONLY. Text without media is deleted.\n\n⚠️ Breaking the rules = automatic, escalating mute.",
-    uk: "💬 Флуд — вільний чат не за темою. Без спаму й реклами.\n\n🛒 Куплю/Продам (Барахолка) — ФОТО + опис (ціна, стан, контакт). Хочеш, щоб оголошення потрапило на сайт RX Team? Додай #promo в опис і май патч → після схвалення адміна воно БЕЗКОШТОВНО на Барахолці 30 днів. Без патча — відмова.\n\n📣 Анонси ігор — ТІЛЬКИ бот, дописи гравців видаляються.\n\n📷 Фото та відео з ігор — ТІЛЬКИ фото/відео. Текст без медіа видаляється.\n\n⚠️ Порушення правил = автоматичне, наростаюче мовчання (mute).",
-  },
+  // faq_tg_a видалено: текст правил Telegram тепер береться з settings.faq_<lang>
+  // (друга частина бот-FAQ після роздільника «━━━»). Див. RulesFaq + getFaqText.
 
   // ── Адмінка: барахолка ──
   adm_nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },
