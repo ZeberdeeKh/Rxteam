@@ -539,6 +539,10 @@ bot.command("start", async (ctx) => {
     await showGameCard(ctx, p, Number(m[1]));
     return;
   }
+  if (payload === "games") {
+    await showGamesList(ctx, p);
+    return;
+  }
   const r = payload.match(/^ref(\d+)$/);
   if (r) {
     await bindReferral(p, Number(r[1]), !existedBefore);
@@ -584,9 +588,8 @@ bot.command("linksite", async (ctx) => {
 // ─────────────────────────── Найближчі ігри (/games) ───────────────────────────
 
 // Список усіх найближчих анонсованих ігор — записатись/виписатись з одного місця.
-bot.command("games", async (ctx) => {
-  if (ctx.chat.type !== "private") return;
-  const p = await ensurePlayer(ctx.from!);
+// Спільний для команди /games і deep-link ?start=games (кнопка під щоденним нагадуванням).
+async function showGamesList(ctx: Context, p: any) {
   const lang = p.lang as Lang;
   const cutoff = new Date(Date.now() - 3 * 3600 * 1000).toISOString();
   const { data: games } = await supabase
@@ -616,6 +619,12 @@ bot.command("games", async (ctx) => {
       .row(),
   );
   await ctx.reply(tr(lang, "games_pick"), { reply_markup: kb });
+}
+
+bot.command("games", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  await showGamesList(ctx, p);
 });
 
 bot.callbackQuery(/^games:(\d+)$/, async (ctx) => {

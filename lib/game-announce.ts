@@ -14,7 +14,7 @@ import { postChoreRun } from "./chores";
 
 // Кнопка реєстрації під анонсом (deep-link на картку гри). Єдине джерело правди —
 // імпортується і в lib/bot.ts (updateAnnouncement).
-export const REG_BTN = "✅ Записатись / Sign up";
+export const REG_BTN = "✅ Записатись / Zapisz się";
 
 export type AnnounceResult =
   | { ok: true }

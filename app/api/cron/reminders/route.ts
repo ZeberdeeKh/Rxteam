@@ -1,5 +1,7 @@
+import { InlineKeyboard } from "grammy";
 import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
+import { REG_BTN } from "@/lib/game-announce";
 import { getSetting, setSetting, featureEnabled } from "@/lib/settings";
 import { formatWhen } from "@/lib/games";
 import { processDueChoreReports } from "@/lib/chores";
@@ -130,8 +132,13 @@ async function processDailyReminder(): Promise<string> {
   const text = `${fill(tplUk, "і")}\n\n———————————————\n\n${fill(tplPl, "i")}`;
 
   const threadId = await getSetting("flood_thread_id");
+  // Кнопка «в один клік з бота»: deep-link відкриває приватний чат з ботом і показує
+  // список ігор (/start games → showGamesList). Посилання на сайт лишається в тексті.
+  const me = await bot.api.getMe();
+  const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${me.username}?start=games`);
   try {
     await bot.api.sendMessage(Number(chatId), text, {
+      reply_markup: kb,
       ...(threadId ? { message_thread_id: Number(threadId) } : {}),
     });
     await setSetting("daily_reminder_last_sent", today);
