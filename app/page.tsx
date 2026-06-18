@@ -17,7 +17,7 @@ import GalleryGrid from "@/components/site/GalleryGrid";
 import ListingCarousel from "@/components/site/ListingCarousel";
 import RulesFaq from "@/components/site/RulesFaq";
 
-// Лендінг (публічний, одна сторінка): «Про нас» + галерея + герой + найближча гра + рейтинг + соцмережі (внизу).
+// Лендінг (публічний, одна сторінка): галерея + «Про нас» + найближча гра + рейтинг + соцмережі (внизу).
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
 export default async function Home() {
   const lang = getServerLang();
@@ -53,15 +53,7 @@ export default async function Home() {
 
   return (
     <div className="space-y-10">
-      {/* Про нас (перший модуль на сторінці) */}
-      <Reveal>
-        <section>
-          <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
-          <p className={`mt-3 whitespace-pre-line leading-relaxed ${ui.body}`}>{aboutBody}</p>
-        </section>
-      </Reveal>
-
-      {/* Галерея (мозаїка, без заголовка/підпису) */}
+      {/* Галерея (мозаїка, без заголовка/підпису; перший модуль на сторінці) */}
       {showGallery && (
         <Reveal>
           <section>
@@ -74,6 +66,14 @@ export default async function Home() {
           </section>
         </Reveal>
       )}
+
+      {/* Про нас */}
+      <Reveal>
+        <section>
+          <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
+          <p className={`mt-3 whitespace-pre-line leading-relaxed ${ui.body}`}>{aboutBody}</p>
+        </section>
+      </Reveal>
 
       {/* Найближча гра */}
       <Reveal>
