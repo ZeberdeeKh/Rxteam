@@ -238,6 +238,30 @@ export async function listLocations() {
   return (data ?? []) as { id: number; name: string }[];
 }
 
+// ── FAQ (Етап 30, право faq) — список усіх питань для адмінки (активні + сховані). ──
+export type FaqItem = {
+  id: number;
+  question_uk: string;
+  question_pl: string;
+  question_en: string;
+  answer_uk: string;
+  answer_pl: string;
+  answer_en: string;
+  sort_order: number;
+  active: boolean;
+};
+
+export async function listFaqItems(): Promise<FaqItem[]> {
+  const { data } = await supabase
+    .from("faq_items")
+    .select(
+      "id, question_uk, question_pl, question_en, answer_uk, answer_pl, answer_en, sort_order, active",
+    )
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true });
+  return (data ?? []) as FaqItem[];
+}
+
 // ── Чек-лист підготовки до гри (Етап 13, майстер) ──
 export type ChoreTemplate = {
   id: number;

@@ -6,6 +6,7 @@ import {
   getRankingWithAchievements,
   getGalleryPhotos,
   getMarketplaceTeaser,
+  getFaqItems,
 } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
@@ -20,12 +21,13 @@ import RulesFaq from "@/components/site/RulesFaq";
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
 export default async function Home() {
   const lang = getServerLang();
-  const [next, ranking, settings, galleryPhotos, market] = await Promise.all([
+  const [next, ranking, settings, galleryPhotos, market, faqItems] = await Promise.all([
     getNextGame(),
     getRankingWithAchievements(10),
     getAllSettings(),
     getGalleryPhotos(60),
     getMarketplaceTeaser(7),
+    getFaqItems(),
   ]);
   const showGallery = settings.feature_gallery !== "false" && galleryPhotos.length > 0;
   const showMarket = settings.feature_marketplace !== "false" && market.length > 0;
@@ -46,13 +48,16 @@ export default async function Home() {
     : null;
   const limits = next?.limits ? buildLimits(ll, next.limits, settings) : null;
 
+  // «Про нас»: текст редагується в адмінці (settings.home_about_{lang}); порожнє → дефолт із site-i18n.
+  const aboutBody = settings[`home_about_${lang}`]?.trim() || st(lang, "home_about_body");
+
   return (
     <div className="space-y-10">
       {/* Про нас (перший модуль на сторінці) */}
       <Reveal>
         <section>
           <h2 className={ui.sectionTitle}>{st(lang, "home_about_title")}</h2>
-          <p className={`mt-3 leading-relaxed ${ui.body}`}>{st(lang, "home_about_body")}</p>
+          <p className={`mt-3 whitespace-pre-line leading-relaxed ${ui.body}`}>{aboutBody}</p>
         </section>
       </Reveal>
 
@@ -150,7 +155,7 @@ export default async function Home() {
         <section id="rules" className="scroll-mt-20">
           <h2 className={ui.sectionTitle}>{st(lang, "faq_title")}</h2>
           <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "faq_intro")}</p>
-          <RulesFaq lang={lang} settings={settings} />
+          <RulesFaq lang={lang} settings={settings} faqItems={faqItems} />
           <p className={`mt-3 ${ui.metaFaint}`}>{st(lang, "faq_footnote")}</p>
         </section>
       </Reveal>

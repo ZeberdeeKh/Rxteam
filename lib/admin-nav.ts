@@ -22,6 +22,7 @@ export function adminNavLinks(admin: SitePlayer, lang: Lang): AdminNavLink[] {
     { href: "/admin/marketplace", label: st(lang, "adm_nav_marketplace"), show: hasPerm(admin, "marketplace") },
     { href: "/admin/roles", label: st(lang, "adm_nav_roles"), show: !!admin.is_master },
     { href: "/admin/chores", label: st(lang, "adm_nav_chores"), show: hasPerm(admin, "chores") },
+    { href: "/admin/faq", label: st(lang, "adm_nav_faq"), show: hasPerm(admin, "faq") },
     {
       href: "/admin/export",
       label: st(lang, "adm_nav_export"),

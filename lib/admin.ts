@@ -17,6 +17,7 @@ export type AdminPerm =
   | "gallery"
   | "marketplace"
   | "chores"
+  | "faq"
   | "export";
 
 // Порядок дзеркалить меню (adminNavLinks) — так виглядає список чекбоксів у «Ролях».
@@ -33,6 +34,7 @@ export const ALL_PERMS: AdminPerm[] = [
   "gallery",
   "marketplace",
   "chores",
+  "faq",
   "export",
 ];
 

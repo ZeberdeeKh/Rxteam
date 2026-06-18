@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Медаль: чат-бульбашка із зіркою в лавровому вінку">
+  <defs>
+    <radialGradient id="disc" cx="50%" cy="40%" r="62%">
+      <stop offset="0" stop-color="#fff3c6"/>
+      <stop offset="0.55" stop-color="#edc352"/>
+      <stop offset="1" stop-color="#b5821a"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7c45c"/>
+      <stop offset="1" stop-color="#6e4d0d"/>
+    </linearGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a98a3c"/>
+      <stop offset="1" stop-color="#6a5018"/>
+    </linearGradient>
+    <linearGradient id="brightGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe7a0"/>
+      <stop offset="1" stop-color="#f0bf3f"/>
+    </linearGradient>
+    <path id="leaf" d="M0,0 C4.5,-7 4.5,-17 0,-24 C-4.5,-17 -4.5,-7 0,0 Z"/>
+    <clipPath id="discClip"><circle cx="100" cy="100" r="86"/></clipPath>
+  </defs>
+
+  <!-- Медаль: рант + диск -->
+  <circle cx="100" cy="100" r="95" fill="url(#rim)"/>
+  <circle cx="100" cy="100" r="86" fill="url(#disc)" stroke="#8a6a1e" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#fff0c0" stroke-width="1" opacity="0.5"/>
+  <!-- Полірований відблиск -->
+  <ellipse cx="100" cy="64" rx="60" ry="28" fill="#ffffff" opacity="0.18" clip-path="url(#discClip)"/>
+
+  <!-- Лавровий вінок -->
+  <g transform="translate(100 102)" fill="url(#bronze)" stroke="#5d4615" stroke-width="0.6" stroke-linejoin="round">
+    <!-- стебла -->
+    <path d="M24.4,-45.9 A52,52 0 0 1 7.2,51.5" fill="none" stroke="#7a5e22" stroke-width="2.4"/>
+    <path d="M-24.4,-45.9 A52,52 0 0 0 -7.2,51.5" fill="none" stroke="#7a5e22" stroke-width="2.4"/>
+    <!-- перехрестя стебел унизу -->
+    <path d="M7.2,51.5 C3,56 -1,58 -5,62" fill="none" stroke="#7a5e22" stroke-width="2.2"/>
+    <path d="M-7.2,51.5 C-3,56 1,58 5,62" fill="none" stroke="#7a5e22" stroke-width="2.2"/>
+
+    <!-- права гілка -->
+    <use href="#leaf" transform="rotate(30)  translate(0 -56) rotate(-62) scale(0.62)"/>
+    <use href="#leaf" transform="rotate(44)  translate(0 -56) rotate(-62) scale(0.70)"/>
+    <use href="#leaf" transform="rotate(60)  translate(0 -56) rotate(-62) scale(0.80)"/>
+    <use href="#leaf" transform="rotate(78)  translate(0 -56) rotate(-62) scale(0.90)"/>
+    <use href="#leaf" transform="rotate(96)  translate(0 -56) rotate(-62) scale(1.00)"/>
+    <use href="#leaf" transform="rotate(114) translate(0 -56) rotate(-62) scale(1.00)"/>
+    <use href="#leaf" transform="rotate(132) translate(0 -56) rotate(-62) scale(0.92)"/>
+    <use href="#leaf" transform="rotate(150) translate(0 -56) rotate(-62) scale(0.82)"/>
+    <use href="#leaf" transform="rotate(168) translate(0 -56) rotate(-62) scale(0.72)"/>
+
+    <!-- ліва гілка -->
+    <use href="#leaf" transform="rotate(-30)  translate(0 -56) rotate(62) scale(0.62)"/>
+    <use href="#leaf" transform="rotate(-44)  translate(0 -56) rotate(62) scale(0.70)"/>
+    <use href="#leaf" transform="rotate(-60)  translate(0 -56) rotate(62) scale(0.80)"/>
+    <use href="#leaf" transform="rotate(-78)  translate(0 -56) rotate(62) scale(0.90)"/>
+    <use href="#leaf" transform="rotate(-96)  translate(0 -56) rotate(62) scale(1.00)"/>
+    <use href="#leaf" transform="rotate(-114) translate(0 -56) rotate(62) scale(1.00)"/>
+    <use href="#leaf" transform="rotate(-132) translate(0 -56) rotate(62) scale(0.92)"/>
+    <use href="#leaf" transform="rotate(-150) translate(0 -56) rotate(62) scale(0.82)"/>
+    <use href="#leaf" transform="rotate(-168) translate(0 -56) rotate(62) scale(0.72)"/>
+
+    <!-- центральний сплеск листя вниз -->
+    <use href="#leaf" transform="rotate(13)  translate(0 52) rotate(180) scale(0.55)"/>
+    <use href="#leaf" transform="rotate(-13) translate(0 52) rotate(180) scale(0.55)"/>
+  </g>
+
+  <!-- Чат-бульбашка з хвостиком (темна бронза + золотий контур) -->
+  <path d="M100,66
+           C115.46,66 128,76.74 128,90
+           C128,103.26 115.46,114 100,114
+           C95,114 90,113.5 85,112.5
+           L74,127
+           C78,114 80,109 78,104
+           C75,99 72,95 72,90
+           C72,76.74 84.54,66 100,66 Z"
+        fill="#5a4413" stroke="url(#brightGold)" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- Зірка в середині -->
+  <path d="M100,72 L103.76,82.82 L115.22,83.06 L106.09,89.98 L109.40,100.94 L100,94.4 L90.60,100.94 L93.91,89.98 L84.78,83.06 L96.24,82.82 Z"
+        fill="url(#brightGold)" stroke="#8a5e12" stroke-width="0.9" stroke-linejoin="round"/>
+</svg>

@@ -691,6 +691,25 @@ const SITE: Record<string, Dict> = {
   adm_nav_chores: { pl: "Czek-lista", en: "Checklist", uk: "Чек-лист" },
   adm_nav_export: { pl: "Eksport", en: "Export", uk: "Експорт" },
   adm_nav_gallery: { pl: "Galeria", en: "Gallery", uk: "Галерея" },
+  adm_nav_faq: { pl: "FAQ", en: "FAQ", uk: "FAQ" },
+
+  // ── FAQ (Етап 30) — модуль питань/відповідей для сайту ──
+  adm_faq_add: { pl: "Dodaj pytanie", en: "Add question", uk: "Додати питання" },
+  adm_faq_question: { pl: "Pytanie (UA / PL / EN)", en: "Question (UA / PL / EN)", uk: "Питання (UA / PL / EN)" },
+  adm_faq_answer: { pl: "Odpowiedź (UA / PL / EN)", en: "Answer (UA / PL / EN)", uk: "Відповідь (UA / PL / EN)" },
+  adm_faq_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
+  adm_faq_active: { pl: "Pokazuj na stronie", en: "Show on site", uk: "Показувати на сайті" },
+  adm_faq_hidden: { pl: "Ukryte", en: "Hidden", uk: "Сховано" },
+  adm_faq_hint: {
+    pl: "Pytania i odpowiedzi z bloku „Zasady i FAQ” na stronie. Bot /rules ma osobny tekst.",
+    en: "Questions and answers for the site's “Rules & FAQ” block. The bot's /rules has its own text.",
+    uk: "Питання й відповіді для блоку «Правила та FAQ» на сайті. У бота /rules окремий текст.",
+  },
+  adm_faq_empty: {
+    pl: "Brak pytań. Dodaj pierwsze — strona pokaże wtedy listę zamiast starego tekstu.",
+    en: "No questions yet. Add the first — the site then shows the list instead of the legacy text.",
+    uk: "Питань ще немає. Додай перше — сайт тоді показує список замість старого тексту.",
+  },
 
   // ── Фото-галерея (Етап 15) ──
   adm_gallery_title: { pl: "Galeria zdjęć", en: "Photo gallery", uk: "Галерея фото" },
@@ -1043,6 +1062,11 @@ const SITE: Record<string, Dict> = {
     pl: "checklista przygotowania do gry.",
     en: "game preparation checklist.",
     uk: "чек-лист підготовки до гри.",
+  },
+  adm_perm_faq: {
+    pl: "pytania i odpowiedzi FAQ na stronie.",
+    en: "FAQ questions and answers on the site.",
+    uk: "питання й відповіді FAQ на сайті.",
   },
   adm_perm_export: {
     pl: "eksport danych do CSV (gracze, rejestracje, check-iny).",

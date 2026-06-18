@@ -4,6 +4,28 @@ import { supabase } from "./supabase";
 import { buildAnnouncement, type LocationLimits } from "./games";
 import { getAllSettings } from "./settings";
 
+// ── FAQ (Етап 30) — активні питання для блоку «Правила та FAQ» на сайті. ──
+// Повертає [] і коли таблиці ще нема (міграція не виконана) — тоді RulesFaq
+// відкочується на старий текст settings.faq_<lang>.
+export type SiteFaqItem = {
+  question_uk: string;
+  question_pl: string;
+  question_en: string;
+  answer_uk: string;
+  answer_pl: string;
+  answer_en: string;
+};
+
+export async function getFaqItems(): Promise<SiteFaqItem[]> {
+  const { data } = await supabase
+    .from("faq_items")
+    .select("question_uk, question_pl, question_en, answer_uk, answer_pl, answer_en")
+    .eq("active", true)
+    .order("sort_order", { ascending: true })
+    .order("id", { ascending: true });
+  return (data ?? []) as SiteFaqItem[];
+}
+
 export type SiteLocation = {
   name: string | null;
   map_url: string | null;

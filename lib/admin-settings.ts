@@ -6,6 +6,7 @@
 import { captchaPrompt, correctMap, wrongMap, expiredMap, faq, type Lang } from "./i18n";
 import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
 import { tr } from "./strings";
+import { st } from "./site-i18n";
 
 type Loc = Record<Lang, string>;
 
@@ -59,6 +60,10 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   // Щоденне нагадування — показуємо дефолтний текст як placeholder (порожнє поле = цей текст).
   daily_reminder_text_uk: DAILY_REMINDER_DEFAULT.uk,
   daily_reminder_text_pl: DAILY_REMINDER_DEFAULT.pl,
+  // Лендінг, блок «Про нас» — дефолт = тексти site-i18n (порожнє поле = цей текст).
+  home_about_pl: st("pl", "home_about_body"),
+  home_about_en: st("en", "home_about_body"),
+  home_about_uk: st("uk", "home_about_body"),
 };
 
 // Слово «ліміт» для згенерованих підписів полів лімітів реплік.
@@ -106,6 +111,17 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_announce_count", type: "toggle", label: { pl: "Licznik graczy w anonsie", en: "Player counter in announcement", uk: "Лічильник гравців в анонсі" } },
       { key: "feature_media_guard", type: "toggle", label: { pl: "Strażnik tematu „tylko media”", en: "Media-only topic guard", uk: "Гард гілки «тільки медіа»" } },
       { key: "feature_daily_reminder", type: "toggle", label: { pl: "Codzienne przypomnienie o rejestracji", en: "Daily registration reminder", uk: "Щоденне нагадування про реєстрацію" } },
+    ],
+  },
+  {
+    // Лендінг, блок «Про нас» (перший модуль сторінки). Заголовок секції лишається в
+    // site-i18n (як інші заголовки лендінгу) — тут редагується лише сам текст, по мовах.
+    // Порожнє поле → fallback на дефолт із site-i18n (показаний як placeholder).
+    title: { pl: "Strona — O nas", en: "Site — About us", uk: "Сайт — Про нас" },
+    fields: [
+      { key: "home_about_pl", type: "textarea", label: { pl: "Treść (PL)", en: "Text (PL)", uk: "Текст (PL)" } },
+      { key: "home_about_en", type: "textarea", label: { pl: "Treść (EN)", en: "Text (EN)", uk: "Текст (EN)" } },
+      { key: "home_about_uk", type: "textarea", label: { pl: "Treść (UA)", en: "Text (UA)", uk: "Текст (UA)" } },
     ],
   },
   {

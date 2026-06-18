@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Медаль: чат-бульбашка із об'ємною зіркою в лавровому вінку">
+  <defs>
+    <radialGradient id="disc" cx="50%" cy="40%" r="62%">
+      <stop offset="0" stop-color="#fff3c6"/>
+      <stop offset="0.55" stop-color="#edc352"/>
+      <stop offset="1" stop-color="#b5821a"/>
+    </radialGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7c45c"/>
+      <stop offset="1" stop-color="#6e4d0d"/>
+    </linearGradient>
+    <linearGradient id="bronze" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a98a3c"/>
+      <stop offset="1" stop-color="#6a5018"/>
+    </linearGradient>
+    <path id="leaf" d="M0,0 C4.5,-7 4.5,-17 0,-24 C-4.5,-17 -4.5,-7 0,0 Z"/>
+    <clipPath id="discClip"><circle cx="100" cy="100" r="86"/></clipPath>
+  </defs>
+
+  <!-- Медаль: рант + диск -->
+  <circle cx="100" cy="100" r="95" fill="url(#rim)"/>
+  <circle cx="100" cy="100" r="86" fill="url(#disc)" stroke="#8a6a1e" stroke-width="1.5"/>
+  <circle cx="100" cy="100" r="90" fill="none" stroke="#fff0c0" stroke-width="1" opacity="0.5"/>
+  <ellipse cx="100" cy="64" rx="60" ry="28" fill="#ffffff" opacity="0.18" clip-path="url(#discClip)"/>
+
+  <!-- Лавровий вінок (ближче до краю) -->
+  <g transform="translate(100 100)" fill="url(#bronze)" stroke="#5d4615" stroke-width="0.6" stroke-linejoin="round">
+    <path d="M28.06,-57.52 A64,64 0 0 1 11.11,63.03" fill="none" stroke="#7a5e22" stroke-width="2.4"/>
+    <path d="M-28.06,-57.52 A64,64 0 0 0 -11.11,63.03" fill="none" stroke="#7a5e22" stroke-width="2.4"/>
+    <path d="M11.11,63.03 C6,68 0,71 -6,75" fill="none" stroke="#7a5e22" stroke-width="2.2"/>
+    <path d="M-11.11,63.03 C-6,68 0,71 6,75" fill="none" stroke="#7a5e22" stroke-width="2.2"/>
+
+    <!-- права гілка -->
+    <use href="#leaf" transform="rotate(28)  translate(0 -68) rotate(-62) scale(0.68)"/>
+    <use href="#leaf" transform="rotate(44)  translate(0 -68) rotate(-62) scale(0.76)"/>
+    <use href="#leaf" transform="rotate(60)  translate(0 -68) rotate(-62) scale(0.86)"/>
+    <use href="#leaf" transform="rotate(78)  translate(0 -68) rotate(-62) scale(0.96)"/>
+    <use href="#leaf" transform="rotate(96)  translate(0 -68) rotate(-62) scale(1.06)"/>
+    <use href="#leaf" transform="rotate(114) translate(0 -68) rotate(-62) scale(1.06)"/>
+    <use href="#leaf" transform="rotate(132) translate(0 -68) rotate(-62) scale(0.98)"/>
+    <use href="#leaf" transform="rotate(150) translate(0 -68) rotate(-62) scale(0.88)"/>
+    <use href="#leaf" transform="rotate(168) translate(0 -68) rotate(-62) scale(0.78)"/>
+
+    <!-- ліва гілка -->
+    <use href="#leaf" transform="rotate(-28)  translate(0 -68) rotate(62) scale(0.68)"/>
+    <use href="#leaf" transform="rotate(-44)  translate(0 -68) rotate(62) scale(0.76)"/>
+    <use href="#leaf" transform="rotate(-60)  translate(0 -68) rotate(62) scale(0.86)"/>
+    <use href="#leaf" transform="rotate(-78)  translate(0 -68) rotate(62) scale(0.96)"/>
+    <use href="#leaf" transform="rotate(-96)  translate(0 -68) rotate(62) scale(1.06)"/>
+    <use href="#leaf" transform="rotate(-114) translate(0 -68) rotate(62) scale(1.06)"/>
+    <use href="#leaf" transform="rotate(-132) translate(0 -68) rotate(62) scale(0.98)"/>
+    <use href="#leaf" transform="rotate(-150) translate(0 -68) rotate(62) scale(0.88)"/>
+    <use href="#leaf" transform="rotate(-168) translate(0 -68) rotate(62) scale(0.78)"/>
+
+    <use href="#leaf" transform="rotate(13)  translate(0 62) rotate(180) scale(0.58)"/>
+    <use href="#leaf" transform="rotate(-13) translate(0 62) rotate(180) scale(0.58)"/>
+  </g>
+
+  <!-- Чат-бульбашка: тільки контур (без заливки) -->
+  <path d="M100,61
+           C122,61 140,76.7 140,96
+           C140,115.3 122,131 100,131
+           C94,131 88,130.3 82,129
+           L64,148
+           C69,132 72,126 70,119
+           C66,113 60,107 60,96
+           C60,76.7 78,61 100,61 Z"
+        fill="none" stroke="#6b4e15" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- Об'ємна зірка: світлі фасети -->
+  <path d="M100,94 L93.83,85.51 L100,68 Z
+           M100,94 L106.17,85.51 L124.73,85.97 Z
+           M100,94 L109.99,97.24 L115.28,115.03 Z
+           M100,94 L100,104.5 L84.72,115.03 Z
+           M100,94 L90.01,97.24 L75.27,85.97 Z"
+        fill="#ffe27a"/>
+  <!-- Об'ємна зірка: темні фасети -->
+  <path d="M100,94 L100,68 L106.17,85.51 Z
+           M100,94 L124.73,85.97 L109.99,97.24 Z
+           M100,94 L115.28,115.03 L100,104.5 Z
+           M100,94 L84.72,115.03 L90.01,97.24 Z
+           M100,94 L75.27,85.97 L93.83,85.51 Z"
+        fill="#9c6406"/>
+  <!-- Контур зірки -->
+  <path d="M100,68 L106.17,85.51 L124.73,85.97 L109.99,97.24 L115.28,115.03 L100,104.5 L84.72,115.03 L90.01,97.24 L75.27,85.97 L93.83,85.51 Z"
+        fill="none" stroke="#6e4708" stroke-width="1" stroke-linejoin="round"/>
+</svg>

@@ -207,6 +207,57 @@ export async function deleteLocation(formData: FormData) {
   back2("?deleted=1");
 }
 
+// ── FAQ (Етап 30, право faq) — CRUD питань/відповідей для блоку «Правила та FAQ» на сайті ──
+const backFaq = (q: string) => redirect(`/admin/faq${q}`);
+
+function parseFaq(formData: FormData) {
+  const sortRaw = Number(formData.get("sort_order"));
+  return {
+    question_uk: String(formData.get("question_uk") ?? "").trim(),
+    question_pl: String(formData.get("question_pl") ?? "").trim(),
+    question_en: String(formData.get("question_en") ?? "").trim(),
+    answer_uk: String(formData.get("answer_uk") ?? "").trim(),
+    answer_pl: String(formData.get("answer_pl") ?? "").trim(),
+    answer_en: String(formData.get("answer_en") ?? "").trim(),
+    active: formData.get("active") === "on",
+    sort_order: Number.isFinite(sortRaw) ? Math.round(sortRaw) : 0,
+  };
+}
+
+export async function createFaq(formData: FormData) {
+  await requirePerm("faq");
+  const f = parseFaq(formData);
+  if (!f.question_uk || !f.answer_uk) backFaq("?err=fields");
+  await supabase.from("faq_items").insert(f);
+  revalidatePath("/admin/faq");
+  revalidatePath("/");
+  backFaq("?created=1");
+}
+
+export async function updateFaq(formData: FormData) {
+  await requirePerm("faq");
+  const id = Number(formData.get("id"));
+  const f = parseFaq(formData);
+  if (!Number.isFinite(id) || !f.question_uk || !f.answer_uk) backFaq("?err=fields");
+  await supabase
+    .from("faq_items")
+    .update({ ...f, updated_at: new Date().toISOString() })
+    .eq("id", id);
+  revalidatePath("/admin/faq");
+  revalidatePath("/");
+  backFaq("?saved=1");
+}
+
+export async function deleteFaq(formData: FormData) {
+  await requirePerm("faq");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backFaq("");
+  await supabase.from("faq_items").delete().eq("id", id);
+  revalidatePath("/admin/faq");
+  revalidatePath("/");
+  backFaq("?deleted=1");
+}
+
 // ── Чек-лист підготовки до гри (Етап 13, право chores) ──
 const backChores = (q: string) => redirect(`/admin/chores${q}`);
 

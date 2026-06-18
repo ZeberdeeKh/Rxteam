@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Чат-бульбашка із зіркою в лавровому вінку — золото">
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe7a0"/>
+      <stop offset="0.5" stop-color="#f0bf3f"/>
+      <stop offset="1" stop-color="#bb841a"/>
+    </linearGradient>
+    <path id="leaf" d="M0,0 C5.5,-4 5.5,-12 0,-17 C-5.5,-12 -5.5,-4 0,0 Z"/>
+  </defs>
+
+  <!-- Лавровий вінок навколо (золото) -->
+  <g transform="translate(100 92)" fill="url(#gold)" stroke="#8a5e12" stroke-width="0.8" stroke-linejoin="round">
+    <use href="#leaf" transform="rotate(38) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(65) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(92) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(119) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(146) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(168) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-38) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-65) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-92) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-119) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-146) translate(0 -58)"/>
+    <use href="#leaf" transform="rotate(-168) translate(0 -58)"/>
+    <!-- Вузол унизу -->
+    <ellipse cx="0" cy="57" rx="5" ry="3.6"/>
+  </g>
+
+  <!-- Чат-бульбашка (овал + хвостик), золотий контур -->
+  <ellipse cx="100" cy="84" rx="46" ry="40" fill="none" stroke="url(#gold)" stroke-width="7"/>
+  <path d="M80,117 L72,133 L98,121 Z" fill="url(#gold)" stroke="#8a5e12" stroke-width="0.8" stroke-linejoin="round"/>
+
+  <!-- Зірка в середині -->
+  <path d="M100,64 L104.70,77.53 L119.02,77.82 L107.61,86.47 L111.76,100.18 L100,92 L88.24,100.18 L92.39,86.47 L80.98,77.82 L95.30,77.53 Z"
+        fill="url(#gold)" stroke="#8a5e12" stroke-width="0.9" stroke-linejoin="round"/>
+</svg>
