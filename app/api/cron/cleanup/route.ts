@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
+import { expireOldListings, sweepStuckCollecting } from "@/lib/marketplace";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,5 +26,9 @@ export async function GET(req: Request) {
     await supabase.from("join_challenges").update({ status: "expired" }).eq("id", ch.id);
   }
 
-  return Response.json({ declined: expired?.length ?? 0 });
+  // Барахолка (Етап 28): авто-протермінування approved + прибирання завислих collecting.
+  const mpExpired = await expireOldListings();
+  const mpSwept = await sweepStuckCollecting();
+
+  return Response.json({ declined: expired?.length ?? 0, mp_expired: mpExpired, mp_swept: mpSwept });
 }

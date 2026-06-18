@@ -421,6 +421,37 @@ export async function getGalleryPhotos(limit = 24): Promise<GalleryPhoto[]> {
   return rows.slice(0, limit).map((r) => ({ id: r.id, url: r.public_url, caption: r.caption }));
 }
 
+// ─────────────────────────── Барахолка / Marketplace (Етап 28) ───────────────────────────
+
+export type MarketplaceListing = {
+  id: number;
+  photos: string[];
+  description: string | null;
+  price: string | null;
+  sellerUsername: string | null;
+  sellerDisplay: string | null;
+  createdAt: string;
+};
+
+// Опубліковані оголошення для публічної /marketplace (новіші — згори).
+export async function getMarketplaceListings(limit = 60): Promise<MarketplaceListing[]> {
+  const { data } = await supabase
+    .from("marketplace_listings")
+    .select("id, photo_urls, description, price, seller_tg_username, seller_display, created_at")
+    .eq("status", "approved")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((r: any) => ({
+    id: r.id,
+    photos: (r.photo_urls ?? []) as string[],
+    description: r.description ?? null,
+    price: r.price ?? null,
+    sellerUsername: r.seller_tg_username ?? null,
+    sellerDisplay: r.seller_display ?? null,
+    createdAt: r.created_at,
+  }));
+}
+
 // Здобуті ачівки гравця (з назвами).
 export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
   const { data } = await supabase

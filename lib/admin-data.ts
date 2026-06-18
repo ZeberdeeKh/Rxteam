@@ -331,6 +331,31 @@ export async function listGalleryMedia(limit = 200): Promise<AdminGalleryItem[]>
   return (data ?? []) as AdminGalleryItem[];
 }
 
+// ── Барахолка / Marketplace (Етап 28) ──
+export type AdminMarketplaceItem = {
+  id: number;
+  status: string; // pending | approved | hidden | rejected | sold | expired
+  description: string | null;
+  price: string | null;
+  photo_urls: string[];
+  seller_display: string | null;
+  seller_tg_username: string | null;
+  created_at: string;
+};
+
+// Оголошення для модерації (без collecting/deleted). Pending — згори, далі за датою.
+export async function listMarketplaceListings(limit = 200): Promise<AdminMarketplaceItem[]> {
+  const { data } = await supabase
+    .from("marketplace_listings")
+    .select("id, status, description, price, photo_urls, seller_display, seller_tg_username, created_at")
+    .in("status", ["pending", "approved", "hidden", "rejected", "sold", "expired"])
+    .order("created_at", { ascending: false })
+    .limit(limit);
+  const rows = (data ?? []) as AdminMarketplaceItem[];
+  // Pending — нагору (потребують дії), решта — за датою спадання.
+  return rows.sort((a, b) => (a.status === "pending" ? -1 : 0) - (b.status === "pending" ? -1 : 0));
+}
+
 export type AdminPurchase = {
   id: number;
   cost: number;

@@ -7,6 +7,8 @@ import { setSetting, getSetting } from "@/lib/settings";
 import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
 import { TOGGLE_KEYS, VALUE_KEYS, PATCH_TOGGLE_KEYS, PATCH_VALUE_KEYS } from "@/lib/admin-settings";
 import { notifyPlayerPatch } from "@/lib/notify";
+import { tr } from "@/lib/strings";
+import { getPlayerByTg } from "@/lib/players";
 import type { Lang } from "@/lib/i18n";
 import { SOCIALS } from "@/lib/social";
 import { makeUtc, computeWindows, getCheckinWindow } from "@/lib/games";
@@ -682,4 +684,85 @@ export async function deleteGalleryMedia(formData: FormData) {
   revalidatePath("/admin/gallery");
   revalidatePath("/gallery");
   redirect("/admin/gallery?saved=1");
+}
+
+// ── Барахолка / Marketplace (право marketplace) — Етап 28 ──
+// Веб-альтернатива апруву в адмін-групі. Ті самі статуси, що й колбэки mpok/mpno в боті,
+// з guarded-UPDATE (where status='pending') проти гонки подвійного апруву.
+const backMp = (q: string) => redirect(`/admin/marketplace${q}`);
+
+async function dmSeller(tgUserId: number | null, key: "mp_you_approved" | "mp_you_rejected") {
+  if (!tgUserId) return;
+  const sp = await getPlayerByTg(tgUserId);
+  try {
+    await new Api(process.env.BOT_TOKEN!).sendMessage(tgUserId, tr((sp?.lang as Lang) ?? "uk", key));
+  } catch {}
+}
+
+export async function approveListing(formData: FormData) {
+  const me = await requirePerm("marketplace");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backMp("");
+  const { data } = await supabase
+    .from("marketplace_listings")
+    .update({ status: "approved", approved_by: me.id, approved_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("status", "pending")
+    .select("seller_tg_user_id")
+    .maybeSingle();
+  if (data) await dmSeller(data.seller_tg_user_id, "mp_you_approved");
+  revalidatePath("/admin/marketplace");
+  revalidatePath("/marketplace");
+  backMp("?saved=1");
+}
+
+export async function rejectListing(formData: FormData) {
+  await requirePerm("marketplace");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backMp("");
+  const { data } = await supabase
+    .from("marketplace_listings")
+    .update({ status: "rejected" })
+    .eq("id", id)
+    .eq("status", "pending")
+    .select("storage_paths, seller_tg_user_id")
+    .maybeSingle();
+  if (data) {
+    if (data.storage_paths?.length) {
+      const bucket = (await getSetting("marketplace_bucket")) || "marketplace";
+      await supabase.storage.from(bucket).remove(data.storage_paths);
+    }
+    await dmSeller(data.seller_tg_user_id, "mp_you_rejected");
+  }
+  revalidatePath("/admin/marketplace");
+  revalidatePath("/marketplace");
+  backMp("?saved=1");
+}
+
+export async function hideListing(formData: FormData) {
+  await requirePerm("marketplace");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backMp("");
+  await supabase
+    .from("marketplace_listings")
+    .update({ status: "hidden" })
+    .eq("id", id)
+    .eq("status", "approved");
+  revalidatePath("/admin/marketplace");
+  revalidatePath("/marketplace");
+  backMp("?saved=1");
+}
+
+export async function unhideListing(formData: FormData) {
+  await requirePerm("marketplace");
+  const id = Number(formData.get("id"));
+  if (!Number.isFinite(id)) backMp("");
+  await supabase
+    .from("marketplace_listings")
+    .update({ status: "approved" })
+    .eq("id", id)
+    .eq("status", "hidden");
+  revalidatePath("/admin/marketplace");
+  revalidatePath("/marketplace");
+  backMp("?saved=1");
 }

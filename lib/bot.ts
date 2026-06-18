@@ -50,6 +50,12 @@ import {
 import { toggleChoreClaim, refreshChoreMessage } from "./chores";
 import { notifyAdminsRental } from "./notify";
 import { announceGame, REG_BTN } from "./game-announce";
+import {
+  ingestSalesPhoto,
+  findListingForDelete,
+  deleteListing,
+  type SellerInfo,
+} from "./marketplace";
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
@@ -289,6 +295,216 @@ async function guardMediaTopic(ctx: Context): Promise<boolean> {
 // Гілка «тільки медіа»: лишаємо фото/відео/документ, решту видаляємо.
 bot.use(async (ctx, next) => {
   if (await guardMediaTopic(ctx)) return; // видалили — далі не обробляємо
+  await next();
+});
+
+// ─── Гард гілки «Барахолка»: лише ФОТО З ОПИСОМ; решту (текст/відео/файли, а також
+// фото без опису) видаляємо. Публікація на сайт — лише з тегом #promo + патч (Етап 28).
+// Гілку задає /setsales (sales_chat_id / sales_thread_id / sales_guard_general).
+const SALES_MUTE_SECONDS = 15 * 60; // 15 хв
+
+function sellerOf(from: any, player: any): SellerInfo {
+  return {
+    playerId: player.id,
+    tgUserId: from.id,
+    username: from.username ?? player.tg_username ?? null,
+    display: player.callsign ?? player.name ?? from.first_name ?? null,
+    lang: (player.lang as Lang) ?? "uk",
+    hasPatch: !!player.has_patch,
+  };
+}
+
+// Виняток від видалення: анонім від імені групи, сам бот, майстер, адмін групи.
+async function salesExempt(ctx: Context, chatId: number, from: any, player: any): Promise<boolean> {
+  if (ctx.senderChat?.id === chatId) return true;
+  if (from && from.id === ctx.me.id) return true;
+  if (player?.is_master) return true;
+  if (from) {
+    try {
+      const mem = await ctx.api.getChatMember(chatId, from.id);
+      if (mem.status === "creator" || mem.status === "administrator") return true;
+    } catch (e) {
+      console.error("sales guard: getChatMember failed", e);
+    }
+  }
+  return false;
+}
+
+// /delete — зняти оголошення (reply на оригінал або на репост/пересилку).
+async function handleSalesDelete(ctx: Context, player: any) {
+  const from = ctx.from!;
+  const chat = ctx.chat!;
+  const reply = (ctx.message as any)?.reply_to_message;
+  const lang = (player?.lang as Lang) ?? "uk";
+  if (!reply) {
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_delete_not_found")); } catch {}
+    return;
+  }
+  const listing = await findListingForDelete(chat.id, reply, from.id);
+  if (!listing) {
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_delete_not_found")); } catch {}
+    return;
+  }
+  const isAdmin = player && (player.is_master || hasPerm(player, "marketplace"));
+  if (listing.seller_tg_user_id !== from.id && !isAdmin) {
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_delete_not_yours")); } catch {}
+    return;
+  }
+  await deleteListing(ctx.api, listing, true);
+  try { await ctx.api.deleteMessage(chat.id, reply.message_id); } catch {}
+  try { await bot.api.sendMessage(from.id, tr(lang, "mp_deleted_ok")); } catch {}
+}
+
+async function guardSalesTopic(ctx: Context): Promise<boolean> {
+  const msg = ctx.message;
+  const chat = ctx.chat;
+  if (!msg || !chat) return false;
+  if (chat.type !== "group" && chat.type !== "supergroup") return false;
+  if (!(await featureEnabled("marketplace"))) return false;
+
+  const guardChatId = await getSetting("sales_chat_id");
+  if (!guardChatId || String(chat.id) !== guardChatId) return false;
+  const guardThreadId = await getSetting("sales_thread_id");
+  const guardGeneral = (await getSetting("sales_guard_general")) === "true";
+  if (!guardThreadId && !guardGeneral) return false; // гілку не налаштовано
+  const inTarget = guardThreadId
+    ? String(msg.message_thread_id ?? "") === guardThreadId
+    : !msg.message_thread_id;
+  if (!inTarget) return false;
+
+  const m = msg as any;
+  const from = ctx.from;
+  const fromUser = !!from && !from.is_bot && ctx.senderChat?.id !== chat.id;
+
+  // Гравець (для info-DM, мови, патча, винятків). ensurePlayer — гілка малотрафічна.
+  const player = fromUser ? await ensurePlayer(from!) : null;
+
+  // Інфо/згода при ПЕРШОМУ повідомленні в гілку (будь-якому) — раз на гравця.
+  if (player && !player.marketplace_info_sent_at) {
+    const lang = (player.lang as Lang) ?? "uk";
+    const flood = (await getSetting("marketplace_flood_hint")) || "";
+    const hint = (await getSetting("marketplace_patch_hint")) || "";
+    try { await bot.api.sendMessage(from!.id, tr(lang, "mp_info", { flood, hint })); } catch {}
+    await supabase
+      .from("players")
+      .update({ marketplace_info_sent_at: new Date().toISOString() })
+      .eq("id", player.id);
+  }
+
+  // /delete — до загального видалення (це текст, інакше гард його з'їв би).
+  if (m.text && /^\/delete(@\w+)?\b/i.test(String(m.text).trim()) && m.reply_to_message) {
+    await handleSalesDelete(ctx, player);
+    try { await ctx.api.deleteMessage(chat.id, msg.message_id); } catch {}
+    return true;
+  }
+
+  const isForward = !!(m.forward_origin || m.forward_from || m.forward_from_chat || m.forward_sender_name);
+
+  // Переслане фото (репост) — указівник для /delete; не створюємо оголошення, лишаємо.
+  if (m.photo && isForward) return true;
+
+  // Альбом — дозбираємо й (з debounce) фіналізуємо в одне оголошення.
+  if (m.photo && m.media_group_id) {
+    if (player && from) {
+      const big = m.photo[m.photo.length - 1];
+      await ingestSalesPhoto(ctx.api, {
+        chatId: chat.id,
+        messageId: msg.message_id,
+        mediaGroupId: String(m.media_group_id),
+        fileId: big.file_id,
+        fileUniqueId: big.file_unique_id,
+        caption: m.caption ?? null,
+        seller: sellerOf(from, player),
+      });
+    }
+    return true;
+  }
+
+  // Одиночне фото.
+  if (m.photo) {
+    const caption = String(m.caption ?? "").trim();
+    if (caption && player && from) {
+      const big = m.photo[m.photo.length - 1];
+      await ingestSalesPhoto(ctx.api, {
+        chatId: chat.id,
+        messageId: msg.message_id,
+        mediaGroupId: null,
+        fileId: big.file_id,
+        fileUniqueId: big.file_unique_id,
+        caption,
+        seller: sellerOf(from, player),
+      });
+      return true;
+    }
+    // Фото без опису → видалити + прохання додати опис (без ескалації мута).
+    if (await salesExempt(ctx, chat.id, from, player)) return true;
+    try { await ctx.api.deleteMessage(chat.id, msg.message_id); } catch {}
+    if (player && from) {
+      try { await bot.api.sendMessage(from.id, tr((player.lang as Lang) ?? "uk", "mp_need_caption")); } catch {}
+    }
+    return true;
+  }
+
+  // Службові повідомлення без контенту — не чіпаємо.
+  const hasContent =
+    m.text || m.caption || m.video || m.document || m.audio || m.voice || m.sticker ||
+    m.animation || m.video_note || m.contact || m.location || m.venue || m.poll || m.dice ||
+    m.game || m.story;
+  if (!hasContent) return false;
+
+  // Виняток (майстер/адмін/анонім/бот) — текст лишаємо.
+  if (await salesExempt(ctx, chat.id, from, player)) return false;
+
+  // Не-фото контент (текст/відео/файл/…) → видалити + ескалація.
+  try { await ctx.api.deleteMessage(chat.id, msg.message_id); } catch {}
+  if (!from || from.is_bot) return true;
+
+  const { data: row } = await supabase
+    .from("marketplace_violations")
+    .select("count")
+    .eq("tg_user_id", from.id)
+    .maybeSingle();
+  const violations = (row?.count ?? 0) + 1;
+  await supabase.from("marketplace_violations").upsert(
+    { tg_user_id: from.id, count: violations, last_at: new Date().toISOString() },
+    { onConflict: "tg_user_id" },
+  );
+  const lang = (player?.lang as Lang) ?? "uk";
+  if (violations === 1) {
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn")); } catch {}
+    return true;
+  }
+  if (violations === 2) {
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn2")); } catch {}
+    return true;
+  }
+  try {
+    await ctx.api.restrictChatMember(
+      chat.id,
+      from.id,
+      {
+        can_send_messages: false,
+        can_send_audios: false,
+        can_send_documents: false,
+        can_send_photos: false,
+        can_send_videos: false,
+        can_send_video_notes: false,
+        can_send_voice_notes: false,
+        can_send_polls: false,
+        can_send_other_messages: false,
+        can_add_web_page_previews: false,
+      },
+      { until_date: Math.floor(Date.now() / 1000) + SALES_MUTE_SECONDS },
+    );
+  } catch (e) {
+    console.error("sales guard: restrict failed", e);
+  }
+  try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_muted")); } catch {}
+  return true;
+}
+
+bot.use(async (ctx, next) => {
+  if (await guardSalesTopic(ctx)) return; // оброблено — далі не йдемо
   await next();
 });
 
@@ -1118,6 +1334,116 @@ bot.command("setflood", async (ctx) => {
       (threadId ? `\nthread_id: ${threadId}` : "") +
       `\n\nЩодня о заданій годині (Налаштування → «Щоденне нагадування») бот постітиме сюди двомовне нагадування про реєстрацію, якщо цього тижня попереду є гра.`,
   );
+});
+
+// Прив'язка гілки «Барахолка»: лише фото з описом; публікація на сайт — з тегом #promo + патч.
+bot.command("setsales", async (ctx) => {
+  if (ctx.chat.type === "private") {
+    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
+    await ctx.reply(tr(actorLang, "sethere_group_only"));
+    return;
+  }
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+  const threadId = ctx.message?.message_thread_id;
+  await setSetting("sales_chat_id", String(ctx.chat.id));
+  await setSetting("sales_thread_id", threadId ? String(threadId) : "");
+  await setSetting("sales_guard_general", threadId ? "false" : "true");
+  await ctx.reply(
+    `✅ Гілку «Барахолка» збережено.\nchat_id: ${ctx.chat.id}` +
+      (threadId ? `\nthread_id: ${threadId}` : " (General)") +
+      `\n\nПравила гілки:\n• лише ФОТО з описом (текст / відео / файли та фото без опису — видаляються);\n` +
+      `• щоб оголошення потрапило на сайт — додай у опис тег #promo (потрібен патч);\n` +
+      `• зняти оголошення — відповідь /delete на своє фото (або репост потрібного + /delete).`,
+  );
+});
+
+// Чи може користувач модерувати барахолку: майстер/право marketplace АБО учасник
+// адмін-групи (chores_chat_id) — туди прилітає картка на апрув (Етап 28).
+async function canModerateMarketplace(ctx: Context, actor: any): Promise<boolean> {
+  if (actor.is_master || hasPerm(actor, "marketplace")) return true;
+  const choresChat = await getSetting("chores_chat_id");
+  if (choresChat && ctx.from) {
+    try {
+      const mem = await ctx.api.getChatMember(Number(choresChat), ctx.from.id);
+      return mem.status !== "left" && mem.status !== "kicked";
+    } catch {}
+  }
+  return false;
+}
+
+// Картка оголошення — це ФОТО (editMessageCaption); фолбек-DM — текст (editMessageText).
+async function editMarketplaceCard(ctx: Context, text: string) {
+  try {
+    await ctx.editMessageCaption({ caption: text });
+  } catch {
+    try {
+      await ctx.editMessageText(text);
+    } catch {}
+  }
+}
+
+bot.callbackQuery(/^mpok:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const actor = await ensurePlayer(ctx.from);
+  if (!(await canModerateMarketplace(ctx, actor))) return;
+  const al = (actor.lang as Lang) ?? "uk";
+  const { data: upd } = await supabase
+    .from("marketplace_listings")
+    .update({ status: "approved", approved_by: actor.id, approved_at: new Date().toISOString() })
+    .eq("id", Number(ctx.match[1]))
+    .eq("status", "pending")
+    .select("id, seller_tg_user_id")
+    .maybeSingle();
+  if (!upd) {
+    await editMarketplaceCard(ctx, tr(al, "mp_card_done"));
+    return;
+  }
+  await editMarketplaceCard(ctx, tr(al, "mp_card_approved", { who: actor.callsign ?? actor.name ?? "?" }));
+  if (upd.seller_tg_user_id) {
+    const sp = await getPlayerByTg(upd.seller_tg_user_id);
+    try { await bot.api.sendMessage(upd.seller_tg_user_id, tr((sp?.lang as Lang) ?? "uk", "mp_you_approved")); } catch {}
+  }
+});
+
+bot.callbackQuery(/^mpno:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const actor = await ensurePlayer(ctx.from);
+  if (!(await canModerateMarketplace(ctx, actor))) return;
+  const al = (actor.lang as Lang) ?? "uk";
+  const { data: upd } = await supabase
+    .from("marketplace_listings")
+    .update({ status: "rejected" })
+    .eq("id", Number(ctx.match[1]))
+    .eq("status", "pending")
+    .select("id, storage_paths, seller_tg_user_id")
+    .maybeSingle();
+  if (!upd) {
+    await editMarketplaceCard(ctx, tr(al, "mp_card_done"));
+    return;
+  }
+  const bucket = (await getSetting("marketplace_bucket")) || "marketplace";
+  if (upd.storage_paths?.length) {
+    try { await supabase.storage.from(bucket).remove(upd.storage_paths); } catch {}
+  }
+  await editMarketplaceCard(ctx, tr(al, "mp_card_rejected", { who: actor.callsign ?? actor.name ?? "?" }));
+  if (upd.seller_tg_user_id) {
+    const sp = await getPlayerByTg(upd.seller_tg_user_id);
+    try { await bot.api.sendMessage(upd.seller_tg_user_id, tr((sp?.lang as Lang) ?? "uk", "mp_you_rejected")); } catch {}
+  }
 });
 
 // Тогл пункту чек-листа: вільно → взяв; мій → звільнив; чужий → «вже взяв …».

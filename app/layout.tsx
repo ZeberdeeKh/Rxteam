@@ -69,6 +69,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_home")}
               </NavLink>
+              <NavLink href="/marketplace" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
+                {st(lang, "nav_marketplace")}
+              </NavLink>
               {loggedIn ? (
                 <>
                   <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>

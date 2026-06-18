@@ -31,6 +31,41 @@ const SITE: Record<string, Dict> = {
   nav_logout: { pl: "Wyloguj", en: "Log out", uk: "Вийти" },
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
   nav_gallery: { pl: "Galeria", en: "Gallery", uk: "Галерея" },
+  nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },
+
+  // ── Барахолка / Marketplace (Етап 28) ──
+  marketplace_intro: {
+    pl: "Sprzęt na sprzedaż od graczy RX Team. Kontakt — bezpośrednio ze sprzedawcą na Telegramie.",
+    en: "Gear for sale from RX Team players. Contact the seller directly on Telegram.",
+    uk: "Спорядження на продаж від гравців RX Team. Зв'язок — напряму з продавцем у Telegram.",
+  },
+  marketplace_empty: {
+    pl: "Brak ogłoszeń.",
+    en: "No listings yet.",
+    uk: "Поки немає оголошень.",
+  },
+  marketplace_disabled: {
+    pl: "Giełda jest chwilowo niedostępna.",
+    en: "The marketplace is temporarily unavailable.",
+    uk: "Барахолка тимчасово недоступна.",
+  },
+  marketplace_contact: {
+    pl: "Napisz do sprzedawcy",
+    en: "Message the seller",
+    uk: "Написати продавцю",
+  },
+  marketplace_photos_more: { pl: "+{n} zdjęć", en: "+{n} photos", uk: "+{n} фото" },
+
+  // ── Адмінка: барахолка ──
+  adm_nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },
+  adm_mp_empty: { pl: "Brak ogłoszeń.", en: "No listings.", uk: "Немає оголошень." },
+  adm_btn_approve: { pl: "Zatwierdź", en: "Approve", uk: "Підтвердити" },
+  adm_mp_st_pending: { pl: "Oczekuje", en: "Pending", uk: "На модерації" },
+  adm_mp_st_approved: { pl: "Opublikowane", en: "Published", uk: "Опубліковано" },
+  adm_mp_st_hidden: { pl: "Ukryte", en: "Hidden", uk: "Сховано" },
+  adm_mp_st_rejected: { pl: "Odrzucone", en: "Rejected", uk: "Відхилено" },
+  adm_mp_st_sold: { pl: "Sprzedane", en: "Sold", uk: "Продано" },
+  adm_mp_st_expired: { pl: "Wygasłe", en: "Expired", uk: "Протерміновано" },
 
   footer_note: {
     pl: "Nieformalna społeczność miłośników ASG z Wrocławia.",

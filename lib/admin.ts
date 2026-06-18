@@ -15,6 +15,7 @@ export type AdminPerm =
   | "rental"
   | "joins"
   | "gallery"
+  | "marketplace"
   | "chores"
   | "export";
 
@@ -30,6 +31,7 @@ export const ALL_PERMS: AdminPerm[] = [
   "rental",
   "joins",
   "gallery",
+  "marketplace",
   "chores",
   "export",
 ];
