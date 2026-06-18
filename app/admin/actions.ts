@@ -9,7 +9,7 @@ import { TOGGLE_KEYS, VALUE_KEYS, PATCH_TOGGLE_KEYS, PATCH_VALUE_KEYS } from "@/
 import { notifyPlayerPatch } from "@/lib/notify";
 import type { Lang } from "@/lib/i18n";
 import { SOCIALS } from "@/lib/social";
-import { makeUtc, computeWindows } from "@/lib/games";
+import { makeUtc, computeWindows, getCheckinWindow } from "@/lib/games";
 import { announceGame } from "@/lib/game-announce";
 import { Api } from "grammy";
 import { performCheckin } from "@/lib/checkins";
@@ -24,6 +24,10 @@ const back2 = (q: string) => redirect(`/admin/locations${q}`);
 // тому зберігаємо їх у тій самій дії (лінки виводяться на лендінгу → revalidate "/").
 export async function saveSettings(formData: FormData) {
   await requireMaster();
+  // Старі значення вікна чек-іну — щоб після збереження зрозуміти, чи їх змінили.
+  const beforeOld = await getSetting("checkin_open_before_min");
+  const afterOld = await getSetting("checkin_close_after_min");
+
   for (const key of TOGGLE_KEYS) {
     await setSetting(key, formData.get(key) === "on" ? "true" : "false");
   }
@@ -35,6 +39,30 @@ export async function saveSettings(formData: FormData) {
     const v = formData.get(s.settingKey);
     if (v !== null) await setSetting(s.settingKey, String(v).trim());
   }
+
+  // Якщо вікно чек-іну змінилось — перераховуємо checkin_from/checkin_to для всіх
+  // анонсованих майбутніх ігор (reg_closes/cancel не чіпаємо). Минулі ігри лишаємо як є.
+  const beforeNew = formData.get("checkin_open_before_min");
+  const afterNew = formData.get("checkin_close_after_min");
+  if (
+    (beforeNew !== null && String(beforeNew) !== (beforeOld ?? "")) ||
+    (afterNew !== null && String(afterNew) !== (afterOld ?? ""))
+  ) {
+    const cw = await getCheckinWindow();
+    const { data: future } = await supabase
+      .from("games")
+      .select("id, gather_at, start_at")
+      .eq("status", "announced")
+      .gt("start_at", new Date().toISOString());
+    for (const g of future ?? []) {
+      const w = computeWindows((g as any).gather_at ?? g.start_at, g.start_at, cw);
+      await supabase
+        .from("games")
+        .update({ checkin_from: w.checkin_from, checkin_to: w.checkin_to })
+        .eq("id", g.id);
+    }
+  }
+
   revalidatePath("/admin/settings");
   revalidatePath("/"); // лендінг показує соц-лінки
   redirect("/admin/settings?saved=1");
@@ -55,7 +83,7 @@ export async function createGame(formData: FormData) {
 
   const gatherUtc = makeUtc(date, gather);
   const startUtc = makeUtc(date, start);
-  const w = computeWindows(gatherUtc, startUtc);
+  const w = computeWindows(gatherUtc, startUtc, await getCheckinWindow());
 
   const { data: game } = await supabase
     .from("games")

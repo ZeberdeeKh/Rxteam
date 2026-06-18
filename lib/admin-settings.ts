@@ -9,6 +9,13 @@ import { tr } from "./strings";
 
 type Loc = Record<Lang, string>;
 
+// Дефолтні шаблони щоденного нагадування (UA+PL). Токени {locations} і {link}
+// підставляє крон (app/api/cron/reminders/route.ts). Порожнє поле в адмінці → цей текст.
+export const DAILY_REMINDER_DEFAULT = {
+  uk: "Нагадуємо, що на цьому тижні граємо на {locations}. Не забудь зареєструватися, якщо плануєш їхати — щоб не втратити свої бали. {link}",
+  pl: "Przypominamy, że w tym tygodniu gramy na {locations}. Nie zapomnij się zarejestrować, jeśli planujesz przyjechać — żeby nie stracić punktów. {link}",
+};
+
 export type SettingField = {
   key: string;
   type: "toggle" | "number" | "text" | "textarea";
@@ -49,6 +56,9 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   patch_msg_pl: tr("pl", "patch_benefits"),
   patch_msg_en: tr("en", "patch_benefits"),
   patch_msg_uk: tr("uk", "patch_benefits"),
+  // Щоденне нагадування — показуємо дефолтний текст як placeholder (порожнє поле = цей текст).
+  daily_reminder_text_uk: DAILY_REMINDER_DEFAULT.uk,
+  daily_reminder_text_pl: DAILY_REMINDER_DEFAULT.pl,
 };
 
 // Слово «ліміт» для згенерованих підписів полів лімітів реплік.
@@ -95,6 +105,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_chores", type: "toggle", label: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" } },
       { key: "feature_announce_count", type: "toggle", label: { pl: "Licznik graczy w anonsie", en: "Player counter in announcement", uk: "Лічильник гравців в анонсі" } },
       { key: "feature_media_guard", type: "toggle", label: { pl: "Strażnik tematu „tylko media”", en: "Media-only topic guard", uk: "Гард гілки «тільки медіа»" } },
+      { key: "feature_daily_reminder", type: "toggle", label: { pl: "Codzienne przypomnienie o rejestracji", en: "Daily registration reminder", uk: "Щоденне нагадування про реєстрацію" } },
     ],
   },
   {
@@ -122,6 +133,26 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
     fields: [
       { key: "remind_day_hour", type: "number", label: { pl: "Dzień przed — godzina (0–23)", en: "Day before — hour (0–23)", uk: "За день — година (0–23)" } },
       { key: "remind_before_h", type: "number", label: { pl: "W dniu gry — godz. przed startem", en: "On game day — hours before start", uk: "У день гри — годин до старту" } },
+    ],
+  },
+  {
+    // Щоденне групове нагадування про реєстрацію (постить у гілку «Флуд/Zalew»).
+    // Гілка задається командою /setflood; on/off — у «Funkcje». {locations} = назви локацій
+    // ігор цього тижня, {link} = посилання на сайт /games. Шле двомовно (UA+PL).
+    title: { pl: "Codzienne przypomnienie", en: "Daily reminder", uk: "Щоденне нагадування" },
+    fields: [
+      { key: "daily_reminder_hour", type: "number", label: { pl: "Godzina wysłania (0–23)", en: "Send hour (0–23)", uk: "Година надсилання (0–23)" } },
+      { key: "daily_reminder_text_uk", type: "textarea", label: { pl: "Treść (UA) — {locations}, {link}", en: "Text (UA) — {locations}, {link}", uk: "Текст (UA) — {locations}, {link}" } },
+      { key: "daily_reminder_text_pl", type: "textarea", label: { pl: "Treść (PL) — {locations}, {link}", en: "Text (PL) — {locations}, {link}", uk: "Текст (PL) — {locations}, {link}" } },
+    ],
+  },
+  {
+    // Вікно чек-іну. Зміна перераховує checkin_from/checkin_to для всіх анонсованих
+    // майбутніх ігор (app/admin/actions.ts → saveSettings).
+    title: { pl: "Check-in (okno)", en: "Check-in (window)", uk: "Чек-ін (вікно)" },
+    fields: [
+      { key: "checkin_open_before_min", type: "number", label: { pl: "Otwarcie — minut przed zbiórką", en: "Opens — minutes before gather", uk: "Відкриття — хвилин до збору" } },
+      { key: "checkin_close_after_min", type: "number", label: { pl: "Zamknięcie — minut po starcie", en: "Closes — minutes after start", uk: "Закриття — хвилин після старту" } },
     ],
   },
   {
@@ -195,6 +226,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "announce_thread_id", type: "text", label: { pl: "Announce thread_id", en: "Announce thread_id", uk: "Announce thread_id" } },
       { key: "media_chat_id", type: "text", label: { pl: "Media chat_id (grupa)", en: "Media chat_id (group)", uk: "Media chat_id (група)" } },
       { key: "media_thread_id", type: "text", label: { pl: "Media thread_id", en: "Media thread_id", uk: "Media thread_id" } },
+      { key: "flood_chat_id", type: "text", label: { pl: "Flood/Zalew chat_id (grupa)", en: "Flood/Zalew chat_id (group)", uk: "Flood/Zalew chat_id (група)" } },
+      { key: "flood_thread_id", type: "text", label: { pl: "Flood/Zalew thread_id", en: "Flood/Zalew thread_id", uk: "Flood/Zalew thread_id" } },
       { key: "chores_chat_id", type: "text", label: { pl: "Czek-lista chat_id (grupa adminów)", en: "Checklist chat_id (admin group)", uk: "Чек-лист chat_id (група адмінів)" } },
       { key: "chores_thread_id", type: "text", label: { pl: "Czek-lista thread_id", en: "Checklist thread_id", uk: "Чек-лист thread_id" } },
       { key: "chores_admin_mentions", type: "text", label: { pl: "Czek-lista — pingowani admini (@user, spacja/przecinek)", en: "Checklist — pinged admins (@user, space/comma)", uk: "Чек-лист — пінговані адміни (@user, пробіл/кома)" } },

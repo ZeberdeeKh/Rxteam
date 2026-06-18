@@ -40,6 +40,7 @@ import {
   validTime,
   makeUtc,
   computeWindows,
+  getCheckinWindow,
   buildAnnouncement,
   registeredCount,
   formatWhen,
@@ -1083,6 +1084,40 @@ bot.command("setmedia", async (ctx) => {
         `Тут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.`,
     );
   }
+});
+
+// Прив'язка гілки «Флуд/Zalew» для щоденного нагадування про реєстрацію (Етап 27).
+// Виконати в потрібному топіку від імені адміна групи (flood_chat_id/flood_thread_id).
+// Поки не задано — щоденне нагадування інертне.
+bot.command("setflood", async (ctx) => {
+  if (ctx.chat.type === "private") {
+    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
+    await ctx.reply(tr(actorLang, "sethere_group_only"));
+    return;
+  }
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+  const threadId = ctx.message?.message_thread_id;
+  await setSetting("flood_chat_id", String(ctx.chat.id));
+  await setSetting("flood_thread_id", threadId ? String(threadId) : "");
+  await ctx.reply(
+    `✅ Гілку «Флуд/Zalew» для щоденного нагадування збережено.\nchat_id: ${ctx.chat.id}` +
+      (threadId ? `\nthread_id: ${threadId}` : "") +
+      `\n\nЩодня о заданій годині (Налаштування → «Щоденне нагадування») бот постітиме сюди двомовне нагадування про реєстрацію, якщо цього тижня попереду є гра.`,
+  );
 });
 
 // Тогл пункту чек-листа: вільно → взяв; мій → звільнив; чужий → «вже взяв …».
@@ -2134,7 +2169,7 @@ async function handleCheckin(ctx: Context, p: any, gameId: number, lat: number, 
 async function finalizeGame(ctx: Context, lang: Lang, data: Record<string, any>) {
   const gatherUtc = makeUtc(data.date, data.gather);
   const startUtc = makeUtc(data.date, data.start);
-  const w = computeWindows(gatherUtc, startUtc);
+  const w = computeWindows(gatherUtc, startUtc, await getCheckinWindow());
   const capacity: number | null = data.capacity ?? null;
 
   const { data: game } = await supabase

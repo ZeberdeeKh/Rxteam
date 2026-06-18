@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { supabase } from "./supabase";
+import { getSetting } from "./settings";
 import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
 
 const ZONE = "Europe/Warsaw";
@@ -30,16 +31,38 @@ export function makeUtc(dateYmd: string, time: string): string {
     .toISO()!;
 }
 
-// Вікна від часу збору (gather) і старту.
-export function computeWindows(gatherUtcIso: string, startUtcIso: string) {
+// Вікна від часу збору (gather) і старту. Вікно чек-іну конфігуровне через налаштування
+// (opts), reg/cancel — поки фіксовані (старт−9 год / збір−24 год). Дефолти: 30 хв до збору,
+// 60 хв після старту.
+export function computeWindows(
+  gatherUtcIso: string,
+  startUtcIso: string,
+  opts?: { checkinBeforeMin?: number; checkinAfterMin?: number },
+) {
   const g = DateTime.fromISO(gatherUtcIso, { zone: "utc" });
   const s = DateTime.fromISO(startUtcIso, { zone: "utc" });
+  const beforeMin = opts?.checkinBeforeMin ?? 30;
+  const afterMin = opts?.checkinAfterMin ?? 60;
   return {
     reg_closes_at: g.minus({ hours: 9 }).toISO()!,
     cancel_deadline: g.minus({ hours: 24 }).toISO()!,
-    checkin_from: g.minus({ minutes: 30 }).toISO()!,
-    checkin_to: s.plus({ minutes: 60 }).toISO()!,
+    checkin_from: g.minus({ minutes: beforeMin }).toISO()!,
+    checkin_to: s.plus({ minutes: afterMin }).toISO()!,
   };
+}
+
+// Вікно чек-іну (у хвилинах) із налаштувань — редагується в адмінці. Дефолти 30/60.
+// Передається в computeWindows при створенні гри і при перерахунку майбутніх ігор.
+export async function getCheckinWindow(): Promise<{ checkinBeforeMin: number; checkinAfterMin: number }> {
+  const [b, a] = await Promise.all([
+    getSetting("checkin_open_before_min"),
+    getSetting("checkin_close_after_min"),
+  ]);
+  const num = (v: string | null, d: number) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 ? n : d;
+  };
+  return { checkinBeforeMin: num(b, 30), checkinAfterMin: num(a, 60) };
 }
 
 export function formatTime(utcIso: string): string {

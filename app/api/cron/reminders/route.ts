@@ -1,10 +1,11 @@
 import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
-import { getSetting, featureEnabled } from "@/lib/settings";
+import { getSetting, setSetting, featureEnabled } from "@/lib/settings";
 import { formatWhen } from "@/lib/games";
 import { processDueChoreReports } from "@/lib/chores";
 import { tr } from "@/lib/strings";
 import type { Lang } from "@/lib/i18n";
+import { DAILY_REMINDER_DEFAULT } from "@/lib/admin-settings";
 import { DateTime } from "luxon";
 
 export const dynamic = "force-dynamic";
@@ -27,7 +28,15 @@ export async function GET(req: Request) {
     return 0;
   });
 
-  if (!(await featureEnabled("reminders"))) return Response.json({ skipped: "disabled", chores });
+  // Щоденне групове нагадування про реєстрацію (гілка «Флуд/Zalew») — незалежно від
+  // feature_reminders (має власний feature_daily_reminder).
+  const daily = await processDailyReminder().catch((e) => {
+    console.error("daily reminder failed", e);
+    return "error";
+  });
+
+  if (!(await featureEnabled("reminders")))
+    return Response.json({ skipped: "disabled", chores, daily });
 
   const nowMs = Date.now();
   const horizonIso = new Date(nowMs + 26 * 3600 * 1000).toISOString();
@@ -65,7 +74,72 @@ export async function GET(req: Request) {
     }
   }
 
-  return Response.json({ day, before, chores });
+  return Response.json({ day, before, chores, daily });
+}
+
+// Перелік назв локацій у текст: «A», «A i B», «A, B i C» (сполучник передаємо мовою).
+function joinNames(names: string[], conj: string): string {
+  if (names.length <= 1) return names[0] ?? "";
+  return `${names.slice(0, -1).join(", ")} ${conj} ${names[names.length - 1]}`;
+}
+
+// Двомовне (UA+PL) щоденне нагадування про реєстрацію. Постить у гілку «Флуд/Zalew»
+// раз на день о daily_reminder_hour (Europe/Warsaw), якщо цього календарного тижня (Пн–Нд)
+// попереду є анонсована гра. Ідемпотентність — daily_reminder_last_sent (дата Вроцлава).
+async function processDailyReminder(): Promise<string> {
+  if (!(await featureEnabled("daily_reminder"))) return "disabled";
+  const chatId = await getSetting("flood_chat_id");
+  if (!chatId) return "no_topic"; // інертно, поки гілку не задано через /setflood
+
+  const hour = Number((await getSetting("daily_reminder_hour")) ?? "18") || 18;
+  const now = DateTime.now().setZone(ZONE);
+  if (now.hour < hour) return "too_early";
+  const today = now.toFormat("yyyy-MM-dd");
+  if ((await getSetting("daily_reminder_last_sent")) === today) return "already_sent";
+
+  // Анонсовані ігри цього календарного тижня (Luxon: тиждень Пн–Нд), які ще попереду.
+  const weekEnd = now.endOf("week");
+  const { data: games } = await supabase
+    .from("games")
+    .select("id, start_at, locations(name)")
+    .eq("status", "announced")
+    .gt("start_at", now.toUTC().toISO())
+    .lte("start_at", weekEnd.toUTC().toISO())
+    .order("start_at", { ascending: true });
+  if (!games || games.length === 0) return "no_games";
+
+  // Унікальні назви локацій у порядку ігор.
+  const names: string[] = [];
+  for (const g of games) {
+    const nm = (g as any).locations?.name as string | undefined;
+    if (nm && !names.includes(nm)) names.push(nm);
+  }
+
+  const siteUrl = (
+    (await getSetting("site_url")) ||
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    "https://www.rxteam.pl"
+  ).replace(/\/$/, "");
+  const link = `${siteUrl}/games`;
+
+  const tplUk = (await getSetting("daily_reminder_text_uk")) || DAILY_REMINDER_DEFAULT.uk;
+  const tplPl = (await getSetting("daily_reminder_text_pl")) || DAILY_REMINDER_DEFAULT.pl;
+  const fill = (tpl: string, conj: string) =>
+    tpl.replace(/\{locations\}/g, joinNames(names, conj)).replace(/\{link\}/g, link);
+  // UA + PL в одному повідомленні (показується всім, незалежно від мови гравця).
+  const text = `${fill(tplUk, "і")}\n\n———————————————\n\n${fill(tplPl, "i")}`;
+
+  const threadId = await getSetting("flood_thread_id");
+  try {
+    await bot.api.sendMessage(Number(chatId), text, {
+      ...(threadId ? { message_thread_id: Number(threadId) } : {}),
+    });
+    await setSetting("daily_reminder_last_sent", today);
+    return "sent";
+  } catch (e) {
+    console.error("daily reminder send failed", e);
+    return "send_failed";
+  }
 }
 
 async function sendRemind(game: { id: number; title: string | null; start_at: string }, key: string) {
