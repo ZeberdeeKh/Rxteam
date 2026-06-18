@@ -63,7 +63,24 @@ export const faq: Record<Lang, string> = {
 🎒 Co zabrać: replika + akumulator/gaz, kulki, ochrona oczu/twarzy, ubranie na pogodę, woda.
 🆕 Nie masz sprzętu? Jest wypożyczalnia — zaznacz przy rejestracji w bocie.
 
-ℹ️ Rejestracja na grę i check-in — przez menu bota. Pytania — pisz do organizatorów. Miłej gry!`,
+ℹ️ Rejestracja na grę i check-in — przez menu bota. Pytania — pisz do organizatorów. Miłej gry!
+
+━━━━━━━━━━
+
+📋 Zasady wątków grupy
+
+💬 Zalew — luźny czat off-topic. Bez spamu i reklam. Szanuj innych.
+
+🛒 Kupię/Sprzedam (Giełda) — kup i sprzedaj sprzęt ASG.
+• Ogłoszenie = ZDJĘCIE + opis (cena, stan, kontakt). Sam tekst lub zdjęcie bez opisu = usuwane.
+• Chcesz, by trafiło na stronę RX Team? Dodaj tag #promo w opisie i miej naszywkę. Po akceptacji admina ląduje ZA DARMO na stronie Giełdy na 30 dni.
+• Bez #promo zdjęcie zostaje tylko w wątku. Bez naszywki — dostaniesz odmowę w wiadomości.
+
+📣 Zapowiedzi gier — TYLKO bot. Posty graczy są usuwane.
+
+📷 Zdjęcia i filmy z gier — TYLKO foto/wideo z gier. Tekst bez mediów jest usuwany.
+
+⚠️ Łamanie zasad w wątkach = automatyczne, rosnące wyciszenie.`,
 
   en: `🎯 RX Team — info for newcomers
 
@@ -75,7 +92,24 @@ export const faq: Record<Lang, string> = {
 🎒 What to bring: replica + battery/gas, BBs, eye/face protection, weather-appropriate clothes, water.
 🆕 No gear? Rental is available — mark it during registration in the bot.
 
-ℹ️ Game registration & check-in — via the bot menu. Questions — message the organizers. Have a good game!`,
+ℹ️ Game registration & check-in — via the bot menu. Questions — message the organizers. Have a good game!
+
+━━━━━━━━━━
+
+📋 Group topic rules
+
+💬 Flood — free off-topic chat. No spam or ads. Respect others.
+
+🛒 Buy/Sell (Marketplace) — buy and sell ASG gear.
+• A listing = PHOTO + description (price, condition, contact). Plain text or a photo with no caption = deleted.
+• Want it on the RX Team site? Add the #promo tag in the caption and have a patch. After an admin approves it, it goes FREE to the Marketplace page for 30 days.
+• Without #promo the photo just stays in the thread. Without a patch you'll get a rejection DM.
+
+📣 Game announcements — BOT ONLY. Player posts are deleted.
+
+📷 Game photos & videos — photos/videos from games ONLY. Text without media is deleted.
+
+⚠️ Breaking topic rules = automatic, escalating mute.`,
 
   uk: `🎯 RX Team — інфо для новачків
 
@@ -87,7 +121,24 @@ export const faq: Record<Lang, string> = {
 🎒 Що взяти: привід + акумулятор/газ, кулі, захист очей/обличчя, одяг по погоді, воду.
 🆕 Немає спорядження? Є оренда — познач при реєстрації в боті.
 
-ℹ️ Реєстрація на гру і чек-ін — через меню бота. Питання — пиши організаторам. Гарної гри!`,
+ℹ️ Реєстрація на гру і чек-ін — через меню бота. Питання — пиши організаторам. Гарної гри!
+
+━━━━━━━━━━
+
+📋 Правила гілок групи
+
+💬 Флуд — вільний чат не за темою. Без спаму й реклами. Поважай інших.
+
+🛒 Куплю/Продам (Барахолка) — купуй і продавай спорядження ASG.
+• Оголошення = ФОТО + опис (ціна, стан, контакт). Лише текст або фото без опису = видаляється.
+• Хочеш на сайт RX Team? Додай тег #promo в опис і май патч. Після схвалення адміна оголошення БЕЗКОШТОВНО потрапляє на сторінку Барахолки на 30 днів.
+• Без #promo фото лишається тільки в гілці. Без патча — отримаєш відмову в особисті.
+
+📣 Анонси ігор — ТІЛЬКИ бот. Дописи гравців видаляються.
+
+📷 Фото та відео з ігор — ТІЛЬКИ фото/відео з ігор. Текст без медіа видаляється.
+
+⚠️ Порушення правил гілок = автоматичне, наростаюче мовчання (mute).`,
 };
 
 // Онбординг — три мови підряд, розділені лінією.
