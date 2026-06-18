@@ -555,9 +555,9 @@ const S: Record<string, Dict> = {
 
   // carpool — /drivers (пасажир) і /myride (водій)
   drivers_none_games: {
-    pl: "Nie masz aktywnych zapisów na grę.",
-    en: "You have no active game sign-ups.",
-    uk: "Немає активних реєстрацій на гру.",
+    pl: "Nie jesteś zapisany na żadną grę. Lista kierowców (carpool) jest dostępna dopiero po zapisaniu się na grę — zapisz się przez /games.",
+    en: "You're not signed up for any game. The drivers list (carpool) is shown only after you sign up — register for a game via /games.",
+    uk: "Ти не записаний на жодну гру. Список водіїв (карпул) можна побачити лише після реєстрації — спершу запишись на гру через /games.",
   },
   drivers_pick_game: { pl: "Wybierz grę:", en: "Pick a game:", uk: "Обери гру:" },
   drivers_title: {
