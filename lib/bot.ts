@@ -169,10 +169,10 @@ bot.use(async (ctx, next) => {
 });
 
 // ─── Гард топіка «тільки медіа»: лишаємо фото/відео/документ; решту (текст тощо) видаляємо ───
-// Адміни групи й майстер — виняток (можуть писати текст). Ескалація: 1-ше порушення → пояснення
-// правил у приват; 2-ге → повторне попередження; 3-тє і кожне наступне → мут у групі на 1 год.
+// Адміни групи й майстер — виняток (можуть писати текст). Ескалація: 1-ше порушення → лише правила
+// у приват; 2-ге → правила ще раз + попередження про мут; 3-тє і кожне наступне → мут у групі на 15 хв.
 // Лічильник — media_violations.
-const MEDIA_MUTE_SECONDS = 60 * 60; // 1 година
+const MEDIA_MUTE_SECONDS = 15 * 60; // 15 хвилин
 
 async function guardMediaTopic(ctx: Context): Promise<boolean> {
   const msg = ctx.message;
@@ -243,21 +243,21 @@ async function guardMediaTopic(ctx: Context): Promise<boolean> {
   const lang = (player?.lang as Lang) ?? "uk";
 
   if (violations === 1) {
-    // Перше порушення — пояснення правил у приват.
+    // Перше порушення — лише правила у приват (без попередження про наступне).
     try {
       await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn"));
     } catch {}
     return true;
   }
   if (violations === 2) {
-    // Друге — повторне (останнє) попередження.
+    // Друге — правила ще раз + попередження про мут.
     try {
       await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn2"));
     } catch {}
     return true;
   }
 
-  // 3-тє і кожне наступне — мут у групі на годину + пояснення в приват.
+  // 3-тє і кожне наступне — мут у групі на 15 хв + пояснення в приват.
   try {
     await ctx.api.restrictChatMember(
       chat.id,
