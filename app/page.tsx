@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
-import { getNextGame, getRankingWithAchievements, getGalleryPhotos } from "@/lib/site-data";
+import {
+  getNextGame,
+  getRankingWithAchievements,
+  getGalleryPhotos,
+  getMarketplaceListings,
+} from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
 import { ui, GLYPH, Reveal } from "@/components/ui";
@@ -13,13 +18,15 @@ import GalleryGrid from "@/components/site/GalleryGrid";
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
 export default async function Home() {
   const lang = getServerLang();
-  const [next, ranking, settings, galleryPhotos] = await Promise.all([
+  const [next, ranking, settings, galleryPhotos, market] = await Promise.all([
     getNextGame(),
     getRankingWithAchievements(10),
     getAllSettings(),
     getGalleryPhotos(60),
+    getMarketplaceListings(3),
   ]);
   const showGallery = settings.feature_gallery !== "false" && galleryPhotos.length > 0;
+  const showMarket = settings.feature_marketplace !== "false" && market.length > 0;
 
   const countText = (() => {
     if (!next) return "";
@@ -57,6 +64,39 @@ export default async function Home() {
               prevLabel={st(lang, "gallery_prev")}
               nextLabel={st(lang, "gallery_next")}
             />
+          </section>
+        </Reveal>
+      )}
+
+      {/* Барахолка — тізер: 1 ряд останніх оголошень + кнопка на /marketplace */}
+      {showMarket && (
+        <Reveal>
+          <section>
+            <div className="flex items-baseline justify-between gap-3">
+              <h2 className={ui.sectionTitle}>{st(lang, "nav_marketplace")}</h2>
+              <Link href="/marketplace" className={ui.link}>
+                {st(lang, "home_cta_marketplace")} →
+              </Link>
+            </div>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {market.map((l) => (
+                <Link
+                  key={l.id}
+                  href="/marketplace"
+                  className="group block overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                >
+                  {l.photos[0] && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={l.photos[0]}
+                      alt=""
+                      loading="lazy"
+                      className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
+                    />
+                  )}
+                </Link>
+              ))}
+            </div>
           </section>
         </Reveal>
       )}
