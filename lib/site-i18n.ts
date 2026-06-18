@@ -57,7 +57,7 @@ const SITE: Record<string, Dict> = {
   marketplace_photos_more: { pl: "+{n} zdjęć", en: "+{n} photos", uk: "+{n} фото" },
   marketplace_expand: { pl: "Rozwiń", en: "Show more", uk: "Розгорнути" },
   marketplace_collapse: { pl: "Zwiń", en: "Show less", uk: "Згорнути" },
-  home_cta_marketplace: { pl: "Przejdź do giełdy", en: "Go to marketplace", uk: "Перейти на барахолку" },
+  home_cta_marketplace: { pl: "Zobacz więcej", en: "See more", uk: "Дивитись більше" },
 
   // ── Адмінка: барахолка ──
   adm_nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },

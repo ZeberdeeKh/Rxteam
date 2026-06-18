@@ -9,10 +9,11 @@ import {
 } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
-import { ui, GLYPH, Reveal } from "@/components/ui";
+import { ui, GLYPH, Reveal, btn } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
+import ListingCard from "@/components/site/ListingCard";
 
 // Лендінг (публічний, одна сторінка): «Про нас» + галерея + герой + найближча гра + рейтинг + соцмережі (внизу).
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
@@ -68,39 +69,6 @@ export default async function Home() {
         </Reveal>
       )}
 
-      {/* Барахолка — тізер: 1 ряд останніх оголошень + кнопка на /marketplace */}
-      {showMarket && (
-        <Reveal>
-          <section>
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className={ui.sectionTitle}>{st(lang, "nav_marketplace")}</h2>
-              <Link href="/marketplace" className={ui.link}>
-                {st(lang, "home_cta_marketplace")} →
-              </Link>
-            </div>
-            <div className="mt-3 grid grid-cols-3 gap-3">
-              {market.map((l) => (
-                <Link
-                  key={l.id}
-                  href="/marketplace"
-                  className="group block overflow-hidden bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                >
-                  {l.photos[0] && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={l.photos[0]}
-                      alt=""
-                      loading="lazy"
-                      className="aspect-square w-full object-cover transition duration-300 group-hover:scale-105"
-                    />
-                  )}
-                </Link>
-              ))}
-            </div>
-          </section>
-        </Reveal>
-      )}
-
       {/* Найближча гра */}
       <Reveal>
         <section>
@@ -149,6 +117,25 @@ export default async function Home() {
           )}
         </section>
       </Reveal>
+
+      {/* Барахолка — тізер: ряд повноцінних карток (з лайтбоксом/каруселлю) + кнопка «дивитись більше» */}
+      {showMarket && (
+        <Reveal>
+          <section>
+            <h2 className={ui.sectionTitle}>{st(lang, "nav_marketplace")}</h2>
+            <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {market.map((l) => (
+                <ListingCard key={l.id} listing={l} lang={lang} />
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <Link href="/marketplace" className={btn("outline")}>
+                {st(lang, "home_cta_marketplace")} →
+              </Link>
+            </div>
+          </section>
+        </Reveal>
+      )}
 
       {/* Рейтинг (на лендінгу, замість окремої сторінки в меню) */}
       <Reveal>
