@@ -26,7 +26,7 @@ const SITE: Record<string, Dict> = {
   nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   nav_ranking: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
   nav_cabinet: { pl: "Mój profil", en: "My profile", uk: "Кабінет" },
-  nav_mygames: { pl: "Moje gry", en: "My games", uk: "Мої ігри" },
+  nav_mygames: { pl: "Gry", en: "Games", uk: "Ігри" },
   nav_login: { pl: "Zaloguj", en: "Log in", uk: "Увійти" },
   nav_logout: { pl: "Wyloguj", en: "Log out", uk: "Вийти" },
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
@@ -505,7 +505,7 @@ const SITE: Record<string, Dict> = {
   ach_earned: { pl: "Zdobyto", en: "Earned", uk: "Отримано" },
 
   // ── 6.2 Мої ігри ──
-  mygames_title: { pl: "Moje gry", en: "My games", uk: "Мої ігри" },
+  mygames_title: { pl: "Gry", en: "Games", uk: "Ігри" },
   mygames_empty: {
     pl: "Brak nadchodzących gier.",
     en: "No upcoming games.",
