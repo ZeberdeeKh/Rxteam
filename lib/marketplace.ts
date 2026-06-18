@@ -1,11 +1,12 @@
-// Барахолка / Marketplace (Етап 28). Bot-agnostic ядро: приймає grammy `Api`
+// Барахолка / Marketplace (Етап 28-29). Bot-agnostic ядро: приймає grammy `Api`
 // (ctx.api у боті / bot.api у кроні), щоб логіка не залежала від точки виклику й
 // не було циклічного імпорту з lib/bot.ts.
 //
 // Потік: фото з описом у гілці продажів → якщо в описі #promo І автор має патч →
 // заливаємо фото в Storage, створюємо 'pending'-оголошення, шлемо картку на апрув у
-// адмін-групу. Альбом (media_group_id) збирається в ОДНЕ оголошення (RPC
-// mp_collect_album_photo) + фіналізація з debounce. Зняття — markDeleted/deleteListing.
+// адмін-групу + DM продавцю. Альбом (media_group_id) збирається в ОДНЕ оголошення
+// ІНКРЕМЕНТАЛЬНО: Telegram доставляє фото альбому ПОСЛІДОВНО (чекає відповідь на кожен
+// апдейт), тому жодного debounce/sleep — кожне фото при надходженні додає себе до рядка.
 import { randomUUID } from "crypto";
 import { type Api } from "grammy";
 import { supabase } from "./supabase";
@@ -14,9 +15,7 @@ import { getAdminsWithPerm } from "./players";
 import { tr } from "./strings";
 import { type Lang } from "./i18n";
 
-const FINALIZE_DELAY_MS = 2000; // скільки чекати перед фіналізацією альбому
-const QUIET_MS = 1500; // якщо нове фото прийшло пізніше за це — фіналізує наступний виклик
-const STUCK_COLLECTING_MIN = 10; // прибирати «завислі» collecting старші за N хв
+const STUCK_COLLECTING_MIN = 10; // прибирати «завислі» collecting (альбом без #promo) старші за N хв
 
 export type MarketplaceListing = {
   id: number;
@@ -57,9 +56,7 @@ export function extractPromo(
 ): { isPromo: boolean; cleaned: string | null } {
   if (!caption) return { isPromo: false, cleaned: null };
   const isPromo = caption.toLowerCase().includes(tag.toLowerCase());
-  const cleaned = (
-    isPromo ? caption.replace(new RegExp(escapeRegex(tag), "ig"), "") : caption
-  )
+  const cleaned = (isPromo ? caption.replace(new RegExp(escapeRegex(tag), "ig"), "") : caption)
     .replace(/[ \t]{2,}/g, " ")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
@@ -98,6 +95,9 @@ async function deleteTgMessages(api: Api, chatId: number, ids: number[] | null |
 }
 
 // Скачати фото з Telegram і залити в публічний bucket. → {url, path} | null.
+// ВАЖЛИВО: Telegram-файловий сервер часто віддає content-type: application/octet-stream.
+// Якщо залити з ним — Telegram sendPhoto за URL відхиляє «не зображення», а браузер
+// СКАЧУЄ файл замість показу. Тож тип/розширення беремо з file_path (там реальне .jpg).
 async function downloadAndUpload(api: Api, fileId: string): Promise<{ url: string; path: string } | null> {
   try {
     const file = await api.getFile(fileId);
@@ -105,8 +105,10 @@ async function downloadAndUpload(api: Api, fileId: string): Promise<{ url: strin
     const res = await fetch(`https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`);
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    const mime = res.headers.get("content-type") || "image/jpeg";
-    const ext = (mime.split("/")[1] ?? "jpg").replace("jpeg", "jpg").replace(/[^a-z0-9]/g, "") || "jpg";
+    const ext0 = (file.file_path.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const ext = ext0 === "jpeg" ? "jpg" : /^(jpg|png|webp|gif)$/.test(ext0) ? ext0 : "jpg";
+    const mime =
+      ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : ext === "gif" ? "image/gif" : "image/jpeg";
     const path = `listings/${randomUUID()}.${ext}`;
     const bucket = await bucketName();
     const up = await supabase.storage.from(bucket).upload(path, buf, { contentType: mime });
@@ -174,6 +176,19 @@ export async function postApprovalCard(api: Api, listingId: number) {
   }
 }
 
+// Повідомити продавця, що оголошення пішло на модерацію (потребує, щоб продавець
+// раніше натиснув /start боту — інакше DM тихо не дійде).
+async function notifySubmitted(api: Api, listingId: number) {
+  const { data: l } = await supabase
+    .from("marketplace_listings")
+    .select("seller_tg_user_id, seller_player_id")
+    .eq("id", listingId)
+    .maybeSingle();
+  if (!l?.seller_tg_user_id) return;
+  const seller = await fetchSeller(l.seller_player_id, l.seller_tg_user_id);
+  await dm(api, l.seller_tg_user_id, tr((seller?.lang as Lang) ?? "uk", "mp_submitted"));
+}
+
 // Приймає одне фото з гілки продажів (одиночне або член альбому).
 // Для одиночного гарантовано є підпис (гард). Для альбому підпис може бути на сусіді.
 export async function ingestSalesPhoto(
@@ -191,25 +206,9 @@ export async function ingestSalesPhoto(
   const promoTag = (await getSetting("marketplace_promo_tag")) || "#promo";
   const { isPromo, cleaned } = extractPromo(opts.caption, promoTag);
 
-  // ── Альбом: ШВИДКО дозбируємо лише file_id (без завантаження!), потім (з debounce)
-  // фіналізуємо. Завантаження відкладене на фіналізацію — інакше повільний download
-  // спричиняв гонку: фіналізація сусіда спрацьовувала до запису підпису (Етап 29).
+  // ── Альбом: інкрементальний збір (без debounce, бо Telegram шле фото послідовно) ──
   if (opts.mediaGroupId) {
-    await supabase.rpc("mp_collect_album_photo", {
-      p_chat_id: opts.chatId,
-      p_media_group_id: opts.mediaGroupId,
-      p_message_id: opts.messageId,
-      p_file_id: opts.fileId,
-      p_file_unique_id: opts.fileUniqueId,
-      p_description: cleaned,
-      p_is_promo: isPromo,
-      p_seller_player_id: opts.seller.playerId,
-      p_seller_tg_user_id: opts.seller.tgUserId,
-      p_seller_tg_username: opts.seller.username,
-      p_seller_display: opts.seller.display,
-    });
-    await new Promise((r) => setTimeout(r, FINALIZE_DELAY_MS));
-    await finalizeAlbum(api, opts.chatId, opts.mediaGroupId);
+    await progressAlbumPhoto(api, opts, isPromo, cleaned);
     return;
   }
 
@@ -248,62 +247,93 @@ export async function ingestSalesPhoto(
     .select("id")
     .maybeSingle();
   if (error || !data) return; // дубль (ретрай вебхука) або помилка → не постимо картку
+  await notifySubmitted(api, data.id);
   await postApprovalCard(api, data.id);
 }
 
-// Фіналізація альбому: дочекалися «затишшя» → рівно один воркер вирішує долю оголошення.
-async function finalizeAlbum(api: Api, chatId: number, mediaGroupId: string) {
+// Інкрементальна обробка одного фото альбому. Збираємо file_id у рядок (RPC), потім за
+// поточним станом рядка вирішуємо: ще чекаємо підпис / це не для сайту / публікуємо.
+// Без sleep — кожне фото самодостатнє; за послідовної доставки Telegram гонки немає.
+async function progressAlbumPhoto(
+  api: Api,
+  opts: {
+    chatId: number;
+    messageId: number;
+    mediaGroupId: string | null;
+    fileId: string;
+    fileUniqueId: string;
+    seller: SellerInfo;
+  },
+  isPromo: boolean,
+  cleaned: string | null,
+) {
+  await supabase.rpc("mp_collect_album_photo", {
+    p_chat_id: opts.chatId,
+    p_media_group_id: opts.mediaGroupId,
+    p_message_id: opts.messageId,
+    p_file_id: opts.fileId,
+    p_file_unique_id: opts.fileUniqueId,
+    p_description: cleaned,
+    p_is_promo: isPromo,
+    p_seller_player_id: opts.seller.playerId,
+    p_seller_tg_user_id: opts.seller.tgUserId,
+    p_seller_tg_username: opts.seller.username,
+    p_seller_display: opts.seller.display,
+  });
+
   const { data: row } = await supabase
     .from("marketplace_listings")
     .select("*")
-    .eq("tg_chat_id", chatId)
-    .eq("media_group_id", mediaGroupId)
+    .eq("tg_chat_id", opts.chatId)
+    .eq("media_group_id", opts.mediaGroupId!)
     .maybeSingle();
-  if (!row || row.status !== "collecting") return;
-  // Прийшло нове фото нещодавно — хай фіналізує наступний виклик.
-  if (Date.now() - new Date(row.updated_at).getTime() < QUIET_MS) return;
+  if (!row) return;
 
-  // Атомарний клейм: лише один виклик пройде далі.
-  const { data: claimed } = await supabase
-    .from("marketplace_listings")
-    .update({ approval_claimed_at: new Date().toISOString() })
-    .eq("id", row.id)
-    .eq("status", "collecting")
-    .is("approval_claimed_at", null)
-    .select("id")
-    .maybeSingle();
-  if (!claimed) return;
+  // Уже на модерації (підпис обробив попередній кадр) → просто додаємо ЦЕ фото.
+  if (row.status === "pending") {
+    await appendPhoto(api, row.id, opts.fileId);
+    return;
+  }
+  if (row.status !== "collecting") return; // термінальний (rejected/deleted) → ігноруємо
+  if (!row.description) return; // підпис ще не прийшов → чекаємо наступні кадри
 
+  const requirePatch = (await getSetting("marketplace_require_patch")) !== "false";
   const seller = await fetchSeller(row.seller_player_id, row.seller_tg_user_id);
   const lang = (seller?.lang as Lang) ?? "uk";
 
-  // Немає опису ніде → весь альбом видаляємо з ТГ + DM, прибираємо файли й рядок.
-  if (!row.description) {
-    await deleteTgMessages(api, chatId, row.tg_message_ids);
-    await removeFiles(row.storage_paths);
-    await supabase.from("marketplace_listings").delete().eq("id", row.id);
-    await dm(api, row.seller_tg_user_id, tr(lang, "mp_need_caption"));
+  // Не для сайту (немає #promo, або #promo без патча) → дропаємо рядок один раз (guarded).
+  if (!row.is_promo || (requirePatch && !seller?.has_patch)) {
+    const { data: claimed } = await supabase
+      .from("marketplace_listings")
+      .delete()
+      .eq("id", row.id)
+      .eq("status", "collecting")
+      .select("id")
+      .maybeSingle();
+    if (claimed && row.is_promo && requirePatch && !seller?.has_patch) {
+      const hint = (await getSetting("marketplace_patch_hint")) || "";
+      await dm(api, row.seller_tg_user_id, tr(lang, "mp_patch_required", { hint }));
+    }
     return;
   }
-  // Є опис, але без #promo → це звичайний контент гілки: лишаємо фото в ТГ, дропаємо рядок.
-  if (!row.is_promo) {
-    await removeFiles(row.storage_paths);
-    await supabase.from("marketplace_listings").delete().eq("id", row.id);
+
+  // Підходить → claim-перехід collecting→pending (рівно один кадр виграє й завантажує
+  // всі зібрані досі фото; решта кадрів потім дозавантажують себе як 'pending').
+  const { data: claimed } = await supabase
+    .from("marketplace_listings")
+    .update({ status: "pending", updated_at: new Date().toISOString() })
+    .eq("id", row.id)
+    .eq("status", "collecting")
+    .select("id, photo_file_ids")
+    .maybeSingle();
+  if (!claimed) {
+    // Уже флипнули (рідко за послідовної доставки) → додаємо це фото.
+    await appendPhoto(api, row.id, opts.fileId);
     return;
   }
-  // #promo без патча → DM + дропаємо рядок (фото лишається в гілці).
-  const requirePatch = (await getSetting("marketplace_require_patch")) !== "false";
-  if (requirePatch && !seller?.has_patch) {
-    await removeFiles(row.storage_paths);
-    await supabase.from("marketplace_listings").delete().eq("id", row.id);
-    const hint = (await getSetting("marketplace_patch_hint")) || "";
-    await dm(api, row.seller_tg_user_id, tr(lang, "mp_patch_required", { hint }));
-    return;
-  }
-  // #promo + патч → ТЕПЕР завантажуємо всі фото альбому (усі вже зібрані) і публікуємо.
   const urls: string[] = [];
   const paths: string[] = [];
-  for (const fid of (row.photo_file_ids ?? []) as string[]) {
+  for (const fid of ((claimed as any).photo_file_ids ?? []) as string[]) {
     const up = await downloadAndUpload(api, fid);
     if (up) {
       urls.push(up.url);
@@ -316,14 +346,29 @@ async function finalizeAlbum(api: Api, chatId: number, mediaGroupId: string) {
   }
   await supabase
     .from("marketplace_listings")
+    .update({ photo_urls: urls, storage_paths: paths, updated_at: new Date().toISOString() })
+    .eq("id", row.id);
+  await notifySubmitted(api, row.id);
+  await postApprovalCard(api, row.id);
+}
+
+// Дозавантажити одне фото до вже існуючого pending-оголошення (член альбому після флипу).
+async function appendPhoto(api: Api, listingId: number, fileId: string) {
+  const up = await downloadAndUpload(api, fileId);
+  if (!up) return;
+  const { data: cur } = await supabase
+    .from("marketplace_listings")
+    .select("photo_urls, storage_paths")
+    .eq("id", listingId)
+    .maybeSingle();
+  await supabase
+    .from("marketplace_listings")
     .update({
-      status: "pending",
-      photo_urls: urls,
-      storage_paths: paths,
+      photo_urls: [...((cur?.photo_urls as string[]) || []), up.url],
+      storage_paths: [...((cur?.storage_paths as string[]) || []), up.path],
       updated_at: new Date().toISOString(),
     })
-    .eq("id", row.id);
-  await postApprovalCard(api, row.id);
+    .eq("id", listingId);
 }
 
 // Знаходить оголошення для /delete: спершу за id повідомлення (відповідь на оригінал),
@@ -385,7 +430,7 @@ export async function expireOldListings(): Promise<number> {
   return data?.length ?? 0;
 }
 
-// Прибирання «завислих» альбомів у статусі collecting (фіналізація не спрацювала).
+// Прибирання «завислих» альбомів у статусі collecting (напр. альбом без #promo).
 export async function sweepStuckCollecting(): Promise<number> {
   const cutoff = new Date(Date.now() - STUCK_COLLECTING_MIN * 60000).toISOString();
   const { data } = await supabase

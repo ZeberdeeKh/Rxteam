@@ -758,6 +758,11 @@ const S: Record<string, Dict> = {
     en: "⛔ This isn't your listing.",
     uk: "⛔ Це не твоє оголошення.",
   },
+  mp_submitted: {
+    pl: "📨 Twoje ogłoszenie zostało wysłane do moderacji. Po zatwierdzeniu pojawi się na stronie (Giełda).",
+    en: "📨 Your listing has been sent for moderation. Once approved it will appear on the site (Marketplace).",
+    uk: "📨 Твоє оголошення надіслано на модерацію. Після підтвердження воно з'явиться на сайті (Барахолка).",
+  },
   mp_you_approved: {
     pl: "✅ Twoje ogłoszenie zostało opublikowane na stronie (Giełda).",
     en: "✅ Your listing has been published on the site (Marketplace).",
