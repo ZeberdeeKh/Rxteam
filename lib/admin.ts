@@ -10,6 +10,7 @@ export type AdminPerm =
   | "games"
   | "locations"
   | "players"
+  | "patch"
   | "referrals"
   | "rental"
   | "joins"
@@ -24,6 +25,7 @@ export const ALL_PERMS: AdminPerm[] = [
   "games",
   "locations",
   "players",
+  "patch",
   "referrals",
   "rental",
   "joins",

@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { setSetting, getSetting } from "@/lib/settings";
 import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
-import { TOGGLE_KEYS, VALUE_KEYS } from "@/lib/admin-settings";
+import { TOGGLE_KEYS, VALUE_KEYS, PATCH_TOGGLE_KEYS, PATCH_VALUE_KEYS } from "@/lib/admin-settings";
+import { notifyPlayerPatch } from "@/lib/notify";
+import type { Lang } from "@/lib/i18n";
 import { SOCIALS } from "@/lib/social";
 import { makeUtc, computeWindows } from "@/lib/games";
 import { announceGame } from "@/lib/game-announce";
@@ -328,6 +330,89 @@ export async function togglePatch(formData: FormData) {
   }
   revalidatePath("/admin/players");
   redirect("/admin/players?patch=1");
+}
+
+// ── Заявки на патч (право "patch") — двокрокове схвалення, дзеркало бота (patchok/patchno/patchhand) ──
+// Окремий запит гравця замість вкладеного embed: patch_requests має ДВА FK на players
+// (player_id і decided_by), тож "players(...)" неоднозначний.
+async function loadPatchReq(id: number) {
+  const { data: req } = await supabase
+    .from("patch_requests")
+    .select("id, status, player_id")
+    .eq("id", id)
+    .single();
+  if (!req) return null;
+  const { data: player } = await supabase
+    .from("players")
+    .select("id, lang, tg_user_id, rank")
+    .eq("id", req.player_id)
+    .single();
+  return { req, player };
+}
+
+// Схвалити заявку (requested → approved). Гравцю — «чекай видачі на грі».
+export async function approvePatchRequest(formData: FormData) {
+  const me = await requirePerm("patch");
+  const id = Number(formData.get("reqId"));
+  const loaded = await loadPatchReq(id);
+  if (!loaded?.req || loaded.req.status !== "requested") redirect("/admin/patches");
+  await supabase
+    .from("patch_requests")
+    .update({ status: "approved", decided_by: me.id, decided_at: new Date().toISOString() })
+    .eq("id", id);
+  await notifyPlayerPatch(loaded!.player?.tg_user_id, (loaded!.player?.lang as Lang) ?? "uk", "patch_you_approved");
+  revalidatePath("/admin/patches");
+  redirect("/admin/patches?done=1");
+}
+
+// Відхилити заявку (requested|approved → rejected).
+export async function rejectPatchRequest(formData: FormData) {
+  const me = await requirePerm("patch");
+  const id = Number(formData.get("reqId"));
+  const loaded = await loadPatchReq(id);
+  if (!loaded?.req || !["requested", "approved"].includes(loaded.req.status)) redirect("/admin/patches");
+  await supabase
+    .from("patch_requests")
+    .update({ status: "rejected", decided_by: me.id, decided_at: new Date().toISOString() })
+    .eq("id", id);
+  await notifyPlayerPatch(loaded!.player?.tg_user_id, (loaded!.player?.lang as Lang) ?? "uk", "patch_you_rejected");
+  revalidatePath("/admin/patches");
+  redirect("/admin/patches?done=1");
+}
+
+// «Видано на грі» (approved → handed): ставимо патч, вхідний ранг Recruit, дату видачі.
+export async function handPatchRequest(formData: FormData) {
+  const me = await requirePerm("patch");
+  const id = Number(formData.get("reqId"));
+  const loaded = await loadPatchReq(id);
+  if (!loaded?.req || loaded.req.status !== "approved") redirect("/admin/patches");
+  await supabase
+    .from("patch_requests")
+    .update({ status: "handed", decided_by: me.id, decided_at: new Date().toISOString() })
+    .eq("id", id);
+  await supabase
+    .from("players")
+    .update({ has_patch: true, rank: loaded!.player?.rank ?? "Recruit", patch_at: new Date().toISOString() })
+    .eq("id", loaded!.req.player_id);
+  await notifyPlayerPatch(loaded!.player?.tg_user_id, (loaded!.player?.lang as Lang) ?? "uk", "patch_you_handed");
+  revalidatePath("/admin/patches");
+  revalidatePath("/cabinet");
+  redirect("/admin/patches?done=1");
+}
+
+// Налаштування системи патчів (право "patch"). Пише ЛИШЕ патч-ключі — інші toggles не чіпає.
+export async function savePatchSettings(formData: FormData) {
+  await requirePerm("patch");
+  for (const key of PATCH_TOGGLE_KEYS) {
+    await setSetting(key, formData.get(key) === "on" ? "true" : "false");
+  }
+  for (const key of PATCH_VALUE_KEYS) {
+    const v = formData.get(key);
+    if (v !== null) await setSetting(key, String(v));
+  }
+  revalidatePath("/admin/patches");
+  revalidatePath("/cabinet"); // ціна/текст показуються в кабінеті
+  redirect("/admin/patches?saved=1");
 }
 
 // Видати гравцю будь-яку ачівку вручну. Переюз канонічної логіки economy.grantAchievement:

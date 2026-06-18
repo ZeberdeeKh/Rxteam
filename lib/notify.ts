@@ -118,6 +118,17 @@ export async function notifyAdminsPatchRequest(req: {
   }
 }
 
+// Сповіщення гравця про рішення по заявці на патч (виклик із адмінки сайту — /admin/patches).
+// Ті самі тексти, що шле бот (patch_you_approved/rejected/handed). Best-effort.
+export async function notifyPlayerPatch(
+  tgUserId: number | null | undefined,
+  lang: Lang,
+  key: "patch_you_approved" | "patch_you_rejected" | "patch_you_handed",
+) {
+  if (!tgUserId) return;
+  await sendTg(tgUserId, tr(lang, key));
+}
+
 // Сповіщення адмінів про реєстрацію з ОРЕНДОЮ (викликається і з сайту, і з бота — lib/bot.ts).
 // Додає явний контакт орендаря: TG-лінк (t.me/username або tg://user?id=) чи email (сайт-юзери).
 export async function notifyAdminsRental(opts: {

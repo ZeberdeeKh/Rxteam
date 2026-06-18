@@ -114,8 +114,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
 
   // Патч: показуємо наявність/відсутність; якщо немає — кнопка запиту (з дедупом «на розгляді»).
   const patchEnabled = await featureEnabled("patch");
-  let patchPending = false;
+  let patchStatus: string | null = null; // "requested" | "approved" | null
   let patchPrice: string | null = null;
+  let patchBenefits = "";
   if (patchEnabled && !player.has_patch) {
     const { data: open } = await supabase
       .from("patch_requests")
@@ -124,8 +125,10 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
       .in("status", ["requested", "approved"])
       .limit(1)
       .maybeSingle();
-    patchPending = !!open;
+    patchStatus = open?.status ?? null;
     patchPrice = await getSetting("patch_price_zl");
+    // Текст-пояснення редагується в адмінці (/admin/patches → patch_msg_*); порожнє → дефолт із i18n.
+    patchBenefits = (await getSetting(`patch_msg_${lang}`)) || st(lang, "patch_benefits_site");
   }
 
   return (
@@ -167,13 +170,15 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                 )}
               </dd>
               {!player.has_patch &&
-                (patchPending ? (
+                (patchStatus === "approved" ? (
+                  <p className={`mt-1 ${ui.meta}`}>{st(lang, "patch_approved_site")}</p>
+                ) : patchStatus === "requested" ? (
                   <p className={`mt-1 ${ui.meta}`}>{st(lang, "patch_under_review")}</p>
                 ) : (
                   <PatchRequestDrawer
                     triggerLabel={st(lang, "patch_request_btn")}
                     title={st(lang, "patch_drawer_title")}
-                    benefits={st(lang, "patch_benefits_site")}
+                    benefits={patchBenefits}
                     priceLine={patchPrice ? st(lang, "patch_price_line_site", { price: patchPrice }) : null}
                     confirmLabel={st(lang, "patch_confirm_btn")}
                     closeLabel={st(lang, "adm_close")}

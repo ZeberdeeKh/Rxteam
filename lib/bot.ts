@@ -1400,7 +1400,8 @@ bot.callbackQuery("patchreq", async (ctx) => {
     return;
   }
   const price = await getSetting("patch_price_zl");
-  let msg = tr(lang, "patch_benefits");
+  // Текст-пояснення редагується в адмінці (/admin/patches → patch_msg_*); порожнє → дефолт із i18n.
+  let msg = (await getSetting(`patch_msg_${lang}`)) || tr(lang, "patch_benefits");
   if (price) msg += "\n\n" + tr(lang, "patch_price_line", { price });
   msg += "\n\n" + tr(lang, "patch_confirm_hint");
   const kb = new InlineKeyboard().text(tr(lang, "btn_patch_confirm"), "patchconfirm");

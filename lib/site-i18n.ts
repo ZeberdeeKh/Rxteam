@@ -197,6 +197,11 @@ const SITE: Record<string, Dict> = {
     en: "⏳ Request under review",
     uk: "⏳ Запит на розгляді",
   },
+  patch_approved_site: {
+    pl: "✅ Zatwierdzono — odbierzesz patch na najbliższej grze.",
+    en: "✅ Approved — you'll get the patch at the next game.",
+    uk: "✅ Схвалено — отримаєш патч на найближчій грі.",
+  },
   // Бокова панель із поясненням патча (донат, бонуси) + повторне підтвердження.
   patch_drawer_title: { pl: "Prośba o patch", en: "Patch request", uk: "Запит на патч" },
   patch_benefits_site: {
@@ -597,6 +602,7 @@ const SITE: Record<string, Dict> = {
   adm_nav_settings: { pl: "Ustawienia", en: "Settings", uk: "Налаштування" },
   adm_nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   adm_nav_players: { pl: "Gracze", en: "Players", uk: "Гравці" },
+  adm_nav_patch: { pl: "Patche", en: "Patches", uk: "Патчі" },
   adm_nav_referrals: { pl: "Polecenia", en: "Referrals", uk: "Реферали" },
   adm_nav_rental: { pl: "Wynajem", en: "Rental", uk: "Оренда" },
   adm_nav_joins: { pl: "Wnioski (grupa)", en: "Join requests", uk: "Заявки в групу" },
@@ -918,6 +924,20 @@ const SITE: Record<string, Dict> = {
     en: "adjust points/balance, patch, change callsign, grant achievements.",
     uk: "корекція балів/балансу, патч, зміна позивного, видача ачівок.",
   },
+  adm_perm_patch: {
+    pl: "zarządzanie prośbami o patch (zatwierdzanie, wydanie na grze) i ustawieniami systemu patchy.",
+    en: "manage patch requests (approve, hand at game) and patch system settings.",
+    uk: "керування заявками на патч (схвалення, видача на грі) і налаштуваннями системи патчів.",
+  },
+  // Сторінка /admin/patches: заявки + налаштування.
+  adm_patch_requests_title: { pl: "Prośby o patch", en: "Patch requests", uk: "Заявки на патч" },
+  adm_patch_no_requests: { pl: "Brak aktywnych próśb.", en: "No active requests.", uk: "Немає активних заявок." },
+  adm_patch_settings_title: { pl: "Ustawienia systemu patchy", en: "Patch system settings", uk: "Налаштування системи патчів" },
+  adm_patch_approve: { pl: "✅ Zatwierdź", en: "✅ Approve", uk: "✅ Схвалити" },
+  adm_patch_reject: { pl: "❌ Odrzuć", en: "❌ Reject", uk: "❌ Відхилити" },
+  adm_patch_hand: { pl: "🎖 Wydano na grze", en: "🎖 Handed at game", uk: "🎖 Видано на грі" },
+  adm_patch_st_requested: { pl: "na rozpatrzeniu", en: "under review", uk: "на розгляді" },
+  adm_patch_st_approved: { pl: "zatwierdzono", en: "approved", uk: "схвалено" },
   adm_perm_joins: {
     pl: "podgląd zgłoszeń dołączenia do grupy.",
     en: "view group join attempts.",

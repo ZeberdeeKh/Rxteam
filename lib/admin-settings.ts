@@ -5,6 +5,7 @@
 // як є — вони позначають, якою мовою редагується сам текст бота, а не мову UI.
 import { captchaPrompt, correctMap, wrongMap, expiredMap, faq, type Lang } from "./i18n";
 import { REPLICA_TYPES, LIMIT_SETTING_DEFAULTS } from "./replicas";
+import { tr } from "./strings";
 
 type Loc = Record<Lang, string>;
 
@@ -44,6 +45,10 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   faq_uk: faq.uk,
   ...LIMIT_SETTING_DEFAULTS,
   ...replicaLimitPlaceholders,
+  // Текст-пояснення патча (редагується на /admin/patches). Порожнє поле = вживається цей дефолт.
+  patch_msg_pl: tr("pl", "patch_benefits"),
+  patch_msg_en: tr("en", "patch_benefits"),
+  patch_msg_uk: tr("uk", "patch_benefits"),
 };
 
 // Слово «ліміт» для згенерованих підписів полів лімітів реплік.
@@ -80,7 +85,6 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_shield", type: "toggle", label: { pl: "Tarcza anty-bot", en: "Anti-bot shield", uk: "Захист від ботів" } },
       { key: "feature_onboarding_faq", type: "toggle", label: { pl: "FAQ powitalne", en: "Onboarding FAQ", uk: "Привітальний FAQ" } },
       { key: "feature_economy", type: "toggle", label: { pl: "Ekonomia (punkty)", en: "Economy (points)", uk: "Економіка (бали)" } },
-      { key: "feature_patch", type: "toggle", label: { pl: "Patch (członkostwo)", en: "Patch (membership)", uk: "Патч (членство)" } },
       { key: "feature_achievements", type: "toggle", label: { pl: "Osiągnięcia", en: "Achievements", uk: "Ачівки" } },
       { key: "feature_referrals", type: "toggle", label: { pl: "Polecenia", en: "Referrals", uk: "Реферали" } },
       { key: "feature_reminders", type: "toggle", label: { pl: "Przypomnienia", en: "Reminders", uk: "Нагадування" } },
@@ -102,16 +106,14 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "pts_ach_easy", type: "number", label: { pl: "Osiągnięcie: easy", en: "Achievement: easy", uk: "Ачівка: easy" } },
       { key: "pts_ach_mid", type: "number", label: { pl: "Osiągnięcie: mid", en: "Achievement: mid", uk: "Ачівка: mid" } },
       { key: "pts_ach_hard", type: "number", label: { pl: "Osiągnięcie: hard", en: "Achievement: hard", uk: "Ачівка: hard" } },
-      { key: "no_patch_multiplier", type: "number", label: { pl: "Mnożnik bez patcha (0–1)", en: "Multiplier without patch (0–1)", uk: "Множник без патча (0–1)" } },
     ],
   },
   {
-    title: { pl: "Rangi i patch", en: "Ranks and patch", uk: "Ранги і патч" },
+    title: { pl: "Rangi i wynajem", en: "Ranks and rental", uk: "Ранги й оренда" },
     fields: [
       { key: "rank_cost_scout", type: "number", label: { pl: "Koszt: Scout", en: "Cost: Scout", uk: "Ціна: Scout" } },
       { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },
       { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
-      { key: "patch_price_zl", type: "text", label: { pl: "Cena patcha (zł, gotówka)", en: "Patch price (zł, cash)", uk: "Ціна патча (zł, готівка)" } },
       { key: "rental_stock", type: "number", label: { pl: "Zapas zestawów do wynajęcia", en: "Rental sets in stock", uk: "Запас комплектів для оренди" } },
     ],
   },
@@ -205,5 +207,36 @@ export const TOGGLE_KEYS = SETTINGS_GROUPS.flatMap((g) =>
   g.fields.filter((f) => f.type === "toggle").map((f) => f.key),
 );
 export const VALUE_KEYS = SETTINGS_GROUPS.flatMap((g) =>
+  g.fields.filter((f) => f.type !== "toggle").map((f) => f.key),
+);
+
+// ── Налаштування системи патчів (окрема сторінка /admin/patches, право "patch") ──
+// Винесено із загальних «Налаштувань» (майстер-онлі), щоб делегувати керування патчами
+// адмінам без повного доступу. Текст-пояснення (patch_msg_*) редагується тут; порожнє
+// поле → fallback на i18n (tr/st "patch_benefits"). Рендериться тим самим кодом, що й
+// SETTINGS_GROUPS, але зберігається окремою дією savePatchSettings.
+export const PATCH_SETTINGS_GROUPS: SettingGroup[] = [
+  {
+    title: { pl: "Patch — funkcja i ceny", en: "Patch — feature & pricing", uk: "Патч — функція і ціни" },
+    fields: [
+      { key: "feature_patch", type: "toggle", label: { pl: "Patch (członkostwo)", en: "Patch (membership)", uk: "Патч (членство)" } },
+      { key: "patch_price_zl", type: "text", label: { pl: "Cena patcha (zł, gotówka)", en: "Patch price (zł, cash)", uk: "Ціна патча (zł, готівка)" } },
+      { key: "no_patch_multiplier", type: "number", label: { pl: "Mnożnik bez patcha (0–1)", en: "Multiplier without patch (0–1)", uk: "Множник без патча (0–1)" } },
+    ],
+  },
+  {
+    title: { pl: "Tekst objaśnienia patcha", en: "Patch explainer text", uk: "Текст-пояснення патча" },
+    fields: [
+      { key: "patch_msg_pl", type: "textarea", label: { pl: "Objaśnienie (PL)", en: "Explainer (PL)", uk: "Пояснення (PL)" } },
+      { key: "patch_msg_en", type: "textarea", label: { pl: "Objaśnienie (EN)", en: "Explainer (EN)", uk: "Пояснення (EN)" } },
+      { key: "patch_msg_uk", type: "textarea", label: { pl: "Objaśnienie (UA)", en: "Explainer (UA)", uk: "Пояснення (UA)" } },
+    ],
+  },
+];
+
+export const PATCH_TOGGLE_KEYS = PATCH_SETTINGS_GROUPS.flatMap((g) =>
+  g.fields.filter((f) => f.type === "toggle").map((f) => f.key),
+);
+export const PATCH_VALUE_KEYS = PATCH_SETTINGS_GROUPS.flatMap((g) =>
   g.fields.filter((f) => f.type !== "toggle").map((f) => f.key),
 );
