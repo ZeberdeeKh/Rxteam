@@ -191,19 +191,17 @@ export async function ingestSalesPhoto(
   const promoTag = (await getSetting("marketplace_promo_tag")) || "#promo";
   const { isPromo, cleaned } = extractPromo(opts.caption, promoTag);
 
-  // ── Альбом: завжди дозбируємо це фото, потім (з debounce) фіналізуємо ──
+  // ── Альбом: ШВИДКО дозбируємо лише file_id (без завантаження!), потім (з debounce)
+  // фіналізуємо. Завантаження відкладене на фіналізацію — інакше повільний download
+  // спричиняв гонку: фіналізація сусіда спрацьовувала до запису підпису (Етап 29).
   if (opts.mediaGroupId) {
-    const up = await downloadAndUpload(api, opts.fileId);
-    if (!up) return;
     await supabase.rpc("mp_collect_album_photo", {
       p_chat_id: opts.chatId,
       p_media_group_id: opts.mediaGroupId,
       p_message_id: opts.messageId,
-      p_photo_url: up.url,
-      p_storage_path: up.path,
+      p_file_id: opts.fileId,
       p_file_unique_id: opts.fileUniqueId,
       p_description: cleaned,
-      p_price: null,
       p_is_promo: isPromo,
       p_seller_player_id: opts.seller.playerId,
       p_seller_tg_user_id: opts.seller.tgUserId,
@@ -302,10 +300,28 @@ async function finalizeAlbum(api: Api, chatId: number, mediaGroupId: string) {
     await dm(api, row.seller_tg_user_id, tr(lang, "mp_patch_required", { hint }));
     return;
   }
-  // #promo + патч → на модерацію.
+  // #promo + патч → ТЕПЕР завантажуємо всі фото альбому (усі вже зібрані) і публікуємо.
+  const urls: string[] = [];
+  const paths: string[] = [];
+  for (const fid of (row.photo_file_ids ?? []) as string[]) {
+    const up = await downloadAndUpload(api, fid);
+    if (up) {
+      urls.push(up.url);
+      paths.push(up.path);
+    }
+  }
+  if (!urls.length) {
+    await supabase.from("marketplace_listings").delete().eq("id", row.id);
+    return;
+  }
   await supabase
     .from("marketplace_listings")
-    .update({ status: "pending", updated_at: new Date().toISOString() })
+    .update({
+      status: "pending",
+      photo_urls: urls,
+      storage_paths: paths,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", row.id);
   await postApprovalCard(api, row.id);
 }
