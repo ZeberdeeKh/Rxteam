@@ -1,21 +1,62 @@
+import type { ReactNode } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
-
-// Пункти правил (дзеркало бот-команди /rules). Перший — розгорнутий за замовчуванням.
-const ITEMS: { key: string; defaultOpen?: boolean }[] = [
-  { key: "newcomer", defaultOpen: true },
-  { key: "flood" },
-  { key: "market" },
-  { key: "announce" },
-  { key: "media" },
-];
+import { REPLICA_TYPES } from "@/lib/replicas";
 
 // Стилізований акордеон правил на нативному <details> (server-safe, без JS).
-// Тактичний вигляд ab3: зрізані кути (.rx-chamfer), помаранчева акцент-смуга
-// зліва від заголовка, spotlight-підсвітка на hover, заголовок display-шрифтом.
-export default function RulesFaq({ lang }: { lang: Lang }) {
+// Три блоки: Правила гри · Ліміти потужності · Правила спілкування в Telegram.
+// Дзеркало бот-команди /rules. Тактичний вигляд ab3: зрізані кути (.rx-chamfer),
+// помаранчева акцент-смуга, заголовок display-шрифтом, spotlight-підсвітка на hover.
+export default function RulesFaq({
+  lang,
+  settings,
+}: {
+  lang: Lang;
+  settings: Record<string, string>;
+}) {
+  // Ліміти задаються per-replica у settings (limit_<code>_pl|uk); en → pl (як в анонсі).
+  const ll: "pl" | "uk" = lang === "uk" ? "uk" : "pl";
+  const limitRows = REPLICA_TYPES.map((t) => ({
+    label: t[lang],
+    val: settings[`limit_${t.code}_${ll}`]?.trim(),
+  })).filter((r): r is { label: string; val: string } => !!r.val);
+
+  const items: { key: string; q: string; body: ReactNode; defaultOpen?: boolean }[] = [
+    {
+      key: "game",
+      q: "faq_game_q",
+      defaultOpen: true,
+      body: <p className={ANSWER}>{st(lang, "faq_game_a")}</p>,
+    },
+    {
+      key: "limits",
+      q: "faq_limits_q",
+      body: (
+        <div className="space-y-2">
+          <p className={ANSWER}>{st(lang, "faq_limits_intro")}</p>
+          {limitRows.length > 0 ? (
+            <ul className="space-y-1 text-sm leading-relaxed text-gray-700">
+              {limitRows.map((r) => (
+                <li key={r.label}>
+                  <span className="font-semibold text-gray-900">{r.label}:</span> {r.val}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-gray-500">{st(lang, "faq_limits_none")}</p>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "tg",
+      q: "faq_tg_q",
+      body: <p className={ANSWER}>{st(lang, "faq_tg_a")}</p>,
+    },
+  ];
+
   return (
     <div className="space-y-3">
-      {ITEMS.map((it) => (
+      {items.map((it) => (
         <details
           key={it.key}
           open={it.defaultOpen}
@@ -24,7 +65,7 @@ export default function RulesFaq({ lang }: { lang: Lang }) {
           <summary className="flex cursor-pointer select-none items-center gap-3 px-5 py-4 transition-colors hover:bg-[var(--c-gray-50)]">
             <span className="h-5 w-1 shrink-0 bg-[var(--c-primary)]" aria-hidden />
             <span className="min-w-0 flex-1 font-display text-base font-semibold uppercase tracking-wide text-gray-900">
-              {st(lang, `faq_${it.key}_q`)}
+              {st(lang, it.q)}
             </span>
             <svg
               className="rx-chevron h-4 w-4 shrink-0 text-[var(--c-primary)] transition-transform duration-200"
@@ -39,13 +80,11 @@ export default function RulesFaq({ lang }: { lang: Lang }) {
               <path d="m6 9 6 6 6-6" />
             </svg>
           </summary>
-          <div className="border-t border-gray-200 px-5 pb-4 pt-3">
-            <p className="whitespace-pre-line text-sm leading-relaxed text-gray-700">
-              {st(lang, `faq_${it.key}_a`)}
-            </p>
-          </div>
+          <div className="border-t border-gray-200 px-5 pb-4 pt-3">{it.body}</div>
         </details>
       ))}
     </div>
   );
 }
+
+const ANSWER = "whitespace-pre-line text-sm leading-relaxed text-gray-700";

@@ -74,47 +74,37 @@ const SITE: Record<string, Dict> = {
     uk: "Правила можуть змінюватися. Актуальна версія завжди в боті за командою /rules.",
   },
 
-  faq_newcomer_q: {
-    pl: "Dla nowych — bezpieczeństwo i sprzęt",
-    en: "For newcomers — safety & gear",
-    uk: "Новачкам — безпека та спорядження",
-  },
-  faq_newcomer_a: {
+  // 1) Правила гри — безпека, чесна гра, спорядження.
+  faq_game_q: { pl: "Zasady gry", en: "Game rules", uk: "Правила гри" },
+  faq_game_a: {
     pl: '🥽 Ochrona oczu OBOWIĄZKOWA przez całą grę.\n🚩 "Trafiony" — podnosisz rękę / czerwoną szmatkę i idziesz do respawnu.\n🤝 Fair play — zaliczaj trafienia.\n🎒 Zabierz: replikę + akumulator/gaz, kulki, ochronę oczu/twarzy, ubranie na pogodę, wodę.\n🆕 Nie masz sprzętu? Jest wypożyczalnia — zaznacz przy rejestracji w bocie.',
     en: '🥽 Eye protection is MANDATORY for the whole game.\n🚩 "Hit" — raise your hand / red rag and walk to respawn.\n🤝 Fair play — call your hits.\n🎒 Bring: replica + battery/gas, BBs, eye/face protection, weather-appropriate clothes, water.\n🆕 No gear? Rental is available — mark it during registration in the bot.',
     uk: '🥽 Захист очей ОБОВ\'ЯЗКОВИЙ протягом усієї гри.\n🚩 "Поранений" — піднімаєш руку / червону ганчірку і йдеш у респ.\n🤝 Чесна гра — зараховуй влучання.\n🎒 Візьми: привід + акумулятор/газ, кулі, захист очей/обличчя, одяг по погоді, воду.\n🆕 Немає спорядження? Є оренда — познач при реєстрації в боті.',
   },
 
-  faq_flood_q: { pl: "💬 Zalew / Флуд", en: "💬 Flood", uk: "💬 Флуд" },
-  faq_flood_a: {
-    pl: "Luźny czat off-topic. Bez spamu i reklam. Szanuj innych — to przestrzeń dla całej społeczności.",
-    en: "Free off-topic chat. No spam or ads. Respect others — this space is for the whole community.",
-    uk: "Вільний чат не за темою. Без спаму й реклами. Поважай інших — це простір для всієї спільноти.",
+  // 2) Ліміти потужності — значення per-replica підставляються з settings (RulesFaq).
+  faq_limits_q: { pl: "Limity mocy", en: "Power limits", uk: "Ліміти потужності" },
+  faq_limits_intro: {
+    pl: "Limity zależą od typu repliki. Dokładne limity dla konkretnej gry znajdziesz w zapowiedzi i w bocie.",
+    en: "Limits depend on the replica type. Exact limits for a specific game are in the announcement and the bot.",
+    uk: "Ліміти залежать від типу репліки. Точні ліміти конкретної гри — в анонсі та в боті.",
+  },
+  faq_limits_none: {
+    pl: "Limity są ogłaszane przy każdej grze — sprawdź zapowiedź lub bota.",
+    en: "Limits are announced for each game — check the announcement or the bot.",
+    uk: "Ліміти оголошуються до кожної гри — дивись анонс або бота.",
   },
 
-  faq_market_q: {
-    pl: "🛒 Kupię / Sprzedam (Giełda)",
-    en: "🛒 Buy / Sell (Marketplace)",
-    uk: "🛒 Куплю / Продам (Барахолка)",
+  // 3) Правила спілкування в Telegram — усі 4 гілки одним блоком.
+  faq_tg_q: {
+    pl: "Zasady komunikacji na Telegramie",
+    en: "Telegram communication rules",
+    uk: "Правила спілкування в Telegram",
   },
-  faq_market_a: {
-    pl: "Kup i sprzedaj sprzęt ASG.\n• Ogłoszenie = ZDJĘCIE + opis (cena, stan, kontakt). Sam tekst lub zdjęcie bez opisu jest usuwane.\n• Chcesz, by ogłoszenie trafiło na stronę RX Team? Dodaj tag #promo w opisie zdjęcia i miej naszywkę. Po akceptacji admina ląduje ZA DARMO na stronie Giełdy na 30 dni.\n• Bez #promo zdjęcie zostaje tylko w wątku na Telegramie.\n• Bez naszywki — dostaniesz odmowę w wiadomości prywatnej.\n⚠️ Łamanie zasad = automatyczne, rosnące wyciszenie.",
-    en: "Buy and sell ASG gear.\n• A listing = PHOTO + description (price, condition, contact). Plain text or a photo with no caption is deleted.\n• Want your listing on the RX Team site? Add the #promo tag in the photo caption and have a patch. After an admin approves it, it goes FREE to the Marketplace page for 30 days.\n• Without #promo the photo just stays in the Telegram thread.\n• Without a patch you'll get a rejection DM.\n⚠️ Breaking the rules = automatic, escalating mute.",
-    uk: "Купуй і продавай спорядження ASG.\n• Оголошення = ФОТО + опис (ціна, стан, контакт). Лише текст або фото без опису видаляється.\n• Хочеш, щоб оголошення потрапило на сайт RX Team? Додай тег #promo в опис фото і май патч. Після схвалення адміна воно БЕЗКОШТОВНО з'являється на сторінці Барахолки на 30 днів.\n• Без #promo фото лишається лише в гілці Telegram.\n• Без патча — отримаєш відмову в особисті повідомлення.\n⚠️ Порушення правил = автоматичне, наростаюче мовчання (mute).",
-  },
-
-  faq_announce_q: { pl: "📣 Zapowiedzi gier", en: "📣 Game announcements", uk: "📣 Анонси ігор" },
-  faq_announce_a: {
-    pl: "Wątek TYLKO dla bota. Posty graczy są automatycznie usuwane, a za powtarzanie grozi rosnące wyciszenie. Pytania o grę kieruj na Zalew lub do organizatorów.",
-    en: "BOT-ONLY topic. Player posts are deleted automatically, and repeats lead to an escalating mute. Ask game questions in Flood or to the organizers.",
-    uk: "Гілка ТІЛЬКИ для бота. Дописи гравців видаляються автоматично, а за повторення — наростаюче мовчання. Питання про гру став у Флуді або організаторам.",
-  },
-
-  faq_media_q: { pl: "📷 Zdjęcia i filmy z gier", en: "📷 Game photos & videos", uk: "📷 Фото та відео з ігор" },
-  faq_media_a: {
-    pl: "Tylko foto/wideo z gier (zdjęcia, filmy, pliki). Wiadomości tekstowe bez mediów są usuwane. Komentarze i dyskusje — na Zalew.",
-    en: "Photos/videos from games only (photos, videos, files). Text messages without media are deleted. Comments and discussion — in Flood.",
-    uk: "Тільки фото/відео з ігор (фото, відео, файли). Текстові повідомлення без медіа видаляються. Коментарі та обговорення — у Флуді.",
+  faq_tg_a: {
+    pl: "💬 Zalew — luźny czat off-topic. Bez spamu i reklam.\n\n🛒 Kupię/Sprzedam (Giełda) — ZDJĘCIE + opis (cena, stan, kontakt). Chcesz, by ogłoszenie trafiło na stronę RX Team? Dodaj #promo w opisie i miej naszywkę → po akceptacji admina ląduje ZA DARMO na Giełdzie na 30 dni. Bez naszywki — odmowa.\n\n📣 Zapowiedzi gier — TYLKO bot, posty graczy są usuwane.\n\n📷 Zdjęcia i filmy z gier — TYLKO foto/wideo. Tekst bez mediów jest usuwany.\n\n⚠️ Łamanie zasad = automatyczne, rosnące wyciszenie.",
+    en: "💬 Flood — free off-topic chat. No spam or ads.\n\n🛒 Buy/Sell (Marketplace) — PHOTO + description (price, condition, contact). Want your listing on the RX Team site? Add #promo in the caption and have a patch → after an admin approves it, it's FREE on the Marketplace for 30 days. Without a patch — rejected.\n\n📣 Game announcements — BOT ONLY, player posts are deleted.\n\n📷 Game photos & videos — photos/videos ONLY. Text without media is deleted.\n\n⚠️ Breaking the rules = automatic, escalating mute.",
+    uk: "💬 Флуд — вільний чат не за темою. Без спаму й реклами.\n\n🛒 Куплю/Продам (Барахолка) — ФОТО + опис (ціна, стан, контакт). Хочеш, щоб оголошення потрапило на сайт RX Team? Додай #promo в опис і май патч → після схвалення адміна воно БЕЗКОШТОВНО на Барахолці 30 днів. Без патча — відмова.\n\n📣 Анонси ігор — ТІЛЬКИ бот, дописи гравців видаляються.\n\n📷 Фото та відео з ігор — ТІЛЬКИ фото/відео. Текст без медіа видаляється.\n\n⚠️ Порушення правил = автоматичне, наростаюче мовчання (mute).",
   },
 
   // ── Адмінка: барахолка ──
