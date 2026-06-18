@@ -32,7 +32,6 @@ const SITE: Record<string, Dict> = {
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
   nav_gallery: { pl: "Galeria", en: "Gallery", uk: "Галерея" },
   nav_marketplace: { pl: "Giełda", en: "Marketplace", uk: "Барахолка" },
-  nav_faq: { pl: "Zasady", en: "Rules", uk: "Правила" },
 
   // ── Барахолка / Marketplace (Етап 28) ──
   marketplace_intro: {

@@ -14,6 +14,7 @@ import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
 import GalleryGrid from "@/components/site/GalleryGrid";
 import ListingCarousel from "@/components/site/ListingCarousel";
+import RulesFaq from "@/components/site/RulesFaq";
 
 // Лендінг (публічний, одна сторінка): «Про нас» + галерея + герой + найближча гра + рейтинг + соцмережі (внизу).
 // Кожен модуль випливає при прокручуванні вниз (Reveal, scroll-reveal у дусі ab3).
@@ -141,6 +142,16 @@ export default async function Home() {
           <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
           <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
           <RankingTable rows={ranking} lang={lang} />
+        </section>
+      </Reveal>
+
+      {/* Правила / FAQ (дзеркало бот-команди /rules) — перед соцмережами */}
+      <Reveal>
+        <section id="rules" className="scroll-mt-20">
+          <h2 className={ui.sectionTitle}>{st(lang, "faq_title")}</h2>
+          <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "faq_intro")}</p>
+          <RulesFaq lang={lang} />
+          <p className={`mt-3 ${ui.metaFaint}`}>{st(lang, "faq_footnote")}</p>
         </section>
       </Reveal>
 
