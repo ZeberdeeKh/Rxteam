@@ -15,21 +15,15 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
       <h4 className={`mb-1 ${ui.legend}`}>
         {st(lang, "games_announce_heading")}
       </h4>
-      <div className="relative">
-        <div
-          className={`whitespace-pre-line text-sm text-gray-600 ${
-            collapsible && !open ? "max-h-40 overflow-hidden" : ""
-          }`}
-        >
-          {text}
-        </div>
-        {/* Згладжуємо обрізаний текст градієнтом під колір картки (--c-white).
-            Затухаємо в ТОЙ САМИЙ колір із нульовою альфою (rgba 17,19,29 = #11131d),
-            а НЕ в `transparent` (=прозорий ЧОРНИЙ) — інакше середина градієнта
-            підмішує чорне й над темною карткою з'являється тёмна смуга-«тінь». */}
-        {collapsible && !open && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--c-white)] to-[rgba(17,19,29,0)]" />
-        )}
+      {/* Обрізаний (схлопнутий) текст — БЕЗ градієнта-затухання: на темній картці
+          ab3 (плоский стиль) він читався як тёмна смуга-«тінь». Достатньо чіткого
+          обрізу + кнопки «Показати повністю». */}
+      <div
+        className={`whitespace-pre-line text-sm text-gray-600 ${
+          collapsible && !open ? "max-h-40 overflow-hidden" : ""
+        }`}
+      >
+        {text}
       </div>
       {collapsible && (
         <button
