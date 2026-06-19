@@ -1,16 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
 import { expireOldListings, sweepStuckCollecting } from "@/lib/marketplace";
+import { checkCronAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 // Відхиляє протерміновані заявки (хто не пройшов капчу вчасно).
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkCronAuth(req);
+  if (denied) return denied;
 
   const nowIso = new Date().toISOString();
   const { data: expired } = await supabase

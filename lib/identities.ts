@@ -65,9 +65,22 @@ export async function redeemLinkCode(rawCode: string, authUserId: string): Promi
   const existing = await getPlayerIdByAuthUser(authUserId);
   if (existing && existing !== row.player_id) return { ok: false, reason: "taken" };
 
+  // Атомарний claim одноразового коду: позначаємо used_at лише якщо він ЩЕ null. Нуль
+  // зачеплених рядків = код уже погашено паралельним запитом (гонку програно) → "used".
+  // Це гарантує справжню одноразовість (раніше identity створювалась ДО позначки used,
+  // тож дві паралельні погашення могли прив'язати двох auth-юзерів до одного player).
+  const { data: claimed } = await supabase
+    .from("link_codes")
+    .update({ used_at: new Date().toISOString() })
+    .eq("code", code)
+    .is("used_at", null)
+    .select("player_id")
+    .maybeSingle();
+  if (!claimed) return { ok: false, reason: "used" };
+
   const { error: idErr } = await supabase.from("identities").upsert(
     {
-      player_id: row.player_id as number,
+      player_id: claimed.player_id as number,
       provider: "email",
       external_id: authUserId,
       verified: true,
@@ -76,8 +89,7 @@ export async function redeemLinkCode(rawCode: string, authUserId: string): Promi
   );
   if (idErr) return { ok: false, reason: "taken" };
 
-  await supabase.from("link_codes").update({ used_at: new Date().toISOString() }).eq("code", code);
-  return { ok: true, playerId: row.player_id as number };
+  return { ok: true, playerId: claimed.player_id as number };
 }
 
 // Резолв player_id за auth-user (email-ідентичність).

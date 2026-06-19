@@ -1,6 +1,7 @@
 import { supabase } from "./supabase";
 import { getSessionContext } from "./session-player";
 import { getServerLang } from "./server-lang";
+import { normalizeCallsign } from "./validation";
 
 // Серверні хелпери «сесія → player» для дій кабінету (реєстрація, чек-ін, магазин).
 // Рішення організатора (2026-06-15): для email-юзера без TG створюємо standalone-профіль.
@@ -44,8 +45,9 @@ export async function setCallsignForPlayer(
   playerId: number,
   rawCallsign: string,
 ): Promise<{ ok: true } | { ok: false; reason: "empty" | "taken" }> {
-  const callsign = rawCallsign.trim().replace(/\s+/g, " ");
-  if (!callsign || callsign.length < 2 || callsign.length > 32) return { ok: false, reason: "empty" };
+  const v = normalizeCallsign(rawCallsign);
+  if (!v.ok) return { ok: false, reason: "empty" }; // довжина/charset/контрол-символи
+  const callsign = v.value;
 
   // Перевірка унікальності (callsign unique у БД; ловимо ще й гонку через error).
   const { data: clash } = await supabase

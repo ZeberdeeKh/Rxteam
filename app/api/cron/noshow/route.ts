@@ -1,5 +1,6 @@
 import { supabase } from "@/lib/supabase";
 import { awardPoints, getPointValue } from "@/lib/economy";
+import { checkCronAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -7,10 +8,8 @@ export const runtime = "nodejs";
 // Авто-позначка неявок: після закриття вікна чек-іну (checkin_to) реєстрації
 // status='registered' без жодного чек-іну → no_show + штраф балами (Етап 3).
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkCronAuth(req);
+  if (denied) return denied;
 
   const nowIso = new Date().toISOString();
 

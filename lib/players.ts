@@ -21,8 +21,14 @@ export async function ensurePlayer(from: TgUser) {
     .eq("tg_user_id", from.id)
     .maybeSingle();
 
+  // Майстер визначається за НЕЗМІННИМ numeric tg_user_id, якщо задано master_tg_id
+  // (стійко до зміни/перехоплення @username — username-squatting). Якщо не задано —
+  // сумісний фолбек на @username (щоб не залочити власника, поки він не виставить id).
+  const masterTgId = (await getSetting("master_tg_id"))?.trim() || null;
   const masterU = (await getSetting("master_username")) ?? "delltex";
-  const isMaster = !!username && username.toLowerCase() === masterU.toLowerCase();
+  const isMaster = masterTgId
+    ? String(from.id) === masterTgId
+    : !!username && username.toLowerCase() === masterU.toLowerCase();
 
   if (!existing) {
     const lang = pickLang(from.language_code);

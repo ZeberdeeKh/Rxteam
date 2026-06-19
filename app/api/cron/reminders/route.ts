@@ -9,6 +9,7 @@ import { tr } from "@/lib/strings";
 import type { Lang } from "@/lib/i18n";
 import { DAILY_REMINDER_DEFAULT } from "@/lib/admin-settings";
 import { DateTime } from "luxon";
+import { checkCronAuth } from "@/lib/cron-auth";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -19,10 +20,8 @@ const ZONE = "Europe/Warsaw";
 // Ідемпотентний — прапорці games.reminded_day / reminded_2h гарантують одне надсилання.
 // Запуск зовнішнім пінгером раз на ~15 хв (Vercel Hobby крон ходить лише раз/добу).
 export async function GET(req: Request) {
-  const auth = req.headers.get("authorization");
-  if (process.env.CRON_SECRET && auth !== `Bearer ${process.env.CRON_SECRET}`) {
-    return new Response("Unauthorized", { status: 401 });
-  }
+  const denied = checkCronAuth(req);
+  if (denied) return denied;
   // Звіт по чек-листах підготовки (пт 22:00) — незалежно від feature_reminders.
   // Ідемпотентно через chore_runs.report_at + status; пінгер ходить кожні ~15 хв.
   const chores = await processDueChoreReports(bot.api).catch((e) => {

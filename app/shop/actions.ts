@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { featureEnabled } from "@/lib/settings";
 import {
-  awardPoints,
+  spendPoints,
   nextRank,
   getPointValue,
   RANK_COST_KEY,
@@ -34,17 +34,19 @@ export async function buyItem(formData: FormData) {
   if (!item || !item.active) back("?err=inactive");
 
   const cost = item!.cost ?? 0;
-  if ((player.points_balance ?? 0) < cost) back("?err=balance");
-
+  // Атомарне списання балів ДО запису покупки. Інакше паралельні запити (подвійний клік /
+  // скрипт) проходять перевірку по снапшоту й дають кілька покупок за один баланс
+  // (double-spend). spendPoints списує рівно один раз і лише якщо балансу досі вистачає.
+  if (cost > 0) {
+    const paid = await spendPoints({
+      playerId: player.id,
+      amount: cost,
+      reason: "purchase",
+      meta: `shop:${itemId}`,
+    });
+    if (!paid) back("?err=balance");
+  }
   await supabase.from("purchases").insert({ player_id: player.id, item_id: itemId, cost });
-  // Списання балансу + запис у журнал (awardPoints: delta<0 не множиться, баланс не нижче 0).
-  await awardPoints({
-    playerId: player.id,
-    reason: "purchase",
-    baseDelta: -cost,
-    meta: `shop:${itemId}`,
-    hasPatch: !!player.has_patch,
-  });
 
   // Сповіщення адмінів (fire-and-forget).
   const itemTitle = (item!.title_pl ?? item!.title_en ?? item!.title_uk ?? `#${itemId}`) as string;
@@ -83,14 +85,22 @@ export async function buyRank(formData: FormData) {
   const balance = player.points_balance ?? 0;
   if (balance < cost) back("?err=rank_balance");
 
-  // Списання + підвищення рангу (як у боті buyrank): point_log + оновлення гравця.
+  // Атомарне підвищення: умовний UPDATE по балансу І поточному рангу. Рядок зміниться
+  // лише якщо ранг ДОСІ = current і балансу вистачає — це закриває і double-spend, і
+  // гонку «купити два ранги одразу». Нуль зачеплених рядків → відмова (rank_changed).
+  let upd = supabase
+    .from("players")
+    .update({ points_balance: balance - cost, rank: next! })
+    .eq("id", player.id)
+    .gte("points_balance", cost);
+  upd = player.rank == null ? upd.is("rank", null) : upd.eq("rank", player.rank);
+  const { data: changed } = await upd.select("id").maybeSingle();
+  if (!changed) back("?err=rank_changed");
+
+  // Журнал списання — лише після успішного атомарного підвищення.
   await supabase
     .from("point_log")
     .insert({ player_id: player.id, delta: -cost, reason: "rank_purchase", meta: next! });
-  await supabase
-    .from("players")
-    .update({ points_balance: balance - cost, rank: next! })
-    .eq("id", player.id);
 
   revalidatePath("/shop");
   revalidatePath("/cabinet");

@@ -16,10 +16,18 @@ interface Body {
   meta?: Record<string, unknown>;
 }
 
+const MAX_DESCRIPTION_CHARS = 5000;
+
 function clientIp(req: NextRequest): string {
-  const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim();
-  return req.headers.get("x-real-ip") ?? "unknown";
+  // Беремо IP лише з джерел, які проставляє платформа (Vercel) і клієнт не контролює.
+  // НЕ використовуємо лівий x-forwarded-for: його задає клієнт і ним обходять rate-limit
+  // (нове значення на кожен запит = новий лічильник).
+  return (
+    req.ip ??
+    req.headers.get("x-vercel-forwarded-for") ??
+    req.headers.get("x-real-ip") ??
+    "unknown"
+  );
 }
 
 export async function POST(req: NextRequest) {
@@ -38,6 +46,9 @@ export async function POST(req: NextRequest) {
   const description = (body.description ?? "").trim();
   if (!description) {
     return NextResponse.json({ error: "missing_description" }, { status: 400 });
+  }
+  if (description.length > MAX_DESCRIPTION_CHARS) {
+    return NextResponse.json({ error: "description_too_long" }, { status: 413 });
   }
   if (body.screenshotBase64 && body.screenshotBase64.length * 0.75 > MAX_IMAGE_BYTES) {
     return NextResponse.json({ error: "attachment_too_large" }, { status: 413 });

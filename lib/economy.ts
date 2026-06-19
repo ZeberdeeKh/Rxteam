@@ -88,6 +88,46 @@ export async function awardPoints(opts: AwardOpts): Promise<number> {
   return delta;
 }
 
+// Атомарне списання балів (захист від double-spend / гонки). Один умовний UPDATE
+// `points_balance >= amount` — рядок оновиться лише якщо балансу ДОСІ вистачає; нуль
+// зачеплених рядків = недостатньо балів або програна гонка. Свіже значення балансу
+// читаємо тут (не довіряємо снапшоту сесії). Повертає true лише при фактичному списанні.
+export async function spendPoints(opts: {
+  playerId: number;
+  amount: number; // додатне число до списання
+  reason: string;
+  meta?: string | null;
+  gameId?: number | null;
+}): Promise<boolean> {
+  if (!(opts.amount > 0)) return false;
+  const { data: cur } = await supabase
+    .from("players")
+    .select("points_balance")
+    .eq("id", opts.playerId)
+    .single();
+  const balance = cur?.points_balance ?? 0;
+  if (balance < opts.amount) return false;
+
+  // Умовне списання: WHERE points_balance >= amount обчислюється атомарно під row-lock.
+  const { data: updated } = await supabase
+    .from("players")
+    .update({ points_balance: balance - opts.amount })
+    .eq("id", opts.playerId)
+    .gte("points_balance", opts.amount)
+    .select("id")
+    .maybeSingle();
+  if (!updated) return false; // недостатньо / гонку програно — нічого не списано
+
+  await supabase.from("point_log").insert({
+    player_id: opts.playerId,
+    delta: -opts.amount,
+    reason: opts.reason,
+    game_id: opts.gameId ?? null,
+    meta: opts.meta ?? null,
+  });
+  return true;
+}
+
 export type GrantedAch = {
   code: string;
   title_pl: string | null;

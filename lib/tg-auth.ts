@@ -1,4 +1,4 @@
-import { createHash, createHmac } from "crypto";
+import { createHash, createHmac, timingSafeEqual } from "crypto";
 
 // Перевірка підпису даних від Telegram Login Widget.
 // https://core.telegram.org/widgets/login#checking-authorization
@@ -16,7 +16,10 @@ export function verifyTelegramAuth(
 
   const secret = createHash("sha256").update(botToken).digest();
   const hmac = createHmac("sha256", secret).update(checkString).digest("hex");
-  return hmac === hash;
+  // Постійний час порівняння (захист від timing-оракула).
+  const a = Buffer.from(hmac);
+  const b = Buffer.from(hash);
+  return a.length === b.length && timingSafeEqual(a, b);
 }
 
 // Свіжість авторизації (захист від повторного використання старого лінка).

@@ -1,19 +1,17 @@
 "use server";
 
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { createClient, isAuthConfigured } from "@/lib/supabase-server";
 import { TG_SESSION_COOKIE } from "@/lib/tg-session";
 
 export type AuthState = { error?: string };
 
+// Базовий URL для абсолютних лінків у листах (emailRedirectTo). Жорстко прив'язано до
+// NEXT_PUBLIC_SITE_URL (фолбек — канонічний домен). НЕ беремо origin/host із заголовків
+// запиту: інакше підроблений Host веде лінк підтвердження (з PKCE-кодом) на чужий домен.
 function siteOrigin(): string {
-  const h = headers();
-  return (
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    h.get("origin") ??
-    `https://${h.get("host") ?? "www.rxteam.pl"}`
-  );
+  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.rxteam.pl").replace(/\/$/, "");
 }
 
 // Реєстрація: email+пароль із підтвердженням пошти.
@@ -56,6 +54,8 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
     if (m.includes("not confirmed")) return { error: "auth_err_not_confirmed" };
     if (m.includes("invalid login") || m.includes("invalid credentials"))
       return { error: "auth_err_bad_creds" };
+    // Supabase сам тротлить підбір пароля — показуємо це користувачу (а не «generic»).
+    if (m.includes("rate limit")) return { error: "auth_err_rate_limit" };
     return { error: "auth_err_generic" };
   }
 

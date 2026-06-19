@@ -207,6 +207,11 @@ const S: Record<string, Dict> = {
     en: "That callsign is taken, try another:",
     uk: "Цей позивний зайнятий, впиши інший:",
   },
+  callsign_bad: {
+    pl: "Nieprawidłowy pseudonim (2–32 znaki: litery, cyfry, spacja, _ . -). Podaj inny:",
+    en: "Invalid callsign (2–32 chars: letters, digits, space, _ . -). Try another:",
+    uk: "Некоректний позивний (2–32 символи: літери, цифри, пробіл, _ . -). Впиши інший:",
+  },
   reg_done: {
     pl: "✅ Zapisano: {loc}, {when}.",
     en: "✅ Signed up: {loc}, {when}.",
@@ -497,6 +502,11 @@ const S: Record<string, Dict> = {
     pl: "🎉 Gratulacje! Nowa ranga: {rank}. 💰 Saldo: {balance} pkt",
     en: "🎉 Congrats! New rank: {rank}. 💰 Balance: {balance} pts",
     uk: "🎉 Вітаємо! Новий ранг: {rank}. 💰 Баланс: {balance} б.",
+  },
+  rank_changed: {
+    pl: "Ranga lub saldo zmieniły się w międzyczasie. Spróbuj ponownie: /rank",
+    en: "Your rank or balance changed meanwhile. Please try again: /rank",
+    uk: "Ранг або баланс змінилися. Спробуй ще раз: /rank",
   },
 
   // ачівки

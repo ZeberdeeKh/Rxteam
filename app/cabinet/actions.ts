@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getAuthUser } from "@/lib/supabase-server";
 import { featureEnabled } from "@/lib/settings";
 import { redeemLinkCode } from "@/lib/identities";
+import { rateLimit } from "@/lib/rate-limit";
 import { supabase } from "@/lib/supabase";
 import { getSessionContext } from "@/lib/session-player";
 import { notifyAdminsRental, notifyAdminsPatchRequest } from "@/lib/notify";
@@ -31,6 +32,9 @@ export async function linkTelegram(_prev: LinkState, formData: FormData): Promis
   if (!user) redirect("/login");
 
   if (!(await featureEnabled("site_link"))) return { error: "auth_err_generic" };
+
+  // Анти-брутфорс коду прив'язки: ≤8 спроб / 10 хв на auth-user (best-effort, per-instance).
+  if (!rateLimit(`link:${user.id}`, 8, 10 * 60_000)) return { error: "auth_err_rate_limit" };
 
   const code = String(formData.get("code") ?? "");
   const res = await redeemLinkCode(code, user.id);
@@ -126,9 +130,14 @@ export async function registerForGame(formData: FormData) {
   const tRaw = formData.get("transport");
   const transport = tRaw === "own" ? "own" : tRaw === "skip" ? null : "need";
   const needsRental = formData.get("needs_rental") === "on";
-  const fromPlace = transport === "own" ? String(formData.get("from_place") ?? "").trim() || null : null;
+  const fromPlace =
+    transport === "own" ? String(formData.get("from_place") ?? "").trim().slice(0, 80) || null : null;
   const freeSeatsRaw = Number(formData.get("free_seats"));
-  const freeSeats = transport === "own" && Number.isFinite(freeSeatsRaw) ? freeSeatsRaw : null;
+  // Зажимаємо в 0..8 цілих (форма має min=0/max=8, але server action отримує сирий POST).
+  const freeSeats =
+    transport === "own" && Number.isFinite(freeSeatsRaw)
+      ? Math.max(0, Math.min(8, Math.trunc(freeSeatsRaw)))
+      : null;
 
   await supabase.from("registrations").upsert(
     {
@@ -143,6 +152,17 @@ export async function registerForGame(formData: FormData) {
     },
     { onConflict: "game_id,player_id" },
   );
+
+  // Пом'якшення гонки місткості (повний атомарний фікс потребує DB-функції): після запису
+  // перевіряємо ще раз — якщо перевищили місткість, відкочуємо саме цю реєстрацію.
+  if (game!.capacity && (await registeredCount(gameId)) > game!.capacity) {
+    await supabase
+      .from("registrations")
+      .update({ status: "cancelled" })
+      .eq("game_id", gameId)
+      .eq("player_id", player.id);
+    backTo(formData, "?err=game_full");
+  }
 
   // Оренда: повідомити адмінів у ТГ із контактом орендаря (TG-лінк або email сайт-юзера).
   if (needsRental) {
@@ -200,6 +220,9 @@ export async function webCheckin(formData: FormData) {
     .select("*, locations(*)")
     .eq("id", gameId)
     .single();
+  // Чек-ін лише в анонсовану гру (не покладаємось лише на статус реєстрації: скасована
+  // гра з реєстрацією у no_show інакше пройшла б).
+  if (!game || game.status !== "announced") backTo(formData, "?err=game_not_found");
   const now = Date.now();
   if (
     !game ||

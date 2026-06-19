@@ -11,6 +11,7 @@ import {
 } from "./bot-texts";
 import { recordMemberSeen, recordMemberLeft, hasEverLeft } from "./members";
 import { makeChallenge } from "./captcha";
+import { normalizeCallsign } from "./validation";
 import { featureEnabled, setSetting, getSetting, getAllSettings } from "./settings";
 import {
   ensurePlayer,
@@ -1987,10 +1988,23 @@ bot.callbackQuery("buyrank", async (ctx) => {
     return;
   }
   const newBalance = balance - cost;
+  // Атомарне підвищення: умовний UPDATE по балансу І поточному рангу (захист від гонки
+  // подвійного тапу / double-spend — рядок зміниться лише якщо ранг досі = current і
+  // балансу вистачає). Журнал списання — лише після успіху.
+  let upd = supabase
+    .from("players")
+    .update({ points_balance: newBalance, rank: next })
+    .eq("id", p.id)
+    .gte("points_balance", cost);
+  upd = p.rank == null ? upd.is("rank", null) : upd.eq("rank", p.rank);
+  const { data: changed } = await upd.select("id").maybeSingle();
+  if (!changed) {
+    await ctx.editMessageText(tr(lang, "rank_changed"));
+    return;
+  }
   await supabase
     .from("point_log")
     .insert({ player_id: p.id, delta: -cost, reason: "rank_purchase", meta: next });
-  await supabase.from("players").update({ points_balance: newBalance, rank: next }).eq("id", p.id);
   await ctx.editMessageText(tr(lang, "rank_bought", { rank: next, balance: newBalance }));
 });
 
@@ -2384,13 +2398,20 @@ bot.on("message:text", async (ctx) => {
 
   // ── реєстрація: позивний ──
   if (state === "reg_callsign") {
-    const callsign = text;
+    const v = normalizeCallsign(text);
+    if (!v.ok) {
+      await ctx.reply(tr(lang, "callsign_bad"));
+      return;
+    }
+    const callsign = v.value;
+    // Унікальність без урахування регістру (як на сайті), виключаючи себе.
     const { data: taken } = await supabase
       .from("players")
       .select("id")
-      .eq("callsign", callsign)
+      .ilike("callsign", callsign)
+      .neq("id", p.id)
       .maybeSingle();
-    if (taken && taken.id !== p.id) {
+    if (taken) {
       await ctx.reply(tr(lang, "callsign_taken"));
       return;
     }
@@ -2399,7 +2420,7 @@ bot.on("message:text", async (ctx) => {
     return;
   }
   if (state === "reg_from") {
-    await setState(ctx.from!.id, "reg_seats", { ...data, fromPlace: text });
+    await setState(ctx.from!.id, "reg_seats", { ...data, fromPlace: text.slice(0, 80) });
     const kb = new InlineKeyboard()
       .text("0", "regseats:0")
       .text("1", "regseats:1")

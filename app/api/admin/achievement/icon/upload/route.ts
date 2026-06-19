@@ -15,7 +15,8 @@ const MAX_SVG_BYTES = 50 * 1024; // 50 КБ — SVG-бейдж дрібний; �
 export async function POST(req: NextRequest) {
   const player = await getSessionPlayer();
   if (!player?.is_master) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
+    // 404 (а не 403) — узгоджено з notFound() гейтами адмінки: не світимо існування ендпоінта.
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
   let form: FormData;
