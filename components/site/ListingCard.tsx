@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import { ui, btn } from "@/components/ui";
 
@@ -20,6 +20,7 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
   const [active, setActive] = useState(0); // фото в превʼю картки
   const [idx, setIdx] = useState<number | null>(null); // індекс фото у лайтбоксі (null = закрито)
   const [expanded, setExpanded] = useState(false);
+  const touchStartX = useRef<number | null>(null); // для свайпу між фото на телефоні
 
   const photos = listing.photos ?? [];
   const contact = listing.sellerUsername ? `https://t.me/${listing.sellerUsername}` : null;
@@ -64,7 +65,7 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
         )}
 
         {photos.length > 1 && (
-          <div className="mt-2 flex gap-1 overflow-x-auto">
+          <div className="mt-2 flex gap-2 overflow-x-auto">
             {photos.map((url, i) => (
               <button
                 key={i}
@@ -73,7 +74,7 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
                 className={`shrink-0 border ${i === active ? "border-[var(--c-brand-text)]" : "border-transparent"}`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={url} alt="" loading="lazy" className="h-12 w-12 object-cover" />
+                <img src={url} alt="" loading="lazy" className="h-14 w-14 object-cover sm:h-12 sm:w-12" />
               </button>
             ))}
           </div>
@@ -128,7 +129,16 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
             src={photos[idx]}
             alt=""
             onClick={(e) => e.stopPropagation()}
-            className="max-h-[85vh] max-w-[88vw] object-contain"
+            onTouchStart={(e) => {
+              touchStartX.current = e.touches[0]?.clientX ?? null;
+            }}
+            onTouchEnd={(e) => {
+              if (touchStartX.current === null || photos.length < 2) return;
+              const dx = (e.changedTouches[0]?.clientX ?? touchStartX.current) - touchStartX.current;
+              if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); // свайп вліво → наступне фото
+              touchStartX.current = null;
+            }}
+            className="max-h-[85vh] max-w-[88vw] touch-pan-y object-contain"
           />
 
           {photos.length > 1 && (
@@ -143,6 +153,12 @@ export default function ListingCard({ listing, lang }: { listing: Listing; lang:
             >
               ›
             </button>
+          )}
+
+          {photos.length > 1 && (
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 font-display text-sm uppercase tracking-wide text-white/80">
+              {idx + 1} / {photos.length}
+            </div>
           )}
 
           <button type="button" onClick={close} className={`${ui.overlayBtn} absolute right-3 top-3`}>

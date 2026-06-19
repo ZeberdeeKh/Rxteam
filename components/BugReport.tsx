@@ -187,7 +187,8 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
         <span className="flex h-11 w-11 flex-shrink-0 items-center justify-center">
           <IconBug size={18} />
         </span>
-        <span className="max-w-0 overflow-hidden whitespace-nowrap font-display text-sm font-bold uppercase tracking-wide transition-all duration-300 group-hover:max-w-[260px]">
+        {/* На мобільному лейбл видно ЗАВЖДИ (hover на тачі не спрацьовує); на десктопі — розкривається при ховері. */}
+        <span className="max-w-[260px] overflow-hidden whitespace-nowrap font-display text-sm font-bold uppercase tracking-wide transition-all duration-300 md:max-w-0 md:group-hover:max-w-[260px]">
           <span className="pr-4">{labels.button}</span>
         </span>
       </button>
@@ -227,7 +228,7 @@ export default function BugReport({ labels, lang }: { labels: BugLabels; lang: L
                   <button
                     onClick={closeModal}
                     disabled={sending}
-                    className={ui.iconBtn}
+                    className={ui.iconBtnLg}
                     aria-label={labels.cancel}
                   >
                     <IconX size={18} />

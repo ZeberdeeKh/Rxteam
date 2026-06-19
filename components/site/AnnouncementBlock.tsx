@@ -15,18 +15,24 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
       <h4 className={`mb-1 ${ui.legend}`}>
         {st(lang, "games_announce_heading")}
       </h4>
-      <div
-        className={`whitespace-pre-line text-sm text-gray-600 ${
-          collapsible && !open ? "max-h-40 overflow-hidden" : ""
-        }`}
-      >
-        {text}
+      <div className="relative">
+        <div
+          className={`whitespace-pre-line text-sm text-gray-600 ${
+            collapsible && !open ? "max-h-40 overflow-hidden" : ""
+          }`}
+        >
+          {text}
+        </div>
+        {/* Згладжуємо обрізаний текст градієнтом під колір картки (--c-white), щоб не виглядало як баг. */}
+        {collapsible && !open && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--c-white)] to-transparent" />
+        )}
       </div>
       {collapsible && (
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
-          className={`mt-1 text-xs ${ui.link}`}
+          className={`mt-1 inline-flex min-h-[44px] items-center text-xs ${ui.link}`}
         >
           {st(lang, open ? "games_show_less" : "games_show_more")}
         </button>

@@ -75,11 +75,12 @@ export const ui = {
   panel: "bg-gray-100 px-3 py-2 text-sm text-gray-600",
 
   // Поля вводу (квадратні)
+  // text-base на мобільному (16px) — щоб iOS Safari НЕ зумив сторінку при фокусі поля; text-sm з md.
   input:
-    "w-full border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 " +
+    "w-full border border-gray-300 bg-white px-3 py-2 text-base text-gray-900 placeholder-gray-400 md:text-sm " +
     "focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand",
   inputSm:
-    "border border-gray-300 bg-white px-2 py-1 text-xs text-gray-900 placeholder-gray-400 " +
+    "border border-gray-300 bg-white px-2 py-1 text-base text-gray-900 placeholder-gray-400 md:text-xs " +
     "focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand",
 
   // Таблиці / списки (квадратні)
@@ -127,8 +128,8 @@ export const ui = {
   fieldLabel: "mb-1 block text-sm font-medium text-gray-700",
   legend: "px-1 text-xs font-semibold uppercase tracking-wide text-gray-500",
   fieldBox: "border border-gray-200 p-3",
-  checkbox: "h-4 w-4 accent-brand",
-  radio: "h-4 w-4 accent-brand",
+  checkbox: "h-5 w-5 accent-brand",
+  radio: "h-5 w-5 accent-brand",
   fileInput:
     "block w-full text-sm text-gray-700 file:mr-3 file:border-0 " +
     "file:bg-[var(--c-action-bg)] file:px-3 file:py-1.5 file:text-[var(--c-action-fg)] hover:file:bg-[var(--c-action-bg-hover)]",
@@ -143,6 +144,11 @@ export const ui = {
   iconBtn:
     "flex h-7 w-7 items-center justify-center text-gray-500 transition hover:bg-gray-200 " +
     "hover:text-gray-800 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40",
+  // Велика іконка-кнопка для оверлеїв (закриття Drawer/Modal): 44px на мобільному, 36px з sm.
+  iconBtnLg:
+    "flex h-11 w-11 items-center justify-center text-gray-500 transition hover:bg-gray-200 " +
+    "hover:text-gray-800 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 " +
+    "sm:h-9 sm:w-9",
   overlayBtn:
     "bg-white/10 px-3 py-1.5 text-sm font-medium uppercase tracking-wide text-neutral-50 transition hover:bg-white/20",
   // Кругла overlay-іконка над фото — лишається КРУГЛОЮ свідомо.
@@ -151,8 +157,8 @@ export const ui = {
   // FAB (плаваюча кнопка баг-репорту) — зрізані кути (chamfer-fill), плоска, у спільному стилі ab3.
   // Без shadow: clip-path однаково обрізав би box-shadow, а ab3 — плоский. Кольори — як у action-кнопки.
   fab:
-    "fixed bottom-4 right-4 z-40 flex items-center rx-chamfer-fill [--cut:8px] bg-[var(--c-primary)] text-[var(--c-primary-fg)] " +
-    "transition-colors hover:bg-[var(--c-primary-hover)]",
+    "fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-40 flex items-center rx-chamfer-fill [--cut:8px] " +
+    "bg-[var(--c-primary)] text-[var(--c-primary-fg)] transition-colors hover:bg-[var(--c-primary-hover)]",
 } as const;
 
 // ── Хелпери статус→бейдж (ADR-0025). Колір пігулки; дефолт невідомого — gray. ──

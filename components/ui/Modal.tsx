@@ -33,7 +33,7 @@ export default function Modal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-3 sm:p-4"
       onMouseDown={(e) => {
         pressOnBackdrop.current = e.target === e.currentTarget;
       }}
@@ -41,7 +41,7 @@ export default function Modal({
         if (closeOnBackdrop && e.target === e.currentTarget && pressOnBackdrop.current) onClose();
       }}
     >
-      <div className={`max-h-[90vh] w-full overflow-y-auto bg-white shadow-2xl ${className}`}>
+      <div className={`max-h-[90vh] w-full overflow-y-auto overscroll-contain bg-white shadow-2xl ${className}`}>
         {children}
       </div>
     </div>

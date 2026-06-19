@@ -48,7 +48,7 @@ export default function Drawer({
       <div className={`rx-drawer flex h-full w-full flex-col bg-white shadow-2xl ${className}`}>
         <div className="flex items-center gap-3 border-b border-gray-200 px-4 py-3">
           <div className="min-w-0 flex-1">{title && <h2 className={ui.cardTitle}>{title}</h2>}</div>
-          <button type="button" onClick={onClose} className={ui.iconBtn} aria-label={closeLabel}>
+          <button type="button" onClick={onClose} className={ui.iconBtnLg} aria-label={closeLabel}>
             <svg
               className="h-4 w-4"
               viewBox="0 0 24 24"
@@ -63,7 +63,9 @@ export default function Drawer({
             </svg>
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-4">{children}</div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4 [padding-bottom:max(1rem,env(safe-area-inset-bottom))]">
+          {children}
+        </div>
       </div>
     </div>
   );

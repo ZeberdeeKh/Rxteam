@@ -24,14 +24,15 @@ export default function RegisterForm({
       <input type="hidden" name="gameId" value={gameId} />
       {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
-      <label className="flex items-center gap-2 text-sm text-gray-700">
+      {/* min-h-[44px] на рядках опцій — комфортний тач-таргет для чекбокса/радіо на телефоні. */}
+      <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
         <input type="checkbox" name="needs_rental" className={ui.checkbox} />
         {st(lang, "reg_rental_q")}
       </label>
 
       <fieldset className="space-y-1">
         <legend className="text-sm text-gray-500">{st(lang, "reg_transport_q")}</legend>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
           <input
             type="radio"
             name="transport"
@@ -42,7 +43,7 @@ export default function RegisterForm({
           />
           {st(lang, "reg_transport_need")}
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
           <input
             type="radio"
             name="transport"
@@ -53,7 +54,7 @@ export default function RegisterForm({
           />
           {st(lang, "reg_transport_own")}
         </label>
-        <label className="flex items-center gap-2 text-sm text-gray-700">
+        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
           <input
             type="radio"
             name="transport"
@@ -80,7 +81,7 @@ export default function RegisterForm({
         </div>
       )}
 
-      <button type="submit" className={btn("action")}>
+      <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
         {st(lang, "btn_register")}
       </button>
     </form>

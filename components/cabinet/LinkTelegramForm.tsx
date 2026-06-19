@@ -8,7 +8,7 @@ import { ui, btn } from "@/components/ui";
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
   return (
-    <button type="submit" disabled={pending} className={btn("action")}>
+    <button type="submit" disabled={pending} className={`${btn("action")} w-full sm:w-auto`}>
       {pending ? "…" : label}
     </button>
   );
@@ -23,7 +23,7 @@ export default function LinkTelegramForm({ lang }: { lang: Lang }) {
       <p className={`mt-2 ${ui.body}`}>{st(lang, "link_intro")}</p>
       <p className={`mt-1 ${ui.meta}`}>{st(lang, "link_how")}</p>
 
-      <form action={formAction} className="mt-4 flex flex-wrap items-end gap-3">
+      <form action={formAction} className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
         <div>
           <label className={ui.label} htmlFor="code">
             {st(lang, "link_code_label")}
@@ -34,7 +34,7 @@ export default function LinkTelegramForm({ lang }: { lang: Lang }) {
             required
             autoComplete="off"
             maxLength={8}
-            className={`mt-1 w-40 uppercase tracking-wide ${ui.input}`}
+            className={`mt-1 w-full uppercase tracking-wide sm:w-40 ${ui.input}`}
           />
         </div>
         <SubmitButton label={st(lang, "link_btn")} />

@@ -27,7 +27,8 @@ function pageList(page: number, totalPages: number): (number | "…")[] {
 }
 
 function pageBtn(active: boolean): string {
-  return `inline-flex h-9 min-w-9 items-center justify-center border px-2 text-sm font-semibold ${
+  // 44px тач-таргет на мобільному, компактні 36px з sm.
+  return `inline-flex h-11 min-w-11 items-center justify-center border px-2 text-sm font-semibold sm:h-9 sm:min-w-9 ${
     active
       ? "border-[var(--c-brand-text)] text-[var(--c-brand-text)]"
       : "border-gray-300 text-gray-700 hover:bg-gray-50"
@@ -60,7 +61,7 @@ export default async function MarketplacePage({ searchParams }: { searchParams: 
           </div>
 
           {totalPages > 1 && (
-            <nav className="flex flex-wrap items-center justify-center gap-1 pt-2">
+            <nav className="flex flex-wrap items-center justify-center gap-1.5 pt-2">
               {page > 1 && (
                 <Link
                   href={`/marketplace?page=${page - 1}`}

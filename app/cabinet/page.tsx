@@ -68,7 +68,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           <h2 className={ui.cardTitle}>{st(lang, "standalone_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "standalone_intro")}</p>
           <form action={createStandalone} className="mt-3">
-            <button type="submit" className={btn("action")}>
+            <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
               {st(lang, "standalone_btn")}
             </button>
           </form>
@@ -88,7 +88,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "callsign_intro")}</p>
-          <form action={saveCallsign} className="mt-3 flex gap-2">
+          <form action={saveCallsign} className="mt-3 flex flex-col gap-2 sm:flex-row">
             <input
               name="callsign"
               required
@@ -97,7 +97,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
               placeholder={st(lang, "callsign_ph")}
               className={`${ui.input} flex-1`}
             />
-            <button type="submit" className={btn("action")}>
+            <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
               {st(lang, "callsign_btn")}
             </button>
           </form>
@@ -153,7 +153,7 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
             </dd>
           </div>
           {patchEnabled && (
-            <div>
+            <div className="col-span-2 sm:col-span-1">
               <dt className={ui.meta}>{st(lang, "prof_patch")}</dt>
               <dd className={ui.bodyStrong}>
                 {player.has_patch ? (

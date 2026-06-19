@@ -15,7 +15,8 @@ type Variant = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
 const LOGO_VARIANT: Variant = "E";
 
 // Спільні класи тексту лого (display-шрифт Oswald, як меню/заголовки).
-const TXT = "font-display text-3xl font-extrabold uppercase leading-none tracking-wide";
+// Менший на мобільному (text-2xl), повний розмір з md — щоб шапка не була завеликою на телефоні.
+const TXT = "font-display text-2xl font-extrabold uppercase leading-none tracking-wide md:text-3xl";
 
 export default function Logo() {
   switch (LOGO_VARIANT) {

@@ -38,7 +38,7 @@ export default function CheckinButton({
   }
 
   return (
-    <form action={webCheckin}>
+    <form action={webCheckin} className="w-full sm:w-auto">
       <input type="hidden" name="gameId" value={gameId} />
       {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
       <input type="hidden" name="lat" />
@@ -47,7 +47,7 @@ export default function CheckinButton({
         type="submit"
         onClick={onClick}
         disabled={status === "locating"}
-        className={btn("action")}
+        className={`${btn("action")} w-full sm:w-auto`}
       >
         {status === "locating" ? st(lang, "checkin_locating") : st(lang, "web_checkin_btn")}
       </button>

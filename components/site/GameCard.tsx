@@ -22,18 +22,20 @@ export default function GameCard({
 
   return (
     <article className={`${ui.card} ${muted ? "opacity-75" : ""}`}>
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className={ui.cardTitle}>{game.title ?? "ASG"}</h3>
+      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
+        <h3 className={`min-w-0 break-words ${ui.cardTitle}`}>{game.title ?? "ASG"}</h3>
         {game.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
       </div>
 
+      {/* На телефоні лейбл стоїть НАД значенням (фікс-колонка w-20 з'являється лише з sm) —
+          щоб довгі назви локацій не тиснулись у вузький ~210px стовпчик. */}
       <dl className="mt-3 space-y-1 text-sm text-gray-600">
-        <div className="flex gap-2">
-          <dt className="w-20 shrink-0 text-gray-400">{st(lang, "games_label_when")}</dt>
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+          <dt className="text-gray-400 sm:w-20 sm:shrink-0">{st(lang, "games_label_when")}</dt>
           <dd>{formatGameWhen(game.gather_at ?? game.start_at, lang)}</dd>
         </div>
-        <div className="flex gap-2">
-          <dt className="w-20 shrink-0 text-gray-400">{st(lang, "games_label_where")}</dt>
+        <div className="flex flex-col gap-0.5 sm:flex-row sm:gap-2">
+          <dt className="text-gray-400 sm:w-20 sm:shrink-0">{st(lang, "games_label_where")}</dt>
           <dd>
             {game.location?.name ?? st(lang, "games_tbd_loc")}
             {game.location?.map_url && (

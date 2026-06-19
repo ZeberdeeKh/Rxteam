@@ -100,8 +100,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
 
       {player ? (
-        <p className="text-sm text-gray-600">
-          {st(lang, "shop_balance")}: <span className="font-semibold">{balance} {GLYPH.balance}</span>
+        // Баланс — головне число для покупок; виносимо в ab3-чип (зрізані кути), щоб не губилось у тексті.
+        <p className="inline-flex items-center gap-1.5 rx-chamfer-fill [--cut:6px] bg-gray-100 px-3 py-1.5 text-sm text-gray-600">
+          {st(lang, "shop_balance")}: <span className="font-semibold text-gray-900">{balance} {GLYPH.balance}</span>
         </p>
       ) : (
         <p className={ui.alertWarn}>

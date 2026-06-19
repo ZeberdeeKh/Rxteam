@@ -9,6 +9,7 @@ import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
 import BugReport from "@/components/BugReport";
 import NavLink from "@/components/site/NavLink";
+import MobileNav from "@/components/site/MobileNav";
 import { ui, headerNavClass, headerAdminClass, Logo } from "@/components/ui";
 
 // Опис слідує мові сайту (cookie rx_lang), тому генеруємо динамічно, а не статично.
@@ -45,6 +46,20 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     error: st(lang, "bug_error"),
   };
 
+  // Лейбли мобільного меню (бургер-панель) — резолвимо на сервері, як і решту шапки.
+  const mobileNavLabels = {
+    menu: st(lang, "nav_menu"),
+    close: st(lang, "nav_close"),
+    home: st(lang, "nav_home"),
+    marketplace: st(lang, "nav_marketplace"),
+    shop: st(lang, "nav_shop"),
+    mygames: st(lang, "nav_mygames"),
+    cabinet: st(lang, "nav_cabinet"),
+    admin: st(lang, "nav_admin"),
+    login: st(lang, "nav_login"),
+    logout: st(lang, "nav_logout"),
+  };
+
   return (
     <html lang={lang}>
       <head>
@@ -58,14 +73,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 border-b border-gray-200 bg-white">
-          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-3">
+          <div className="mx-auto flex w-full max-w-[66rem] items-center justify-between gap-4 px-4 py-2 md:py-3">
             {/* Текстовий вордмарк замість лого-картинки: рівно рендериться на будь-якій ширині.
                 Колір — ЄДИНИЙ токен --c-brand-text (той самий, що й заголовки сайту). */}
             {/* Логотип — компонент Logo (варіанти A–D, перемикач LOGO_VARIANT у Logo.tsx). */}
             <Link href="/" className="inline-flex" aria-label="RX Team">
               <Logo />
             </Link>
-            <nav className="flex items-center gap-1 text-sm">
+            <nav className="hidden items-center gap-1 text-sm md:flex">
               <NavLink href="/" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_home")}
               </NavLink>
@@ -102,10 +117,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <span className="mx-1 h-5 w-px bg-gray-200" />
               <LangSwitcher current={lang} />
             </nav>
+
+            {/* Мобільне меню (< md): бургер + повноекранна панель ab3 */}
+            <MobileNav lang={lang} loggedIn={loggedIn} admin={admin} labels={mobileNavLabels} />
           </div>
         </header>
 
-        <main className="mx-auto w-full max-w-[66rem] flex-1 px-4 py-8">{children}</main>
+        {/* pb-24 на мобільному — щоб остання дія/кнопка не ховалась під плаваючим FAB баг-репорту */}
+        <main className="mx-auto w-full max-w-[66rem] flex-1 px-4 pt-8 pb-24 md:pb-8">{children}</main>
 
         <footer className="border-t border-gray-200 bg-white">
           <div className={`mx-auto w-full max-w-[66rem] px-4 py-4 text-center ${ui.meta}`}>

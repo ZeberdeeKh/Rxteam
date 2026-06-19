@@ -3,7 +3,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
 import RegisterForm from "@/components/cabinet/RegisterForm";
 import { unregisterFromGame } from "@/app/cabinet/actions";
-import { ui, btn, badgeClass } from "@/components/ui";
+import { btn, badgeClass } from "@/components/ui";
 
 // Дії над грою на публічній /games (слот children у GameCard).
 // Перевикористовує RegisterForm/unregisterFromGame з кабінету (returnTo="/games").
@@ -21,25 +21,21 @@ export default function GameActions({
   hasCallsign: boolean;
   reg?: CabinetGame;
 }) {
-  // Не залогований → запросити увійти.
+  // Не залогований → запросити увійти. Повноширинна outline-кнопка на телефоні (тач-таргет).
   if (!loggedIn) {
     return (
-      <p className="text-sm text-gray-500">
-        <Link href="/login" className={ui.link}>
-          {st(lang, "games_login_to_register")}
-        </Link>
-      </p>
+      <Link href="/login" className={`${btn("outline")} w-full sm:w-auto`}>
+        {st(lang, "games_login_to_register")}
+      </Link>
     );
   }
 
   // Залогований без позивного → задати в кабінеті (правило registerForGame).
   if (!hasCallsign) {
     return (
-      <p className="text-sm text-gray-500">
-        <Link href="/cabinet" className={ui.link}>
-          {st(lang, "games_need_callsign")}
-        </Link>
-      </p>
+      <Link href="/cabinet" className={`${btn("outline")} w-full sm:w-auto`}>
+        {st(lang, "games_need_callsign")}
+      </Link>
     );
   }
 
