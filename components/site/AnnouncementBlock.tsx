@@ -23,9 +23,12 @@ export default function AnnouncementBlock({ text, lang }: { text: string; lang: 
         >
           {text}
         </div>
-        {/* Згладжуємо обрізаний текст градієнтом під колір картки (--c-white), щоб не виглядало як баг. */}
+        {/* Згладжуємо обрізаний текст градієнтом під колір картки (--c-white).
+            Затухаємо в ТОЙ САМИЙ колір із нульовою альфою (rgba 17,19,29 = #11131d),
+            а НЕ в `transparent` (=прозорий ЧОРНИЙ) — інакше середина градієнта
+            підмішує чорне й над темною карткою з'являється тёмна смуга-«тінь». */}
         {collapsible && !open && (
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--c-white)] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[var(--c-white)] to-[rgba(17,19,29,0)]" />
         )}
       </div>
       {collapsible && (
