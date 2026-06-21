@@ -10,6 +10,7 @@ import {
   savePatchSettings,
 } from "@/app/admin/actions";
 import { supabase } from "@/lib/supabase";
+import { listConfirmedPatchPlayers } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
 import { ui, btn, badgeClass, Collapsible } from "@/components/ui";
 
@@ -38,6 +39,9 @@ export default async function AdminPatches({
     ? await supabase.from("players").select("id, callsign, name, tg_username").in("id", ids)
     : { data: [] as { id: number; callsign: string | null; name: string | null; tg_username: string | null }[] };
   const pmap = new Map((pls ?? []).map((p) => [p.id, p]));
+
+  // Список усіх гравців із підтвердженим патчем (has_patch=true) — внизу сторінки.
+  const confirmed = await listConfirmedPatchPlayers();
 
   return (
     <div className={ui.pageStack}>
@@ -152,6 +156,41 @@ export default async function AdminPatches({
           {st(lang, "adm_save")}
         </button>
       </form>
+
+      {/* Усі гравці з підтвердженим патчем */}
+      <section className={ui.card}>
+        <h2 className={`mb-3 ${ui.legend}`}>
+          {st(lang, "adm_patch_confirmed_title")} · {confirmed.length}
+        </h2>
+        {confirmed.length === 0 ? (
+          <p className={ui.muted}>{st(lang, "adm_patch_confirmed_empty")}</p>
+        ) : (
+          <div className={`overflow-x-auto ${ui.tableWrap} bg-white`}>
+            <table className={ui.table}>
+              <thead className={ui.thead}>
+                <tr>
+                  <th className={ui.th}>{st(lang, "adm_patch_col_callsign")}</th>
+                  <th className={ui.th}>{st(lang, "adm_patch_col_name")}</th>
+                  <th className={ui.th}>{st(lang, "adm_patch_col_tg")}</th>
+                  <th className={ui.th}>{st(lang, "adm_patch_col_date")}</th>
+                </tr>
+              </thead>
+              <tbody className={ui.tbody}>
+                {confirmed.map((p) => (
+                  <tr key={p.id}>
+                    <td className={`${ui.td} font-medium text-gray-900`}>{p.callsign ?? `#${p.id}`}</td>
+                    <td className={ui.td}>{p.name ?? "—"}</td>
+                    <td className={ui.td}>{p.tg_username ? `@${p.tg_username}` : "—"}</td>
+                    <td className={`whitespace-nowrap ${ui.td}`}>
+                      {p.patch_at ? formatGameWhen(p.patch_at, lang) : "—"}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

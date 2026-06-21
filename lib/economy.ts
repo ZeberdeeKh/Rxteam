@@ -19,6 +19,18 @@ export const RANK_COST_FALLBACK: Record<string, number> = {
   "Team Leader": 500,
 };
 
+// Зміна позивного в магазині: ціна (settings) + правило безкоштовності.
+export const CALLSIGN_CHANGE_COST_KEY = "callsign_change_cost";
+export const CALLSIGN_CHANGE_COST_FALLBACK = 50;
+
+// Squad Leader і вище міняють позивний безкоштовно (перк рангу); решта — за бали.
+// Ранг має сенс лише з патчем, тож викликач передає ефективний ранг (has_patch ? rank : null).
+export function callsignChangeIsFree(rank: string | null): boolean {
+  if (!rank) return false;
+  const idx = RANKS.indexOf(rank as Rank);
+  return idx >= 0 && idx >= RANKS.indexOf("Squad Leader");
+}
+
 // Числове значення з settings зі знаком; fallback якщо не задано/невалідне.
 export async function getPointValue(key: string, fallback: number): Promise<number> {
   const v = await getSetting(key);

@@ -4,7 +4,7 @@ import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
 import { listGamesAdmin, listLocations } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
-import { createGame } from "@/app/admin/actions";
+import { createGame, deleteGame } from "@/app/admin/actions";
 import { ui, btn, gameStatusBadge, Collapsible, CreateDrawer } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function AdminGames({
   searchParams,
 }: {
-  searchParams: { created?: string; cancelled?: string; err?: string };
+  searchParams: { created?: string; cancelled?: string; deleted?: string; err?: string };
 }) {
   await requirePerm("games");
   const lang = getServerLang();
@@ -82,9 +82,14 @@ export default async function AdminGames({
         )}
       </div>
 
-      {searchParams.created && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
-      {searchParams.cancelled && <p className={ui.alertOk}>{st(lang, "adm_done")}</p>}
-      {searchParams.err && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
+      {(searchParams.created || searchParams.cancelled || searchParams.deleted) && (
+        <p className={ui.alertOk}>{st(lang, "adm_done")}</p>
+      )}
+      {searchParams.err && (
+        <p className={ui.alertErr}>
+          {st(lang, searchParams.err === "notcancelled" ? "adm_err_notcancelled" : "adm_err_fields")}
+        </p>
+      )}
 
       {/* Список ігор — компактні рядки, що розгортають деталі й кнопку «Відкрити» (як меню «Гравці»). */}
       {games.length === 0 ? (
@@ -110,9 +115,19 @@ export default async function AdminGames({
                   {st(lang, "adm_col_reg")}: <b>{g.regCount}</b> · {st(lang, "adm_col_checkins")}:{" "}
                   <b>{g.checkinCount}</b>
                 </div>
-                <Link href={`/admin/games/${g.id}`} className={btn("action")}>
-                  {st(lang, "adm_open")}
-                </Link>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link href={`/admin/games/${g.id}`} className={btn("action")}>
+                    {st(lang, "adm_open")}
+                  </Link>
+                  {g.status === "cancelled" && (
+                    <form action={deleteGame}>
+                      <input type="hidden" name="gameId" value={g.id} />
+                      <button type="submit" className={btn("delete")}>
+                        {st(lang, "adm_btn_delete_game")}
+                      </button>
+                    </form>
+                  )}
+                </div>
               </div>
             </Collapsible>
           ))}

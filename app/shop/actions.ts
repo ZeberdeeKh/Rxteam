@@ -10,7 +10,11 @@ import {
   getPointValue,
   RANK_COST_KEY,
   RANK_COST_FALLBACK,
+  CALLSIGN_CHANGE_COST_KEY,
+  CALLSIGN_CHANGE_COST_FALLBACK,
+  callsignChangeIsFree,
 } from "@/lib/economy";
+import { normalizeCallsign } from "@/lib/validation";
 import { getSessionPlayer } from "@/lib/site-player";
 import { notifyAdminsPurchase } from "@/lib/notify";
 
@@ -105,4 +109,62 @@ export async function buyRank(formData: FormData) {
   revalidatePath("/shop");
   revalidatePath("/cabinet");
   back("?rank_bought=1");
+}
+
+// Зміна позивного за бали. Squad Leader і вище — безкоштовно (перк рангу); решта — за
+// settings.callsign_change_cost (дефолт 50). Перейменування + списання роблять ОДИН
+// атомарний умовний UPDATE (як buyRank): не списати без зміни і не змінити без списання.
+export async function changeCallsign(formData: FormData) {
+  if (!(await featureEnabled("shop"))) back("?err=disabled");
+
+  const player = await getSessionPlayer();
+  if (!player) redirect("/login");
+
+  const v = normalizeCallsign(String(formData.get("callsign") ?? ""));
+  if (!v.ok) return back("?err=callsign_invalid");
+  const callsign = v.value;
+
+  // Без зміни (той самий, можливо інший регістр) — не списуємо бали даремно.
+  if (player.callsign && callsign.toLowerCase() === String(player.callsign).toLowerCase()) {
+    back("?err=callsign_same");
+  }
+
+  // Унікальність без урахування регістру (як скрізь), виключаючи себе.
+  const { data: clash } = await supabase
+    .from("players")
+    .select("id")
+    .ilike("callsign", callsign)
+    .neq("id", player.id)
+    .maybeSingle();
+  if (clash) back("?err=callsign_taken");
+
+  const free = !!player.has_patch && callsignChangeIsFree(player.rank ?? null);
+  const cost = free ? 0 : await getPointValue(CALLSIGN_CHANGE_COST_KEY, CALLSIGN_CHANGE_COST_FALLBACK);
+
+  if (cost > 0) {
+    const balance = player.points_balance ?? 0;
+    if (balance < cost) back("?err=balance");
+    // Атомарне перейменування+списання одним умовним UPDATE по балансу (gte). Нуль
+    // зачеплених рядків = недостатньо балів / гонку програно; помилка UNIQUE = зайнятий.
+    const { data: changed, error } = await supabase
+      .from("players")
+      .update({ points_balance: balance - cost, callsign })
+      .eq("id", player.id)
+      .gte("points_balance", cost)
+      .select("id")
+      .maybeSingle();
+    if (error) back("?err=callsign_taken"); // 23505 (UNIQUE) або інша помилка
+    if (!changed) back("?err=balance");
+    await supabase
+      .from("point_log")
+      .insert({ player_id: player.id, delta: -cost, reason: "callsign_change", meta: callsign });
+  } else {
+    // Безкоштовно (Squad Leader+): просте перейменування; колізія UNIQUE → зайнятий.
+    const { error } = await supabase.from("players").update({ callsign }).eq("id", player.id);
+    if (error) back("?err=callsign_taken");
+  }
+
+  revalidatePath("/shop");
+  revalidatePath("/cabinet");
+  back("?callsign_changed=1");
 }

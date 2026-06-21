@@ -212,6 +212,60 @@ const S: Record<string, Dict> = {
     en: "Invalid callsign (2–32 chars: letters, digits, space, _ . -). Try another:",
     uk: "Некоректний позивний (2–32 символи: літери, цифри, пробіл, _ . -). Впиши інший:",
   },
+  // Підтвердження позивного при першій реєстрації (ставиться один раз).
+  callsign_confirm_q: {
+    pl: "Twój pseudonim: {callsign}\n\nUstawiasz go raz. Zmiana później — tylko w sklepie za punkty lub po zdobyciu rangi Squad Leader.\n\nPotwierdzić?",
+    en: "Your callsign: {callsign}\n\nSet once. Changing it later — only in the shop for points or after reaching the Squad Leader rank.\n\nConfirm?",
+    uk: "Твій позивний: {callsign}\n\nВстановлюється один раз. Змінити згодом — лише в магазині за бали або отримавши ранг Squad Leader.\n\nПідтвердити?",
+  },
+  btn_callsign_confirm: { pl: "✅ Potwierdź", en: "✅ Confirm", uk: "✅ Підтвердити" },
+  btn_callsign_cancel: { pl: "✖️ Anuluj", en: "✖️ Cancel", uk: "✖️ Скасувати" },
+  callsign_cancelled: {
+    pl: "Anulowano. Podaj inny pseudonim:",
+    en: "Cancelled. Enter another callsign:",
+    uk: "Скасовано. Впиши інший позивний:",
+  },
+  callsign_set: {
+    pl: "✅ Pseudonim ustawiony: {callsign}",
+    en: "✅ Callsign set: {callsign}",
+    uk: "✅ Позивний встановлено: {callsign}",
+  },
+  // Зміна позивного за бали (/callsign). Squad Leader+ — безкоштовно.
+  callsign_change_ask: {
+    pl: "Podaj nowy pseudonim. Koszt: {cost} pkt.",
+    en: "Enter a new callsign. Cost: {cost} pts.",
+    uk: "Впиши новий позивний. Ціна: {cost} б.",
+  },
+  callsign_change_ask_free: {
+    pl: "Podaj nowy pseudonim (za darmo — ranga Squad Leader+):",
+    en: "Enter a new callsign (free — Squad Leader+ rank):",
+    uk: "Впиши новий позивний (безкоштовно — ранг Squad Leader+):",
+  },
+  callsign_change_done: {
+    pl: "✅ Pseudonim zmieniony: {callsign}",
+    en: "✅ Callsign changed: {callsign}",
+    uk: "✅ Позивний змінено: {callsign}",
+  },
+  callsign_change_not_enough: {
+    pl: "Za mało punktów: potrzeba {cost}, masz {balance}.",
+    en: "Not enough points: need {cost}, you have {balance}.",
+    uk: "Недостатньо балів: потрібно {cost}, у тебе {balance}.",
+  },
+  callsign_change_same: {
+    pl: "To już Twój pseudonim. Podaj inny:",
+    en: "That's already your callsign. Enter another:",
+    uk: "Це вже твій позивний. Впиши інший:",
+  },
+  callsign_change_off: {
+    pl: "Zmiana pseudonimu jest teraz niedostępna.",
+    en: "Callsign change is currently unavailable.",
+    uk: "Зміна позивного зараз недоступна.",
+  },
+  callsign_change_need_first: {
+    pl: "Najpierw ustaw pseudonim (zapisz się na grę).",
+    en: "Set your callsign first (sign up for a game).",
+    uk: "Спершу встанови позивний (запишись на гру).",
+  },
   reg_done: {
     pl: "✅ Zapisano: {loc}, {when}.",
     en: "✅ Signed up: {loc}, {when}.",

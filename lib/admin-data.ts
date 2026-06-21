@@ -147,6 +147,27 @@ export async function listPlayers(limit = 300): Promise<AdminPlayer[]> {
   return (data ?? []) as AdminPlayer[];
 }
 
+export type ConfirmedPatchPlayer = {
+  id: number;
+  callsign: string | null;
+  name: string | null;
+  tg_username: string | null;
+  patch_at: string | null;
+};
+
+// Усі гравці з підтвердженим патчем (has_patch = true) — для списку внизу /admin/patches.
+// «Підтверджений патч» = has_patch=true (видано на грі handPatchRequest або вручну togglePatch).
+// patch_at може бути null для давніх рядків, яких бекфіл etap25 не зміг розв'язати → у UI «—».
+export async function listConfirmedPatchPlayers(): Promise<ConfirmedPatchPlayer[]> {
+  const { data } = await supabase
+    .from("players")
+    .select("id, callsign, name, tg_username, patch_at")
+    .eq("has_patch", true)
+    .order("patch_at", { ascending: false, nullsFirst: false })
+    .order("callsign", { ascending: true });
+  return (data ?? []) as ConfirmedPatchPlayer[];
+}
+
 export type AdminReferral = {
   id: number;
   status: string;
@@ -190,13 +211,16 @@ export type RentalReq = {
   status: string;
 };
 
-// Заявки на оренду (registrations.needs_rental) для майбутніх/нещодавніх ігор. Read-only.
+// Заявки на оренду (registrations.needs_rental) для АКТИВНИХ (announced) ігор. Read-only.
+// Коли гру завершено/скасовано, її заявки автоматично зникають із цього списку
+// (games!inner + status='announced') — «оренда очищається» разом зі статусом гри.
 export async function listRentalRequests(): Promise<RentalReq[]> {
   const { data } = await supabase
     .from("registrations")
-    .select("status, games(id, title, start_at), players(callsign, name)")
+    .select("status, games!inner(id, title, start_at, status), players(callsign, name)")
     .eq("needs_rental", true)
     .eq("status", "registered")
+    .eq("games.status", "announced")
     .limit(200);
   const rows = (data ?? []).map((r: any) => {
     const g = Array.isArray(r.games) ? r.games[0] : r.games;

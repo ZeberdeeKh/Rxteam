@@ -137,6 +137,34 @@ export async function cancelGame(formData: FormData) {
   redirect("/admin/games?cancelled=1");
 }
 
+// Видалення гри — ЛИШЕ зі статусом «cancelled». Захист у самому екшені (guarded delete:
+// .eq("status","cancelled")), не лише в UI — інакше hard-delete каскадом прибрав би
+// реєстрації/чек-іни живої гри. FK: registrations/checkins/chore_runs → ON DELETE CASCADE;
+// point_log/referrals/player_achievements → ON DELETE SET NULL (історія/бали лишаються).
+export async function deleteGame(formData: FormData) {
+  await requirePerm("games");
+  const gameId = Number(formData.get("gameId"));
+  if (!Number.isFinite(gameId)) redirect("/admin/games");
+  const { data: g } = await supabase
+    .from("games")
+    .select("status, announce_chat_id, announce_message_id")
+    .eq("id", gameId)
+    .maybeSingle();
+  if (!g || g.status !== "cancelled") redirect("/admin/games?err=notcancelled");
+  // Прибираємо анонс із каналу «Анонси» (best-effort — збій не блокує видалення).
+  if (g.announce_chat_id && g.announce_message_id) {
+    try {
+      await new Api(process.env.BOT_TOKEN!).deleteMessage(
+        Number(g.announce_chat_id),
+        Number(g.announce_message_id),
+      );
+    } catch {}
+  }
+  await supabase.from("games").delete().eq("id", gameId).eq("status", "cancelled");
+  revalidatePath("/admin/games");
+  redirect("/admin/games?deleted=1");
+}
+
 // ── Локації (право games) ──
 function mapUrl(lat: number, lng: number) {
   return `https://maps.google.com/?q=${lat},${lng}`;

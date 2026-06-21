@@ -496,6 +496,19 @@ const SITE: Record<string, Dict> = {
   },
   callsign_ph: { pl: "np. Ghost", en: "e.g. Ghost", uk: "напр. Ghost" },
   callsign_btn: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
+  callsign_warning: {
+    pl: "Pseudonim ustawiasz raz. Później zmienisz go tylko w sklepie za punkty albo zdobywając rangę Squad Leader.",
+    en: "You set your callsign once. Later you can change it only in the shop for points or by reaching the Squad Leader rank.",
+    uk: "Позивний встановлюється один раз. Змінити його згодом можна буде лише в магазині за бали або отримавши ранг Squad Leader.",
+  },
+  callsign_confirm_title: { pl: "Potwierdzić pseudonim?", en: "Confirm callsign?", uk: "Підтвердити позивний?" },
+  callsign_confirm_btn: { pl: "Potwierdź", en: "Confirm", uk: "Підтвердити" },
+  callsign_cancel_btn: { pl: "Anuluj", en: "Cancel", uk: "Скасувати" },
+  err_callsign_locked: {
+    pl: "Pseudonim jest już ustawiony. Zmienisz go w sklepie za punkty lub z rangą Squad Leader.",
+    en: "Your callsign is already set. Change it in the shop for points or with the Squad Leader rank.",
+    uk: "Позивний уже встановлено. Змінити його можна в магазині за бали або з рангом Squad Leader.",
+  },
 
   // ── 6.2 Профіль ──
   prof_section: { pl: "Profil", en: "Profile", uk: "Профіль" },
@@ -573,6 +586,8 @@ const SITE: Record<string, Dict> = {
   reason_achievement: { pl: "Osiągnięcie", en: "Achievement", uk: "Ачівка" },
   reason_rank_purchase: { pl: "Zakup rangi", en: "Rank purchase", uk: "Купівля рангу" },
   reason_purchase: { pl: "Zakup w sklepie", en: "Shop purchase", uk: "Купівля в магазині" },
+  reason_callsign_change: { pl: "Zmiana pseudonimu", en: "Callsign change", uk: "Зміна позивного" },
+  reason_photo_post: { pl: "Zdjęcie z gry", en: "Game photo", uk: "Фото з гри" },
   reason_manual: { pl: "Korekta admina", en: "Admin adjustment", uk: "Корекція адміна" },
 
   // ── 6.3 Магазин ──
@@ -672,6 +687,39 @@ const SITE: Record<string, Dict> = {
     pl: "Ekonomia punktów jest wyłączona.",
     en: "The points economy is disabled.",
     uk: "Економіку балів вимкнено.",
+  },
+
+  // ── Зміна позивного в магазині (Squad Leader+ — безкоштовно) ──
+  shop_callsign_title: { pl: "Zmiana pseudonimu", en: "Change callsign", uk: "Зміна позивного" },
+  shop_callsign_intro: {
+    pl: "Wpisz nowy pseudonim. Musi być unikalny (2–32 znaki).",
+    en: "Enter a new callsign. It must be unique (2–32 characters).",
+    uk: "Впиши новий позивний. Має бути унікальним (2–32 символи).",
+  },
+  shop_callsign_btn: { pl: "Zmień pseudonim", en: "Change callsign", uk: "Змінити позивний" },
+  shop_callsign_confirm: { pl: "Zmień", en: "Change", uk: "Змінити" },
+  shop_callsign_free: { pl: "Za darmo (Squad Leader+)", en: "Free (Squad Leader+)", uk: "Безкоштовно (Squad Leader+)" },
+  shop_callsign_price: { pl: "Koszt: {cost} pkt", en: "Cost: {cost} pts", uk: "Ціна: {cost} б." },
+  shop_callsign_current: { pl: "Teraz: {callsign}", en: "Now: {callsign}", uk: "Зараз: {callsign}" },
+  shop_callsign_changed_ok: {
+    pl: "✅ Pseudonim zmieniony.",
+    en: "✅ Callsign changed.",
+    uk: "✅ Позивний змінено.",
+  },
+  shop_err_callsign_taken: {
+    pl: "Ten pseudonim jest już zajęty.",
+    en: "That callsign is already taken.",
+    uk: "Цей позивний уже зайнятий.",
+  },
+  shop_err_callsign_invalid: {
+    pl: "Nieprawidłowy pseudonim (2–32 znaki: litery, cyfry, spacja, _ . -).",
+    en: "Invalid callsign (2–32 chars: letters, digits, space, _ . -).",
+    uk: "Некоректний позивний (2–32 символи: літери, цифри, пробіл, _ . -).",
+  },
+  shop_err_callsign_same: {
+    pl: "To już Twój pseudonim.",
+    en: "That's already your callsign.",
+    uk: "Це вже твій позивний.",
   },
 
   // ── 6.4 Адмінка ──
@@ -938,6 +986,12 @@ const SITE: Record<string, Dict> = {
   adm_f_scenario_uk: { pl: "Scenariusz (UA)", en: "Scenario (UA)", uk: "Сценарій (UA)" },
   adm_btn_create: { pl: "Utwórz", en: "Create", uk: "Створити" },
   adm_btn_cancel_game: { pl: "Odwołaj", en: "Cancel", uk: "Скасувати" },
+  adm_btn_delete_game: { pl: "Usuń grę", en: "Delete game", uk: "Видалити гру" },
+  adm_err_notcancelled: {
+    pl: "Usunąć można tylko odwołaną grę.",
+    en: "Only a cancelled game can be deleted.",
+    uk: "Видалити можна лише скасовану гру.",
+  },
   adm_open: { pl: "Otwórz", en: "Open", uk: "Відкрити" },
   adm_close: { pl: "Zamknij", en: "Close", uk: "Закрити" },
   adm_col_status: { pl: "Status", en: "Status", uk: "Статус" },
@@ -1040,6 +1094,16 @@ const SITE: Record<string, Dict> = {
   adm_patch_hand: { pl: "🎖 Wydano na grze", en: "🎖 Handed at game", uk: "🎖 Видано на грі" },
   adm_patch_st_requested: { pl: "na rozpatrzeniu", en: "under review", uk: "на розгляді" },
   adm_patch_st_approved: { pl: "zatwierdzono", en: "approved", uk: "схвалено" },
+  adm_patch_confirmed_title: { pl: "Gracze z naszywką", en: "Players with a patch", uk: "Гравці з патчем" },
+  adm_patch_confirmed_empty: {
+    pl: "Brak graczy z potwierdzoną naszywką.",
+    en: "No players with a confirmed patch yet.",
+    uk: "Поки немає гравців із підтвердженим патчем.",
+  },
+  adm_patch_col_callsign: { pl: "Pseudonim", en: "Callsign", uk: "Позивний" },
+  adm_patch_col_name: { pl: "Imię", en: "Name", uk: "Ім'я" },
+  adm_patch_col_tg: { pl: "Telegram", en: "Telegram", uk: "Telegram" },
+  adm_patch_col_date: { pl: "Data", en: "Date", uk: "Дата" },
   adm_perm_joins: {
     pl: "podgląd zgłoszeń dołączenia do grupy.",
     en: "view group join attempts.",

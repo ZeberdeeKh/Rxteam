@@ -9,11 +9,15 @@ import {
   RANKS,
   RANK_COST_KEY,
   RANK_COST_FALLBACK,
+  CALLSIGN_CHANGE_COST_KEY,
+  CALLSIGN_CHANGE_COST_FALLBACK,
+  callsignChangeIsFree,
   getPointValue,
   nextRank,
   type Rank,
 } from "@/lib/economy";
-import { buyItem, buyRank } from "@/app/shop/actions";
+import { buyItem, buyRank, changeCallsign } from "@/app/shop/actions";
+import CallsignChangeDrawer from "@/components/site/CallsignChangeDrawer";
 import { ui, btn, badgeClass, GLYPH } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +40,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
     ? "shop_rank_bought_ok"
     : searchParams.bought
       ? "shop_bought_ok"
-      : null;
+      : searchParams.callsign_changed
+        ? "shop_callsign_changed_ok"
+        : null;
   const errVal = typeof searchParams.err === "string" ? searchParams.err : null;
   const errKey = errVal ? `shop_err_${errVal}` : null;
 
@@ -63,6 +69,13 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         ),
       )
     : [];
+
+  // Зміна позивного: Squad Leader+ — безкоштовно, решта — за settings.callsign_change_cost.
+  const callsignFree = hasPatch && callsignChangeIsFree(current);
+  const callsignCost = callsignFree
+    ? 0
+    : await getPointValue(CALLSIGN_CHANGE_COST_KEY, CALLSIGN_CHANGE_COST_FALLBACK);
+  const callsignAfford = callsignFree || balance >= callsignCost;
 
   // Єдина картка-плитка для будь-якого товару (бонус або ранг): назва зверху,
   // підпис, а внизу — рядок «ціна + дія/статус». Усі товари виглядають однаково.
@@ -183,6 +196,37 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                 </ShopTile>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {/* Зміна позивного (доступна гравцю, який уже має позивний) */}
+      {player && player.callsign && (
+        <section className="space-y-3">
+          <h2 className={ui.sectionTitle}>{st(lang, "shop_callsign_title")}</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <ShopTile
+              title={st(lang, "shop_callsign_title")}
+              subtitle={st(lang, "shop_callsign_intro")}
+              cost={callsignFree ? st(lang, "shop_callsign_free") : `${callsignCost} ${GLYPH.balance}`}
+            >
+              <CallsignChangeDrawer
+                triggerLabel={st(lang, "shop_callsign_btn")}
+                title={st(lang, "shop_callsign_title")}
+                intro={st(lang, "shop_callsign_intro")}
+                currentLine={st(lang, "shop_callsign_current", { callsign: player.callsign })}
+                placeholder={st(lang, "callsign_ph")}
+                priceLine={
+                  callsignFree
+                    ? st(lang, "shop_callsign_free")
+                    : st(lang, "shop_callsign_price", { cost: callsignCost })
+                }
+                confirmLabel={st(lang, "shop_callsign_confirm")}
+                closeLabel={st(lang, "adm_close")}
+                canAfford={callsignAfford}
+                action={changeCallsign}
+              />
+            </ShopTile>
           </div>
         </section>
       )}

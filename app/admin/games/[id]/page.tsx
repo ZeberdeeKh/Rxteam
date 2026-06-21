@@ -5,7 +5,7 @@ import { st, statusText } from "@/lib/site-i18n";
 import { requirePerm, getAdmin, hasPerm } from "@/lib/admin";
 import { getGameDetail } from "@/lib/admin-data";
 import { formatGameWhen } from "@/lib/games";
-import { cancelGame, manualCheckin, markNoShow } from "@/app/admin/actions";
+import { cancelGame, deleteGame, manualCheckin, markNoShow } from "@/app/admin/actions";
 import { ui, btn, badgeClass } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +47,14 @@ export default async function AdminGameDetail({
             <input type="hidden" name="gameId" value={game.id} />
             <button type="submit" className={btn("delete")}>
               {st(lang, "adm_btn_cancel_game")}
+            </button>
+          </form>
+        )}
+        {game.status === "cancelled" && (
+          <form action={deleteGame}>
+            <input type="hidden" name="gameId" value={game.id} />
+            <button type="submit" className={btn("delete")}>
+              {st(lang, "adm_btn_delete_game")}
             </button>
           </form>
         )}

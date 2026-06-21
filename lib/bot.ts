@@ -28,6 +28,9 @@ import {
   nextRank,
   RANK_COST_KEY,
   RANK_COST_FALLBACK,
+  CALLSIGN_CHANGE_COST_KEY,
+  CALLSIGN_CHANGE_COST_FALLBACK,
+  callsignChangeIsFree,
   grantCheckinAchievements,
   grantAchievement,
 } from "./economy";
@@ -67,6 +70,94 @@ bot.use(async (ctx, next) => {
   if (chat && (chat.type === "group" || chat.type === "supergroup") && ctx.from && !ctx.from.is_bot) {
     recordMemberSeen(ctx.from.id).catch(() => {});
   }
+  await next();
+});
+
+// ─── Бали за фото-пост у топіку «Zdjęcia i filmy z gier / Фото та відео з ігор» (Етап 32) ───
+// 1 бал за ПОСТ (фото/відео), незалежно від к-сті файлів: альбом (media_group_id) = 1 пост.
+// Тижневий ліміт photo_weekly_cap балів на гравця. Лише прив'язані гравці (getPlayerByTg).
+// Дедуп/ідемпотентність — таблиця photo_post_awards з UNIQUE(tg_chat_id, dedupe_key):
+// кадри альбому й ретраї вебхука просто no-op. Реєструється ДО гардів топіків і завжди
+// викликає next() (не термінальний) — щоб гард не видалив фото раніше за нарахування.
+async function awardPhotoPost(ctx: Context): Promise<void> {
+  const msg = ctx.message;
+  const chat = ctx.chat;
+  if (!msg || !chat) return;
+  if (chat.type !== "group" && chat.type !== "supergroup") return;
+
+  // Дешева синхронна відсічка ДО запитів у БД: переважна більшість повідомлень — не фото.
+  const m = msg as any;
+  if (!m.photo && !m.video) return; // топік «фото та відео»
+
+  if (!(await featureEnabled("photo_award"))) return;
+  // Економіка off → бали нікому не нараховуються. Виходимо ДО claim-рядка, інакше дедуп-ключ
+  // зайнявся б із awarded_points=0 і цей пост уже ніколи не нарахувався б (коли економіку ввімкнуть).
+  if (!(await featureEnabled("economy"))) return;
+
+  const photosChatId = await getSetting("photos_chat_id");
+  if (!photosChatId || String(chat.id) !== photosChatId) return;
+  const threadId = await getSetting("photos_thread_id");
+  const guardGeneral = (await getSetting("photos_guard_general")) === "true";
+  if (!threadId && !guardGeneral) return; // топік не налаштовано (/setphotos)
+  const inTarget = threadId
+    ? String(msg.message_thread_id ?? "") === threadId
+    : !msg.message_thread_id;
+  if (!inTarget) return;
+
+  const from = ctx.from;
+  if (!from || from.is_bot) return;
+  if (ctx.senderChat?.id === chat.id) return; // анонімно від імені групи
+  if (from.id === ctx.me.id) return;
+
+  const player = await getPlayerByTg(from.id);
+  if (!player) return; // лише прив'язані гравці
+
+  // Дедуп: альбом = 1 пост (mg:<media_group_id>); одиночне фото = 1 повідомлення (msg:<id>).
+  const dedupeKey = m.media_group_id ? `mg:${m.media_group_id}` : `msg:${msg.message_id}`;
+  const { data: claim } = await supabase
+    .from("photo_post_awards")
+    .upsert(
+      {
+        player_id: player.id,
+        tg_chat_id: chat.id,
+        dedupe_key: dedupeKey,
+        message_id: msg.message_id,
+        media_group_id: m.media_group_id ?? null,
+      },
+      { onConflict: "tg_chat_id,dedupe_key", ignoreDuplicates: true },
+    )
+    .select("id")
+    .maybeSingle();
+  if (!claim) return; // вже нараховано (кадр альбому / ретрай вебхука)
+
+  // Тижневий ліміт: сума нарахованих балів за фото за останні 7 днів < photo_weekly_cap.
+  const cap = await getPointValue("photo_weekly_cap", 5);
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data: recent } = await supabase
+    .from("photo_post_awards")
+    .select("awarded_points")
+    .eq("player_id", player.id)
+    .gte("created_at", weekAgo);
+  const usedThisWeek = (recent ?? []).reduce((s, r) => s + (r.awarded_points ?? 0), 0);
+  if (usedThisWeek >= cap) return; // ліміт вичерпано — рядок claim лишається з awarded_points=0
+
+  // Затискаємо нарахування під залишок тижневого ліміту — щоб один пост не перескочив cap,
+  // якщо pts_photo_post > 1 (за дефолту 1 — це no-op).
+  const pts = Math.min(await getPointValue("pts_photo_post", 1), cap - usedThisWeek);
+  const delta = await awardPoints({
+    playerId: player.id,
+    reason: "photo_post",
+    baseDelta: pts,
+    meta: dedupeKey,
+    hasPatch: !!player.has_patch,
+  });
+  if (delta > 0) {
+    await supabase.from("photo_post_awards").update({ awarded_points: delta }).eq("id", claim.id);
+  }
+}
+
+bot.use(async (ctx, next) => {
+  await awardPhotoPost(ctx).catch((e) => console.error("photo award failed", e));
   await next();
 });
 
@@ -1312,6 +1403,49 @@ bot.command("setmedia", async (ctx) => {
   }
 });
 
+// Прив'язка топіка «Zdjęcia i filmy z gier / Фото та відео з ігор» для нарахування балів
+// за фото-пост (Етап 32). Виконати в потрібному топіку від імені адміна групи.
+bot.command("setphotos", async (ctx) => {
+  if (ctx.chat.type === "private") {
+    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
+    await ctx.reply(tr(actorLang, "sethere_group_only"));
+    return;
+  }
+  let isChatAdmin = false;
+  if (ctx.senderChat?.id === ctx.chat.id) {
+    isChatAdmin = true;
+  } else if (ctx.from) {
+    try {
+      const m = await ctx.api.getChatMember(ctx.chat.id, ctx.from.id);
+      isChatAdmin = m.status === "creator" || m.status === "administrator";
+    } catch (e) {
+      console.error("getChatMember failed", e);
+    }
+  }
+  if (!isChatAdmin) {
+    await ctx.reply("⛔ Лише для адмінів групи.");
+    return;
+  }
+  const threadId = ctx.message?.message_thread_id;
+  await setSetting("photos_chat_id", String(ctx.chat.id));
+  await setSetting("photos_thread_id", threadId ? String(threadId) : "");
+  // Без thread_id → головна тема «General» форуму (її повідомлення без thread_id).
+  await setSetting("photos_guard_general", threadId ? "false" : "true");
+  if (threadId) {
+    await ctx.reply(
+      `✅ Топік для балів за фото збережено.\n` +
+        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
+        `За фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.`,
+    );
+  } else {
+    await ctx.reply(
+      `✅ Збережено: топік для балів за фото — головна тема «General».\n` +
+        `chat_id: ${ctx.chat.id}\n\n` +
+        `За фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.`,
+    );
+  }
+});
+
 // Прив'язка гілки «Флуд/Zalew» для щоденного нагадування про реєстрацію (Етап 27).
 // Виконати в потрібному топіку від імені адміна групи (flood_chat_id/flood_thread_id).
 // Поки не задано — щоденне нагадування інертне.
@@ -2008,6 +2142,33 @@ bot.callbackQuery("buyrank", async (ctx) => {
   await ctx.editMessageText(tr(lang, "rank_bought", { rank: next, balance: newBalance }));
 });
 
+// ───────────────────────────── Зміна позивного ─────────────────────────────
+// Аналог магазину на сайті: Squad Leader+ — безкоштовно, решта — за settings.callsign_change_cost.
+bot.command("callsign", async (ctx) => {
+  if (ctx.chat.type !== "private") return;
+  const p = await ensurePlayer(ctx.from!);
+  const lang = p.lang as Lang;
+  if (!(await featureEnabled("shop"))) {
+    await ctx.reply(tr(lang, "callsign_change_off"));
+    return;
+  }
+  if (!p.callsign) {
+    await ctx.reply(tr(lang, "callsign_change_need_first"));
+    return;
+  }
+  const free = !!p.has_patch && callsignChangeIsFree(p.rank ?? null);
+  const cost = free ? 0 : await getPointValue(CALLSIGN_CHANGE_COST_KEY, CALLSIGN_CHANGE_COST_FALLBACK);
+  const balance = p.points_balance ?? 0;
+  if (!free && balance < cost) {
+    await ctx.reply(tr(lang, "callsign_change_not_enough", { cost, balance }));
+    return;
+  }
+  await setState(ctx.from!.id, "change_callsign", {});
+  await ctx.reply(
+    free ? tr(lang, "callsign_change_ask_free") : tr(lang, "callsign_change_ask", { cost }),
+  );
+});
+
 // ───────────────────────────── Callback queries ─────────────────────────────
 
 bot.callbackQuery(/^lang:(pl|en|uk)$/, async (ctx) => {
@@ -2090,6 +2251,42 @@ bot.callbackQuery(/^reg:(\d+)$/, async (ctx) => {
     return;
   }
   await startRegFlow(ctx, lang, gameId);
+});
+
+// Підтвердження позивного при реєстрації (крок reg_callsign_confirm). Тільки тут пишемо
+// в БД — позивний незмінний після встановлення (далі змінюється лише через /callsign у магазині).
+bot.callbackQuery("csconfirm", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_callsign_confirm" || !data.callsign) return;
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  const callsign = String(data.callsign);
+  // Повторна перевірка унікальності (могли зайняти між кроками).
+  const { data: taken } = await supabase
+    .from("players")
+    .select("id")
+    .ilike("callsign", callsign)
+    .neq("id", p.id)
+    .maybeSingle();
+  if (taken) {
+    await setState(ctx.from.id, "reg_callsign", { gameId: data.gameId });
+    await ctx.editMessageText(tr(lang, "callsign_taken"));
+    return;
+  }
+  await supabase.from("players").update({ callsign }).eq("id", p.id);
+  await ctx.editMessageText(tr(lang, "callsign_set", { callsign }));
+  await startRegFlow(ctx, lang, data.gameId);
+});
+
+bot.callbackQuery("cscancel", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_callsign_confirm") return;
+  const lang = ((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk";
+  // Назад до вводу позивного — нехай впише інший.
+  await setState(ctx.from.id, "reg_callsign", { gameId: data.gameId });
+  await ctx.editMessageText(tr(lang, "callsign_cancelled"));
 });
 
 bot.callbackQuery(/^regrent:(yes|no)$/, async (ctx) => {
@@ -2396,8 +2593,10 @@ bot.on("message:text", async (ctx) => {
     return;
   }
 
-  // ── реєстрація: позивний ──
-  if (state === "reg_callsign") {
+  // ── реєстрація: позивний (ставиться один раз → крок підтвердження) ──
+  // Також ловимо reg_callsign_confirm: якщо гравець ВПИСАВ інший позивний замість кнопки —
+  // перевіряємо новий і знову показуємо підтвердження (а не ігноруємо повідомлення).
+  if (state === "reg_callsign" || state === "reg_callsign_confirm") {
     const v = normalizeCallsign(text);
     if (!v.ok) {
       await ctx.reply(tr(lang, "callsign_bad"));
@@ -2415,8 +2614,14 @@ bot.on("message:text", async (ctx) => {
       await ctx.reply(tr(lang, "callsign_taken"));
       return;
     }
-    await supabase.from("players").update({ callsign }).eq("id", p.id);
-    await startRegFlow(ctx, lang, data.gameId);
+    // НЕ пишемо одразу — спершу підтвердження (позивний незмінний після встановлення).
+    // Сам позивний тримаємо в state.data (поза callback_data, під лімітом 64 байти).
+    await setState(ctx.from!.id, "reg_callsign_confirm", { ...data, callsign });
+    const kb = new InlineKeyboard()
+      .text(tr(lang, "btn_callsign_confirm"), "csconfirm")
+      .row()
+      .text(tr(lang, "btn_callsign_cancel"), "cscancel");
+    await ctx.reply(tr(lang, "callsign_confirm_q", { callsign }), { reply_markup: kb });
     return;
   }
   if (state === "reg_from") {
@@ -2436,6 +2641,69 @@ bot.on("message:text", async (ctx) => {
       return;
     }
     await finalizeReg(ctx, p, { ...data, freeSeats: seats });
+    return;
+  }
+
+  // ── зміна позивного за бали (/callsign) ──
+  if (state === "change_callsign") {
+    const v = normalizeCallsign(text);
+    if (!v.ok) {
+      await ctx.reply(tr(lang, "callsign_bad"));
+      return;
+    }
+    const callsign = v.value;
+    if (p.callsign && callsign.toLowerCase() === String(p.callsign).toLowerCase()) {
+      await ctx.reply(tr(lang, "callsign_change_same"));
+      return;
+    }
+    const { data: taken } = await supabase
+      .from("players")
+      .select("id")
+      .ilike("callsign", callsign)
+      .neq("id", p.id)
+      .maybeSingle();
+    if (taken) {
+      await ctx.reply(tr(lang, "callsign_taken"));
+      return;
+    }
+    const free = !!p.has_patch && callsignChangeIsFree(p.rank ?? null);
+    const cost = free ? 0 : await getPointValue(CALLSIGN_CHANGE_COST_KEY, CALLSIGN_CHANGE_COST_FALLBACK);
+    if (cost > 0) {
+      const balance = p.points_balance ?? 0;
+      if (balance < cost) {
+        await clearState(ctx.from!.id);
+        await ctx.reply(tr(lang, "callsign_change_not_enough", { cost, balance }));
+        return;
+      }
+      // Атомарне перейменування+списання (як buyRank); UNIQUE-колізія → callsign_taken.
+      const { data: changed, error } = await supabase
+        .from("players")
+        .update({ points_balance: balance - cost, callsign })
+        .eq("id", p.id)
+        .gte("points_balance", cost)
+        .select("id")
+        .maybeSingle();
+      if (error) {
+        await ctx.reply(tr(lang, "callsign_taken"));
+        return;
+      }
+      if (!changed) {
+        await clearState(ctx.from!.id);
+        await ctx.reply(tr(lang, "callsign_change_not_enough", { cost, balance }));
+        return;
+      }
+      await supabase
+        .from("point_log")
+        .insert({ player_id: p.id, delta: -cost, reason: "callsign_change", meta: callsign });
+    } else {
+      const { error } = await supabase.from("players").update({ callsign }).eq("id", p.id);
+      if (error) {
+        await ctx.reply(tr(lang, "callsign_taken"));
+        return;
+      }
+    }
+    await clearState(ctx.from!.id);
+    await ctx.reply(tr(lang, "callsign_change_done", { callsign }));
     return;
   }
 });

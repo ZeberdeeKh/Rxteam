@@ -29,5 +29,21 @@ export async function GET(req: Request) {
   const mpExpired = await expireOldListings();
   const mpSwept = await sweepStuckCollecting();
 
-  return Response.json({ declined: expired?.length ?? 0, mp_expired: mpExpired, mp_swept: mpSwept });
+  // Авто-завершення ігор (Етап 32): гру, що стартувала понад 8 год тому й досі «announced»,
+  // переводимо в «finished». Звідси гра випадає з активних списків (upcoming) і з заявок на
+  // оренду в адмінці; історія/бали лишаються. Ідемпотентно (зачіпає лише announced-рядки).
+  const finishCutoff = new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString();
+  const { data: finished } = await supabase
+    .from("games")
+    .update({ status: "finished" })
+    .eq("status", "announced")
+    .lt("start_at", finishCutoff)
+    .select("id");
+
+  return Response.json({
+    declined: expired?.length ?? 0,
+    mp_expired: mpExpired,
+    mp_swept: mpSwept,
+    finished: finished?.length ?? 0,
+  });
 }

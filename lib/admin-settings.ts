@@ -64,6 +64,10 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   home_about_pl: st("pl", "home_about_body"),
   home_about_en: st("en", "home_about_body"),
   home_about_uk: st("uk", "home_about_body"),
+  // Бали за фото та зміна позивного — дефолти збігаються з кодовими fallback'ами.
+  pts_photo_post: "1",
+  photo_weekly_cap: "5",
+  callsign_change_cost: "50",
 };
 
 // Слово «ліміт» для згенерованих підписів полів лімітів реплік.
@@ -111,6 +115,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_announce_count", type: "toggle", label: { pl: "Licznik graczy w anonsie", en: "Player counter in announcement", uk: "Лічильник гравців в анонсі" } },
       { key: "feature_media_guard", type: "toggle", label: { pl: "Strażnik tematu „tylko media”", en: "Media-only topic guard", uk: "Гард гілки «тільки медіа»" } },
       { key: "feature_daily_reminder", type: "toggle", label: { pl: "Codzienne przypomnienie o rejestracji", en: "Daily registration reminder", uk: "Щоденне нагадування про реєстрацію" } },
+      { key: "feature_photo_award", type: "toggle", label: { pl: "Punkty za zdjęcia w temacie", en: "Points for photos in topic", uk: "Бали за фото в топіку" } },
     ],
   },
   {
@@ -133,6 +138,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "pts_ach_easy", type: "number", label: { pl: "Osiągnięcie: easy", en: "Achievement: easy", uk: "Ачівка: easy" } },
       { key: "pts_ach_mid", type: "number", label: { pl: "Osiągnięcie: mid", en: "Achievement: mid", uk: "Ачівка: mid" } },
       { key: "pts_ach_hard", type: "number", label: { pl: "Osiągnięcie: hard", en: "Achievement: hard", uk: "Ачівка: hard" } },
+      { key: "pts_photo_post", type: "number", label: { pl: "Za zdjęcie w temacie (+)", en: "For a photo in topic (+)", uk: "За фото в топіку (+)" } },
+      { key: "photo_weekly_cap", type: "number", label: { pl: "Limit punktów za zdjęcia / tydzień", en: "Photo points cap / week", uk: "Ліміт балів за фото / тиждень" } },
     ],
   },
   {
@@ -142,6 +149,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },
       { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
       { key: "rental_stock", type: "number", label: { pl: "Zapas zestawów do wynajęcia", en: "Rental sets in stock", uk: "Запас комплектів для оренди" } },
+      { key: "callsign_change_cost", type: "number", label: { pl: "Zmiana pseudonimu (koszt, pkt)", en: "Callsign change (cost, pts)", uk: "Зміна позивного (ціна, бали)" } },
     ],
   },
   {
@@ -247,6 +255,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "chores_chat_id", type: "text", label: { pl: "Czek-lista chat_id (grupa adminów)", en: "Checklist chat_id (admin group)", uk: "Чек-лист chat_id (група адмінів)" } },
       { key: "chores_thread_id", type: "text", label: { pl: "Czek-lista thread_id", en: "Checklist thread_id", uk: "Чек-лист thread_id" } },
       { key: "chores_admin_mentions", type: "text", label: { pl: "Czek-lista — pingowani admini (@user, spacja/przecinek)", en: "Checklist — pinged admins (@user, space/comma)", uk: "Чек-лист — пінговані адміни (@user, пробіл/кома)" } },
+      { key: "photos_chat_id", type: "text", label: { pl: "Zdjęcia chat_id (grupa)", en: "Photos chat_id (group)", uk: "Фото chat_id (група)" } },
+      { key: "photos_thread_id", type: "text", label: { pl: "Zdjęcia thread_id", en: "Photos thread_id", uk: "Фото thread_id" } },
     ],
   },
   {

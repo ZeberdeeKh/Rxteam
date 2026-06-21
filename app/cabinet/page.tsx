@@ -11,6 +11,7 @@ import {
 import { formatGameWhen } from "@/lib/games";
 import LinkTelegramForm from "@/components/cabinet/LinkTelegramForm";
 import PatchRequestDrawer from "@/components/site/PatchRequestDrawer";
+import CallsignConfirm from "@/components/site/CallsignConfirm";
 import { createStandalone, saveCallsign, requestPatch } from "@/app/cabinet/actions";
 import { featureEnabled, getSetting } from "@/lib/settings";
 import { supabase } from "@/lib/supabase";
@@ -88,19 +89,15 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
         <section className={ui.card}>
           <h2 className={ui.cardTitle}>{st(lang, "callsign_title")}</h2>
           <p className="mt-1 text-sm text-gray-600">{st(lang, "callsign_intro")}</p>
-          <form action={saveCallsign} className="mt-3 flex flex-col gap-2 sm:flex-row">
-            <input
-              name="callsign"
-              required
-              minLength={2}
-              maxLength={32}
-              placeholder={st(lang, "callsign_ph")}
-              className={`${ui.input} flex-1`}
-            />
-            <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
-              {st(lang, "callsign_btn")}
-            </button>
-          </form>
+          <CallsignConfirm
+            warning={st(lang, "callsign_warning")}
+            placeholder={st(lang, "callsign_ph")}
+            saveLabel={st(lang, "callsign_btn")}
+            confirmTitle={st(lang, "callsign_confirm_title")}
+            confirmLabel={st(lang, "callsign_confirm_btn")}
+            cancelLabel={st(lang, "callsign_cancel_btn")}
+            action={saveCallsign}
+          />
         </section>
       </div>
     );

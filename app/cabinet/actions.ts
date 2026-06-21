@@ -64,10 +64,13 @@ export async function createStandalone() {
   back("?welcome=1");
 }
 
-// Призначити позивний (унікальний). Потрібен перед першим записом на гру.
+// Призначити позивний (унікальний). Ставиться ОДИН раз — перед першим записом на гру.
+// Якщо позивний уже є, зміна заборонена тут (лише через магазин за бали / ранг Squad Leader,
+// див. changeCallsign у app/shop/actions.ts) — захист від обходу «set once» крафтнутим POST.
 export async function saveCallsign(formData: FormData) {
   const player = await getSessionPlayer();
   if (!player) redirect("/login");
+  if (player.callsign) back("?err=callsign_locked");
   const res = await setCallsignForPlayer(player.id, String(formData.get("callsign") ?? ""));
   if (!res.ok) back(`?err=callsign_${res.reason}`);
   revalidatePath("/cabinet");
