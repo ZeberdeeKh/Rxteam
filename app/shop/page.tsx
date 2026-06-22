@@ -11,12 +11,14 @@ import {
   RANK_COST_FALLBACK,
   CALLSIGN_CHANGE_COST_KEY,
   CALLSIGN_CHANGE_COST_FALLBACK,
+  GAME_ENTRY_COST_KEY,
+  GAME_ENTRY_COST_FALLBACK,
   callsignChangeIsFree,
   getPointValue,
   nextRank,
   type Rank,
 } from "@/lib/economy";
-import { buyItem, buyRank, changeCallsign } from "@/app/shop/actions";
+import { buyItem, buyRank, changeCallsign, buyGameEntry } from "@/app/shop/actions";
 import CallsignChangeDrawer from "@/components/site/CallsignChangeDrawer";
 import { ui, btn, badgeClass, GLYPH } from "@/components/ui";
 
@@ -42,7 +44,9 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       ? "shop_bought_ok"
       : searchParams.callsign_changed
         ? "shop_callsign_changed_ok"
-        : null;
+        : searchParams.game_entry
+          ? "shop_game_entry_ok"
+          : null;
   const errVal = typeof searchParams.err === "string" ? searchParams.err : null;
   const errKey = errVal ? `shop_err_${errVal}` : null;
 
@@ -76,6 +80,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
     ? 0
     : await getPointValue(CALLSIGN_CHANGE_COST_KEY, CALLSIGN_CHANGE_COST_FALLBACK);
   const callsignAfford = callsignFree || balance >= callsignCost;
+
+  // Безкоштовний вхід на найближчу гру: ціна з settings (дефолт 100).
+  const gameEntryCost = await getPointValue(GAME_ENTRY_COST_KEY, GAME_ENTRY_COST_FALLBACK);
+  const gameEntryAfford = !!player && balance >= gameEntryCost;
 
   // Єдина картка-плитка для будь-якого товару (бонус або ранг): назва зверху,
   // підпис, а внизу — рядок «ціна + дія/статус». Усі товари виглядають однаково.
@@ -129,7 +137,7 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
       {/* Група: Товари — бонуси + послуги (зміна позивного) в одній сітці */}
       <section className="space-y-3">
         <h2 className={ui.sectionTitle}>{st(lang, "shop_items_title")}</h2>
-        {items.length === 0 && !(player && player.callsign) ? (
+        {items.length === 0 && !player ? (
           <p className={ui.emptyState}>{st(lang, "shop_empty")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -153,6 +161,21 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                 </ShopTile>
               );
             })}
+
+            {/* Безкоштовний вхід на найближчу гру — адмін надає вручну, на наступну не переноситься */}
+            {player && (
+              <ShopTile
+                title={st(lang, "shop_game_entry_title")}
+                subtitle={st(lang, "shop_game_entry_intro")}
+                cost={`${gameEntryCost} ${GLYPH.balance}`}
+              >
+                <form action={buyGameEntry}>
+                  <button type="submit" disabled={!gameEntryAfford} className={btn("action")}>
+                    {st(lang, "shop_buy")}
+                  </button>
+                </form>
+              </ShopTile>
+            )}
 
             {/* Зміна позивного — теж товар у спільній сітці (доступна гравцю з позивним) */}
             {player && player.callsign && (

@@ -90,6 +90,26 @@ export async function notifyAdminsPurchase(opts: {
   }
 }
 
+// Сповіщення про купівлю безкоштовного входу на найближчу гру — власникам дозволу
+// "players" (+ майстру), кожному його мовою. Вхід надається вручну на найближчій грі.
+export async function notifyAdminsGameEntry(opts: {
+  playerCallsign: string | null;
+  playerName: string | null;
+  cost: number;
+}) {
+  const who = opts.playerCallsign ?? opts.playerName ?? "?";
+  const admins = await getAdminsWithPerm("players");
+
+  for (const a of admins ?? []) {
+    if (!a.tg_user_id) continue;
+    const text = tr((a.lang as Lang) ?? "uk", "admin_game_entry_notify", {
+      who,
+      cost: opts.cost,
+    });
+    await sendTg(a.tg_user_id as number, text);
+  }
+}
+
 // Сповіщення адмінів про запит на патч із сайту (best-effort; ті самі отримувачі, що в боті).
 // Додаємо посилання на чат із гравцем + inline-кнопки підтвердження/відхилення (patchok/patchno —
 // їх обробляє той самий бот за токеном, тож кнопки робочі й для DM із сайту).

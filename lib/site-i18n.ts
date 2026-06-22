@@ -837,6 +837,19 @@ const SITE: Record<string, Dict> = {
   },
   shop_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
 
+  // ── Безкоштовний вхід на гру (купівля → сповіщення адмінів із доступом «гравці») ──
+  shop_game_entry_title: { pl: "Darmowe wejście na grę", en: "Free game entry", uk: "Безкоштовний вхід на гру" },
+  shop_game_entry_intro: {
+    pl: "Darmowe wejście na najbliższą grę. Nie przechodzi na następną.",
+    en: "Free entry to the nearest game. Doesn't carry over to the next one.",
+    uk: "Безкоштовний вхід на найближчу гру. На наступну не переноситься.",
+  },
+  shop_game_entry_ok: {
+    pl: "✅ Kupione! Administrator potwierdzi darmowe wejście na najbliższą grę.",
+    en: "✅ Purchased! An admin will confirm your free entry to the nearest game.",
+    uk: "✅ Куплено! Адмін підтвердить безкоштовний вхід на найближчу гру.",
+  },
+
   // ── Ранги в магазині (купівля наступного — правила як у боті /rank) ──
   shop_ranks_title: { pl: "Rangi", en: "Ranks", uk: "Ранги" },
   shop_ranks_intro: {

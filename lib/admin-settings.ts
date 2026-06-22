@@ -68,6 +68,7 @@ export const SETTING_DEFAULTS: Record<string, string> = {
   pts_photo_post: "1",
   photo_weekly_cap: "5",
   callsign_change_cost: "50",
+  game_entry_cost: "100",
 };
 
 // Слово «ліміт» для згенерованих підписів полів лімітів реплік.
@@ -150,6 +151,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
       { key: "rental_stock", type: "number", label: { pl: "Zapas zestawów do wynajęcia", en: "Rental sets in stock", uk: "Запас комплектів для оренди" } },
       { key: "callsign_change_cost", type: "number", label: { pl: "Zmiana pseudonimu (koszt, pkt)", en: "Callsign change (cost, pts)", uk: "Зміна позивного (ціна, бали)" } },
+      { key: "game_entry_cost", type: "number", label: { pl: "Darmowe wejście na grę (koszt, pkt)", en: "Free game entry (cost, pts)", uk: "Безкоштовний вхід на гру (ціна, бали)" } },
     ],
   },
   {

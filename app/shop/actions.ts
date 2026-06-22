@@ -12,11 +12,13 @@ import {
   RANK_COST_FALLBACK,
   CALLSIGN_CHANGE_COST_KEY,
   CALLSIGN_CHANGE_COST_FALLBACK,
+  GAME_ENTRY_COST_KEY,
+  GAME_ENTRY_COST_FALLBACK,
   callsignChangeIsFree,
 } from "@/lib/economy";
 import { normalizeCallsign } from "@/lib/validation";
 import { getSessionPlayer } from "@/lib/site-player";
-import { notifyAdminsPurchase } from "@/lib/notify";
+import { notifyAdminsPurchase, notifyAdminsGameEntry } from "@/lib/notify";
 
 const back = (q: string) => redirect(`/shop${q}`);
 
@@ -167,4 +169,31 @@ export async function changeCallsign(formData: FormData) {
   revalidatePath("/shop");
   revalidatePath("/cabinet");
   back("?callsign_changed=1");
+}
+
+// Купівля безкоштовного входу на найближчу гру за бали (ціна — settings.game_entry_cost,
+// дефолт 100). Атомарне списання, далі сповіщення адмінів із доступом до «гравців» — вони
+// надають вхід вручну на найближчій грі. Окремий ентайтлмент НЕ зберігаємо, тож вхід не
+// переноситься на наступну гру (як решта покупок: «організатор/адмін видасть»).
+export async function buyGameEntry() {
+  if (!(await featureEnabled("shop"))) back("?err=disabled");
+
+  const player = await getSessionPlayer();
+  if (!player) redirect("/login"); // лише linked-гравець із балансом
+
+  const cost = await getPointValue(GAME_ENTRY_COST_KEY, GAME_ENTRY_COST_FALLBACK);
+  // Атомарне списання (захист від double-spend, як у buyItem). false → бракує балів/гонку програно.
+  const paid = await spendPoints({ playerId: player.id, amount: cost, reason: "game_entry" });
+  if (!paid) back("?err=balance");
+
+  // Сповіщення адмінів із доступом «гравці» (fire-and-forget, як buyItem).
+  notifyAdminsGameEntry({
+    playerCallsign: player.callsign ?? null,
+    playerName: player.name ?? null,
+    cost,
+  }).catch(() => {});
+
+  revalidatePath("/shop");
+  revalidatePath("/cabinet");
+  back("?game_entry=1");
 }

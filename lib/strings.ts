@@ -397,6 +397,11 @@ const S: Record<string, Dict> = {
     en: "🛒 New shop purchase!\n👤 Player: {who}\n📦 Item: {item}\n💰 Cost: {cost} pts\n\nAction needed — hand the item to the player.",
     uk: "🛒 Нова покупка в магазині!\n👤 Гравець: {who}\n📦 Товар: {item}\n💰 Вартість: {cost} балів\n\nПотрібна ваша дія — видайте товар гравцю.",
   },
+  admin_game_entry_notify: {
+    pl: "🎟️ Darmowe wejście na grę!\n👤 Gracz: {who}\n💰 Koszt: {cost} pkt\n\nKupił darmowe wejście na najbliższą grę (nie przechodzi na następną).",
+    en: "🎟️ Free game entry!\n👤 Player: {who}\n💰 Cost: {cost} pts\n\nBought free entry to the nearest game (doesn't carry over to the next one).",
+    uk: "🎟️ Безкоштовний вхід на гру!\n👤 Гравець: {who}\n💰 Вартість: {cost} балів\n\nКупив безкоштовний вхід на найближчу гру (на наступну не переноситься).",
+  },
 
   // чек-ін
   checkin_none: {

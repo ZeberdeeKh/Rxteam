@@ -23,6 +23,10 @@ export const RANK_COST_FALLBACK: Record<string, number> = {
 export const CALLSIGN_CHANGE_COST_KEY = "callsign_change_cost";
 export const CALLSIGN_CHANGE_COST_FALLBACK = 50;
 
+// Безкоштовний вхід на найближчу гру в магазині: ціна з settings (дефолт 100).
+export const GAME_ENTRY_COST_KEY = "game_entry_cost";
+export const GAME_ENTRY_COST_FALLBACK = 100;
+
 // Squad Leader і вище міняють позивний безкоштовно (перк рангу); решта — за бали.
 // Ранг має сенс лише з патчем, тож викликач передає ефективний ранг (has_patch ? rank : null).
 export function callsignChangeIsFree(rank: string | null): boolean {
