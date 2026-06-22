@@ -165,6 +165,40 @@ const SITE: Record<string, Dict> = {
     en: "Enter the price per seat.",
     uk: "Вкажи ціну за місце.",
   },
+  // ── Маршрут + точки підбору (Етап 36) ──
+  carpool_ok_pickups: {
+    pl: "Zapisano punkty zbiórki.",
+    en: "Pickup points saved.",
+    uk: "Точки підбору збережено.",
+  },
+  carpool_mode_departure: { pl: "📍 Wyjazd", en: "📍 Departure", uk: "📍 Виїзд" },
+  carpool_mode_pickup: { pl: "🛑 Zbiórka ({n}/4)", en: "🛑 Pickup ({n}/4)", uk: "🛑 Підбір ({n}/4)" },
+  carpool_pickups_hint: {
+    pl: "W trybie „Zbiórka” klikaj mapę, aby dodać do 4 punktów, gdzie możesz kogoś zabrać. ✕ — usuń.",
+    en: "In “Pickup” mode tap the map to add up to 4 points where you can pick someone up. ✕ to remove.",
+    uk: "У режимі «Підбір» тицяй по мапі, щоб додати до 4 точок, де можеш когось забрати. ✕ — прибрати.",
+  },
+  carpool_save_pickups: {
+    pl: "Zapisz punkty zbiórki",
+    en: "Save pickup points",
+    uk: "Зберегти точки підбору",
+  },
+  carpool_how_title: { pl: "Jak to działa?", en: "How it works?", uk: "Як це працює?" },
+  carpool_how_1: {
+    pl: "Kierowca oznacza punkt wyjazdu, cenę za miejsce i do 4 punktów zbiórki po drodze.",
+    en: "The driver marks a departure point, a price per seat and up to 4 pickup points along the way.",
+    uk: "Водій позначає точку виїзду, ціну за місце й до 4 точок підбору по дорозі.",
+  },
+  carpool_how_2: {
+    pl: "Mapa rysuje orientacyjną trasę do miejsca gry. Szukasz auta — kliknij „Poproś o miejsce” u wybranego kierowcy.",
+    en: "The map draws an approximate route to the venue. Need a ride — tap “Request a seat” on a driver.",
+    uk: "Мапа малює орієнтовний маршрут до полігону. Шукаєш авто — тисни «Прошу місце» в потрібного водія.",
+  },
+  carpool_how_3: {
+    pl: "Gdy kierowca potwierdzi — wymienicie się kontaktami. Do tego momentu wszystko jest anonimowe.",
+    en: "Once the driver confirms, you exchange contacts. Until then everything is anonymous.",
+    uk: "Щойно водій підтвердить — ви обміняєтесь контактами. До того все анонімно.",
+  },
 
   // ── FAQ / Правила (публічні правила груп та гілок Telegram; дзеркало бот-команди /rules) ──
   faq_title: { pl: "Zasady i FAQ", en: "Rules & FAQ", uk: "Правила та FAQ" },

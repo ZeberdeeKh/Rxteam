@@ -520,6 +520,8 @@ export async function getMarketplacePage(
 
 // ─────────────────────────── Карпул-мапа (Етап 34) ───────────────────────────
 
+export type CarpoolPoint = { lat: number; lng: number };
+
 export type CarpoolDriver = {
   playerId: number;
   callsign: string | null;
@@ -531,6 +533,7 @@ export type CarpoolDriver = {
   seatsClosed: boolean;
   lat: number; // чужим — округлено до ~110 м (приватність); собі — точно
   lng: number;
+  pickups: CarpoolPoint[]; // до 4 точок підбору по дорозі
   isMe: boolean;
   myRequest: "pending" | "accepted" | "declined" | null; // статус запиту глядача саме цьому водієві
 };
@@ -550,6 +553,7 @@ export type CarpoolMe = {
   fromLat: number | null;
   fromLng: number | null;
   ridePrice: number | null;
+  pickups: CarpoolPoint[];
   freeSeats: number | null;
   seatsClosed: boolean;
 };
@@ -588,7 +592,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   // Водії «своїм ходом», що поставили точку виїзду.
   const { data: rows } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, ride_price, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own")
@@ -603,7 +607,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
     const [{ data: myReg }, { data: out }, { data: inc }] = await Promise.all([
       supabase
         .from("registrations")
-        .select("transport, status, from_lat, from_lng, ride_price, free_seats, seats_closed")
+        .select("transport, status, from_lat, from_lng, ride_price, pickups, free_seats, seats_closed")
         .eq("game_id", gameId)
         .eq("player_id", playerId)
         .maybeSingle(),
@@ -636,6 +640,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       fromLat: myReg?.from_lat ?? null,
       fromLng: myReg?.from_lng ?? null,
       ridePrice: myReg?.ride_price ?? null,
+      pickups: normPickups(myReg?.pickups),
       freeSeats: myReg?.free_seats ?? null,
       seatsClosed: !!myReg?.seats_closed,
     };
@@ -662,6 +667,15 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   }
 
   const round3 = (n: number) => Math.round(n * 1000) / 1000;
+  // Нормалізує jsonb pickups → масив {lat,lng}, максимум 4, лише валідні числа.
+  function normPickups(raw: any): CarpoolPoint[] {
+    return Array.isArray(raw)
+      ? raw
+          .filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng))
+          .slice(0, 4)
+          .map((p) => ({ lat: p.lat as number, lng: p.lng as number }))
+      : [];
+  }
   const drivers: CarpoolDriver[] = (rows ?? []).map((d: any) => {
     const pl = Array.isArray(d.players) ? d.players[0] : d.players;
     const isMe = playerId != null && d.player_id === playerId;
@@ -676,6 +690,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       seatsClosed: !!d.seats_closed,
       lat: isMe ? d.from_lat : round3(d.from_lat),
       lng: isMe ? d.from_lng : round3(d.from_lng),
+      pickups: normPickups(d.pickups),
       isMe,
       myRequest: (myOutgoing.get(d.player_id) as CarpoolDriver["myRequest"]) ?? null,
     };

@@ -712,6 +712,11 @@ const S: Record<string, Dict> = {
     en: "write in the group",
     uk: "напиши в групі",
   },
+  drivers_pickups: {
+    pl: "🛑 {n} punktów zbiórki",
+    en: "🛑 {n} pickup points",
+    uk: "🛑 {n} точок підбору",
+  },
   myride_none: {
     pl: "Nie jesteś kierowcą na żadnej grze (zapis „własnym autem”).",
     en: "You're not a driver for any game (signed up as „my own ride”).",

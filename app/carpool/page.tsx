@@ -140,6 +140,18 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
 
       <p className={ui.body}>{st(lang, "carpool_intro")}</p>
 
+      {/* Коротке пояснення «як це працює» — розкривний блок з ⓘ. */}
+      <details className={ui.card}>
+        <summary className="cursor-pointer text-sm font-semibold text-[var(--c-brand-text)]">
+          ⓘ {st(lang, "carpool_how_title")}
+        </summary>
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-gray-600">
+          <li>{st(lang, "carpool_how_1")}</li>
+          <li>{st(lang, "carpool_how_2")}</li>
+          <li>{st(lang, "carpool_how_3")}</li>
+        </ul>
+      </details>
+
       <CarpoolView
         lang={lang}
         gameId={data.game.id}
@@ -153,6 +165,7 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
           seatsClosed: d.seatsClosed,
           lat: d.lat,
           lng: d.lng,
+          pickups: d.pickups,
           isMe: d.isMe,
         }))}
         canSetPin={!!me?.isDriver && !isPast}
@@ -161,6 +174,7 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
             ? { lat: me.fromLat, lng: me.fromLng }
             : null
         }
+        myPickups={me.pickups}
       />
 
       {/* Водії + бронювання — надійний список під мапою (працює і на вузьких екранах) */}

@@ -786,7 +786,7 @@ async function showDrivers(
 ) {
   const { data: drivers } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, ride_price, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own");
@@ -805,9 +805,12 @@ async function showDrivers(
       d.from_lat != null && d.from_lng != null
         ? `\n🗺 https://maps.google.com/?q=${d.from_lat},${d.from_lng}`
         : "";
-    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from, price }) + mapLink;
+    // Точки підбору по дорозі (Етап 36) — показуємо лічильник.
+    const pcount = Array.isArray(d.pickups) ? d.pickups.length : 0;
+    const pickupLine = pcount > 0 ? "\n" + tr(lang, "drivers_pickups", { n: pcount }) : "";
+    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from, price }) + mapLink + pickupLine;
     const contact = pl?.tg_username ? "@" + pl.tg_username : tr(lang, "drivers_contact_none");
-    return tr(lang, "drivers_line", { who, from, price, seats: d.free_seats ?? 0, contact }) + mapLink;
+    return tr(lang, "drivers_line", { who, from, price, seats: d.free_seats ?? 0, contact }) + mapLink + pickupLine;
   });
 
   // Кнопки «Прошу місце» — лише для відкритих оферт і не собі (Етап 34, під фічфлагом).

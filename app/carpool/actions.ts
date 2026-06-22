@@ -62,6 +62,56 @@ export async function setDeparturePoint(formData: FormData) {
   backCarpool(gameId, "&ok=pin");
 }
 
+// Водій зберігає до 4 точок підбору (JSON-масив [{lat,lng}]). Мапа малює маршрут через них.
+export async function savePickups(formData: FormData) {
+  const player = await getSessionPlayer();
+  if (!player) redirect("/login");
+  if (!(await featureEnabled("carpool_map"))) redirect("/");
+
+  const gameId = Number(formData.get("gameId"));
+  if (!Number.isFinite(gameId)) redirect("/carpool");
+
+  let pickups: { lat: number; lng: number }[] = [];
+  try {
+    const raw = JSON.parse(String(formData.get("pickups") ?? "[]"));
+    if (Array.isArray(raw)) {
+      pickups = raw
+        .filter(
+          (p: any) =>
+            Number.isFinite(p?.lat) &&
+            Number.isFinite(p?.lng) &&
+            p.lat >= -90 &&
+            p.lat <= 90 &&
+            p.lng >= -180 &&
+            p.lng <= 180,
+        )
+        .slice(0, 4)
+        .map((p: any) => ({ lat: p.lat, lng: p.lng }));
+    }
+  } catch {
+    backCarpool(gameId, "&err=generic");
+  }
+
+  // Точки підбору ставить лише водій «своїм ходом», записаний на гру.
+  const { data: reg } = await supabase
+    .from("registrations")
+    .select("status, transport")
+    .eq("game_id", gameId)
+    .eq("player_id", player.id)
+    .maybeSingle();
+  if (!reg || reg.status !== "registered" || reg.transport !== "own") {
+    backCarpool(gameId, "&err=not_driver");
+  }
+
+  await supabase
+    .from("registrations")
+    .update({ pickups: pickups.length ? pickups : null })
+    .eq("game_id", gameId)
+    .eq("player_id", player.id);
+  revalidatePath("/carpool");
+  backCarpool(gameId, "&ok=pickups");
+}
+
 // Пасажир просить місце у водія (вся валідація + DM водію — у createRideRequest).
 export async function requestSeat(formData: FormData) {
   const player = await getSessionPlayer();
