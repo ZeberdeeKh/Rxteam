@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMapEvents } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMapEvents } from "react-leaflet";
 import { st, type Lang } from "@/lib/site-i18n";
 
 type Pt = { lat: number; lng: number };
@@ -25,8 +25,9 @@ export type RegisterCarpoolMapProps = {
   mode: "own" | "need";
   venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
   drivers: RegisterMapDriver[];
-  pin: Pt | null; // обрана точка виїзду (режим own)
-  onPick: (lat: number, lng: number) => void;
+  pin: Pt | null; // моя точка виїзду (own)
+  pickups: Pt[]; // мої точки підбору (own)
+  onPick: (lat: number, lng: number) => void; // батько маршрутизує за режимом (виїзд/підбір)
 };
 
 function pinIcon(emoji: string, border: string, bg: string) {
@@ -48,27 +49,62 @@ function pickupIcon(n: number) {
   });
 }
 
-// Клік по мапі → обрати точку виїзду (лише режим own).
+// Маршрут по дорогах (OSRM, без ключа); при недоступності — пряма ламана через точки.
+function DriverRoute({
+  from,
+  via,
+  to,
+  weight,
+}: {
+  from: [number, number];
+  via: [number, number][];
+  to: [number, number];
+  weight: number;
+}) {
+  const straight = useMemo<[number, number][]>(() => [from, ...via, to], [from, via, to]);
+  const [geo, setGeo] = useState<[number, number][] | null>(null);
+  const key = JSON.stringify(straight);
+  useEffect(() => {
+    let cancelled = false;
+    const path = straight.map((p) => `${p[1]},${p[0]}`).join(";");
+    fetch(`https://router.project-osrm.org/route/v1/driving/${path}?overview=full&geometries=geojson`)
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("osrm"))))
+      .then((j) => {
+        const g = j?.routes?.[0]?.geometry?.coordinates;
+        if (!cancelled && Array.isArray(g)) setGeo(g.map((c: number[]) => [c[1], c[0]] as [number, number]));
+      })
+      .catch(() => {
+        if (!cancelled) setGeo(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
+  return <Polyline positions={geo ?? straight} pathOptions={{ color: "#f6921e", weight, opacity: 0.6 }} />;
+}
+
 function Clicker({ onPick }: { onPick: (lat: number, lng: number) => void }) {
   useMapEvents({ click: (e) => onPick(e.latlng.lat, e.latlng.lng) });
   return null;
 }
 
-// Компактна мапа всередині форми реєстрації:
-//  own  → клік ставить точку виїзду (+ для контексту видно полігон і чужих водіїв);
-//  need → лише перегляд активних водіїв навколо полігону.
+// Повна мапа всередині форми:
+//  own  → клік ставить точку виїзду / зупинку (за режимом батька), малюється маршрут;
+//  need → перегляд активних водіїв із маршрутами й точками підбору.
 export default function RegisterCarpoolMap({
   lang,
   mode,
   venue,
   drivers,
   pin,
+  pickups,
   onPick,
 }: RegisterCarpoolMapProps) {
   const venueIcon = useMemo(() => pinIcon("🎯", "#111", "#fff"), []);
   const driverIcon = useMemo(() => pinIcon("🚗", "#b45309", "#f6921e"), []);
   const meIcon = useMemo(() => pinIcon("🚙", "#111", "#fde68a"), []);
 
+  const others = drivers.filter((d) => !d.isMe);
   const center: [number, number] = pin
     ? [pin.lat, pin.lng]
     : venue
@@ -78,7 +114,7 @@ export default function RegisterCarpoolMap({
         : [51.107, 17.038];
 
   return (
-    <div className="h-72 w-full overflow-hidden border border-gray-200">
+    <div className="h-80 w-full overflow-hidden border border-gray-200">
       <MapContainer center={center} zoom={9} scrollWheelZoom className="h-full w-full">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -98,8 +134,8 @@ export default function RegisterCarpoolMap({
           </>
         )}
 
-        {/* Активні водії (для контексту в own, основне у need) */}
-        {drivers.map((d) => (
+        {/* Інші водії: маркер + маршрут + точки підбору */}
+        {others.map((d) => (
           <Marker key={d.playerId} position={[d.lat, d.lng]} icon={driverIcon}>
             <Popup>
               <div className="space-y-1">
@@ -114,14 +150,36 @@ export default function RegisterCarpoolMap({
             </Popup>
           </Marker>
         ))}
-        {drivers.flatMap((d) =>
+        {venue &&
+          others.map((d) => (
+            <DriverRoute
+              key={`route-${d.playerId}`}
+              from={[d.lat, d.lng]}
+              via={d.pickups.map((p) => [p.lat, p.lng] as [number, number])}
+              to={[venue.lat, venue.lng]}
+              weight={2}
+            />
+          ))}
+        {others.flatMap((d) =>
           d.pickups.map((p, i) => (
             <Marker key={`pk-${d.playerId}-${i}`} position={[p.lat, p.lng]} icon={pickupIcon(i + 1)} />
           )),
         )}
 
-        {/* Режим own: обрана точка виїзду + обробник кліку */}
+        {/* Я-водій: точка виїзду + зупинки + живий маршрут + клік */}
         {mode === "own" && pin && <Marker position={[pin.lat, pin.lng]} icon={meIcon} />}
+        {mode === "own" &&
+          pickups.map((p, i) => (
+            <Marker key={`mine-pk-${i}`} position={[p.lat, p.lng]} icon={pickupIcon(i + 1)} />
+          ))}
+        {mode === "own" && venue && pin && (
+          <DriverRoute
+            from={[pin.lat, pin.lng]}
+            via={pickups.map((p) => [p.lat, p.lng] as [number, number])}
+            to={[venue.lat, venue.lng]}
+            weight={4}
+          />
+        )}
         {mode === "own" && <Clicker onPick={onPick} />}
       </MapContainer>
     </div>

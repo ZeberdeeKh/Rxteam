@@ -279,6 +279,14 @@ export type CabinetGame = SiteGame & {
   canRegister: boolean;
   canUnregister: boolean;
   checkinOpen: boolean;
+  // Моє карпул-оголошення (для редагування), якщо записаний:
+  myTransport: "own" | "need" | null;
+  myFreeSeats: number | null;
+  myRidePrice: number | null;
+  myFromLat: number | null;
+  myFromLng: number | null;
+  myPickups: CarpoolPoint[];
+  mySeatsClosed: boolean;
 };
 
 // Ігри для кабінету: усі анонсовані, чиє вікно чек-іну ще не закрите (checkin_to >= now),
@@ -299,19 +307,24 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
   const ids = rows.map((r) => r.id as number);
   const [counts, regsRes, checksRes, settings] = await Promise.all([
     countsFor(ids),
-    supabase.from("registrations").select("game_id, status").eq("player_id", playerId).in("game_id", ids),
+    supabase
+      .from("registrations")
+      .select("game_id, status, transport, free_seats, ride_price, from_lat, from_lng, pickups, seats_closed")
+      .eq("player_id", playerId)
+      .in("game_id", ids),
     supabase.from("checkins").select("game_id").eq("player_id", playerId).in("game_id", ids),
     getAllSettings(),
   ]);
-  const regMap = new Map<number, string>();
-  for (const r of regsRes.data ?? []) regMap.set(r.game_id as number, r.status as string);
+  const regMap = new Map<number, any>();
+  for (const r of regsRes.data ?? []) regMap.set(r.game_id as number, r);
   const checkedSet = new Set((checksRes.data ?? []).map((c) => c.game_id as number));
 
   const ms = (iso: string | null) => (iso ? new Date(iso).getTime() : null);
 
   return rows.map((r) => {
     const count = counts.get(r.id as number) ?? 0;
-    const regStatus = (regMap.get(r.id as number) ?? null) as CabinetGame["regStatus"];
+    const myReg = regMap.get(r.id as number);
+    const regStatus = (myReg?.status ?? null) as CabinetGame["regStatus"];
     const checkedIn = checkedSet.has(r.id as number);
     const regCloses = ms((r as any).reg_closes_at);
     const cancelDl = ms((r as any).cancel_deadline);
@@ -333,6 +346,13 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
         cTo !== null &&
         cFrom <= now &&
         now <= cTo,
+      myTransport: (myReg?.transport as CabinetGame["myTransport"]) ?? null,
+      myFreeSeats: myReg?.free_seats ?? null,
+      myRidePrice: myReg?.ride_price ?? null,
+      myFromLat: myReg?.from_lat ?? null,
+      myFromLng: myReg?.from_lng ?? null,
+      myPickups: normPickups(myReg?.pickups),
+      mySeatsClosed: !!myReg?.seats_closed,
     };
   });
 }
@@ -522,6 +542,16 @@ export async function getMarketplacePage(
 
 export type CarpoolPoint = { lat: number; lng: number };
 
+// Нормалізує jsonb pickups → масив {lat,lng}, максимум 4, лише валідні числа.
+function normPickups(raw: any): CarpoolPoint[] {
+  return Array.isArray(raw)
+    ? raw
+        .filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng))
+        .slice(0, 4)
+        .map((p) => ({ lat: p.lat as number, lng: p.lng as number }))
+    : [];
+}
+
 export type CarpoolDriver = {
   playerId: number;
   callsign: string | null;
@@ -667,15 +697,6 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   }
 
   const round3 = (n: number) => Math.round(n * 1000) / 1000;
-  // Нормалізує jsonb pickups → масив {lat,lng}, максимум 4, лише валідні числа.
-  function normPickups(raw: any): CarpoolPoint[] {
-    return Array.isArray(raw)
-      ? raw
-          .filter((p) => p && Number.isFinite(p.lat) && Number.isFinite(p.lng))
-          .slice(0, 4)
-          .map((p) => ({ lat: p.lat as number, lng: p.lng as number }))
-      : [];
-  }
   const drivers: CarpoolDriver[] = (rows ?? []).map((d: any) => {
     const pl = Array.isArray(d.players) ? d.players[0] : d.players;
     const isMe = playerId != null && d.player_id === playerId;

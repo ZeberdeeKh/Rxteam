@@ -2,6 +2,7 @@ import Link from "next/link";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
 import RegisterForm from "@/components/cabinet/RegisterForm";
+import CarpoolEditToggle from "@/components/site/CarpoolEditToggle";
 import { unregisterFromGame } from "@/app/cabinet/actions";
 import { btn, badgeClass } from "@/components/ui";
 
@@ -39,25 +40,38 @@ export default function GameActions({
     );
   }
 
-  // Записаний → бейдж + карпул-мапа цієї гри + відписка (поки відкрито) або інфо про блокування.
+  // Записаний → бейдж + відписка + редактор поїздки (карпул) прямо тут.
   if (reg?.regStatus === "registered") {
     return (
-      <div className="flex flex-wrap items-center gap-3">
-        <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
-        <Link href={`/carpool?game=${gameId}`} className={btn("outline", "sm")}>
-          🚗 {st(lang, "carpool_title")}
-        </Link>
-        {reg.canUnregister ? (
-          <form action={unregisterFromGame}>
-            <input type="hidden" name="gameId" value={gameId} />
-            <input type="hidden" name="returnTo" value="/games" />
-            <button type="submit" className={btn("delete")}>
-              {st(lang, "btn_unregister")}
-            </button>
-          </form>
-        ) : (
-          <span className="text-xs text-gray-400">{st(lang, "cancel_locked_info")}</span>
-        )}
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
+          {reg.canUnregister ? (
+            <form action={unregisterFromGame}>
+              <input type="hidden" name="gameId" value={gameId} />
+              <input type="hidden" name="returnTo" value="/games" />
+              <button type="submit" className={btn("delete")}>
+                {st(lang, "btn_unregister")}
+              </button>
+            </form>
+          ) : (
+            <span className="text-xs text-gray-400">{st(lang, "cancel_locked_info")}</span>
+          )}
+        </div>
+        <CarpoolEditToggle
+          gameId={gameId}
+          lang={lang}
+          returnTo="/games"
+          initial={{
+            transport: reg.myTransport,
+            freeSeats: reg.myFreeSeats,
+            ridePrice: reg.myRidePrice,
+            fromLat: reg.myFromLat,
+            fromLng: reg.myFromLng,
+            pickups: reg.myPickups,
+            seatsClosed: reg.mySeatsClosed,
+          }}
+        />
       </div>
     );
   }

@@ -7,37 +7,60 @@ import { registerForGame } from "@/app/cabinet/actions";
 import { ui, btn } from "@/components/ui";
 import type { RegisterMapDriver } from "@/components/site/RegisterCarpoolMap";
 
-// Leaflet чіпає window на імпорті → вантажимо мапу лише на клієнті (форма вже "use client").
 const RegisterCarpoolMap = dynamic(() => import("@/components/site/RegisterCarpoolMap"), {
   ssr: false,
-  loading: () => <div className="h-72 w-full animate-pulse bg-gray-100" />,
+  loading: () => <div className="h-80 w-full animate-pulse bg-gray-100" />,
 });
 
+type Pt = { lat: number; lng: number };
 type Carpool = {
   venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
   drivers: RegisterMapDriver[];
 };
 
-// Форма запису на гру: оренда + транспорт. Для own/need одразу показуємо мапу гри:
-//  own  → клік ставить точку виїзду (зберігається при сабміті); + місця та ціна;
-//  need → перегляд активних водіїв (бронювання — далі на /carpool).
+// Початкове оголошення для режиму редагування (із getCabinetGames).
+export type RegisterInitial = {
+  transport: "own" | "need" | null;
+  freeSeats: number | null;
+  ridePrice: number | null;
+  fromLat: number | null;
+  fromLng: number | null;
+  pickups: Pt[];
+  seatsClosed: boolean;
+};
+
+// Форма запису/редагування поїздки. Для own — повний редактор у мапі (виїзд + до 4 зупинок +
+// маршрут), місця, ціна, «набір закрито». Для need — перегляд активних водіїв. Сабміт = upsert.
 export default function RegisterForm({
   gameId,
   lang,
   returnTo,
+  initial,
+  editing = false,
 }: {
   gameId: number;
   lang: Lang;
   returnTo?: string;
+  initial?: RegisterInitial;
+  editing?: boolean;
 }) {
-  const [transport, setTransport] = useState<"need" | "own" | "skip">("skip");
-  const [pin, setPin] = useState<{ lat: number; lng: number } | null>(null);
+  const [transport, setTransport] = useState<"need" | "own" | "skip">(initial?.transport ?? "skip");
+  const [pin, setPin] = useState<Pt | null>(
+    initial?.fromLat != null && initial?.fromLng != null
+      ? { lat: initial.fromLat, lng: initial.fromLng }
+      : null,
+  );
+  const [pickups, setPickups] = useState<Pt[]>(initial?.pickups ?? []);
+  const [editMode, setEditMode] = useState<"departure" | "pickup">("departure");
+  const [seats, setSeats] = useState<string>(initial?.freeSeats != null ? String(initial.freeSeats) : "");
+  const [price, setPrice] = useState<string>(initial?.ridePrice != null ? String(initial.ridePrice) : "");
+  const [seatsClosed, setSeatsClosed] = useState<boolean>(!!initial?.seatsClosed);
   const [carpool, setCarpool] = useState<Carpool | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const inputCls = ui.input;
   const showMap = transport === "own" || transport === "need";
 
-  // Вантажимо полігон + активних водіїв, коли обрано транспорт (один раз на форму).
+  // Полігон + активні водії для мапи (один раз на форму, коли потрібна мапа).
   useEffect(() => {
     if (!showMap || carpool || loadFailed) return;
     let cancelled = false;
@@ -54,13 +77,19 @@ export default function RegisterForm({
     };
   }, [showMap, carpool, loadFailed, gameId]);
 
+  // Клік по мапі: у режимі «виїзд» — точка виїзду; у режимі «підбір» — зупинка (до 4).
+  function onPick(lat: number, lng: number) {
+    if (editMode === "departure") setPin({ lat, lng });
+    else setPickups((cur) => (cur.length >= 4 ? cur : [...cur, { lat, lng }]));
+  }
+
   return (
     <form action={registerForGame} className="space-y-3">
       <input type="hidden" name="gameId" value={gameId} />
       {returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
-      {/* Точка виїзду водія (обрана на мапі). Порожньо → поставить пізніше на /carpool. */}
       <input type="hidden" name="from_lat" value={pin?.lat ?? ""} />
       <input type="hidden" name="from_lng" value={pin?.lng ?? ""} />
+      <input type="hidden" name="pickups" value={JSON.stringify(pickups)} />
 
       <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
         <input type="checkbox" name="needs_rental" className={ui.checkbox} />
@@ -69,46 +98,58 @@ export default function RegisterForm({
 
       <fieldset className="space-y-1">
         <legend className="text-sm text-gray-500">{st(lang, "reg_transport_q")}</legend>
-        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
-          <input
-            type="radio"
-            name="transport"
-            value="need"
-            checked={transport === "need"}
-            onChange={() => setTransport("need")}
-            className={ui.radio}
-          />
-          {st(lang, "reg_transport_need")}
-        </label>
-        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
-          <input
-            type="radio"
-            name="transport"
-            value="own"
-            checked={transport === "own"}
-            onChange={() => setTransport("own")}
-            className={ui.radio}
-          />
-          {st(lang, "reg_transport_own")}
-        </label>
-        <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
-          <input
-            type="radio"
-            name="transport"
-            value="skip"
-            checked={transport === "skip"}
-            onChange={() => setTransport("skip")}
-            className={ui.radio}
-          />
-          {st(lang, "reg_transport_skip")}
-        </label>
+        {(["need", "own", "skip"] as const).map((t) => (
+          <label key={t} className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
+            <input
+              type="radio"
+              name="transport"
+              value={t}
+              checked={transport === t}
+              onChange={() => setTransport(t)}
+              className={ui.radio}
+            />
+            {st(lang, t === "need" ? "reg_transport_need" : t === "own" ? "reg_transport_own" : "reg_transport_skip")}
+          </label>
+        ))}
       </fieldset>
 
       {showMap && (
-        <div className="space-y-1">
+        <div className="space-y-2">
           <p className={`text-xs ${ui.metaFaint}`}>
             {st(lang, transport === "own" ? "reg_map_own_hint" : "reg_map_need_hint")}
           </p>
+
+          {/* Перемикач: точка виїзду / зупинка (лише водій) */}
+          {transport === "own" && (
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setEditMode("departure")}
+                className={btn(editMode === "departure" ? "action" : "outline", "sm")}
+              >
+                {st(lang, "carpool_mode_departure")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditMode("pickup")}
+                className={btn(editMode === "pickup" ? "action" : "outline", "sm")}
+              >
+                {st(lang, "carpool_mode_pickup", { n: pickups.length })}
+              </button>
+              {pickups.length > 0 &&
+                pickups.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => setPickups((cur) => cur.filter((_, j) => j !== i))}
+                    className="inline-flex items-center gap-1 border border-gray-300 px-2 py-0.5 text-xs text-gray-700 hover:border-[var(--c-danger-solid)]"
+                  >
+                    {i + 1} ✕
+                  </button>
+                ))}
+            </div>
+          )}
+
           {carpool ? (
             <RegisterCarpoolMap
               lang={lang}
@@ -116,12 +157,13 @@ export default function RegisterForm({
               venue={carpool.venue}
               drivers={carpool.drivers}
               pin={pin}
-              onPick={(lat, lng) => setPin({ lat, lng })}
+              pickups={pickups}
+              onPick={onPick}
             />
           ) : loadFailed ? (
             <p className={`text-xs ${ui.warnText}`}>{st(lang, "carpool_err_generic")}</p>
           ) : (
-            <div className="h-72 w-full animate-pulse bg-gray-100" />
+            <div className="h-80 w-full animate-pulse bg-gray-100" />
           )}
         </div>
       )}
@@ -133,6 +175,8 @@ export default function RegisterForm({
             type="number"
             min={0}
             max={8}
+            value={seats}
+            onChange={(e) => setSeats(e.target.value)}
             placeholder={st(lang, "reg_seats_ph")}
             className={inputCls}
           />
@@ -142,14 +186,26 @@ export default function RegisterForm({
             min={0}
             max={1000}
             required
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
             placeholder={st(lang, "reg_price_ph")}
             className={inputCls}
           />
+          <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
+            <input
+              type="checkbox"
+              name="seats_closed"
+              checked={seatsClosed}
+              onChange={(e) => setSeatsClosed(e.target.checked)}
+              className={ui.checkbox}
+            />
+            {st(lang, "carpool_close_seats")}
+          </label>
         </div>
       )}
 
       <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
-        {st(lang, "btn_register")}
+        {st(lang, editing ? "btn_save" : "btn_register")}
       </button>
     </form>
   );

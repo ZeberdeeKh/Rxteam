@@ -159,6 +159,29 @@ export async function registerForGame(formData: FormData) {
   const fromLng =
     transport === "own" && Number.isFinite(lngNum) && lngNum >= -180 && lngNum <= 180 ? lngNum : null;
 
+  // Точки підбору (до 4) + «набір закрито» — лише для водія.
+  let pickups: { lat: number; lng: number }[] = [];
+  try {
+    const raw = JSON.parse(String(formData.get("pickups") ?? "[]"));
+    if (Array.isArray(raw)) {
+      pickups = raw
+        .filter(
+          (p: any) =>
+            Number.isFinite(p?.lat) &&
+            Number.isFinite(p?.lng) &&
+            p.lat >= -90 &&
+            p.lat <= 90 &&
+            p.lng >= -180 &&
+            p.lng <= 180,
+        )
+        .slice(0, 4)
+        .map((p: any) => ({ lat: p.lat, lng: p.lng }));
+    }
+  } catch {
+    /* ignore — порожні точки */
+  }
+  const seatsClosed = transport === "own" && formData.get("seats_closed") === "on";
+
   // Чи був пін раніше — щоб анонсувати водія шукачам лише на «перший пін» (без спаму).
   const { data: existingReg } = await supabase
     .from("registrations")
@@ -176,12 +199,16 @@ export async function registerForGame(formData: FormData) {
     transport,
     free_seats: freeSeats,
     ride_price: ridePrice,
-    seats_closed: false,
+    seats_closed: seatsClosed,
   };
   // Пін зберігаємо лише якщо щойно поставлений — інакше не чіпаємо наявний (повторна реєстрація).
   if (fromLat !== null && fromLng !== null) {
     regRow.from_lat = fromLat;
     regRow.from_lng = fromLng;
+  }
+  // Точки підбору для водія оновлюємо завжди (порожньо → null); для не-водія не чіпаємо.
+  if (transport === "own") {
+    regRow.pickups = pickups.length ? pickups : null;
   }
   await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
 
@@ -216,10 +243,7 @@ export async function registerForGame(formData: FormData) {
   revalidatePath("/cabinet");
   revalidatePath("/games");
   revalidatePath("/my-games");
-  // Карпул: водій уже з піном (точки/маршрут — на /carpool), пасажир бачить водіїв. Обом — на /carpool.
-  if (transport === "own" || transport === "need") {
-    redirect(`/carpool?game=${gameId}&ok=reg`);
-  }
+  // Усе робиться у формі (мапа, точки, маршрут, місця) — лишаємось на сторінці зі списком ігор.
   backTo(formData, "?reg=1");
 }
 

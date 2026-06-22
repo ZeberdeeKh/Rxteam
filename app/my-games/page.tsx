@@ -5,6 +5,7 @@ import { getSessionContext } from "@/lib/session-player";
 import { getCabinetGames, type CabinetGame } from "@/lib/site-data";
 import CheckinButton from "@/components/cabinet/CheckinButton";
 import RegisterForm from "@/components/cabinet/RegisterForm";
+import CarpoolEditToggle from "@/components/site/CarpoolEditToggle";
 import GameCard from "@/components/site/GameCard";
 import { unregisterFromGame } from "@/app/cabinet/actions";
 import { ui, btn, badgeClass } from "@/components/ui";
@@ -99,6 +100,26 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
                   {g.canRegister && (
                     <div className="mt-3">
                       <RegisterForm gameId={g.id} lang={lang} returnTo={RETURN_TO} />
+                    </div>
+                  )}
+
+                  {/* Зареєстрований → редагувати своє оголошення (місця/ціна/виїзд/зупинки) тут же. */}
+                  {g.regStatus === "registered" && (
+                    <div className="mt-3">
+                      <CarpoolEditToggle
+                        gameId={g.id}
+                        lang={lang}
+                        returnTo={RETURN_TO}
+                        initial={{
+                          transport: g.myTransport,
+                          freeSeats: g.myFreeSeats,
+                          ridePrice: g.myRidePrice,
+                          fromLat: g.myFromLat,
+                          fromLng: g.myFromLng,
+                          pickups: g.myPickups,
+                          seatsClosed: g.mySeatsClosed,
+                        }}
+                      />
                     </div>
                   )}
                 </GameCard>

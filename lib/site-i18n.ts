@@ -193,6 +193,13 @@ const SITE: Record<string, Dict> = {
     en: "Save pickup points",
     uk: "Зберегти точки підбору",
   },
+  carpool_close_seats: {
+    pl: "Zamknij nabór (brak miejsc)",
+    en: "Close seats (full)",
+    uk: "Закрити набір (місць немає)",
+  },
+  carpool_edit_toggle: { pl: "Edytuj przejazd", en: "Edit ride", uk: "Редагувати поїздку" },
+  btn_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
   carpool_how_title: { pl: "Jak to działa?", en: "How it works?", uk: "Як це працює?" },
   carpool_how_1: {
     pl: "Kierowca oznacza punkt wyjazdu, cenę za miejsce i do 4 punktów zbiórki po drodze.",
