@@ -52,9 +52,9 @@ export default function RegisterForm({
   );
   const [pickups, setPickups] = useState<Pt[]>(initial?.pickups ?? []);
   const [editMode, setEditMode] = useState<"departure" | "pickup">("departure");
-  const [seats, setSeats] = useState<string>(initial?.freeSeats != null ? String(initial.freeSeats) : "");
+  const [seats, setSeats] = useState<number>(initial?.freeSeats ?? 1);
   const [price, setPrice] = useState<string>(initial?.ridePrice != null ? String(initial.ridePrice) : "");
-  const [seatsClosed, setSeatsClosed] = useState<boolean>(!!initial?.seatsClosed);
+  const [showHelp, setShowHelp] = useState(false);
   const [carpool, setCarpool] = useState<Carpool | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
   const inputCls = ui.input;
@@ -115,9 +115,29 @@ export default function RegisterForm({
 
       {showMap && (
         <div className="space-y-2">
-          <p className={`text-xs ${ui.metaFaint}`}>
-            {st(lang, transport === "own" ? "reg_map_own_hint" : "reg_map_need_hint")}
-          </p>
+          <div className="flex items-start gap-2">
+            <p className={`text-xs ${ui.metaFaint}`}>
+              {st(lang, transport === "own" ? "reg_map_own_hint" : "reg_map_need_hint")}
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowHelp((h) => !h)}
+              aria-label={st(lang, "carpool_how_title")}
+              className="shrink-0 text-sm text-[var(--c-brand-text)]"
+            >
+              ⓘ
+            </button>
+          </div>
+          {showHelp && (
+            <div className={`${ui.panel} space-y-1`}>
+              <p className="text-sm font-semibold text-gray-700">{st(lang, "carpool_how_title")}</p>
+              <ul className="list-disc space-y-0.5 pl-5 text-xs text-gray-600">
+                <li>{st(lang, "carpool_how_1")}</li>
+                <li>{st(lang, "carpool_how_2")}</li>
+                <li>{st(lang, "carpool_how_3")}</li>
+              </ul>
+            </div>
+          )}
 
           {/* Перемикач: точка виїзду / зупинка (лише водій) */}
           {transport === "own" && (
@@ -170,16 +190,31 @@ export default function RegisterForm({
 
       {transport === "own" && (
         <div className="space-y-2">
-          <input
-            name="free_seats"
-            type="number"
-            min={0}
-            max={8}
-            value={seats}
-            onChange={(e) => setSeats(e.target.value)}
-            placeholder={st(lang, "reg_seats_ph")}
-            className={inputCls}
-          />
+          {/* Місця: степер ±; 0 = набір закрито (окремого чекбокса «закрити» немає). */}
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">{st(lang, "reg_seats_label")}</span>
+            <button
+              type="button"
+              onClick={() => setSeats((s) => Math.max(0, s - 1))}
+              className={btn("outline", "sm")}
+              aria-label="-1"
+            >
+              −
+            </button>
+            <span className="min-w-[2ch] text-center text-sm font-semibold text-gray-800">{seats}</span>
+            <button
+              type="button"
+              onClick={() => setSeats((s) => Math.min(8, s + 1))}
+              className={btn("outline", "sm")}
+              aria-label="+1"
+            >
+              +
+            </button>
+            {seats === 0 && (
+              <span className={`text-xs ${ui.warnText}`}>{st(lang, "carpool_seats_closed")}</span>
+            )}
+          </div>
+          <input type="hidden" name="free_seats" value={seats} />
           <input
             name="ride_price"
             type="number"
@@ -191,16 +226,6 @@ export default function RegisterForm({
             placeholder={st(lang, "reg_price_ph")}
             className={inputCls}
           />
-          <label className="flex min-h-[44px] items-center gap-3 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              name="seats_closed"
-              checked={seatsClosed}
-              onChange={(e) => setSeatsClosed(e.target.checked)}
-              className={ui.checkbox}
-            />
-            {st(lang, "carpool_close_seats")}
-          </label>
         </div>
       )}
 

@@ -19,16 +19,18 @@ export default function CarpoolEditToggle({
   initial: RegisterInitial;
 }) {
   const [open, setOpen] = useState(false);
+  // Фрагмент: кнопка лишається в одному ряду з бейджем/відпискою; форма (w-full) переноситься
+  // на новий повноширинний рядок у flex-wrap-контейнері.
   return (
-    <div>
+    <>
       <button type="button" onClick={() => setOpen((o) => !o)} className={btn("outline", "sm")}>
         🚗 {st(lang, "carpool_edit_toggle")}
       </button>
       {open && (
-        <div className="mt-3">
+        <div className="mt-1 w-full">
           <RegisterForm gameId={gameId} lang={lang} returnTo={returnTo} initial={initial} editing />
         </div>
       )}
-    </div>
+    </>
   );
 }

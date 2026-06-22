@@ -200,6 +200,7 @@ const SITE: Record<string, Dict> = {
   },
   carpool_edit_toggle: { pl: "Edytuj przejazd", en: "Edit ride", uk: "Редагувати поїздку" },
   btn_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
+  reg_seats_label: { pl: "Wolne miejsca:", en: "Free seats:", uk: "Вільних місць:" },
   carpool_how_title: { pl: "Jak to działa?", en: "How it works?", uk: "Як це працює?" },
   carpool_how_1: {
     pl: "Kierowca oznacza punkt wyjazdu, cenę za miejsce i do 4 punktów zbiórki po drodze.",

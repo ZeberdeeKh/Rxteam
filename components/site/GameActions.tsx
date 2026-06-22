@@ -40,24 +40,22 @@ export default function GameActions({
     );
   }
 
-  // Записаний → бейдж + відписка + редактор поїздки (карпул) прямо тут.
+  // Записаний → бейдж + відписка + кнопка редактора поїздки — в один ряд (форма розкривається нижче).
   if (reg?.regStatus === "registered") {
     return (
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
-          {reg.canUnregister ? (
-            <form action={unregisterFromGame}>
-              <input type="hidden" name="gameId" value={gameId} />
-              <input type="hidden" name="returnTo" value="/games" />
-              <button type="submit" className={btn("delete")}>
-                {st(lang, "btn_unregister")}
-              </button>
-            </form>
-          ) : (
-            <span className="text-xs text-gray-400">{st(lang, "cancel_locked_info")}</span>
-          )}
-        </div>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
+        {reg.canUnregister ? (
+          <form action={unregisterFromGame}>
+            <input type="hidden" name="gameId" value={gameId} />
+            <input type="hidden" name="returnTo" value="/games" />
+            <button type="submit" className={btn("delete")}>
+              {st(lang, "btn_unregister")}
+            </button>
+          </form>
+        ) : (
+          <span className="text-xs text-gray-400">{st(lang, "cancel_locked_info")}</span>
+        )}
         <CarpoolEditToggle
           gameId={gameId}
           lang={lang}

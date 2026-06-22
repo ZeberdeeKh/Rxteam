@@ -135,10 +135,12 @@ export async function registerForGame(formData: FormData) {
   const transport = tRaw === "own" ? "own" : tRaw === "skip" ? null : "need";
   const needsRental = formData.get("needs_rental") === "on";
   const freeSeatsRaw = Number(formData.get("free_seats"));
-  // Зажимаємо в 0..8 цілих (форма має min=0/max=8, але server action отримує сирий POST).
+  // Для водія завжди число 0..8 (степер у формі); 0 = набір закрито.
   const freeSeats =
-    transport === "own" && Number.isFinite(freeSeatsRaw)
-      ? Math.max(0, Math.min(8, Math.trunc(freeSeatsRaw)))
+    transport === "own"
+      ? Number.isFinite(freeSeatsRaw)
+        ? Math.max(0, Math.min(8, Math.trunc(freeSeatsRaw)))
+        : 0
       : null;
 
   // Ціна за місце (zł) — обов'язкова для водія (Етап 35), 0..1000.
@@ -180,7 +182,8 @@ export async function registerForGame(formData: FormData) {
   } catch {
     /* ignore — порожні точки */
   }
-  const seatsClosed = transport === "own" && formData.get("seats_closed") === "on";
+  // Набір закрито = 0 вільних місць (окремого прапорця в формі більше немає).
+  const seatsClosed = transport === "own" && freeSeats === 0;
 
   // Чи був пін раніше — щоб анонсувати водія шукачам лише на «перший пін» (без спаму).
   const { data: existingReg } = await supabase

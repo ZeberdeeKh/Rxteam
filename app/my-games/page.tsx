@@ -95,17 +95,7 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
                         {st(lang, "cancel_locked_info")}
                       </span>
                     )}
-                  </div>
-
-                  {g.canRegister && (
-                    <div className="mt-3">
-                      <RegisterForm gameId={g.id} lang={lang} returnTo={RETURN_TO} />
-                    </div>
-                  )}
-
-                  {/* Зареєстрований → редагувати своє оголошення (місця/ціна/виїзд/зупинки) тут же. */}
-                  {g.regStatus === "registered" && (
-                    <div className="mt-3">
+                    {g.regStatus === "registered" && (
                       <CarpoolEditToggle
                         gameId={g.id}
                         lang={lang}
@@ -120,6 +110,12 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
                           seatsClosed: g.mySeatsClosed,
                         }}
                       />
+                    )}
+                  </div>
+
+                  {g.canRegister && (
+                    <div className="mt-3">
+                      <RegisterForm gameId={g.id} lang={lang} returnTo={RETURN_TO} />
                     </div>
                   )}
                 </GameCard>
