@@ -227,6 +227,17 @@ export async function notifyPassengerRideAccepted(opts: {
   await sendTg(opts.passengerTgUserId, text);
 }
 
+// DM шукачу авто: з'явився активний водій на гру — АНОНІМНО (без імені водія).
+// Контакт розкривається лише коли водій підтвердить запит (notifyPassengerRideAccepted).
+export async function notifySeekerNewDriver(opts: {
+  seekerTgUserId?: number | null;
+  seekerLang: Lang;
+  gameTitle: string | null;
+}) {
+  if (!opts.seekerTgUserId) return;
+  await sendTg(opts.seekerTgUserId, tr(opts.seekerLang, "ride_new_driver", { title: opts.gameTitle ?? "ASG" }));
+}
+
 // DM пасажиру: відмова або водій знявся з гри. key обирає текст.
 export async function notifyPassengerRideEnded(opts: {
   passengerTgUserId?: number | null;

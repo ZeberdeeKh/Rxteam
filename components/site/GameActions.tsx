@@ -39,11 +39,14 @@ export default function GameActions({
     );
   }
 
-  // Записаний → бейдж + відписка (поки відкрито) або інфо про блокування.
+  // Записаний → бейдж + карпул-мапа цієї гри + відписка (поки відкрито) або інфо про блокування.
   if (reg?.regStatus === "registered") {
     return (
       <div className="flex flex-wrap items-center gap-3">
         <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
+        <Link href={`/carpool?game=${gameId}`} className={btn("outline", "sm")}>
+          🚗 {st(lang, "carpool_title")}
+        </Link>
         {reg.canUnregister ? (
           <form action={unregisterFromGame}>
             <input type="hidden" name="gameId" value={gameId} />

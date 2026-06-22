@@ -48,6 +48,24 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
   if (!data) notFound();
 
   const me = data.me;
+
+  // Карпул видно лише тим, хто записаний на цю гру (інфа про водіїв не публічна).
+  if (!me?.registered) {
+    return (
+      <div className={ui.pageStack}>
+        <h1 className={ui.pageTitle}>
+          {st(lang, "carpool_map_for", { title: data.game.title ?? "ASG" })}
+        </h1>
+        <p className={ui.emptyState}>
+          {st(lang, player ? "carpool_need_register" : "carpool_need_login")}
+        </p>
+        <Link href={player ? "/games" : "/login"} className={`${btn("outline")} w-full sm:w-auto`}>
+          {st(lang, player ? "carpool_go_register" : "carpool_request_login")}
+        </Link>
+      </div>
+    );
+  }
+
   const isPast =
     data.game.status !== "announced" ||
     new Date(data.game.startAt).getTime() < Date.now() - PAST_CUTOFF_MS;
@@ -130,6 +148,7 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
           playerId: d.playerId,
           label: d.callsign ?? d.name ?? "?",
           fromPlace: d.fromPlace,
+          ridePrice: d.ridePrice,
           freeSeats: d.freeSeats,
           seatsClosed: d.seatsClosed,
           lat: d.lat,
@@ -148,7 +167,9 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
       <section>
         <h2 className={`mb-3 ${ui.sectionTitle}`}>{st(lang, "carpool_drivers_heading")}</h2>
         {data.drivers.length === 0 ? (
-          <p className={ui.emptyState}>{st(lang, "carpool_no_drivers")}</p>
+          <p className={ui.emptyState}>
+            {st(lang, me.transport === "need" ? "carpool_seeker_none" : "carpool_no_drivers")}
+          </p>
         ) : (
           <ul className={ui.listStack}>
             {data.drivers.map((d) => (
@@ -163,6 +184,9 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
                   </p>
                   <p className={ui.muted}>
                     {(d.fromPlace ? `${d.fromPlace} · ` : "") +
+                      (d.ridePrice != null
+                        ? `${st(lang, "carpool_price", { price: d.ridePrice })} · `
+                        : "") +
                       (d.seatsClosed
                         ? st(lang, "carpool_seats_closed")
                         : st(lang, "carpool_seats_free", { n: d.freeSeats }))}

@@ -6,6 +6,7 @@ import {
   notifyDriverRideRequest,
   notifyPassengerRideAccepted,
   notifyPassengerRideEnded,
+  notifySeekerNewDriver,
 } from "./notify";
 
 // Та сама межа «минулої гри», що в боті (myUpcomingGames) — ~3 год після старту.
@@ -79,6 +80,54 @@ export async function createRideRequest(
     gameTitle: game.title ?? null,
   });
   return { ok: true, requestId: row.id as number };
+}
+
+// Новий активний водій з'явився на гру → анонімно сповіщаємо всіх, хто ШУКАЄ авто і ще
+// не має ПІДТВЕРДЖЕНОЇ поїздки. Викликати лише коли водій щойно став активним (перший пін),
+// щоб не спамити (гейт «перший пін» — на боці викликача).
+export async function announceDriverToSeekers(gameId: number, driverPlayerId: number): Promise<void> {
+  // Водій справді активний (пін + є місця + набір відкритий)?
+  const { data: drv } = await supabase
+    .from("registrations")
+    .select("free_seats, seats_closed, from_lat")
+    .eq("game_id", gameId)
+    .eq("player_id", driverPlayerId)
+    .eq("status", "registered")
+    .eq("transport", "own")
+    .maybeSingle();
+  if (!drv || drv.from_lat == null || drv.seats_closed || (drv.free_seats ?? 0) < 1) return;
+
+  const { data: seekers } = await supabase
+    .from("registrations")
+    .select("player_id")
+    .eq("game_id", gameId)
+    .eq("status", "registered")
+    .eq("transport", "need");
+  if (!seekers?.length) return;
+
+  // Виключаємо тих, у кого вже є підтверджена поїздка.
+  const { data: accepted } = await supabase
+    .from("ride_requests")
+    .select("passenger_id")
+    .eq("game_id", gameId)
+    .eq("status", "accepted");
+  const haveRide = new Set((accepted ?? []).map((r) => r.passenger_id as number));
+  const targetIds = seekers
+    .map((s) => s.player_id as number)
+    .filter((id) => !haveRide.has(id));
+  if (!targetIds.length) return;
+
+  const [{ data: game }, { data: players }] = await Promise.all([
+    supabase.from("games").select("title").eq("id", gameId).maybeSingle(),
+    supabase.from("players").select("tg_user_id, lang").in("id", targetIds),
+  ]);
+  for (const pl of players ?? []) {
+    await notifySeekerNewDriver({
+      seekerTgUserId: pl.tg_user_id as number | null,
+      seekerLang: (pl.lang as Lang) ?? "uk",
+      gameTitle: game?.title ?? null,
+    });
+  }
 }
 
 export type RideDecisionResult =

@@ -4,7 +4,6 @@ import "./globals.css";
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getSessionContext } from "@/lib/session-player";
-import { featureEnabled } from "@/lib/settings";
 import { isAdmin } from "@/lib/admin";
 import { signOut } from "@/app/auth/actions";
 import LangSwitcher from "@/components/LangSwitcher";
@@ -27,7 +26,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const ctx = await getSessionContext();
   const loggedIn = ctx.state !== "anon";
   const admin = ctx.state === "linked" && isAdmin(ctx.player);
-  const carpoolOn = await featureEnabled("carpool_map");
 
   // Лейбли bug-report резолвимо на сервері (є lang) і передаємо в клієнтський компонент.
   const bugLabels = {
@@ -54,7 +52,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     close: st(lang, "nav_close"),
     home: st(lang, "nav_home"),
     marketplace: st(lang, "nav_marketplace"),
-    carpool: st(lang, "nav_carpool"),
     shop: st(lang, "nav_shop"),
     mygames: st(lang, "nav_mygames"),
     cabinet: st(lang, "nav_cabinet"),
@@ -90,11 +87,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <NavLink href="/marketplace" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_marketplace")}
               </NavLink>
-              {carpoolOn && (
-                <NavLink href="/carpool" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
-                  {st(lang, "nav_carpool")}
-                </NavLink>
-              )}
               {loggedIn ? (
                 <>
                   <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
@@ -127,13 +119,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </nav>
 
             {/* Мобільне меню (< md): бургер + повноекранна панель ab3 */}
-            <MobileNav
-              lang={lang}
-              loggedIn={loggedIn}
-              admin={admin}
-              carpoolEnabled={carpoolOn}
-              labels={mobileNavLabels}
-            />
+            <MobileNav lang={lang} loggedIn={loggedIn} admin={admin} labels={mobileNavLabels} />
           </div>
         </header>
 

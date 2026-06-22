@@ -78,6 +78,17 @@ export default function RegisterForm({
             placeholder={st(lang, "reg_seats_ph")}
             className={inputCls}
           />
+          {/* Ціна за місце (zł) — обов'язкова для водія (Етап 35). */}
+          <input
+            name="ride_price"
+            type="number"
+            min={0}
+            max={1000}
+            required={transport === "own"}
+            placeholder={st(lang, "reg_price_ph")}
+            className={inputCls}
+          />
+          <p className="text-xs text-gray-400">{st(lang, "reg_carpool_hint")}</p>
         </div>
       )}
 

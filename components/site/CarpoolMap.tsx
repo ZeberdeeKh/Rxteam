@@ -13,6 +13,7 @@ export type CarpoolMapDriver = {
   playerId: number;
   label: string;
   fromPlace: string | null;
+  ridePrice: number | null;
   freeSeats: number;
   seatsClosed: boolean;
   lat: number;
@@ -113,6 +114,7 @@ export default function CarpoolMap({ lang, gameId, venue, drivers, canSetPin, my
                     {d.isMe ? ` ${st(lang, "carpool_you")}` : ""}
                   </p>
                   {d.fromPlace && <p>{d.fromPlace}</p>}
+                  {d.ridePrice != null && <p>{st(lang, "carpool_price", { price: d.ridePrice })}</p>}
                   <p>
                     {d.seatsClosed
                       ? st(lang, "carpool_seats_closed")

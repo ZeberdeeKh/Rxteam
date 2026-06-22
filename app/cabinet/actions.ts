@@ -143,6 +143,14 @@ export async function registerForGame(formData: FormData) {
       ? Math.max(0, Math.min(8, Math.trunc(freeSeatsRaw)))
       : null;
 
+  // Ціна за місце (zł) — обов'язкова для водія (Етап 35), 0..1000.
+  const priceRaw = Number(formData.get("ride_price"));
+  const ridePrice =
+    transport === "own" && Number.isFinite(priceRaw)
+      ? Math.max(0, Math.min(1000, Math.trunc(priceRaw)))
+      : null;
+  if (transport === "own" && ridePrice === null) backTo(formData, "?err=need_price");
+
   await supabase.from("registrations").upsert(
     {
       game_id: gameId,
@@ -152,6 +160,7 @@ export async function registerForGame(formData: FormData) {
       transport,
       from_place: fromPlace,
       free_seats: freeSeats,
+      ride_price: ridePrice,
       seats_closed: false,
     },
     { onConflict: "game_id,player_id" },
@@ -183,6 +192,10 @@ export async function registerForGame(formData: FormData) {
   revalidatePath("/cabinet");
   revalidatePath("/games");
   revalidatePath("/my-games");
+  // Карпул (Етап 35): водій → ставить пін на мапі; пасажир → бачить активних водіїв. Обом — на /carpool.
+  if (transport === "own" || transport === "need") {
+    redirect(`/carpool?game=${gameId}&ok=reg`);
+  }
   backTo(formData, "?reg=1");
 }
 

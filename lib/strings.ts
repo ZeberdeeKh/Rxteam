@@ -698,14 +698,14 @@ const S: Record<string, Dict> = {
     uk: "Поки що ніхто не пропонує місця на цю гру.",
   },
   drivers_line: {
-    pl: "🚗 {who} — {from} · {seats} miejsc → {contact}",
-    en: "🚗 {who} — {from} · {seats} seats → {contact}",
-    uk: "🚗 {who} — {from} · {seats} місць → {contact}",
+    pl: "🚗 {who} — {from} · {price} · {seats} miejsc → {contact}",
+    en: "🚗 {who} — {from} · {price} · {seats} seats → {contact}",
+    uk: "🚗 {who} — {from} · {price} · {seats} місць → {contact}",
   },
   drivers_line_closed: {
-    pl: "🚗 {who} — {from} · (komplet)",
-    en: "🚗 {who} — {from} · (full)",
-    uk: "🚗 {who} — {from} · (набір закрито)",
+    pl: "🚗 {who} — {from} · {price} · (komplet)",
+    en: "🚗 {who} — {from} · {price} · (full)",
+    uk: "🚗 {who} — {from} · {price} · (набір закрито)",
   },
   drivers_contact_none: {
     pl: "napisz w grupie",
@@ -719,9 +719,9 @@ const S: Record<string, Dict> = {
   },
   myride_pick: { pl: "Wybierz grę:", en: "Pick a game:", uk: "Обери гру:" },
   myride_panel: {
-    pl: "🚗 «{title}»\nSkąd: {from}\nWolne miejsca: {seats}\nStatus: {status}",
-    en: "🚗 «{title}»\nFrom: {from}\nFree seats: {seats}\nStatus: {status}",
-    uk: "🚗 «{title}»\nЗвідки: {from}\nВільних місць: {seats}\nСтатус: {status}",
+    pl: "🚗 «{title}»\nSkąd: {from}\nCena: {price}\nWolne miejsca: {seats}\nStatus: {status}",
+    en: "🚗 «{title}»\nFrom: {from}\nPrice: {price}\nFree seats: {seats}\nStatus: {status}",
+    uk: "🚗 «{title}»\nЗвідки: {from}\nЦіна: {price}\nВільних місць: {seats}\nСтатус: {status}",
   },
   myride_status_open: { pl: "otwarty 🟢", en: "open 🟢", uk: "відкрито 🟢" },
   myride_status_closed: { pl: "komplet 🔴", en: "full 🔴", uk: "закрито 🔴" },
@@ -795,6 +795,33 @@ const S: Record<string, Dict> = {
     pl: "Ta prośba została już rozpatrzona.",
     en: "This request was already handled.",
     uk: "Цей запит уже опрацьовано.",
+  },
+  // Реєстрація водія: ціна + пін (Етап 35)
+  reg_price_q: {
+    pl: "Ile kosztuje miejsce (zł)? Wpisz liczbę.",
+    en: "How much per seat (zł)? Enter a number.",
+    uk: "Скільки коштує місце (zł)? Введи число.",
+  },
+  reg_price_bad: {
+    pl: "Podaj cenę liczbą (0–1000).",
+    en: "Enter the price as a number (0–1000).",
+    uk: "Введи ціну числом (0–1000).",
+  },
+  reg_pin_q: {
+    pl: "Wyślij swoją lokalizację (📎 → Lokalizacja) — pojawisz się na mapie carpool. Albo „Później”.",
+    en: "Send your location (📎 → Location) — you'll appear on the carpool map. Or “Later”.",
+    uk: "Надішли свою локацію (📎 → Місцезнаходження) — з'явишся на карпул-мапі. Або «Пізніше».",
+  },
+  btn_reg_pin_skip: { pl: "⏭ Później", en: "⏭ Later", uk: "⏭ Пізніше" },
+  ride_seeker_none: {
+    pl: "Na razie brak aktywnych kierowców na tę grę. Zajrzyj później — napiszemy, gdy ktoś się zgłosi.",
+    en: "No active drivers for this game yet. Check back later — we'll ping you when one shows up.",
+    uk: "Поки активних водіїв на цю гру нема. Зайди пізніше — ми напишемо, коли хтось зголоситься.",
+  },
+  ride_new_driver: {
+    pl: "🚗 Na grę «{title}» zgłosił się kierowca! Sprawdź carpool — może Cię podwiezie.",
+    en: "🚗 A driver signed up for «{title}»! Check carpool — maybe you'll get a ride.",
+    uk: "🚗 На гру «{title}» зголосився водій! Перевір карпул — можливо, тебе підвезуть.",
   },
 
   // нагадування

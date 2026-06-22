@@ -17,7 +17,6 @@ export interface MobileNavLabels {
   close: string;
   home: string;
   marketplace: string;
-  carpool: string;
   shop: string;
   mygames: string;
   cabinet: string;
@@ -32,13 +31,11 @@ export default function MobileNav({
   lang,
   loggedIn,
   admin,
-  carpoolEnabled,
   labels,
 }: {
   lang: Lang;
   loggedIn: boolean;
   admin: boolean;
-  carpoolEnabled: boolean;
   labels: MobileNavLabels;
 }) {
   const [open, setOpen] = useState(false);
@@ -66,7 +63,6 @@ export default function MobileNav({
   const items: Item[] = [
     { href: "/", label: labels.home },
     { href: "/marketplace", label: labels.marketplace },
-    ...(carpoolEnabled ? [{ href: "/carpool", label: labels.carpool }] : []),
     ...(loggedIn
       ? [
           { href: "/shop", label: labels.shop },

@@ -1,5 +1,4 @@
-﻿import Link from "next/link";
-import { st, type Lang } from "@/lib/site-i18n";
+﻿import { st, type Lang } from "@/lib/site-i18n";
 import { formatGameWhen } from "@/lib/games";
 import type { SiteGame } from "@/lib/site-data";
 import { youtubeEmbedUrl } from "@/lib/youtube";
@@ -58,15 +57,6 @@ export default function GameCard({
           </dd>
         </div>
       </dl>
-
-      {/* Карпул-мапа гри (Етап 34): хто звідки їде + бронювання місць. Лише для майбутніх ігор. */}
-      {!muted && (
-        <p className="mt-2 text-sm">
-          <Link href={`/carpool?game=${game.id}`} className={ui.link}>
-            🚗 {st(lang, "nav_carpool")}
-          </Link>
-        </p>
-      )}
 
       {game.announcement && <AnnouncementBlock text={game.announcement} lang={lang} />}
 

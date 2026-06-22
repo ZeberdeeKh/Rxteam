@@ -526,6 +526,7 @@ export type CarpoolDriver = {
   name: string | null;
   tgUsername: string | null;
   fromPlace: string | null;
+  ridePrice: number | null; // ціна за місце (zł)
   freeSeats: number;
   seatsClosed: boolean;
   lat: number; // чужим — округлено до ~110 м (приватність); собі — точно
@@ -548,6 +549,7 @@ export type CarpoolMe = {
   isDriver: boolean; // registered + transport='own'
   fromLat: number | null;
   fromLng: number | null;
+  ridePrice: number | null;
   freeSeats: number | null;
   seatsClosed: boolean;
 };
@@ -586,7 +588,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   // Водії «своїм ходом», що поставили точку виїзду.
   const { data: rows } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own")
@@ -601,7 +603,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
     const [{ data: myReg }, { data: out }, { data: inc }] = await Promise.all([
       supabase
         .from("registrations")
-        .select("transport, status, from_lat, from_lng, free_seats, seats_closed")
+        .select("transport, status, from_lat, from_lng, ride_price, free_seats, seats_closed")
         .eq("game_id", gameId)
         .eq("player_id", playerId)
         .maybeSingle(),
@@ -633,6 +635,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       isDriver: registered && myReg?.transport === "own",
       fromLat: myReg?.from_lat ?? null,
       fromLng: myReg?.from_lng ?? null,
+      ridePrice: myReg?.ride_price ?? null,
       freeSeats: myReg?.free_seats ?? null,
       seatsClosed: !!myReg?.seats_closed,
     };
@@ -668,6 +671,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       name: pl?.name ?? null,
       tgUsername: pl?.tg_username ?? null,
       fromPlace: d.from_place ?? null,
+      ridePrice: d.ride_price ?? null,
       freeSeats: d.free_seats ?? 0,
       seatsClosed: !!d.seats_closed,
       lat: isMe ? d.from_lat : round3(d.from_lat),

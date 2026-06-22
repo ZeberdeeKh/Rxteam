@@ -58,6 +58,7 @@ import {
   acceptRideRequest,
   declineRideRequest,
   cancelDriverRideRequests,
+  announceDriverToSeekers,
 } from "./carpool";
 import { announceGame, REG_BTN, appendVideoLine, announceLinkPreview } from "./game-announce";
 import {
@@ -776,30 +777,37 @@ async function myUpcomingGames(playerId: number) {
     .sort((a, b) => new Date(a.start_at).getTime() - new Date(b.start_at).getTime());
 }
 
-async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: string | null) {
+async function showDrivers(
+  ctx: Context,
+  lang: Lang,
+  gameId: number,
+  title: string | null,
+  emptyKey = "drivers_empty",
+) {
   const { data: drivers } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own");
   const offering = (drivers ?? []).filter((d) => (d.free_seats ?? 0) > 0);
   if (!offering.length) {
-    await ctx.reply(tr(lang, "drivers_empty"));
+    await ctx.reply(tr(lang, emptyKey));
     return;
   }
   const lines = offering.map((d) => {
     const pl = (d as any).players;
     const who = pl?.callsign ?? pl?.name ?? "?";
     const from = d.from_place ?? "—";
+    const price = d.ride_price != null ? `${d.ride_price} zł` : "—";
     // Точка виїзду на мапі (Етап 34) — якщо водій її поставив.
     const mapLink =
       d.from_lat != null && d.from_lng != null
         ? `\n🗺 https://maps.google.com/?q=${d.from_lat},${d.from_lng}`
         : "";
-    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from }) + mapLink;
+    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from, price }) + mapLink;
     const contact = pl?.tg_username ? "@" + pl.tg_username : tr(lang, "drivers_contact_none");
-    return tr(lang, "drivers_line", { who, from, seats: d.free_seats ?? 0, contact }) + mapLink;
+    return tr(lang, "drivers_line", { who, from, price, seats: d.free_seats ?? 0, contact }) + mapLink;
   });
 
   // Кнопки «Прошу місце» — лише для відкритих оферт і не собі (Етап 34, під фічфлагом).
@@ -1136,7 +1144,7 @@ async function myDriverGames(playerId: number) {
 async function renderRide(playerId: number, gameId: number, lang: Lang) {
   const { data: reg } = await supabase
     .from("registrations")
-    .select("from_place, free_seats, seats_closed")
+    .select("from_place, ride_price, free_seats, seats_closed")
     .eq("game_id", gameId)
     .eq("player_id", playerId)
     .maybeSingle();
@@ -1146,6 +1154,7 @@ async function renderRide(playerId: number, gameId: number, lang: Lang) {
   const text = tr(lang, "myride_panel", {
     title: game?.title ?? "ASG",
     from: reg?.from_place ?? "—",
+    price: reg?.ride_price != null ? `${reg.ride_price} zł` : "—",
     seats,
     status: tr(lang, closed ? "myride_status_closed" : "myride_status_open"),
   });
@@ -2431,7 +2440,20 @@ bot.callbackQuery(/^regseats:(\d+)$/, async (ctx) => {
   const { state, data } = await getState(ctx.from.id);
   if (state !== "reg_seats") return;
   const p = await ensurePlayer(ctx.from);
-  await finalizeReg(ctx, p, { ...data, freeSeats: Number(ctx.match[1]) });
+  const lang = p.lang as Lang;
+  // Останній крок реєстрації водія — точка виїзду (пін). Можна пропустити (додати в /myride).
+  await setState(ctx.from.id, "reg_pin", { ...data, freeSeats: Number(ctx.match[1]) });
+  const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
+  await ctx.editMessageText(tr(lang, "reg_pin_q"), { reply_markup: kb });
+});
+
+// Пропустити пін під час реєстрації — завершуємо без координат (пін можна додати через /myride).
+bot.callbackQuery("regpinskip", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_pin") return;
+  const p = await ensurePlayer(ctx.from);
+  await finalizeReg(ctx, p, data);
 });
 
 bot.callbackQuery(/^unreg:(\d+)$/, async (ctx) => {
@@ -2579,7 +2601,13 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
 bot.on("message:location", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const { state, data } = await getState(ctx.from!.id);
-  if (state !== "loc_pin" && state !== "checkin" && state !== "ride_pin") return;
+  if (
+    state !== "loc_pin" &&
+    state !== "checkin" &&
+    state !== "ride_pin" &&
+    state !== "reg_pin"
+  )
+    return;
   const p = await ensurePlayer(ctx.from!);
   const loc = ctx.message.location;
 
@@ -2593,8 +2621,14 @@ bot.on("message:location", async (ctx) => {
     return;
   }
 
-  // Карпул: водій ставить точку виїзду (ті самі колонки from_lat/from_lng, що пише сайт).
+  // Карпул: водій ставить точку виїзду з /myride (ті самі колонки from_lat/from_lng, що пише сайт).
   if (state === "ride_pin") {
+    const { data: prev } = await supabase
+      .from("registrations")
+      .select("from_lat")
+      .eq("game_id", data.gameId)
+      .eq("player_id", p.id)
+      .maybeSingle();
     await supabase
       .from("registrations")
       .update({ from_lat: loc.latitude, from_lng: loc.longitude })
@@ -2602,6 +2636,14 @@ bot.on("message:location", async (ctx) => {
       .eq("player_id", p.id);
     await clearState(ctx.from!.id);
     await ctx.reply(tr(p.lang as Lang, "ride_pin_saved"));
+    // Перший пін → водій став активним: анонімно сповіщаємо шукачів авто.
+    if (prev?.from_lat == null) await announceDriverToSeekers(data.gameId, p.id);
+    return;
+  }
+
+  // Карпул: пін під час реєстрації водієм — завершуємо реєстрацію з координатами.
+  if (state === "reg_pin") {
+    await finalizeReg(ctx, p, { ...data, lat: loc.latitude, lng: loc.longitude });
     return;
   }
 
@@ -2739,7 +2781,17 @@ bot.on("message:text", async (ctx) => {
     return;
   }
   if (state === "reg_from") {
-    await setState(ctx.from!.id, "reg_seats", { ...data, fromPlace: text.slice(0, 80) });
+    await setState(ctx.from!.id, "reg_price", { ...data, fromPlace: text.slice(0, 80) });
+    await ctx.reply(tr(lang, "reg_price_q"));
+    return;
+  }
+  if (state === "reg_price") {
+    const price = parseInt(text, 10);
+    if (isNaN(price) || price < 0 || price > 1000) {
+      await ctx.reply(tr(lang, "reg_price_bad"));
+      return;
+    }
+    await setState(ctx.from!.id, "reg_seats", { ...data, price });
     const kb = new InlineKeyboard()
       .text("0", "regseats:0")
       .text("1", "regseats:1")
@@ -2754,7 +2806,15 @@ bot.on("message:text", async (ctx) => {
       await ctx.reply(tr(lang, "reg_seats_q"));
       return;
     }
-    await finalizeReg(ctx, p, { ...data, freeSeats: seats });
+    await setState(ctx.from!.id, "reg_pin", { ...data, freeSeats: seats });
+    const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
+    await ctx.reply(tr(lang, "reg_pin_q"), { reply_markup: kb });
+    return;
+  }
+  if (state === "reg_pin") {
+    // Тут чекаємо ЛОКАЦІЮ (або кнопку «Пізніше»). Текст → повторюємо підказку.
+    const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
+    await ctx.reply(tr(lang, "reg_pin_q"), { reply_markup: kb });
     return;
   }
 
@@ -3086,6 +3146,9 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
       transport: data.transport ?? null,
       from_place: data.fromPlace ?? null,
       free_seats: data.freeSeats ?? null,
+      ride_price: data.price ?? null,
+      from_lat: data.lat ?? null,
+      from_lng: data.lng ?? null,
       seats_closed: false,
     },
     { onConflict: "game_id,player_id" },
@@ -3117,6 +3180,12 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
   }
   if (data.transport === "own") {
     await ctx.reply(tr(p.lang as Lang, "myride_hint"));
+    // Пін при реєстрації → водій став активним: анонімно сповіщаємо шукачів авто.
+    if (data.lat != null) await announceDriverToSeekers(gameId, p.id);
+  }
+  // Шукач авто: одразу показуємо активних водіїв (або «поки нема — напишемо, коли зголосяться»).
+  if (data.transport === "need") {
+    await showDrivers(ctx, p.lang as Lang, gameId, (game as any)?.title ?? null, "ride_seeker_none");
   }
 }
 

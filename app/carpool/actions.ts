@@ -5,7 +5,12 @@ import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { featureEnabled } from "@/lib/settings";
 import { getSessionPlayer } from "@/lib/site-player";
-import { createRideRequest, acceptRideRequest, declineRideRequest } from "@/lib/carpool";
+import {
+  createRideRequest,
+  acceptRideRequest,
+  declineRideRequest,
+  announceDriverToSeekers,
+} from "@/lib/carpool";
 
 // Усі дії повертають на /carpool?game=<id> з банером ?ok=… / ?err=… (як кабінет).
 function backCarpool(gameId: number, q: string): never {
@@ -36,19 +41,23 @@ export async function setDeparturePoint(formData: FormData) {
   // Точку виїзду можуть ставити лише водії «своїм ходом», записані на гру.
   const { data: reg } = await supabase
     .from("registrations")
-    .select("status, transport")
+    .select("status, transport, from_lat")
     .eq("game_id", gameId)
     .eq("player_id", player.id)
     .maybeSingle();
   if (!reg || reg.status !== "registered" || reg.transport !== "own") {
     backCarpool(gameId, "&err=not_driver");
   }
+  const wasFirstPin = reg!.from_lat == null;
 
   await supabase
     .from("registrations")
     .update({ from_lat: lat, from_lng: lng })
     .eq("game_id", gameId)
     .eq("player_id", player.id);
+
+  // Перший пін → водій став активним: анонімно сповіщаємо шукачів авто на цю гру.
+  if (wasFirstPin) await announceDriverToSeekers(gameId, player.id);
   revalidatePath("/carpool");
   backCarpool(gameId, "&ok=pin");
 }

@@ -132,6 +132,39 @@ const SITE: Record<string, Dict> = {
   carpool_err_not_found: { pl: "Nie znaleziono prośby.", en: "Request not found.", uk: "Запит не знайдено." },
   carpool_err_not_pending: { pl: "Prośba została już rozpatrzona.", en: "Request already handled.", uk: "Запит уже опрацьовано." },
   carpool_err_generic: { pl: "Coś poszło nie tak.", en: "Something went wrong.", uk: "Щось пішло не так." },
+  carpool_price: { pl: "{price} zł", en: "{price} zł", uk: "{price} zł" },
+  carpool_ok_reg: {
+    pl: "Zapisano na grę! Oznacz, skąd jedziesz / zobacz kierowców poniżej.",
+    en: "Signed up! Mark where you set off from / see drivers below.",
+    uk: "Записано на гру! Познач, звідки їдеш / поглянь на водіїв нижче.",
+  },
+  carpool_need_register: {
+    pl: "Carpool zobaczysz po zapisaniu się na tę grę.",
+    en: "Carpool is visible after you sign up for this game.",
+    uk: "Карпул видно після запису на цю гру.",
+  },
+  carpool_need_login: {
+    pl: "Zaloguj się i zapisz na grę, aby zobaczyć carpool.",
+    en: "Log in and sign up for the game to see carpool.",
+    uk: "Увійди й запишись на гру, щоб бачити карпул.",
+  },
+  carpool_go_register: { pl: "Do gier", en: "To games", uk: "До ігор" },
+  carpool_seeker_none: {
+    pl: "Na razie brak aktywnych kierowców. Zajrzyj później — napiszemy, gdy ktoś się zgłosi.",
+    en: "No active drivers yet. Check back later — we'll ping you when one shows up.",
+    uk: "Поки активних водіїв нема. Зайди пізніше — ми напишемо, коли хтось зголоситься.",
+  },
+  reg_price_ph: { pl: "Cena za miejsce (zł)", en: "Price per seat (zł)", uk: "Ціна за місце (zł)" },
+  reg_carpool_hint: {
+    pl: "Po zapisaniu otworzy się mapa — oznaczysz, skąd jedziesz.",
+    en: "After signing up the map opens — you'll mark where you set off from.",
+    uk: "Після запису відкриється мапа — познач, звідки виїжджаєш.",
+  },
+  err_need_price: {
+    pl: "Podaj cenę za miejsce.",
+    en: "Enter the price per seat.",
+    uk: "Вкажи ціну за місце.",
+  },
 
   // ── FAQ / Правила (публічні правила груп та гілок Telegram; дзеркало бот-команди /rules) ──
   faq_title: { pl: "Zasady i FAQ", en: "Rules & FAQ", uk: "Правила та FAQ" },
