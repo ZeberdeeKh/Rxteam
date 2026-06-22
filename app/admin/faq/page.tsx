@@ -7,6 +7,12 @@ import { ui, btn, badgeClass, Collapsible, CreateDrawer } from "@/components/ui"
 
 export const dynamic = "force-dynamic";
 
+// Заголовок питання мовою адміна (UA — фолбек, бо обов'язкове поле).
+function pickQ(it: FaqItem, lang: Lang): string {
+  const v = lang === "pl" ? it.question_pl : lang === "en" ? it.question_en : it.question_uk;
+  return (v && v.trim()) || it.question_uk || "";
+}
+
 // Поля одного питання FAQ: питання (3 мови) + відповідь (3 мови) + порядок + показ.
 // UA — обов'язкове (мова-фолбек); PL/EN можна лишити порожнім (сайт відкотиться на UA/PL).
 function FaqFields({ lang, item }: { lang: Lang; item?: FaqItem }) {
@@ -113,7 +119,7 @@ export default async function AdminFaq({
               summary={
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
                   <span className={ui.metaFaint}>#{it.sort_order}</span>
-                  <span className={ui.cardTitle}>{it.question_uk}</span>
+                  <span className={ui.cardTitle}>{pickQ(it, lang)}</span>
                 </div>
               }
             >
