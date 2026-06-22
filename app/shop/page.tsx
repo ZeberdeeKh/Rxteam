@@ -126,10 +126,10 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         </p>
       )}
 
-      {/* Група: Бонуси */}
+      {/* Група: Товари — бонуси + послуги (зміна позивного) в одній сітці */}
       <section className="space-y-3">
         <h2 className={ui.sectionTitle}>{st(lang, "shop_items_title")}</h2>
-        {items.length === 0 ? (
+        {items.length === 0 && !(player && player.callsign) ? (
           <p className={ui.emptyState}>{st(lang, "shop_empty")}</p>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -153,6 +153,32 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
                 </ShopTile>
               );
             })}
+
+            {/* Зміна позивного — теж товар у спільній сітці (доступна гравцю з позивним) */}
+            {player && player.callsign && (
+              <ShopTile
+                title={st(lang, "shop_callsign_title")}
+                subtitle={st(lang, "shop_callsign_intro")}
+                cost={callsignFree ? st(lang, "shop_callsign_free") : `${callsignCost} ${GLYPH.balance}`}
+              >
+                <CallsignChangeDrawer
+                  triggerLabel={st(lang, "shop_callsign_btn")}
+                  title={st(lang, "shop_callsign_title")}
+                  intro={st(lang, "shop_callsign_intro")}
+                  currentLine={st(lang, "shop_callsign_current", { callsign: player.callsign })}
+                  placeholder={st(lang, "callsign_ph")}
+                  priceLine={
+                    callsignFree
+                      ? st(lang, "shop_callsign_free")
+                      : st(lang, "shop_callsign_price", { cost: callsignCost })
+                  }
+                  confirmLabel={st(lang, "shop_callsign_confirm")}
+                  closeLabel={st(lang, "adm_close")}
+                  canAfford={callsignAfford}
+                  action={changeCallsign}
+                />
+              </ShopTile>
+            )}
           </div>
         )}
       </section>
@@ -200,36 +226,6 @@ export default async function ShopPage({ searchParams }: { searchParams: Flags }
         </section>
       )}
 
-      {/* Зміна позивного (доступна гравцю, який уже має позивний) */}
-      {player && player.callsign && (
-        <section className="space-y-3">
-          <h2 className={ui.sectionTitle}>{st(lang, "shop_callsign_title")}</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <ShopTile
-              title={st(lang, "shop_callsign_title")}
-              subtitle={st(lang, "shop_callsign_intro")}
-              cost={callsignFree ? st(lang, "shop_callsign_free") : `${callsignCost} ${GLYPH.balance}`}
-            >
-              <CallsignChangeDrawer
-                triggerLabel={st(lang, "shop_callsign_btn")}
-                title={st(lang, "shop_callsign_title")}
-                intro={st(lang, "shop_callsign_intro")}
-                currentLine={st(lang, "shop_callsign_current", { callsign: player.callsign })}
-                placeholder={st(lang, "callsign_ph")}
-                priceLine={
-                  callsignFree
-                    ? st(lang, "shop_callsign_free")
-                    : st(lang, "shop_callsign_price", { cost: callsignCost })
-                }
-                confirmLabel={st(lang, "shop_callsign_confirm")}
-                closeLabel={st(lang, "adm_close")}
-                canAfford={callsignAfford}
-                action={changeCallsign}
-              />
-            </ShopTile>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

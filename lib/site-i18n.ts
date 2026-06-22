@@ -791,7 +791,7 @@ const SITE: Record<string, Dict> = {
     en: "Earn points at games, special events and for friends invited via your referral link — then spend them here on perks and ranks.",
     uk: "Заробляй бали на іграх, спеціальних подіях і за друзів, запрошених через реф-посилання, — а тут обмінюй їх на корисні бонуси та ранги.",
   },
-  shop_items_title: { pl: "Bonusy", en: "Perks", uk: "Бонуси" },
+  shop_items_title: { pl: "Towary", en: "Items", uk: "Товари" },
   shop_balance: { pl: "Twoje saldo", en: "Your balance", uk: "Твій баланс" },
   shop_cost: { pl: "Koszt", en: "Cost", uk: "Ціна" },
   shop_buy: { pl: "Kup", en: "Buy", uk: "Купити" },
