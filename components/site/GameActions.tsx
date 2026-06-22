@@ -49,7 +49,7 @@ export default function GameActions({
           <form action={unregisterFromGame}>
             <input type="hidden" name="gameId" value={gameId} />
             <input type="hidden" name="returnTo" value="/games" />
-            <button type="submit" className={btn("delete")}>
+            <button type="submit" className={btn("delete", "sm")}>
               {st(lang, "btn_unregister")}
             </button>
           </form>

@@ -24,7 +24,7 @@ export default function CarpoolEditToggle({
   return (
     <>
       <button type="button" onClick={() => setOpen((o) => !o)} className={btn("outline", "sm")}>
-        🚗 {st(lang, "carpool_edit_toggle")}
+        {st(lang, "carpool_edit_toggle")}
       </button>
       {open && (
         <div className="mt-1 w-full">

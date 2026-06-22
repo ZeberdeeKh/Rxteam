@@ -84,7 +84,7 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
                       <form action={unregisterFromGame}>
                         <input type="hidden" name="gameId" value={g.id} />
                         <input type="hidden" name="returnTo" value={RETURN_TO} />
-                        <button type="submit" className={btn("delete")}>
+                        <button type="submit" className={btn("delete", "sm")}>
                           {st(lang, "btn_unregister")}
                         </button>
                       </form>

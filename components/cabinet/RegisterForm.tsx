@@ -123,9 +123,24 @@ export default function RegisterForm({
               type="button"
               onClick={() => setShowHelp((h) => !h)}
               aria-label={st(lang, "carpool_how_title")}
-              className="shrink-0 text-sm text-[var(--c-brand-text)]"
+              title={st(lang, "carpool_how_title")}
+              className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-[var(--c-brand-text)] hover:opacity-80"
             >
-              ⓘ
+              <svg
+                className="h-4 w-4"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.6"
+                aria-hidden
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z"
+                />
+              </svg>
+              {st(lang, "carpool_how_title")}
             </button>
           </div>
           {showHelp && (
