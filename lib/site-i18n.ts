@@ -217,6 +217,43 @@ const SITE: Record<string, Dict> = {
     en: "Once the driver confirms, you exchange contacts. Until then everything is anonymous.",
     uk: "Щойно водій підтвердить — ви обміняєтесь контактами. До того все анонімно.",
   },
+  // Покрокове пояснення саме для форми запису — водій (own).
+  carpool_how_own_1: {
+    pl: "Najpierw kliknij na mapie punkt startu — skąd jedziesz (przycisk „Wyjazd” jest już aktywny).",
+    en: "First click your start point on the map — where you set off from (the “Departure” button is already active).",
+    uk: "Спершу тицьни на мапі точку старту — звідки виїжджаєш (кнопка «Виїзд» уже активна).",
+  },
+  carpool_how_own_2: {
+    pl: "Aby dodać przystanki po drodze — przełącz na „Zbiórka” i klikaj miejsca (do 4).",
+    en: "To add stops along the way — switch to “Pickup” and tap places (up to 4).",
+    uk: "Щоб додати зупинки по дорозі — перемкни на «Підбір» і тицяй місця (до 4).",
+  },
+  carpool_how_own_3: {
+    pl: "Ustaw liczbę miejsc (±) i cenę — mapa narysuje trasę (0 miejsc = nabór zamknięty).",
+    en: "Set the number of seats (±) and the price — the map draws the route (0 seats = closed).",
+    uk: "Постав кількість місць (±) і ціну — мапа намалює маршрут (0 місць = набір закрито).",
+  },
+  carpool_how_own_4: {
+    pl: "Pasażer klika „Poproś o miejsce” → dostajesz prośbę → akceptujesz i wymieniacie się kontaktami.",
+    en: "A passenger taps “Request a seat” → you get a request → you accept and exchange contacts.",
+    uk: "Пасажир тисне «Прошу місце» → тобі прийде запит → приймаєш, і ви обмінюєтесь контактами.",
+  },
+  // Пояснення для пасажира (need).
+  carpool_how_need_1: {
+    pl: "Tu są aktywni kierowcy na tę grę: trasa, wolne miejsca i cena.",
+    en: "These are active drivers for this game: route, free seats and price.",
+    uk: "Тут — активні водії на цю гру: маршрут, вільні місця й ціна.",
+  },
+  carpool_how_need_2: {
+    pl: "Aby poprosić o miejsce — otwórz mapę carpool gry i kliknij „Poproś o miejsce” u kierowcy.",
+    en: "To request a seat — open the game's carpool map and tap “Request a seat” on a driver.",
+    uk: "Щоб попросити місце — відкрий карпул-мапу гри й тисни «Прошу місце» в потрібного водія.",
+  },
+  carpool_how_need_3: {
+    pl: "Gdy kierowca potwierdzi — dostaniesz jego kontakt. Do tego momentu wszystko anonimowo.",
+    en: "Once the driver confirms — you get their contact. Until then it's all anonymous.",
+    uk: "Щойно водій підтвердить — отримаєш його контакт. До того все анонімно.",
+  },
 
   // ── FAQ / Правила (публічні правила груп та гілок Telegram; дзеркало бот-команди /rules) ──
   faq_title: { pl: "Zasady i FAQ", en: "Rules & FAQ", uk: "Правила та FAQ" },

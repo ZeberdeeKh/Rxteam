@@ -131,11 +131,21 @@ export default function RegisterForm({
           {showHelp && (
             <div className={`${ui.panel} space-y-1`}>
               <p className="text-sm font-semibold text-gray-700">{st(lang, "carpool_how_title")}</p>
-              <ul className="list-disc space-y-0.5 pl-5 text-xs text-gray-600">
-                <li>{st(lang, "carpool_how_1")}</li>
-                <li>{st(lang, "carpool_how_2")}</li>
-                <li>{st(lang, "carpool_how_3")}</li>
-              </ul>
+              {transport === "own" ? (
+                // Водій: покрокова інструкція саме по формі (старт → підбір → місця/ціна → пасажир).
+                <ol className="list-decimal space-y-0.5 pl-5 text-xs text-gray-600">
+                  <li>{st(lang, "carpool_how_own_1")}</li>
+                  <li>{st(lang, "carpool_how_own_2")}</li>
+                  <li>{st(lang, "carpool_how_own_3")}</li>
+                  <li>{st(lang, "carpool_how_own_4")}</li>
+                </ol>
+              ) : (
+                <ul className="list-disc space-y-0.5 pl-5 text-xs text-gray-600">
+                  <li>{st(lang, "carpool_how_need_1")}</li>
+                  <li>{st(lang, "carpool_how_need_2")}</li>
+                  <li>{st(lang, "carpool_how_need_3")}</li>
+                </ul>
+              )}
             </div>
           )}
 
