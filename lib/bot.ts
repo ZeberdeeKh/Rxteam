@@ -53,7 +53,7 @@ import {
 } from "./games";
 import { toggleChoreClaim, refreshChoreMessage } from "./chores";
 import { notifyAdminsRental } from "./notify";
-import { announceGame, REG_BTN, appendVideoLine } from "./game-announce";
+import { announceGame, REG_BTN, appendVideoLine, announceLinkPreview } from "./game-announce";
 import {
   ingestSalesPhoto,
   findListingForDelete,
@@ -2877,9 +2877,11 @@ async function updateAnnouncement(gameId: number) {
     REG_BTN,
     `https://t.me/${bot.botInfo.username}?start=g${gameId}`,
   );
+  const linkPreview = announceLinkPreview(loc.youtube_url ?? null);
   try {
     await bot.api.editMessageText(game.announce_chat_id, game.announce_message_id, text, {
       reply_markup: kb,
+      ...(linkPreview ? { link_preview_options: linkPreview } : {}),
     });
   } catch (e) {
     console.error("update announcement failed", e);

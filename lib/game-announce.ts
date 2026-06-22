@@ -28,6 +28,15 @@ export function appendVideoLine(text: string, url: string | null): string {
   return url ? `${text}\n\n${VIDEO_LBL}: ${url}` : text;
 }
 
+// Опції прев'ю посилання для анонсу. Якщо в локації заданий YouTube — націлюємо прев'ю
+// САМЕ на нього (бо в тексті є ще лінк на мапу) і робимо велику картку: Telegram показує
+// мініатюру з кнопкою ▶ і програє відео прямо в чаті по тапу (вбудований плеєр Telegram —
+// найближче до «програвача в анонсі», iframe у боті неможливий). Без відео → null (нічого
+// не міняємо, поведінка анонсу без відео лишається як була).
+export function announceLinkPreview(youtubeUrl: string | null) {
+  return youtubeUrl ? { url: youtubeUrl, prefer_large_media: true } : null;
+}
+
 export type AnnounceResult =
   | { ok: true }
   | { ok: false; reason: "no_announce_chat" | "send_failed" };
@@ -80,10 +89,12 @@ export async function announceGame(api: Api, gameId: number): Promise<AnnounceRe
 
   const me = await api.getMe();
   const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${me.username}?start=g${gameId}`);
+  const linkPreview = announceLinkPreview(loc.youtube_url ?? null);
 
   try {
     const msg = await api.sendMessage(Number(chatId), text, {
       reply_markup: kb,
+      ...(linkPreview ? { link_preview_options: linkPreview } : {}),
       ...(threadId ? { message_thread_id: Number(threadId) } : {}),
     });
     await supabase
