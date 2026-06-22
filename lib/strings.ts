@@ -57,6 +57,69 @@ const S: Record<string, Dict> = {
     en: "✅ Announcements topic saved.",
     uk: "✅ Топік для анонсів збережено.",
   },
+
+  // ── Прив'язка топіків (set*-команди): підтвердження адміну його мовою (pl/en/uk).
+  // {chat}/{thread} — технічні id (мовно-нейтральні), підставляються в коді. ──
+  not_admin_group: {
+    pl: "⛔ Tylko dla adminów grupy.",
+    en: "⛔ Group admins only.",
+    uk: "⛔ Лише для адмінів групи.",
+  },
+  setchores_group_only: {
+    pl: "Wykonaj tę komendę w grupie adminów (we właściwym temacie).",
+    en: "Run this command in the admin group (in the right topic).",
+    uk: "Виконай цю команду в адмін-групі (у потрібному топіку).",
+  },
+  sethere_ok_topic: {
+    pl: "✅ Temat ogłoszeń zapisany.\nchat_id: {chat}\nthread_id: {thread}\n\nTeraz w tym temacie pisze tylko bot — pozostałe wiadomości bot będzie usuwał.",
+    en: "✅ Announcements topic saved.\nchat_id: {chat}\nthread_id: {thread}\n\nNow only the bot posts in this topic — other messages will be deleted.",
+    uk: "✅ Тему для анонсів збережено.\nchat_id: {chat}\nthread_id: {thread}\n\nТепер у цій темі пише лише бот — решту повідомлень бот видалятиме.",
+  },
+  sethere_ok_general: {
+    pl: "✅ Zapisano: wątek ogłoszeń to temat główny «General» (pierwszy temat forum nie ma thread_id, to normalne).\nchat_id: {chat}\n\nTeraz tutaj pisze tylko bot — pozostałe wiadomości bot będzie usuwał.",
+    en: "✅ Saved: the announcements thread is the main «General» topic (the first forum topic has no thread_id, that's normal).\nchat_id: {chat}\n\nNow only the bot posts here — other messages will be deleted.",
+    uk: "✅ Збережено: гілка анонсів — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\nchat_id: {chat}\n\nТепер тут пише лише бот — решту повідомлень бот видалятиме.",
+  },
+  setchores_ok: {
+    pl: "✅ Grupa do checklist przygotowań zapisana.\nchat_id: {chat}{thread}\n\nTeraz przy ogłoszeniu gry przyleci tu interaktywna lista zadań.",
+    en: "✅ Prep-checklist group saved.\nchat_id: {chat}{thread}\n\nNow an interactive task list will arrive here when a game is announced.",
+    uk: "✅ Групу для чек-листів підготовки збережено.\nchat_id: {chat}{thread}\n\nТепер при анонсі гри сюди прилітатиме інтерактивний список завдань.",
+  },
+  setmedia_ok_topic: {
+    pl: "✅ Wątek «tylko media» zapisany.\nchat_id: {chat}\nthread_id: {thread}\n\nTu zostają tylko zdjęcia / wideo / pliki (z podpisem lub bez) — wiadomości tekstowe bot będzie usuwał. Admini i master — wyjątek.",
+    en: "✅ «Media only» topic saved.\nchat_id: {chat}\nthread_id: {thread}\n\nOnly photos / videos / files stay here (with or without a caption) — text messages will be deleted. Admins and the master are an exception.",
+    uk: "✅ Гілку «тільки медіа» збережено.\nchat_id: {chat}\nthread_id: {thread}\n\nТут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.",
+  },
+  setmedia_ok_general: {
+    pl: "✅ Zapisano: wątek «tylko media» to temat główny «General» (pierwszy temat forum nie ma thread_id, to normalne).\nchat_id: {chat}\n\nTu zostają tylko zdjęcia / wideo / pliki (z podpisem lub bez) — wiadomości tekstowe bot będzie usuwał. Admini i master — wyjątek.",
+    en: "✅ Saved: the «media only» thread is the main «General» topic (the first forum topic has no thread_id, that's normal).\nchat_id: {chat}\n\nOnly photos / videos / files stay here (with or without a caption) — text messages will be deleted. Admins and the master are an exception.",
+    uk: "✅ Збережено: гілка «тільки медіа» — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\nchat_id: {chat}\n\nТут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.",
+  },
+  setphotos_ok_topic: {
+    pl: "✅ Temat punktów za zdjęcia zapisany.\nchat_id: {chat}\nthread_id: {thread}\n\nZa zdjęcie/wideo tutaj powiązany gracz dostaje 1 punkt za post (album = 1 post). Limit — w ustawieniach.",
+    en: "✅ Photo-points topic saved.\nchat_id: {chat}\nthread_id: {thread}\n\nFor a photo/video here a linked player gets 1 point per post (an album = 1 post). The limit is in settings.",
+    uk: "✅ Топік для балів за фото збережено.\nchat_id: {chat}\nthread_id: {thread}\n\nЗа фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.",
+  },
+  setphotos_ok_general: {
+    pl: "✅ Zapisano: temat punktów za zdjęcia to temat główny «General».\nchat_id: {chat}\n\nZa zdjęcie/wideo tutaj powiązany gracz dostaje 1 punkt za post (album = 1 post). Limit — w ustawieniach.",
+    en: "✅ Saved: the photo-points topic is the main «General» topic.\nchat_id: {chat}\n\nFor a photo/video here a linked player gets 1 point per post (an album = 1 post). The limit is in settings.",
+    uk: "✅ Збережено: топік для балів за фото — головна тема «General».\nchat_id: {chat}\n\nЗа фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.",
+  },
+  setflood_ok: {
+    pl: "✅ Wątek «Flood/Zalew» do codziennego przypomnienia zapisany.\nchat_id: {chat}{thread}\n\nCodziennie o ustalonej godzinie (Ustawienia → «Codzienne przypomnienie») bot będzie tu wysyłał dwujęzyczne przypomnienie o zapisach, jeśli w tym tygodniu jest jeszcze gra.",
+    en: "✅ The «Flood/Zalew» thread for the daily reminder is saved.\nchat_id: {chat}{thread}\n\nEvery day at the set hour (Settings → «Daily reminder») the bot will post a bilingual sign-up reminder here, if there's still a game this week.",
+    uk: "✅ Гілку «Флуд/Zalew» для щоденного нагадування збережено.\nchat_id: {chat}{thread}\n\nЩодня о заданій годині (Налаштування → «Щоденне нагадування») бот постітиме сюди двомовне нагадування про реєстрацію, якщо цього тижня попереду є гра.",
+  },
+  setsales_ok: {
+    pl: "✅ Wątek «Giełda» zapisany.\nchat_id: {chat}{thread}\n\nZasady wątku:\n• tylko ZDJĘCIE z opisem (tekst / wideo / pliki oraz zdjęcia bez opisu — usuwane);\n• aby ogłoszenie trafiło na stronę — dodaj w opisie tag #promo (wymagana naszywka);\n• zdjąć ogłoszenie — odpowiedz /delete na swoje zdjęcie (lub prześlij je ponownie + /delete).",
+    en: "✅ The «Marketplace» thread is saved.\nchat_id: {chat}{thread}\n\nThread rules:\n• photos WITH a description only (text / videos / files and photos without a caption are deleted);\n• to get a listing on the site — add the #promo tag to the caption (a patch is required);\n• to remove a listing — reply /delete to your photo (or repost it + /delete).",
+    uk: "✅ Гілку «Барахолка» збережено.\nchat_id: {chat}{thread}\n\nПравила гілки:\n• лише ФОТО з описом (текст / відео / файли та фото без опису — видаляються);\n• щоб оголошення потрапило на сайт — додай у опис тег #promo (потрібен патч);\n• зняти оголошення — відповідь /delete на своє фото (або репост потрібного + /delete).",
+  },
+  bug_report_header: {
+    pl: "🐞 Zgłoszenie błędu",
+    en: "🐞 Bug report",
+    uk: "🐞 Звіт про помилку",
+  },
   loc_ask_name: {
     pl: "📍 Podaj nazwę lokacji:",
     en: "📍 Enter the location name:",
@@ -668,6 +731,70 @@ const S: Record<string, Dict> = {
     pl: "🚗 Zapisano jako kierowca. Zarządzaj miejscami: /myride",
     en: "🚗 Signed up as a driver. Manage seats: /myride",
     uk: "🚗 Записано як водія. Керуй місцями: /myride",
+  },
+
+  // ── Carpool: точка виїзду + бронювання місць (Етап 34) ──
+  btn_ride_pin: { pl: "📍 Punkt wyjazdu", en: "📍 Departure point", uk: "📍 Точка виїзду" },
+  ride_ask_pin: {
+    pl: "Wyślij swoją lokalizację (📎 → Lokalizacja), aby zaznaczyć, skąd jedziesz.",
+    en: "Send your location (📎 → Location) to mark where you set off from.",
+    uk: "Надішли свою локацію (📎 → Місцезнаходження), щоб позначити, звідки їдеш.",
+  },
+  ride_pin_saved: {
+    pl: "📍 Zapisano punkt wyjazdu. Zobaczysz go na mapie carpool na stronie.",
+    en: "📍 Departure point saved. You'll see it on the carpool map on the site.",
+    uk: "📍 Точку виїзду збережено. Вона з'явиться на карпул-мапі на сайті.",
+  },
+  btn_request_seat: { pl: "🪑 Miejsce u {who}", en: "🪑 Seat with {who}", uk: "🪑 Місце в {who}" },
+  ride_request_to_driver: {
+    pl: "🚗 {who} prosi o miejsce na «{title}».",
+    en: "🚗 {who} requests a seat for «{title}».",
+    uk: "🚗 {who} просить місце на «{title}».",
+  },
+  btn_ride_accept: { pl: "✅ Przyjmij", en: "✅ Accept", uk: "✅ Прийняти" },
+  btn_ride_decline: { pl: "❌ Odrzuć", en: "❌ Decline", uk: "❌ Відхилити" },
+  ride_accepted_passenger: {
+    pl: "✅ {who} zabiera Cię na «{title}»! Kontakt:",
+    en: "✅ {who} is giving you a ride to «{title}»! Contact:",
+    uk: "✅ {who} бере тебе на «{title}»! Контакт:",
+  },
+  ride_declined_passenger: {
+    pl: "🚗 {who} nie ma już miejsca na «{title}».",
+    en: "🚗 {who} has no seat for «{title}».",
+    uk: "🚗 {who} не має місця на «{title}».",
+  },
+  ride_driver_left_passenger: {
+    pl: "🚗 {who} wypisał się z «{title}» — Twoja rezerwacja anulowana.",
+    en: "🚗 {who} withdrew from «{title}» — your booking is cancelled.",
+    uk: "🚗 {who} знявся з «{title}» — твоє бронювання скасовано.",
+  },
+  ride_request_sent_passenger: {
+    pl: "Wysłano prośbę do {who}.",
+    en: "Request sent to {who}.",
+    uk: "Запит надіслано {who}.",
+  },
+  ride_already_requested: {
+    pl: "Już poprosiłeś tego kierowcę.",
+    en: "You already asked this driver.",
+    uk: "Ти вже просив цього водія.",
+  },
+  ride_no_seats: { pl: "Brak wolnych miejsc.", en: "No free seats.", uk: "Місць немає." },
+  ride_self: { pl: "To Twoje auto 🙂", en: "That's your car 🙂", uk: "Це твоя машина 🙂" },
+  ride_request_failed: {
+    pl: "Nie udało się wysłać prośby.",
+    en: "Couldn't send the request.",
+    uk: "Не вдалося надіслати запит.",
+  },
+  ride_accepted_driver: {
+    pl: "✅ Przyjęto. Wysłaliśmy pasażerowi Twój kontakt.",
+    en: "✅ Accepted. We sent the passenger your contact.",
+    uk: "✅ Прийнято. Пасажиру надіслано твій контакт.",
+  },
+  ride_declined_driver: { pl: "Odrzucono.", en: "Declined.", uk: "Відхилено." },
+  ride_decided_already: {
+    pl: "Ta prośba została już rozpatrzona.",
+    en: "This request was already handled.",
+    uk: "Цей запит уже опрацьовано.",
   },
 
   // нагадування

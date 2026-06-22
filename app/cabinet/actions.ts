@@ -16,6 +16,7 @@ import {
 } from "@/lib/site-player";
 import { registeredCount, distanceMeters } from "@/lib/games";
 import { performCheckin } from "@/lib/checkins";
+import { cancelDriverRideRequests } from "@/lib/carpool";
 
 export type LinkState = { error?: string };
 
@@ -202,6 +203,8 @@ export async function unregisterFromGame(formData: FormData) {
     .update({ status: "cancelled" })
     .eq("game_id", gameId)
     .eq("player_id", player.id);
+  // Карпул (Етап 34): якщо знявся водій — скасовуємо його брони й сповіщаємо пасажирів.
+  await cancelDriverRideRequests(gameId, player.id);
   revalidatePath("/cabinet");
   revalidatePath("/games");
   revalidatePath("/my-games");

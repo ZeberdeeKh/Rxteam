@@ -53,6 +53,12 @@ import {
 } from "./games";
 import { toggleChoreClaim, refreshChoreMessage } from "./chores";
 import { notifyAdminsRental } from "./notify";
+import {
+  createRideRequest,
+  acceptRideRequest,
+  declineRideRequest,
+  cancelDriverRideRequests,
+} from "./carpool";
 import { announceGame, REG_BTN, appendVideoLine, announceLinkPreview } from "./game-announce";
 import {
   ingestSalesPhoto,
@@ -773,7 +779,7 @@ async function myUpcomingGames(playerId: number) {
 async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: string | null) {
   const { data: drivers } = await supabase
     .from("registrations")
-    .select("from_place, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own");
@@ -786,11 +792,37 @@ async function showDrivers(ctx: Context, lang: Lang, gameId: number, title: stri
     const pl = (d as any).players;
     const who = pl?.callsign ?? pl?.name ?? "?";
     const from = d.from_place ?? "—";
-    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from });
+    // Точка виїзду на мапі (Етап 34) — якщо водій її поставив.
+    const mapLink =
+      d.from_lat != null && d.from_lng != null
+        ? `\n🗺 https://maps.google.com/?q=${d.from_lat},${d.from_lng}`
+        : "";
+    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from }) + mapLink;
     const contact = pl?.tg_username ? "@" + pl.tg_username : tr(lang, "drivers_contact_none");
-    return tr(lang, "drivers_line", { who, from, seats: d.free_seats ?? 0, contact });
+    return tr(lang, "drivers_line", { who, from, seats: d.free_seats ?? 0, contact }) + mapLink;
   });
-  await ctx.reply(tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"));
+
+  // Кнопки «Прошу місце» — лише для відкритих оферт і не собі (Етап 34, під фічфлагом).
+  let reply_markup: InlineKeyboard | undefined;
+  if (await featureEnabled("carpool_map")) {
+    const viewer = ctx.from ? await getPlayerByTg(ctx.from.id) : null;
+    const kb = new InlineKeyboard();
+    let any = false;
+    for (const d of offering) {
+      if (d.seats_closed) continue;
+      if (viewer && d.player_id === viewer.id) continue; // не пропонуємо бронювати в себе
+      const pl = (d as any).players;
+      const who = pl?.callsign ?? pl?.name ?? "?";
+      kb.text(tr(lang, "btn_request_seat", { who }), `rideask:${gameId}:${d.player_id}`).row();
+      any = true;
+    }
+    if (any) reply_markup = kb;
+  }
+
+  await ctx.reply(
+    tr(lang, "drivers_title", { title: title ?? "ASG" }) + "\n\n" + lines.join("\n"),
+    reply_markup ? { reply_markup } : undefined,
+  );
 }
 
 // ─────────────────── Лотерея надійних + «У цифрах» ───────────────────
@@ -1122,9 +1154,99 @@ async function renderRide(playerId: number, gameId: number, lang: Lang) {
     .text(String(seats), "noop")
     .text("➕", `rideseat:${gameId}:1`)
     .row()
-    .text(tr(lang, closed ? "btn_ride_open" : "btn_ride_close"), `rideclose:${gameId}`);
+    .text(tr(lang, closed ? "btn_ride_open" : "btn_ride_close"), `rideclose:${gameId}`)
+    .row()
+    .text(tr(lang, "btn_ride_pin"), `ridepin:${gameId}`);
   return { text, kb };
 }
+
+// Водій ставить точку виїзду з бота: просимо надіслати локацію (стан ride_pin).
+bot.callbackQuery(/^ridepin:(\d+)$/, async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const p = await ensurePlayer(ctx.from);
+  await setState(ctx.from.id, "ride_pin", { gameId: Number(ctx.match[1]) });
+  await ctx.reply(tr(p.lang as Lang, "ride_ask_pin"));
+});
+
+// Пасажир просить місце у водія (кнопка з /drivers). Уся валідація + DM водію — у createRideRequest.
+bot.callbackQuery(/^rideask:(\d+):(\d+)$/, async (ctx) => {
+  const p = await ensurePlayer(ctx.from);
+  const lang = p.lang as Lang;
+  const gameId = Number(ctx.match[1]);
+  const driverPlayerId = Number(ctx.match[2]);
+  if (!(await featureEnabled("carpool_map"))) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  const res = await createRideRequest(gameId, driverPlayerId, p.id);
+  if (res.ok) {
+    const { data: drv } = await supabase
+      .from("players")
+      .select("callsign, name")
+      .eq("id", driverPlayerId)
+      .maybeSingle();
+    await ctx.answerCallbackQuery({
+      text: tr(lang, "ride_request_sent_passenger", { who: drv?.callsign ?? drv?.name ?? "?" }),
+      show_alert: true,
+    });
+    return;
+  }
+  const key =
+    res.reason === "self"
+      ? "ride_self"
+      : res.reason === "duplicate"
+        ? "ride_already_requested"
+        : res.reason === "closed" || res.reason === "full"
+          ? "ride_no_seats"
+          : "ride_request_failed";
+  await ctx.answerCallbackQuery({ text: tr(lang, key), show_alert: true });
+});
+
+// Водій ПРИЙМАЄ запит (кнопка в DM, що прийшов із сайту або бота). Атомарне списання — у acceptRideRequest.
+bot.callbackQuery(/^rideok:(\d+)$/, async (ctx) => {
+  const driver = await ensurePlayer(ctx.from);
+  const lang = driver.lang as Lang;
+  const requestId = Number(ctx.match[1]);
+  const { data: req } = await supabase
+    .from("ride_requests")
+    .select("driver_player_id, status")
+    .eq("id", requestId)
+    .maybeSingle();
+  if (!req || req.driver_player_id !== driver.id) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  if (req.status !== "pending") {
+    await ctx.answerCallbackQuery({ text: tr(lang, "ride_decided_already"), show_alert: true });
+    return;
+  }
+  const res = await acceptRideRequest(requestId);
+  await ctx.answerCallbackQuery();
+  try {
+    await ctx.editMessageText(tr(lang, res.ok ? "ride_accepted_driver" : "ride_no_seats"));
+  } catch {}
+});
+
+// Водій ВІДХИЛЯЄ запит.
+bot.callbackQuery(/^rideno:(\d+)$/, async (ctx) => {
+  const driver = await ensurePlayer(ctx.from);
+  const lang = driver.lang as Lang;
+  const requestId = Number(ctx.match[1]);
+  const { data: req } = await supabase
+    .from("ride_requests")
+    .select("driver_player_id, status")
+    .eq("id", requestId)
+    .maybeSingle();
+  if (!req || req.driver_player_id !== driver.id) {
+    await ctx.answerCallbackQuery();
+    return;
+  }
+  await declineRideRequest(requestId);
+  await ctx.answerCallbackQuery();
+  try {
+    await ctx.editMessageText(tr(lang, "ride_declined_driver"));
+  } catch {}
+});
 
 // Чи перебуває користувач ЗАРАЗ у групі (Telegram getChatMember по announce_chat_id).
 async function isCurrentGroupMember(tgUserId?: number | null): Promise<boolean> {
@@ -1287,9 +1409,9 @@ bot.command("cancel", async (ctx) => {
 });
 
 bot.command("sethere", async (ctx) => {
+  // Мова адміна, що виконує команду (pl/en/uk); для анонімного адміна (senderChat) → uk.
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    // Приватна відповідь конкретному адміну — мовою цього адміна (pl/en/uk).
-    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
     await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
@@ -1305,7 +1427,7 @@ bot.command("sethere", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
@@ -1314,25 +1436,18 @@ bot.command("sethere", async (ctx) => {
   // Без thread_id → це головна тема «General» форуму (її повідомлення без thread_id).
   await setSetting("announce_guard_general", threadId ? "false" : "true");
   if (threadId) {
-    await ctx.reply(
-      `✅ Тему для анонсів збережено.\n` +
-        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
-        `Тепер у цій темі пише лише бот — решту повідомлень бот видалятиме.`,
-    );
+    await ctx.reply(tr(actorLang, "sethere_ok_topic", { chat: ctx.chat.id, thread: threadId }));
   } else {
-    await ctx.reply(
-      `✅ Збережено: гілка анонсів — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\n` +
-        `chat_id: ${ctx.chat.id}\n\n` +
-        `Тепер тут пише лише бот — решту повідомлень бот видалятиме.`,
-    );
+    await ctx.reply(tr(actorLang, "sethere_ok_general", { chat: ctx.chat.id }));
   }
 });
 
 // Прив'язка адмін-групи (другої, закритої) для чек-листів підготовки до гри (Етап 13).
 // Виконати в потрібній групі/топіку — далі при анонсі гри сюди летить інтерактивний список.
 bot.command("setchores", async (ctx) => {
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    await ctx.reply("Виконай цю команду в адмін-групі (у потрібному топіку).");
+    await ctx.reply(tr(actorLang, "setchores_group_only"));
     return;
   }
   let isChatAdmin = false;
@@ -1347,24 +1462,25 @@ bot.command("setchores", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
   await setSetting("chores_chat_id", String(ctx.chat.id));
   await setSetting("chores_thread_id", threadId ? String(threadId) : "");
   await ctx.reply(
-    `✅ Групу для чек-листів підготовки збережено.\nchat_id: ${ctx.chat.id}` +
-      (threadId ? `\nthread_id: ${threadId}` : "") +
-      `\n\nТепер при анонсі гри сюди прилітатиме інтерактивний список завдань.`,
+    tr(actorLang, "setchores_ok", {
+      chat: ctx.chat.id,
+      thread: threadId ? `\nthread_id: ${threadId}` : "",
+    }),
   );
 });
 
 // Прив'язка гілки «тільки медіа»: лишаємо фото/відео/документ, текстові — видаляємо.
 // Виконати в потрібному топіку (або в General) від імені адміна групи.
 bot.command("setmedia", async (ctx) => {
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
     await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
@@ -1380,7 +1496,7 @@ bot.command("setmedia", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
@@ -1389,25 +1505,17 @@ bot.command("setmedia", async (ctx) => {
   // Без thread_id → це головна тема «General» форуму (її повідомлення без thread_id).
   await setSetting("media_guard_general", threadId ? "false" : "true");
   if (threadId) {
-    await ctx.reply(
-      `✅ Гілку «тільки медіа» збережено.\n` +
-        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
-        `Тут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.`,
-    );
+    await ctx.reply(tr(actorLang, "setmedia_ok_topic", { chat: ctx.chat.id, thread: threadId }));
   } else {
-    await ctx.reply(
-      `✅ Збережено: гілка «тільки медіа» — головна тема «General» (для першої теми форуму thread_id немає, це нормально).\n` +
-        `chat_id: ${ctx.chat.id}\n\n` +
-        `Тут лишаються лише фото / відео / файли (з підписом чи без) — текстові повідомлення бот видалятиме. Адміни й майстер — виняток.`,
-    );
+    await ctx.reply(tr(actorLang, "setmedia_ok_general", { chat: ctx.chat.id }));
   }
 });
 
 // Прив'язка топіка «Zdjęcia i filmy z gier / Фото та відео з ігор» для нарахування балів
 // за фото-пост (Етап 32). Виконати в потрібному топіку від імені адміна групи.
 bot.command("setphotos", async (ctx) => {
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
     await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
@@ -1423,7 +1531,7 @@ bot.command("setphotos", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
@@ -1432,17 +1540,9 @@ bot.command("setphotos", async (ctx) => {
   // Без thread_id → головна тема «General» форуму (її повідомлення без thread_id).
   await setSetting("photos_guard_general", threadId ? "false" : "true");
   if (threadId) {
-    await ctx.reply(
-      `✅ Топік для балів за фото збережено.\n` +
-        `chat_id: ${ctx.chat.id}\nthread_id: ${threadId}\n\n` +
-        `За фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.`,
-    );
+    await ctx.reply(tr(actorLang, "setphotos_ok_topic", { chat: ctx.chat.id, thread: threadId }));
   } else {
-    await ctx.reply(
-      `✅ Збережено: топік для балів за фото — головна тема «General».\n` +
-        `chat_id: ${ctx.chat.id}\n\n` +
-        `За фото/відео тут прив'язаний гравець отримує 1 бал за пост (альбом = 1 пост). Ліміт — у налаштуваннях.`,
-    );
+    await ctx.reply(tr(actorLang, "setphotos_ok_general", { chat: ctx.chat.id }));
   }
 });
 
@@ -1450,8 +1550,8 @@ bot.command("setphotos", async (ctx) => {
 // Виконати в потрібному топіку від імені адміна групи (flood_chat_id/flood_thread_id).
 // Поки не задано — щоденне нагадування інертне.
 bot.command("setflood", async (ctx) => {
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
     await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
@@ -1467,23 +1567,24 @@ bot.command("setflood", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
   await setSetting("flood_chat_id", String(ctx.chat.id));
   await setSetting("flood_thread_id", threadId ? String(threadId) : "");
   await ctx.reply(
-    `✅ Гілку «Флуд/Zalew» для щоденного нагадування збережено.\nchat_id: ${ctx.chat.id}` +
-      (threadId ? `\nthread_id: ${threadId}` : "") +
-      `\n\nЩодня о заданій годині (Налаштування → «Щоденне нагадування») бот постітиме сюди двомовне нагадування про реєстрацію, якщо цього тижня попереду є гра.`,
+    tr(actorLang, "setflood_ok", {
+      chat: ctx.chat.id,
+      thread: threadId ? `\nthread_id: ${threadId}` : "",
+    }),
   );
 });
 
 // Прив'язка гілки «Барахолка»: лише фото з описом; публікація на сайт — з тегом #promo + патч.
 bot.command("setsales", async (ctx) => {
+  const actorLang = ctx.from ? (((await getPlayerByTg(ctx.from.id))?.lang as Lang) ?? "uk") : "uk";
   if (ctx.chat.type === "private") {
-    const actorLang = ((await getPlayerByTg(ctx.from!.id))?.lang as Lang) ?? "uk";
     await ctx.reply(tr(actorLang, "sethere_group_only"));
     return;
   }
@@ -1499,7 +1600,7 @@ bot.command("setsales", async (ctx) => {
     }
   }
   if (!isChatAdmin) {
-    await ctx.reply("⛔ Лише для адмінів групи.");
+    await ctx.reply(tr(actorLang, "not_admin_group"));
     return;
   }
   const threadId = ctx.message?.message_thread_id;
@@ -1507,11 +1608,10 @@ bot.command("setsales", async (ctx) => {
   await setSetting("sales_thread_id", threadId ? String(threadId) : "");
   await setSetting("sales_guard_general", threadId ? "false" : "true");
   await ctx.reply(
-    `✅ Гілку «Барахолка» збережено.\nchat_id: ${ctx.chat.id}` +
-      (threadId ? `\nthread_id: ${threadId}` : " (General)") +
-      `\n\nПравила гілки:\n• лише ФОТО з описом (текст / відео / файли та фото без опису — видаляються);\n` +
-      `• щоб оголошення потрапило на сайт — додай у опис тег #promo (потрібен патч);\n` +
-      `• зняти оголошення — відповідь /delete на своє фото (або репост потрібного + /delete).`,
+    tr(actorLang, "setsales_ok", {
+      chat: ctx.chat.id,
+      thread: threadId ? `\nthread_id: ${threadId}` : " (General)",
+    }),
   );
 });
 
@@ -1614,7 +1714,7 @@ bot.command("choresdiag", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const p = await ensurePlayer(ctx.from!);
   if (!p.is_master && !p.is_admin) {
-    await ctx.reply("⛔ Лише для адмінів.");
+    await ctx.reply(tr(p.lang as Lang, "not_admin"));
     return;
   }
   const out: string[] = ["🔎 Діагностика чек-листа:"];
@@ -2353,6 +2453,8 @@ bot.callbackQuery(/^unreg:(\d+)$/, async (ctx) => {
     .update({ status: "cancelled" })
     .eq("game_id", gameId)
     .eq("player_id", p.id);
+  // Карпул (Етап 34): якщо знявся водій — скасовуємо його брони й сповіщаємо пасажирів.
+  await cancelDriverRideRequests(gameId, p.id);
   await updateAnnouncement(gameId);
   // Оновлюємо картку на місці — кнопка перемикається «Відписатись» → «Записатись».
   const card = await buildGameCard(p, gameId);
@@ -2477,7 +2579,7 @@ bot.callbackQuery(/^cap:(-?\d+)$/, async (ctx) => {
 bot.on("message:location", async (ctx) => {
   if (ctx.chat.type !== "private") return;
   const { state, data } = await getState(ctx.from!.id);
-  if (state !== "loc_pin" && state !== "checkin") return;
+  if (state !== "loc_pin" && state !== "checkin" && state !== "ride_pin") return;
   const p = await ensurePlayer(ctx.from!);
   const loc = ctx.message.location;
 
@@ -2488,6 +2590,18 @@ bot.on("message:location", async (ctx) => {
       .text("300 м", "locrad:300")
       .text("500 м", "locrad:500");
     await ctx.reply(tr(p.lang as Lang, "loc_ask_radius"), { reply_markup: kb });
+    return;
+  }
+
+  // Карпул: водій ставить точку виїзду (ті самі колонки from_lat/from_lng, що пише сайт).
+  if (state === "ride_pin") {
+    await supabase
+      .from("registrations")
+      .update({ from_lat: loc.latitude, from_lng: loc.longitude })
+      .eq("game_id", data.gameId)
+      .eq("player_id", p.id);
+    await clearState(ctx.from!.id);
+    await ctx.reply(tr(p.lang as Lang, "ride_pin_saved"));
     return;
   }
 

@@ -518,6 +518,180 @@ export async function getMarketplacePage(
   return { listings: (data ?? []).map(mapListing), total: count ?? 0 };
 }
 
+// ─────────────────────────── Карпул-мапа (Етап 34) ───────────────────────────
+
+export type CarpoolDriver = {
+  playerId: number;
+  callsign: string | null;
+  name: string | null;
+  tgUsername: string | null;
+  fromPlace: string | null;
+  freeSeats: number;
+  seatsClosed: boolean;
+  lat: number; // чужим — округлено до ~110 м (приватність); собі — точно
+  lng: number;
+  isMe: boolean;
+  myRequest: "pending" | "accepted" | "declined" | null; // статус запиту глядача саме цьому водієві
+};
+
+export type CarpoolIncoming = {
+  requestId: number;
+  passengerCallsign: string | null;
+  passengerName: string | null;
+  passengerTgUsername: string | null;
+};
+
+export type CarpoolMe = {
+  playerId: number;
+  registered: boolean; // status='registered' на цю гру
+  transport: "own" | "need" | null;
+  isDriver: boolean; // registered + transport='own'
+  fromLat: number | null;
+  fromLng: number | null;
+  freeSeats: number | null;
+  seatsClosed: boolean;
+};
+
+export type CarpoolData = {
+  game: { id: number; title: string | null; startAt: string; gatherAt: string | null; status: string };
+  venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
+  drivers: CarpoolDriver[];
+  me: CarpoolMe | null; // null для anon
+  incoming: CarpoolIncoming[]; // pending-запити, де глядач — водій (для accept/decline на сайті)
+};
+
+// Дані для сторінки /carpool: гра + полігон + водії з координатами + стан глядача.
+// playerId=null → лише перегляд (anon). null повертаємо, якщо гри нема.
+export async function getCarpool(gameId: number, playerId: number | null): Promise<CarpoolData | null> {
+  const { data: game } = await supabase
+    .from("games")
+    .select("id, title, start_at, gather_at, status, locations(name, lat, lng, radius_m)")
+    .eq("id", gameId)
+    .maybeSingle();
+  if (!game) return null;
+
+  const loc = Array.isArray((game as any).locations)
+    ? (game as any).locations[0]
+    : (game as any).locations;
+  const venue =
+    loc && loc.lat != null && loc.lng != null
+      ? {
+          name: loc.name ?? null,
+          lat: loc.lat as number,
+          lng: loc.lng as number,
+          radiusM: (loc.radius_m as number) ?? 300,
+        }
+      : null;
+
+  // Водії «своїм ходом», що поставили точку виїзду.
+  const { data: rows } = await supabase
+    .from("registrations")
+    .select("player_id, from_place, from_lat, from_lng, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .eq("game_id", gameId)
+    .eq("status", "registered")
+    .eq("transport", "own")
+    .not("from_lat", "is", null)
+    .not("from_lng", "is", null);
+
+  const myOutgoing = new Map<number, string>();
+  let me: CarpoolMe | null = null;
+  let incoming: CarpoolIncoming[] = [];
+
+  if (playerId != null) {
+    const [{ data: myReg }, { data: out }, { data: inc }] = await Promise.all([
+      supabase
+        .from("registrations")
+        .select("transport, status, from_lat, from_lng, free_seats, seats_closed")
+        .eq("game_id", gameId)
+        .eq("player_id", playerId)
+        .maybeSingle(),
+      supabase
+        .from("ride_requests")
+        .select("driver_player_id, status")
+        .eq("game_id", gameId)
+        .eq("passenger_id", playerId)
+        .in("status", ["pending", "accepted", "declined"]),
+      supabase
+        .from("ride_requests")
+        .select("id, passenger_id")
+        .eq("game_id", gameId)
+        .eq("driver_player_id", playerId)
+        .eq("status", "pending"),
+    ]);
+
+    // Найрелевантніший статус по водієві: pending/accepted перекриває declined.
+    for (const r of out ?? []) {
+      const prev = myOutgoing.get(r.driver_player_id as number);
+      if (!prev || prev === "declined") myOutgoing.set(r.driver_player_id as number, r.status as string);
+    }
+
+    const registered = myReg?.status === "registered";
+    me = {
+      playerId,
+      registered,
+      transport: ((myReg?.transport as any) ?? null) as CarpoolMe["transport"],
+      isDriver: registered && myReg?.transport === "own",
+      fromLat: myReg?.from_lat ?? null,
+      fromLng: myReg?.from_lng ?? null,
+      freeSeats: myReg?.free_seats ?? null,
+      seatsClosed: !!myReg?.seats_closed,
+    };
+
+    // Контакти пасажирів вхідних запитів — окремим запитом (без покладання на ім'я FK).
+    const paxIds = [...new Set((inc ?? []).map((r) => r.passenger_id as number))];
+    const paxMap = new Map<number, any>();
+    if (paxIds.length) {
+      const { data: paxes } = await supabase
+        .from("players")
+        .select("id, callsign, name, tg_username")
+        .in("id", paxIds);
+      for (const p of paxes ?? []) paxMap.set(p.id as number, p);
+    }
+    incoming = (inc ?? []).map((r) => {
+      const p = paxMap.get(r.passenger_id as number);
+      return {
+        requestId: r.id as number,
+        passengerCallsign: p?.callsign ?? null,
+        passengerName: p?.name ?? null,
+        passengerTgUsername: p?.tg_username ?? null,
+      };
+    });
+  }
+
+  const round3 = (n: number) => Math.round(n * 1000) / 1000;
+  const drivers: CarpoolDriver[] = (rows ?? []).map((d: any) => {
+    const pl = Array.isArray(d.players) ? d.players[0] : d.players;
+    const isMe = playerId != null && d.player_id === playerId;
+    return {
+      playerId: d.player_id,
+      callsign: pl?.callsign ?? null,
+      name: pl?.name ?? null,
+      tgUsername: pl?.tg_username ?? null,
+      fromPlace: d.from_place ?? null,
+      freeSeats: d.free_seats ?? 0,
+      seatsClosed: !!d.seats_closed,
+      lat: isMe ? d.from_lat : round3(d.from_lat),
+      lng: isMe ? d.from_lng : round3(d.from_lng),
+      isMe,
+      myRequest: (myOutgoing.get(d.player_id) as CarpoolDriver["myRequest"]) ?? null,
+    };
+  });
+
+  return {
+    game: {
+      id: game.id as number,
+      title: game.title ?? null,
+      startAt: game.start_at as string,
+      gatherAt: game.gather_at ?? null,
+      status: game.status as string,
+    },
+    venue,
+    drivers,
+    me,
+    incoming,
+  };
+}
+
 // Здобуті ачівки гравця (з назвами).
 export async function getPlayerAchievements(playerId: number): Promise<PlayerAch[]> {
   const { data } = await supabase

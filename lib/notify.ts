@@ -30,14 +30,16 @@ async function sendTgPhoto(chatId: number, bytes: Buffer, mime: string) {
   } catch {}
 }
 
-// Telegram-id майстер-адміна (delltex). Звіти про помилки йдуть ТІЛЬКИ йому.
-async function masterChatIds(): Promise<number[]> {
+// Telegram-id майстер-адміна (delltex) + його мова. Звіти про помилки йдуть ТІЛЬКИ йому.
+async function masterChats(): Promise<{ id: number; lang: Lang }[]> {
   const { data } = await supabase
     .from("players")
-    .select("tg_user_id")
+    .select("tg_user_id, lang")
     .eq("is_master", true)
     .not("tg_user_id", "is", null);
-  return (data ?? []).map((a) => a.tg_user_id as number).filter(Boolean);
+  return (data ?? [])
+    .filter((a) => a.tg_user_id)
+    .map((a) => ({ id: a.tg_user_id as number, lang: (a.lang as Lang) ?? "uk" }));
 }
 
 // Сповіщення майстер-адміна про звіт «Повідомити про помилку».
@@ -51,16 +53,17 @@ export async function notifyAdminsBugReport(opts: {
     .map(([k, v]) => `${k}: ${String(v)}`)
     .join("\n");
   const emailLine = opts.email ? `\n✉️ ${opts.email}` : "";
-  const text =
-    `🐞 Zgłoszenie błędu / Звіт про помилку\n\n${opts.description}\n\n— context —\n${metaLines}${emailLine}`.slice(
-      0,
-      4096,
-    );
 
-  const ids = await masterChatIds();
-  for (const id of ids) {
-    await sendTg(id, text);
-    if (opts.screenshot) await sendTgPhoto(id, opts.screenshot.bytes, opts.screenshot.mime);
+  const chats = await masterChats();
+  for (const m of chats) {
+    // Заголовок — мовою конкретного майстер-адміна; решта (опис, контекст) — як надіслано.
+    const text =
+      `${tr(m.lang, "bug_report_header")}\n\n${opts.description}\n\n— context —\n${metaLines}${emailLine}`.slice(
+        0,
+        4096,
+      );
+    await sendTg(m.id, text);
+    if (opts.screenshot) await sendTgPhoto(m.id, opts.screenshot.bytes, opts.screenshot.mime);
   }
 }
 
@@ -165,4 +168,76 @@ export async function notifyAdminsRental(opts: {
       }) + contactLine;
     await sendTg(a.tg_user_id as number, text);
   }
+}
+
+// ─────────────────────────── Carpool: бронювання місць (Етап 34) ───────────────────────────
+// Спільні для сайту й бота. Кнопки rideok/rideno обробляє той самий бот за токеном,
+// тож DM, відправлений із сайту, має робочі кнопки (як patchok/patchno).
+
+function tgContactLine(tgUsername?: string | null, tgUserId?: number | null): string {
+  return tgUsername
+    ? `\n👤 https://t.me/${tgUsername}`
+    : tgUserId
+      ? `\n👤 tg://user?id=${tgUserId}`
+      : "";
+}
+
+// DM водію: пасажир просить місце. Inline-кнопки Прийняти/Відхилити (callback rideok/rideno).
+export async function notifyDriverRideRequest(opts: {
+  requestId: number;
+  driverTgUserId?: number | null;
+  driverLang: Lang;
+  passengerWho: string;
+  passengerTgUserId?: number | null;
+  passengerTgUsername?: string | null;
+  gameTitle: string | null;
+}) {
+  if (!opts.driverTgUserId) return;
+  const text =
+    tr(opts.driverLang, "ride_request_to_driver", {
+      who: opts.passengerWho,
+      title: opts.gameTitle ?? "ASG",
+    }) + tgContactLine(opts.passengerTgUsername, opts.passengerTgUserId);
+  const reply_markup = {
+    inline_keyboard: [
+      [
+        { text: tr(opts.driverLang, "btn_ride_accept"), callback_data: `rideok:${opts.requestId}` },
+        { text: tr(opts.driverLang, "btn_ride_decline"), callback_data: `rideno:${opts.requestId}` },
+      ],
+    ],
+  };
+  await sendTg(opts.driverTgUserId, text, reply_markup);
+}
+
+// DM пасажиру: водій ПРИЙНЯВ — додаємо контакт водія для зв'язку.
+export async function notifyPassengerRideAccepted(opts: {
+  passengerTgUserId?: number | null;
+  passengerLang: Lang;
+  driverWho: string;
+  driverTgUsername?: string | null;
+  driverTgUserId?: number | null;
+  gameTitle: string | null;
+}) {
+  if (!opts.passengerTgUserId) return;
+  const text =
+    tr(opts.passengerLang, "ride_accepted_passenger", {
+      who: opts.driverWho,
+      title: opts.gameTitle ?? "ASG",
+    }) + tgContactLine(opts.driverTgUsername, opts.driverTgUserId);
+  await sendTg(opts.passengerTgUserId, text);
+}
+
+// DM пасажиру: відмова або водій знявся з гри. key обирає текст.
+export async function notifyPassengerRideEnded(opts: {
+  passengerTgUserId?: number | null;
+  passengerLang: Lang;
+  key: "ride_declined_passenger" | "ride_driver_left_passenger";
+  driverWho: string;
+  gameTitle: string | null;
+}) {
+  if (!opts.passengerTgUserId) return;
+  await sendTg(
+    opts.passengerTgUserId,
+    tr(opts.passengerLang, opts.key, { who: opts.driverWho, title: opts.gameTitle ?? "ASG" }),
+  );
 }
