@@ -53,7 +53,7 @@ import {
 } from "./games";
 import { toggleChoreClaim, refreshChoreMessage } from "./chores";
 import { notifyAdminsRental } from "./notify";
-import { announceGame, REG_BTN } from "./game-announce";
+import { announceGame, REG_BTN, appendVideoLine } from "./game-announce";
 import {
   ingestSalesPhoto,
   findListingForDelete,
@@ -2848,27 +2848,30 @@ async function updateAnnouncement(gameId: number) {
   const loc = (game as any).locations;
   const count = await registeredCount(gameId);
   const settings = await getAllSettings();
-  const text = buildAnnouncement(
-    {
-      title: game.title,
-      lat: loc.lat,
-      lng: loc.lng,
-      mapUrl: loc.map_url,
-      gatherUtc: game.gather_at ?? game.start_at,
-      startUtc: game.start_at,
-      scenarioPl: game.scenario_pl,
-      scenarioUk: game.scenario_uk,
-      count,
-      capacity: game.capacity,
-      replicaTypes: loc.replica_types ?? [],
-      pyro: loc.pyro ?? "no",
-      pyroNotePl: loc.pyro_note_pl ?? null,
-      pyroNoteUk: loc.pyro_note_uk ?? null,
-      fireMode: loc.fire_mode ?? "semi",
-      paymentPl: loc.payment_pl ?? null,
-      paymentUk: loc.payment_uk ?? null,
-    },
-    settings,
+  const text = appendVideoLine(
+    buildAnnouncement(
+      {
+        title: game.title,
+        lat: loc.lat,
+        lng: loc.lng,
+        mapUrl: loc.map_url,
+        gatherUtc: game.gather_at ?? game.start_at,
+        startUtc: game.start_at,
+        scenarioPl: game.scenario_pl,
+        scenarioUk: game.scenario_uk,
+        count,
+        capacity: game.capacity,
+        replicaTypes: loc.replica_types ?? [],
+        pyro: loc.pyro ?? "no",
+        pyroNotePl: loc.pyro_note_pl ?? null,
+        pyroNoteUk: loc.pyro_note_uk ?? null,
+        fireMode: loc.fire_mode ?? "semi",
+        paymentPl: loc.payment_pl ?? null,
+        paymentUk: loc.payment_uk ?? null,
+      },
+      settings,
+    ),
+    loc.youtube_url ?? null,
   );
   const kb = new InlineKeyboard().url(
     REG_BTN,

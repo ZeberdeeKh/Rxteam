@@ -319,13 +319,14 @@ export type AdminLocation = {
   fire_mode: string; // auto | semi
   payment_pl: string | null; // текст блоку «Оплата» (PL) для анонсу
   payment_uk: string | null; // текст блоку «Оплата» (UA) для анонсу
+  youtube_url: string | null; // посилання на відео локації (YouTube) для анонсу
   gameCount: number; // у скількох іграх використана (для блокування видалення)
 };
 
 export async function listLocationsFull(): Promise<AdminLocation[]> {
   const { data: locs } = await supabase
     .from("locations")
-    .select("id, name, lat, lng, radius_m, map_url, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk")
+    .select("id, name, lat, lng, radius_m, map_url, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk, youtube_url")
     .order("name", { ascending: true });
   const rows = locs ?? [];
   if (!rows.length) return [];
@@ -350,6 +351,7 @@ export async function listLocationsFull(): Promise<AdminLocation[]> {
     fire_mode: ((l as any).fire_mode as string) ?? "semi",
     payment_pl: ((l as any).payment_pl as string) ?? null,
     payment_uk: ((l as any).payment_uk as string) ?? null,
+    youtube_url: ((l as any).youtube_url as string) ?? null,
     gameCount: used.get(l.id as number) ?? 0,
   }));
 }

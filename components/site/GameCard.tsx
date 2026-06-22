@@ -1,6 +1,7 @@
 ﻿import { st, type Lang } from "@/lib/site-i18n";
 import { formatGameWhen } from "@/lib/games";
 import type { SiteGame } from "@/lib/site-data";
+import { youtubeEmbedUrl } from "@/lib/youtube";
 import { ui } from "@/components/ui";
 import AnnouncementBlock from "@/components/site/AnnouncementBlock";
 
@@ -19,6 +20,8 @@ export default function GameCard({
   const countText = game.capacity
     ? st(lang, "games_count_cap", { n: game.count, cap: game.capacity })
     : st(lang, "games_count", { n: game.count });
+  // Посилання на відео локації → URL вбудованого програвача (null, якщо не YouTube/порожнє).
+  const videoUrl = youtubeEmbedUrl(game.location?.youtube_url);
 
   return (
     <article className={`${ui.card} ${muted ? "opacity-75" : ""}`}>
@@ -56,6 +59,22 @@ export default function GameCard({
       </dl>
 
       {game.announcement && <AnnouncementBlock text={game.announcement} lang={lang} />}
+
+      {/* Вбудований YouTube-програвач із відео локації (16:9, lazy). */}
+      {videoUrl && (
+        <div className="mt-4">
+          <p className={`mb-2 ${ui.muted}`}>{st(lang, "games_video")}</p>
+          <iframe
+            src={videoUrl}
+            title={st(lang, "games_video")}
+            className="aspect-video w-full rounded-lg border border-gray-200"
+            loading="lazy"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowFullScreen
+          />
+        </div>
+      )}
 
       {children && <div className="mt-4 border-t border-gray-100 pt-4">{children}</div>}
     </article>

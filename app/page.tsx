@@ -10,6 +10,7 @@ import {
 } from "@/lib/site-data";
 import { getAllSettings } from "@/lib/settings";
 import { formatGameWhen, buildLimits } from "@/lib/games";
+import { youtubeEmbedUrl } from "@/lib/youtube";
 import { ui, GLYPH, Reveal, btn } from "@/components/ui";
 import RankingTable from "@/components/site/RankingTable";
 import SocialLinks from "@/components/site/SocialLinks";
@@ -47,6 +48,8 @@ export default async function Home() {
       : next.scenario_pl ?? next.scenario_uk
     : null;
   const limits = next?.limits ? buildLimits(ll, next.limits, settings) : null;
+  // Вбудований програвач відео локації в тізері найближчої гри (як у картці на /games).
+  const nextVideoUrl = youtubeEmbedUrl(next?.location?.youtube_url);
 
   // «Про нас»: текст редагується в адмінці (settings.home_about_{lang}); порожнє → дефолт із site-i18n.
   const aboutBody = settings[`home_about_${lang}`]?.trim() || st(lang, "home_about_body");
@@ -111,6 +114,22 @@ export default async function Home() {
                 <div className="mt-3 space-y-2 border-t border-gray-100 pt-3">
                   {scenario && <p className={`whitespace-pre-line ${ui.body}`}>{scenario}</p>}
                   {limits && <p className={`whitespace-pre-line ${ui.muted}`}>{limits}</p>}
+                </div>
+              )}
+
+              {/* Вбудований YouTube-програвач із відео локації (16:9, lazy). */}
+              {nextVideoUrl && (
+                <div className="mt-3">
+                  <p className={`mb-2 ${ui.muted}`}>{st(lang, "games_video")}</p>
+                  <iframe
+                    src={nextVideoUrl}
+                    title={st(lang, "games_video")}
+                    className="aspect-video w-full rounded-lg border border-gray-200"
+                    loading="lazy"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                  />
                 </div>
               )}
 

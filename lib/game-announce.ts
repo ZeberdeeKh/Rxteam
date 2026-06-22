@@ -16,6 +16,18 @@ import { postChoreRun } from "./chores";
 // імпортується і в lib/bot.ts (updateAnnouncement).
 export const REG_BTN = "✅ Записатись / Zapisz się";
 
+// Підпис рядка з відео локації в анонсі (двомовний, як REG_BTN). Єдине джерело правди —
+// імпортується в lib/bot.ts (updateAnnouncement), щоб бот і сайт давали однаковий анонс.
+export const VIDEO_LBL = "🎬 Відео локації / Wideo z lokalizacji";
+
+// Дописує рядок з посиланням на відео локації в КІНЕЦЬ тексту анонсу (після map_url).
+// Telegram сам робить голий URL клікабельним (parse_mode не використовується). Робимо це
+// ПІСЛЯ buildAnnouncement, а не всередині, щоб URL не протік у текстовий блок анонсу на сайті
+// (сайт відтворює той самий buildAnnouncement, але показує відео окремим програвачем).
+export function appendVideoLine(text: string, url: string | null): string {
+  return url ? `${text}\n\n${VIDEO_LBL}: ${url}` : text;
+}
+
 export type AnnounceResult =
   | { ok: true }
   | { ok: false; reason: "no_announce_chat" | "send_failed" };
@@ -61,7 +73,10 @@ export async function announceGame(api: Api, gameId: number): Promise<AnnounceRe
 
   const count = await registeredCount(gameId);
   const settings = await getAllSettings();
-  const text = buildAnnouncement(toAnnounceInput(game, loc, count), settings);
+  const text = appendVideoLine(
+    buildAnnouncement(toAnnounceInput(game, loc, count), settings),
+    loc.youtube_url ?? null,
+  );
 
   const me = await api.getMe();
   const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${me.username}?start=g${gameId}`);

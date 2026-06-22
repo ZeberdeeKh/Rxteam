@@ -185,7 +185,8 @@ function parseLimits(formData: FormData) {
   const pyro_note_uk = String(formData.get("pyro_note_uk") ?? "").trim() || null;
   const payment_pl = String(formData.get("payment_pl") ?? "").trim() || null;
   const payment_uk = String(formData.get("payment_uk") ?? "").trim() || null;
-  return { replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk };
+  const youtube_url = String(formData.get("youtube_url") ?? "").trim() || null;
+  return { replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk, youtube_url };
 }
 
 export async function createLocation(formData: FormData) {

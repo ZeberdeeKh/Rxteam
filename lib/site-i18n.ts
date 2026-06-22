@@ -356,6 +356,7 @@ const SITE: Record<string, Dict> = {
   games_count: { pl: "{n} zapisanych", en: "{n} signed up", uk: "{n} записаних" },
   games_count_cap: { pl: "{n}/{cap} zapisanych", en: "{n}/{cap} signed up", uk: "{n}/{cap} записаних" },
   games_map: { pl: "Mapa", en: "Map", uk: "Карта" },
+  games_video: { pl: "Wideo z lokalizacji", en: "Location video", uk: "Відео локації" },
   games_tbd_loc: { pl: "Lokalizacja w trakcie ustalania", en: "Location TBD", uk: "Локація уточнюється" },
   games_announce_heading: { pl: "Opis gry", en: "Game description", uk: "Опис гри" },
   games_show_more: { pl: "Pokaż całość", en: "Show more", uk: "Показати повністю" },
@@ -845,6 +846,11 @@ const SITE: Record<string, Dict> = {
   },
   adm_loc_payment_pl: { pl: "Tekst PL", en: "PL text", uk: "Текст PL" },
   adm_loc_payment_uk: { pl: "Tekst UA", en: "UA text", uk: "Текст UA" },
+  adm_loc_youtube: {
+    pl: "Link YouTube (do anonsu)",
+    en: "YouTube link (for the announcement)",
+    uk: "Посилання YouTube (для анонсу)",
+  },
 
   // ── Чек-лист підготовки до гри (Етап 13, майстер) ──
   adm_chores_title: { pl: "Czek-lista przygotowań", en: "Prep checklist", uk: "Чек-лист підготовки" },

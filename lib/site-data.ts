@@ -29,6 +29,7 @@ export async function getFaqItems(): Promise<SiteFaqItem[]> {
 export type SiteLocation = {
   name: string | null;
   map_url: string | null;
+  youtube_url: string | null; // посилання на відео локації (YouTube) — вбудований програвач у картці
   lat: number | null;
   lng: number | null;
 };
@@ -50,13 +51,19 @@ export type SiteGame = {
 };
 
 const GAME_COLS =
-  "id, title, start_at, gather_at, capacity, status, scenario_pl, scenario_uk, locations(name, map_url, lat, lng, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk)";
+  "id, title, start_at, gather_at, capacity, status, scenario_pl, scenario_uk, locations(name, map_url, youtube_url, lat, lng, replica_types, pyro, pyro_note_pl, pyro_note_uk, fire_mode, payment_pl, payment_uk)";
 
 // Нормалізує вкладену локацію (Supabase повертає масив/обʼєкт залежно від звʼязку).
 function normLoc(row: any): SiteLocation | null {
   const l = Array.isArray(row?.locations) ? row.locations[0] : row?.locations;
   if (!l) return null;
-  return { name: l.name ?? null, map_url: l.map_url ?? null, lat: l.lat ?? null, lng: l.lng ?? null };
+  return {
+    name: l.name ?? null,
+    map_url: l.map_url ?? null,
+    youtube_url: l.youtube_url ?? null,
+    lat: l.lat ?? null,
+    lng: l.lng ?? null,
+  };
 }
 
 // Ліміти локації (репліки/піро/режим вогню) — ті самі дані, що й у блоці лімітів анонсу.

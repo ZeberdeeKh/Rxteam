@@ -101,6 +101,19 @@ function LimitControls({ lang, loc }: { lang: Lang; loc?: AdminLocation }) {
           </label>
         </div>
       </fieldset>
+
+      {/* Посилання на YouTube-відео локації — одне поле (мова відео не важлива). */}
+      <fieldset className={`${box} sm:col-span-2`}>
+        <legend className={ui.legend}>{st(lang, "adm_loc_youtube")}</legend>
+        <input
+          name="youtube_url"
+          type="url"
+          inputMode="url"
+          placeholder="https://youtu.be/…"
+          defaultValue={loc?.youtube_url ?? ""}
+          className={ui.input}
+        />
+      </fieldset>
     </div>
   );
 }
