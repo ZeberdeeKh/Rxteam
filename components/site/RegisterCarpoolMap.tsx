@@ -114,7 +114,7 @@ export default function RegisterCarpoolMap({
         : [51.107, 17.038];
 
   return (
-    <div className="h-[400px] w-full overflow-hidden border border-gray-200">
+    <div className="h-[450px] w-full overflow-hidden border border-gray-200">
       <MapContainer center={center} zoom={9} scrollWheelZoom className="h-full w-full">
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

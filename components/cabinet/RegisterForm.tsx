@@ -9,7 +9,7 @@ import type { RegisterMapDriver } from "@/components/site/RegisterCarpoolMap";
 
 const RegisterCarpoolMap = dynamic(() => import("@/components/site/RegisterCarpoolMap"), {
   ssr: false,
-  loading: () => <div className="h-[400px] w-full animate-pulse bg-gray-100" />,
+  loading: () => <div className="h-[450px] w-full animate-pulse bg-gray-100" />,
 });
 
 type Pt = { lat: number; lng: number };
@@ -208,7 +208,7 @@ export default function RegisterForm({
           ) : loadFailed ? (
             <p className={`text-xs ${ui.warnText}`}>{st(lang, "carpool_err_generic")}</p>
           ) : (
-            <div className="h-[400px] w-full animate-pulse bg-gray-100" />
+            <div className="h-[450px] w-full animate-pulse bg-gray-100" />
           )}
         </div>
       )}
