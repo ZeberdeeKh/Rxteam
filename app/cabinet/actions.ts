@@ -185,9 +185,9 @@ export async function registerForGame(formData: FormData) {
   // Набір закрито = 0 вільних місць (окремого прапорця в формі більше немає).
   const seatsClosed = transport === "own" && freeSeats === 0;
 
-  // Короткий коментар водія для пасажирів (ліміт ~120 символів).
+  // Короткий коментар водія для пасажирів (ліміт 80 символів).
   const rideNote =
-    transport === "own" ? String(formData.get("ride_note") ?? "").trim().slice(0, 120) || null : null;
+    transport === "own" ? String(formData.get("ride_note") ?? "").trim().slice(0, 80) || null : null;
 
   // Чи був пін раніше — щоб анонсувати водія шукачам лише на «перший пін» (без спаму).
   const { data: existingReg } = await supabase

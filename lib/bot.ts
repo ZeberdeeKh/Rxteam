@@ -2829,7 +2829,7 @@ bot.on("message:text", async (ctx) => {
     return;
   }
   if (state === "reg_note") {
-    await setState(ctx.from!.id, "reg_seats", { ...data, note: text.slice(0, 120) });
+    await setState(ctx.from!.id, "reg_seats", { ...data, note: text.slice(0, 80) });
     const kb = new InlineKeyboard()
       .text("0", "regseats:0")
       .text("1", "regseats:1")
@@ -3196,7 +3196,7 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
     regRow.pickups = data.pickups.length ? data.pickups : null;
   }
   if (data.transport === "own") {
-    regRow.ride_note = data.note ? String(data.note).slice(0, 120) : null;
+    regRow.ride_note = data.note ? String(data.note).slice(0, 80) : null;
   }
   await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
   await clearState(ctx.from!.id);

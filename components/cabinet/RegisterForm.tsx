@@ -256,7 +256,7 @@ export default function RegisterForm({
           <input
             name="ride_note"
             type="text"
-            maxLength={120}
+            maxLength={80}
             value={note}
             onChange={(e) => setNote(e.target.value)}
             placeholder={st(lang, "reg_note_ph")}
