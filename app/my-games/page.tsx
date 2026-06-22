@@ -104,6 +104,7 @@ export default async function MyGamesPage({ searchParams }: { searchParams: Flag
                           transport: g.myTransport,
                           freeSeats: g.myFreeSeats,
                           ridePrice: g.myRidePrice,
+                          rideNote: g.myRideNote,
                           fromLat: g.myFromLat,
                           fromLng: g.myFromLng,
                           pickups: g.myPickups,

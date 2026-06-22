@@ -812,6 +812,12 @@ const S: Record<string, Dict> = {
     en: "Enter the price as a number (0–1000).",
     uk: "Введи ціну числом (0–1000).",
   },
+  reg_note_q: {
+    pl: "Krótki komentarz dla pasażerów? (godzina wyjazdu, szczegóły) Albo „Pomiń”.",
+    en: "A short comment for passengers? (departure time, details) Or “Skip”.",
+    uk: "Короткий коментар для пасажирів? (час виїзду, нюанси) Або «Пропустити».",
+  },
+  btn_skip: { pl: "⏭ Pomiń", en: "⏭ Skip", uk: "⏭ Пропустити" },
   reg_pin_q: {
     pl: "Wyślij lokalizację punktu wyjazdu (📎 → Lokalizacja). Każda następna lokacja to przystanek po drodze. „Gotowe”, gdy skończysz.",
     en: "Send your departure location (📎 → Location). Each next location is a stop along the way. Tap “Done” when finished.",

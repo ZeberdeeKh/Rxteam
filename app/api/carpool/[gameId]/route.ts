@@ -25,6 +25,7 @@ export async function GET(_req: Request, { params }: { params: { gameId: string 
       lng: d.lng,
       pickups: d.pickups,
       ridePrice: d.ridePrice,
+      rideNote: d.rideNote,
       freeSeats: d.freeSeats,
       seatsClosed: d.seatsClosed,
       isMe: d.isMe,

@@ -283,6 +283,7 @@ export type CabinetGame = SiteGame & {
   myTransport: "own" | "need" | null;
   myFreeSeats: number | null;
   myRidePrice: number | null;
+  myRideNote: string | null;
   myFromLat: number | null;
   myFromLng: number | null;
   myPickups: CarpoolPoint[];
@@ -309,7 +310,7 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
     countsFor(ids),
     supabase
       .from("registrations")
-      .select("game_id, status, transport, free_seats, ride_price, from_lat, from_lng, pickups, seats_closed")
+      .select("game_id, status, transport, free_seats, ride_price, ride_note, from_lat, from_lng, pickups, seats_closed")
       .eq("player_id", playerId)
       .in("game_id", ids),
     supabase.from("checkins").select("game_id").eq("player_id", playerId).in("game_id", ids),
@@ -349,6 +350,7 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
       myTransport: (myReg?.transport as CabinetGame["myTransport"]) ?? null,
       myFreeSeats: myReg?.free_seats ?? null,
       myRidePrice: myReg?.ride_price ?? null,
+      myRideNote: myReg?.ride_note ?? null,
       myFromLat: myReg?.from_lat ?? null,
       myFromLng: myReg?.from_lng ?? null,
       myPickups: normPickups(myReg?.pickups),
@@ -558,6 +560,7 @@ export type CarpoolDriver = {
   name: string | null;
   tgUsername: string | null;
   fromPlace: string | null;
+  rideNote: string | null; // короткий коментар водія для пасажирів
   ridePrice: number | null; // ціна за місце (zł)
   freeSeats: number;
   seatsClosed: boolean;
@@ -622,7 +625,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   // Водії «своїм ходом», що поставили точку виїзду.
   const { data: rows } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, ride_price, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, ride_note, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own")
@@ -706,6 +709,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       name: pl?.name ?? null,
       tgUsername: pl?.tg_username ?? null,
       fromPlace: d.from_place ?? null,
+      rideNote: d.ride_note ?? null,
       ridePrice: d.ride_price ?? null,
       freeSeats: d.free_seats ?? 0,
       seatsClosed: !!d.seats_closed,

@@ -23,6 +23,7 @@ export type RegisterInitial = {
   transport: "own" | "need" | null;
   freeSeats: number | null;
   ridePrice: number | null;
+  rideNote: string | null;
   fromLat: number | null;
   fromLng: number | null;
   pickups: Pt[];
@@ -54,6 +55,7 @@ export default function RegisterForm({
   const [editMode, setEditMode] = useState<"departure" | "pickup">("departure");
   const [seats, setSeats] = useState<number>(initial?.freeSeats ?? 1);
   const [price, setPrice] = useState<string>(initial?.ridePrice != null ? String(initial.ridePrice) : "");
+  const [note, setNote] = useState<string>(initial?.rideNote ?? "");
   const [showHelp, setShowHelp] = useState(false);
   const [carpool, setCarpool] = useState<Carpool | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -249,6 +251,15 @@ export default function RegisterForm({
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             placeholder={st(lang, "reg_price_ph")}
+            className={inputCls}
+          />
+          <input
+            name="ride_note"
+            type="text"
+            maxLength={120}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={st(lang, "reg_note_ph")}
             className={inputCls}
           />
         </div>

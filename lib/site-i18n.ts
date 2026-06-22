@@ -155,6 +155,11 @@ const SITE: Record<string, Dict> = {
     uk: "Поки активних водіїв нема. Зайди пізніше — ми напишемо, коли хтось зголоситься.",
   },
   reg_price_ph: { pl: "Cena za miejsce (zł)", en: "Price per seat (zł)", uk: "Ціна за місце (zł)" },
+  reg_note_ph: {
+    pl: "Komentarz dla pasażerów (opcjonalnie)",
+    en: "Comment for passengers (optional)",
+    uk: "Коментар для пасажирів (необов'язково)",
+  },
   reg_carpool_hint: {
     pl: "Po zapisaniu otworzy się mapa — oznaczysz, skąd jedziesz.",
     en: "After signing up the map opens — you'll mark where you set off from.",

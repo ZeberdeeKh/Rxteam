@@ -786,7 +786,7 @@ async function showDrivers(
 ) {
   const { data: drivers } = await supabase
     .from("registrations")
-    .select("player_id, from_place, from_lat, from_lng, ride_price, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
+    .select("player_id, from_place, from_lat, from_lng, ride_price, ride_note, pickups, free_seats, seats_closed, players(callsign, name, tg_username)")
     .eq("game_id", gameId)
     .eq("status", "registered")
     .eq("transport", "own");
@@ -808,9 +808,11 @@ async function showDrivers(
     // Точки підбору по дорозі (Етап 36) — показуємо лічильник.
     const pcount = Array.isArray(d.pickups) ? d.pickups.length : 0;
     const pickupLine = pcount > 0 ? "\n" + tr(lang, "drivers_pickups", { n: pcount }) : "";
-    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from, price }) + mapLink + pickupLine;
+    // Коментар водія для пасажирів (Етап 37).
+    const noteLine = d.ride_note ? `\n💬 ${d.ride_note}` : "";
+    if (d.seats_closed) return tr(lang, "drivers_line_closed", { who, from, price }) + mapLink + pickupLine + noteLine;
     const contact = pl?.tg_username ? "@" + pl.tg_username : tr(lang, "drivers_contact_none");
-    return tr(lang, "drivers_line", { who, from, price, seats: d.free_seats ?? 0, contact }) + mapLink + pickupLine;
+    return tr(lang, "drivers_line", { who, from, price, seats: d.free_seats ?? 0, contact }) + mapLink + pickupLine + noteLine;
   });
 
   // Кнопки «Прошу місце» — лише для відкритих оферт і не собі (Етап 34, під фічфлагом).
@@ -2461,6 +2463,21 @@ bot.callbackQuery("regdone", async (ctx) => {
   await finalizeReg(ctx, p, data);
 });
 
+// Пропустити коментар → одразу до кроку «місця».
+bot.callbackQuery("regnoteskip", async (ctx) => {
+  await ctx.answerCallbackQuery();
+  const { state, data } = await getState(ctx.from.id);
+  if (state !== "reg_note") return;
+  const p = await ensurePlayer(ctx.from);
+  const kb = new InlineKeyboard()
+    .text("0", "regseats:0")
+    .text("1", "regseats:1")
+    .text("2", "regseats:2")
+    .text("3", "regseats:3");
+  await setState(ctx.from.id, "reg_seats", { ...data });
+  await ctx.editMessageText(tr(p.lang as Lang, "reg_seats_q"), { reply_markup: kb });
+});
+
 bot.callbackQuery(/^unreg:(\d+)$/, async (ctx) => {
   await ctx.answerCallbackQuery();
   const gameId = Number(ctx.match[1]);
@@ -2805,7 +2822,14 @@ bot.on("message:text", async (ctx) => {
       await ctx.reply(tr(lang, "reg_price_bad"));
       return;
     }
-    await setState(ctx.from!.id, "reg_seats", { ...data, price });
+    await setState(ctx.from!.id, "reg_note", { ...data, price });
+    await ctx.reply(tr(lang, "reg_note_q"), {
+      reply_markup: new InlineKeyboard().text(tr(lang, "btn_skip"), "regnoteskip"),
+    });
+    return;
+  }
+  if (state === "reg_note") {
+    await setState(ctx.from!.id, "reg_seats", { ...data, note: text.slice(0, 120) });
     const kb = new InlineKeyboard()
       .text("0", "regseats:0")
       .text("1", "regseats:1")
@@ -3170,6 +3194,9 @@ async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
   }
   if (Array.isArray(data.pickups)) {
     regRow.pickups = data.pickups.length ? data.pickups : null;
+  }
+  if (data.transport === "own") {
+    regRow.ride_note = data.note ? String(data.note).slice(0, 120) : null;
   }
   await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
   await clearState(ctx.from!.id);

@@ -185,6 +185,10 @@ export async function registerForGame(formData: FormData) {
   // Набір закрито = 0 вільних місць (окремого прапорця в формі більше немає).
   const seatsClosed = transport === "own" && freeSeats === 0;
 
+  // Короткий коментар водія для пасажирів (ліміт ~120 символів).
+  const rideNote =
+    transport === "own" ? String(formData.get("ride_note") ?? "").trim().slice(0, 120) || null : null;
+
   // Чи був пін раніше — щоб анонсувати водія шукачам лише на «перший пін» (без спаму).
   const { data: existingReg } = await supabase
     .from("registrations")
@@ -209,9 +213,10 @@ export async function registerForGame(formData: FormData) {
     regRow.from_lat = fromLat;
     regRow.from_lng = fromLng;
   }
-  // Точки підбору для водія оновлюємо завжди (порожньо → null); для не-водія не чіпаємо.
+  // Точки підбору + коментар для водія оновлюємо завжди (порожньо → null); для не-водія не чіпаємо.
   if (transport === "own") {
     regRow.pickups = pickups.length ? pickups : null;
+    regRow.ride_note = rideNote;
   }
   await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
 

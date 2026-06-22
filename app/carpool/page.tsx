@@ -161,6 +161,7 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
           label: d.callsign ?? d.name ?? "?",
           fromPlace: d.fromPlace,
           ridePrice: d.ridePrice,
+          rideNote: d.rideNote,
           freeSeats: d.freeSeats,
           seatsClosed: d.seatsClosed,
           lat: d.lat,
@@ -205,6 +206,7 @@ export default async function CarpoolPage({ searchParams }: { searchParams: Flag
                         ? st(lang, "carpool_seats_closed")
                         : st(lang, "carpool_seats_free", { n: d.freeSeats }))}
                   </p>
+                  {d.rideNote && <p className={`${ui.muted} italic`}>“{d.rideNote}”</p>}
                 </div>
                 <div className="shrink-0">{booking(d)}</div>
               </li>

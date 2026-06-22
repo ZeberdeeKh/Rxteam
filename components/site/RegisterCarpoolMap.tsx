@@ -15,6 +15,7 @@ export type RegisterMapDriver = {
   lng: number;
   pickups: Pt[];
   ridePrice: number | null;
+  rideNote: string | null;
   freeSeats: number;
   seatsClosed: boolean;
   isMe: boolean;
@@ -146,6 +147,7 @@ export default function RegisterCarpoolMap({
                     ? st(lang, "carpool_seats_closed")
                     : st(lang, "carpool_seats_free", { n: d.freeSeats })}
                 </p>
+                {d.rideNote && <p className="italic">“{d.rideNote}”</p>}
               </div>
             </Popup>
           </Marker>

@@ -64,6 +64,7 @@ export default function GameActions({
             transport: reg.myTransport,
             freeSeats: reg.myFreeSeats,
             ridePrice: reg.myRidePrice,
+            rideNote: reg.myRideNote,
             fromLat: reg.myFromLat,
             fromLng: reg.myFromLng,
             pickups: reg.myPickups,

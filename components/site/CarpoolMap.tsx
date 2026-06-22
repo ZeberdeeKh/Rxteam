@@ -16,6 +16,7 @@ export type CarpoolMapDriver = {
   label: string;
   fromPlace: string | null;
   ridePrice: number | null;
+  rideNote: string | null;
   freeSeats: number;
   seatsClosed: boolean;
   lat: number;
@@ -242,6 +243,7 @@ export default function CarpoolMap({
                       ? st(lang, "carpool_seats_closed")
                       : st(lang, "carpool_seats_free", { n: d.freeSeats })}
                   </p>
+                  {d.rideNote && <p className="italic">“{d.rideNote}”</p>}
                 </div>
               </Popup>
             </Marker>
