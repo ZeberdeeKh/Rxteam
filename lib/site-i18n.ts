@@ -160,6 +160,16 @@ const SITE: Record<string, Dict> = {
     en: "After signing up the map opens — you'll mark where you set off from.",
     uk: "Після запису відкриється мапа — познач, звідки виїжджаєш.",
   },
+  reg_map_own_hint: {
+    pl: "Kliknij na mapie punkt, skąd jedziesz (możesz pominąć — ustawisz później).",
+    en: "Click on the map where you set off from (optional — you can set it later).",
+    uk: "Тицьни на мапі точку, звідки виїжджаєш (можна пропустити — поставиш пізніше).",
+  },
+  reg_map_need_hint: {
+    pl: "Aktywni kierowcy na tę grę. Zapisz się, aby poprosić o miejsce.",
+    en: "Active drivers for this game. Sign up to request a seat.",
+    uk: "Активні водії на цю гру. Запишись, щоб попросити місце.",
+  },
   err_need_price: {
     pl: "Podaj cenę za miejsce.",
     en: "Enter the price per seat.",

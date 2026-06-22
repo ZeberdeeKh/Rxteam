@@ -16,7 +16,7 @@ import {
 } from "@/lib/site-player";
 import { registeredCount, distanceMeters } from "@/lib/games";
 import { performCheckin } from "@/lib/checkins";
-import { cancelDriverRideRequests } from "@/lib/carpool";
+import { cancelDriverRideRequests, announceDriverToSeekers } from "@/lib/carpool";
 
 export type LinkState = { error?: string };
 
@@ -134,8 +134,6 @@ export async function registerForGame(formData: FormData) {
   const tRaw = formData.get("transport");
   const transport = tRaw === "own" ? "own" : tRaw === "skip" ? null : "need";
   const needsRental = formData.get("needs_rental") === "on";
-  const fromPlace =
-    transport === "own" ? String(formData.get("from_place") ?? "").trim().slice(0, 80) || null : null;
   const freeSeatsRaw = Number(formData.get("free_seats"));
   // Зажимаємо в 0..8 цілих (форма має min=0/max=8, але server action отримує сирий POST).
   const freeSeats =
@@ -151,20 +149,41 @@ export async function registerForGame(formData: FormData) {
       : null;
   if (transport === "own" && ridePrice === null) backTo(formData, "?err=need_price");
 
-  await supabase.from("registrations").upsert(
-    {
-      game_id: gameId,
-      player_id: player.id,
-      status: "registered",
-      needs_rental: needsRental,
-      transport,
-      from_place: fromPlace,
-      free_seats: freeSeats,
-      ride_price: ridePrice,
-      seats_closed: false,
-    },
-    { onConflict: "game_id,player_id" },
-  );
+  // Точка виїзду водія з вбудованої мапи форми (порожньо → пін можна поставити пізніше на /carpool).
+  const latStr = String(formData.get("from_lat") ?? "");
+  const lngStr = String(formData.get("from_lng") ?? "");
+  const latNum = latStr === "" ? NaN : Number(latStr);
+  const lngNum = lngStr === "" ? NaN : Number(lngStr);
+  const fromLat =
+    transport === "own" && Number.isFinite(latNum) && latNum >= -90 && latNum <= 90 ? latNum : null;
+  const fromLng =
+    transport === "own" && Number.isFinite(lngNum) && lngNum >= -180 && lngNum <= 180 ? lngNum : null;
+
+  // Чи був пін раніше — щоб анонсувати водія шукачам лише на «перший пін» (без спаму).
+  const { data: existingReg } = await supabase
+    .from("registrations")
+    .select("from_lat")
+    .eq("game_id", gameId)
+    .eq("player_id", player.id)
+    .maybeSingle();
+  const hadPin = existingReg?.from_lat != null;
+
+  const regRow: Record<string, any> = {
+    game_id: gameId,
+    player_id: player.id,
+    status: "registered",
+    needs_rental: needsRental,
+    transport,
+    free_seats: freeSeats,
+    ride_price: ridePrice,
+    seats_closed: false,
+  };
+  // Пін зберігаємо лише якщо щойно поставлений — інакше не чіпаємо наявний (повторна реєстрація).
+  if (fromLat !== null && fromLng !== null) {
+    regRow.from_lat = fromLat;
+    regRow.from_lng = fromLng;
+  }
+  await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
 
   // Пом'якшення гонки місткості (повний атомарний фікс потребує DB-функції): після запису
   // перевіряємо ще раз — якщо перевищили місткість, відкочуємо саме цю реєстрацію.
@@ -189,10 +208,15 @@ export async function registerForGame(formData: FormData) {
     });
   }
 
+  // Перший пін водія при реєстрації → анонімно сповіщаємо шукачів авто на цю гру.
+  if (transport === "own" && fromLat !== null && !hadPin) {
+    await announceDriverToSeekers(gameId, player.id);
+  }
+
   revalidatePath("/cabinet");
   revalidatePath("/games");
   revalidatePath("/my-games");
-  // Карпул (Етап 35): водій → ставить пін на мапі; пасажир → бачить активних водіїв. Обом — на /carpool.
+  // Карпул: водій уже з піном (точки/маршрут — на /carpool), пасажир бачить водіїв. Обом — на /carpool.
   if (transport === "own" || transport === "need") {
     redirect(`/carpool?game=${gameId}&ok=reg`);
   }
