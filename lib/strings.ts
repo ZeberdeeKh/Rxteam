@@ -813,11 +813,27 @@ const S: Record<string, Dict> = {
     uk: "Введи ціну числом (0–1000).",
   },
   reg_pin_q: {
-    pl: "Wyślij swoją lokalizację (📎 → Lokalizacja) — pojawisz się na mapie carpool. Albo „Później”.",
-    en: "Send your location (📎 → Location) — you'll appear on the carpool map. Or “Later”.",
-    uk: "Надішли свою локацію (📎 → Місцезнаходження) — з'явишся на карпул-мапі. Або «Пізніше».",
+    pl: "Wyślij lokalizację punktu wyjazdu (📎 → Lokalizacja). Każda następna lokacja to przystanek po drodze. „Gotowe”, gdy skończysz.",
+    en: "Send your departure location (📎 → Location). Each next location is a stop along the way. Tap “Done” when finished.",
+    uk: "Надішли локацію точки виїзду (📎 → Місцезнаходження). Кожна наступна локація — зупинка по дорозі. «Готово», коли все.",
   },
   btn_reg_pin_skip: { pl: "⏭ Później", en: "⏭ Later", uk: "⏭ Пізніше" },
+  btn_reg_done: { pl: "✅ Gotowe", en: "✅ Done", uk: "✅ Готово" },
+  reg_pin_departure_saved: {
+    pl: "📍 Punkt wyjazdu zapisany. Wyślij kolejną lokację — to będzie przystanek, albo „Gotowe”.",
+    en: "📍 Departure saved. Send another location for a stop along the way, or tap “Done”.",
+    uk: "📍 Точку виїзду збережено. Надішли наступну локацію — це буде зупинка, або «Готово».",
+  },
+  reg_pin_stop_added: {
+    pl: "🛑 Przystanek {n} dodany. Wyślij kolejną lokację lub „Gotowe”.",
+    en: "🛑 Stop {n} added. Send another location or tap “Done”.",
+    uk: "🛑 Зупинку {n} додано. Ще локація або «Готово».",
+  },
+  reg_pin_max: {
+    pl: "Maksymalnie 4 przystanki. Naciśnij „Gotowe”.",
+    en: "Max 4 stops. Tap “Done”.",
+    uk: "Максимум 4 зупинки. Тисни «Готово».",
+  },
   ride_seeker_none: {
     pl: "Na razie brak aktywnych kierowców na tę grę. Zajrzyj później — napiszemy, gdy ktoś się zgłosi.",
     en: "No active drivers for this game yet. Check back later — we'll ping you when one shows up.",

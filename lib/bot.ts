@@ -2434,8 +2434,9 @@ bot.callbackQuery(/^regtr:(own|need|skip)$/, async (ctx) => {
     await finalizeReg(ctx, p, { ...data, transport: "need" });
     return;
   }
-  await setState(ctx.from.id, "reg_from", { ...data, transport: "own" });
-  await ctx.editMessageText(tr(lang, "reg_from_q"));
+  // Тільки пін: текст «звідки» не питаємо. Спершу ціна → місця → локації (виїзд + зупинки).
+  await setState(ctx.from.id, "reg_price", { ...data, transport: "own" });
+  await ctx.editMessageText(tr(lang, "reg_price_q"));
 });
 
 bot.callbackQuery(/^regseats:(\d+)$/, async (ctx) => {
@@ -2445,13 +2446,14 @@ bot.callbackQuery(/^regseats:(\d+)$/, async (ctx) => {
   const p = await ensurePlayer(ctx.from);
   const lang = p.lang as Lang;
   // Останній крок реєстрації водія — точка виїзду (пін). Можна пропустити (додати в /myride).
-  await setState(ctx.from.id, "reg_pin", { ...data, freeSeats: Number(ctx.match[1]) });
-  const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
-  await ctx.editMessageText(tr(lang, "reg_pin_q"), { reply_markup: kb });
+  await setState(ctx.from.id, "reg_pin", { ...data, freeSeats: Number(ctx.match[1]), pickups: [] });
+  await ctx.editMessageText(tr(lang, "reg_pin_q"), {
+    reply_markup: new InlineKeyboard().text(tr(lang, "btn_reg_done"), "regdone"),
+  });
 });
 
-// Пропустити пін під час реєстрації — завершуємо без координат (пін можна додати через /myride).
-bot.callbackQuery("regpinskip", async (ctx) => {
+// «Готово» — завершуємо реєстрацію з тим, що зібрали (виїзд + зупинки, або без піна).
+bot.callbackQuery("regdone", async (ctx) => {
   await ctx.answerCallbackQuery();
   const { state, data } = await getState(ctx.from.id);
   if (state !== "reg_pin") return;
@@ -2644,9 +2646,23 @@ bot.on("message:location", async (ctx) => {
     return;
   }
 
-  // Карпул: пін під час реєстрації водієм — завершуємо реєстрацію з координатами.
+  // Карпул-реєстрація: 1-й пін — точка виїзду, кожен наступний — зупинка (до 4). «Готово» завершує.
   if (state === "reg_pin") {
-    await finalizeReg(ctx, p, { ...data, lat: loc.latitude, lng: loc.longitude });
+    const rlang = p.lang as Lang;
+    const doneKb = new InlineKeyboard().text(tr(rlang, "btn_reg_done"), "regdone");
+    if (data.lat == null) {
+      await setState(ctx.from!.id, "reg_pin", { ...data, lat: loc.latitude, lng: loc.longitude });
+      await ctx.reply(tr(rlang, "reg_pin_departure_saved"), { reply_markup: doneKb });
+      return;
+    }
+    const pickups: { lat: number; lng: number }[] = Array.isArray(data.pickups) ? data.pickups : [];
+    if (pickups.length >= 4) {
+      await ctx.reply(tr(rlang, "reg_pin_max"), { reply_markup: doneKb });
+      return;
+    }
+    const next = [...pickups, { lat: loc.latitude, lng: loc.longitude }];
+    await setState(ctx.from!.id, "reg_pin", { ...data, pickups: next });
+    await ctx.reply(tr(rlang, "reg_pin_stop_added", { n: next.length }), { reply_markup: doneKb });
     return;
   }
 
@@ -2783,11 +2799,6 @@ bot.on("message:text", async (ctx) => {
     await ctx.reply(tr(lang, "callsign_confirm_q", { callsign }), { reply_markup: kb });
     return;
   }
-  if (state === "reg_from") {
-    await setState(ctx.from!.id, "reg_price", { ...data, fromPlace: text.slice(0, 80) });
-    await ctx.reply(tr(lang, "reg_price_q"));
-    return;
-  }
   if (state === "reg_price") {
     const price = parseInt(text, 10);
     if (isNaN(price) || price < 0 || price > 1000) {
@@ -2809,15 +2820,17 @@ bot.on("message:text", async (ctx) => {
       await ctx.reply(tr(lang, "reg_seats_q"));
       return;
     }
-    await setState(ctx.from!.id, "reg_pin", { ...data, freeSeats: seats });
-    const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
-    await ctx.reply(tr(lang, "reg_pin_q"), { reply_markup: kb });
+    await setState(ctx.from!.id, "reg_pin", { ...data, freeSeats: seats, pickups: [] });
+    await ctx.reply(tr(lang, "reg_pin_q"), {
+      reply_markup: new InlineKeyboard().text(tr(lang, "btn_reg_done"), "regdone"),
+    });
     return;
   }
   if (state === "reg_pin") {
-    // Тут чекаємо ЛОКАЦІЮ (або кнопку «Пізніше»). Текст → повторюємо підказку.
-    const kb = new InlineKeyboard().text(tr(lang, "btn_reg_pin_skip"), "regpinskip");
-    await ctx.reply(tr(lang, "reg_pin_q"), { reply_markup: kb });
+    // Тут чекаємо ЛОКАЦІЮ (виїзд / зупинки) або «Готово». Текст → повторюємо підказку.
+    await ctx.reply(tr(lang, "reg_pin_q"), {
+      reply_markup: new InlineKeyboard().text(tr(lang, "btn_reg_done"), "regdone"),
+    });
     return;
   }
 
@@ -3140,22 +3153,25 @@ async function startRegFlow(ctx: Context, lang: Lang, gameId: number) {
 
 async function finalizeReg(ctx: Context, p: any, data: Record<string, any>) {
   const gameId = data.gameId;
-  await supabase.from("registrations").upsert(
-    {
-      game_id: gameId,
-      player_id: p.id,
-      status: "registered",
-      needs_rental: !!data.needsRental,
-      transport: data.transport ?? null,
-      from_place: data.fromPlace ?? null,
-      free_seats: data.freeSeats ?? null,
-      ride_price: data.price ?? null,
-      from_lat: data.lat ?? null,
-      from_lng: data.lng ?? null,
-      seats_closed: false,
-    },
-    { onConflict: "game_id,player_id" },
-  );
+  const regRow: Record<string, any> = {
+    game_id: gameId,
+    player_id: p.id,
+    status: "registered",
+    needs_rental: !!data.needsRental,
+    transport: data.transport ?? null,
+    free_seats: data.freeSeats ?? null,
+    ride_price: data.price ?? null,
+    seats_closed: false,
+  };
+  // Пін/зупинки зберігаємо лише якщо щойно задані — інакше не чіпаємо наявні (повторна реєстрація).
+  if (data.lat != null && data.lng != null) {
+    regRow.from_lat = data.lat;
+    regRow.from_lng = data.lng;
+  }
+  if (Array.isArray(data.pickups)) {
+    regRow.pickups = data.pickups.length ? data.pickups : null;
+  }
+  await supabase.from("registrations").upsert(regRow, { onConflict: "game_id,player_id" });
   await clearState(ctx.from!.id);
   await updateAnnouncement(gameId);
   const { data: game } = await supabase
