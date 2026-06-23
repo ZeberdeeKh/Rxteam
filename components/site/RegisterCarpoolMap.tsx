@@ -140,17 +140,30 @@ function pickupIcon(n: number) {
   });
 }
 
+// Маршрути водіїв: РІЗНІ кольори (щоб розрізняти трасу кожного), але ОДНАКОВА товщина всюди.
+const ROUTE_WEIGHT = 4;
+const ROUTE_COLORS = [
+  "#ef4444", // red
+  "#2563eb", // blue
+  "#16a34a", // green
+  "#9333ea", // purple
+  "#0891b2", // cyan
+  "#db2777", // pink
+  "#ca8a04", // amber
+  "#4f46e5", // indigo
+];
+
 // Маршрут по дорогах (OSRM, без ключа); при недоступності — пряма ламана через точки.
 function DriverRoute({
   from,
   via,
   to,
-  weight,
+  color,
 }: {
   from: [number, number];
   via: [number, number][];
   to: [number, number];
-  weight: number;
+  color: string;
 }) {
   const straight = useMemo<[number, number][]>(() => [from, ...via, to], [from, via, to]);
   const [geo, setGeo] = useState<[number, number][] | null>(null);
@@ -171,7 +184,7 @@ function DriverRoute({
       cancelled = true;
     };
   }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
-  return <Polyline positions={geo ?? straight} pathOptions={{ color: "#ef4444", weight, opacity: 0.9 }} />;
+  return <Polyline positions={geo ?? straight} pathOptions={{ color, weight: ROUTE_WEIGHT, opacity: 0.9 }} />;
 }
 
 function Clicker({ onPick }: { onPick: (lat: number, lng: number) => void }) {
@@ -246,13 +259,13 @@ export default function RegisterCarpoolMap({
           </Marker>
         ))}
         {venue &&
-          others.map((d) => (
+          others.map((d, i) => (
             <DriverRoute
               key={`route-${d.playerId}`}
               from={[d.lat, d.lng]}
               via={d.pickups.map((p) => [p.lat, p.lng] as [number, number])}
               to={[venue.lat, venue.lng]}
-              weight={2}
+              color={ROUTE_COLORS[i % ROUTE_COLORS.length]}
             />
           ))}
         {others.flatMap((d) =>
@@ -272,7 +285,7 @@ export default function RegisterCarpoolMap({
             from={[pin.lat, pin.lng]}
             via={pickups.map((p) => [p.lat, p.lng] as [number, number])}
             to={[venue.lat, venue.lng]}
-            weight={4}
+            color={ROUTE_COLORS[others.length % ROUTE_COLORS.length]}
           />
         )}
         {mode === "own" && <Clicker onPick={onPick} />}
