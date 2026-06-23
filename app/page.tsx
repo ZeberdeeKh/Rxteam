@@ -133,7 +133,7 @@ export default async function Home() {
                 </div>
               )}
 
-              <Link href="/games" className={`mt-3 inline-block ${ui.link}`}>
+              <Link href="/games" className={`mt-3 ${btn("outline")}`}>
                 {st(lang, "home_cta_games")} →
               </Link>
             </div>
