@@ -50,7 +50,7 @@ const back = (q: string) => redirect(`/cabinet${q}`);
 
 // Куди повертати після дії: /cabinet (дефолт) або /games — за полем returnTo форми.
 // Дозволяємо лише власні шляхи (захист від open-redirect).
-const RETURN_PATHS = new Set(["/cabinet", "/games", "/my-games"]);
+const RETURN_PATHS = new Set(["/cabinet", "/games"]);
 function backTo(formData: FormData, q: string): never {
   const rt = String(formData.get("returnTo") ?? "");
   const base = RETURN_PATHS.has(rt) ? rt : "/cabinet";
@@ -250,7 +250,6 @@ export async function registerForGame(formData: FormData) {
 
   revalidatePath("/cabinet");
   revalidatePath("/games");
-  revalidatePath("/my-games");
   // Усе робиться у формі (мапа, точки, маршрут, місця) — лишаємось на сторінці зі списком ігор.
   backTo(formData, "?reg=1");
 }
@@ -276,7 +275,6 @@ export async function unregisterFromGame(formData: FormData) {
   await cancelDriverRideRequests(gameId, player.id);
   revalidatePath("/cabinet");
   revalidatePath("/games");
-  revalidatePath("/my-games");
   backTo(formData, "?unreg=1");
 }
 
@@ -348,6 +346,6 @@ export async function webCheckin(formData: FormData) {
   });
 
   revalidatePath("/cabinet");
-  revalidatePath("/my-games");
+  revalidatePath("/games");
   backTo(formData, "?checkin=1");
 }

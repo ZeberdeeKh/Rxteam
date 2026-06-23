@@ -17,8 +17,8 @@ export interface MobileNavLabels {
   close: string;
   home: string;
   marketplace: string;
+  games: string;
   shop: string;
-  mygames: string;
   cabinet: string;
   admin: string;
   login: string;
@@ -63,10 +63,10 @@ export default function MobileNav({
   const items: Item[] = [
     { href: "/", label: labels.home },
     { href: "/marketplace", label: labels.marketplace },
+    { href: "/games", label: labels.games },
     ...(loggedIn
       ? [
           { href: "/shop", label: labels.shop },
-          { href: "/my-games", label: labels.mygames },
           { href: "/cabinet", label: labels.cabinet },
           ...(admin ? [{ href: "/admin", label: labels.admin, accent: true }] : []),
         ]

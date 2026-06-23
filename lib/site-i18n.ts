@@ -26,7 +26,6 @@ const SITE: Record<string, Dict> = {
   nav_games: { pl: "Gry", en: "Games", uk: "Ігри" },
   nav_ranking: { pl: "Ranking", en: "Ranking", uk: "Рейтинг" },
   nav_cabinet: { pl: "Mój profil", en: "My profile", uk: "Кабінет" },
-  nav_mygames: { pl: "Gry", en: "Games", uk: "Ігри" },
   nav_login: { pl: "Zaloguj", en: "Log in", uk: "Увійти" },
   nav_logout: { pl: "Wyloguj", en: "Log out", uk: "Вийти" },
   nav_register: { pl: "Rejestracja", en: "Sign up", uk: "Реєстрація" },
@@ -717,13 +716,7 @@ const SITE: Record<string, Dict> = {
   ach_empty: { pl: "Brak osiągnięć.", en: "No achievements yet.", uk: "Поки що немає ачівок." },
   ach_earned: { pl: "Zdobyto", en: "Earned", uk: "Отримано" },
 
-  // ── 6.2 Мої ігри ──
-  mygames_title: { pl: "Gry", en: "Games", uk: "Ігри" },
-  mygames_empty: {
-    pl: "Brak nadchodzących gier.",
-    en: "No upcoming games.",
-    uk: "Немає майбутніх ігор.",
-  },
+  // ── 6.2 Статуси реєстрації (бейджі на /games) ──
   regst_registered: { pl: "Zapisany", en: "Signed up", uk: "Записаний" },
   regst_cancelled: { pl: "Wypisany", en: "Cancelled", uk: "Відписаний" },
   regst_no_show: { pl: "Nieobecność", en: "No-show", uk: "Неявка" },

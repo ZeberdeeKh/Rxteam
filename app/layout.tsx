@@ -52,8 +52,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     close: st(lang, "nav_close"),
     home: st(lang, "nav_home"),
     marketplace: st(lang, "nav_marketplace"),
+    games: st(lang, "nav_games"),
     shop: st(lang, "nav_shop"),
-    mygames: st(lang, "nav_mygames"),
     cabinet: st(lang, "nav_cabinet"),
     admin: st(lang, "nav_admin"),
     login: st(lang, "nav_login"),
@@ -87,13 +87,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <NavLink href="/marketplace" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                 {st(lang, "nav_marketplace")}
               </NavLink>
+              <NavLink href="/games" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
+                {st(lang, "nav_games")}
+              </NavLink>
               {loggedIn ? (
                 <>
                   <NavLink href="/shop" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_shop")}
-                  </NavLink>
-                  <NavLink href="/my-games" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
-                    {st(lang, "nav_mygames")}
                   </NavLink>
                   <NavLink href="/cabinet" className={headerNavClass(false)} activeClassName={headerNavClass(true)}>
                     {st(lang, "nav_cabinet")}

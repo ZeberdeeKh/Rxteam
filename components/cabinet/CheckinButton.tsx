@@ -6,7 +6,7 @@ import { webCheckin } from "@/app/cabinet/actions";
 import { btn, ui } from "@/components/ui";
 
 // Веб-чек-ін: бере геолокацію браузера → кладе lat/lng у форму → сабмітить серверну дію.
-// returnTo — куди повернути після чек-іну (/cabinet за дефолтом або /my-games).
+// returnTo — куди повернути після чек-іну (/cabinet за дефолтом або /games).
 export default function CheckinButton({
   gameId,
   lang,

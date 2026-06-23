@@ -5,7 +5,7 @@ import { st, type Lang } from "@/lib/site-i18n";
 import RegisterForm, { type RegisterInitial } from "@/components/cabinet/RegisterForm";
 import { btn } from "@/components/ui";
 
-// Кнопка «Редагувати поїздку» для зареєстрованої гри (на /games і /my-games).
+// Кнопка «Редагувати поїздку» для зареєстрованої гри (на /games).
 // Форма (а з нею і мапа) монтується лише після розгортання — щоб не вантажити мапу для кожної гри.
 export default function CarpoolEditToggle({
   gameId,

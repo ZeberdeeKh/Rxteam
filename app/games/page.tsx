@@ -19,6 +19,7 @@ type Flags = { [key: string]: string | string[] | undefined };
 function successKey(f: Flags): string | null {
   if (f.reg) return "cab_reg_ok";
   if (f.unreg) return "cab_unreg_ok";
+  if (f.checkin) return "cab_checkin_ok";
   return null;
 }
 
@@ -48,6 +49,18 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
       loggedIn={loggedIn}
       hasCallsign={hasCallsign}
       reg={regMap.get(gameId)}
+    />
+  );
+
+  // Компактні дії для вже стартованих ігор у «Минулих»: лише чек-ін, поки вікно відкрите.
+  const startedActions = (gameId: number) => (
+    <GameActions
+      gameId={gameId}
+      lang={lang}
+      loggedIn={loggedIn}
+      hasCallsign={hasCallsign}
+      reg={regMap.get(gameId)}
+      startedView
     />
   );
 
@@ -101,9 +114,17 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
         </h2>
         {past.length > 0 ? (
           <div className="grid gap-4 sm:grid-cols-2">
-            {past.map((g) => (
-              <GameCard key={g.id} game={g} lang={lang} muted />
-            ))}
+            {past.map((g) => {
+              // Стартована гра з ще відкритим вікном чек-іну → показуємо кнопку чек-іну
+              // (така гра вже «минула» за start_at, але checkin_to ще в майбутньому).
+              const reg = regMap.get(g.id);
+              const showCheckin = loggedIn && (reg?.checkinOpen || reg?.checkedIn);
+              return (
+                <GameCard key={g.id} game={g} lang={lang} muted>
+                  {showCheckin ? startedActions(g.id) : undefined}
+                </GameCard>
+              );
+            })}
           </div>
         ) : (
           <p className={ui.emptyState}>
