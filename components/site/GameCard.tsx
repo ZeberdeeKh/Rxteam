@@ -5,16 +5,20 @@ import { youtubeEmbedUrl } from "@/lib/youtube";
 import { ui } from "@/components/ui";
 import AnnouncementBlock from "@/components/site/AnnouncementBlock";
 
-// Презентаційна картка гри (серверкомпонент). children — слот під дії (запис/відписка у 6.2).
+// Презентаційна картка гри (серверкомпонент).
+// headerActions — слот праворуч у хедері (кнопки запису/відписки/редагування, чек-ін).
+// children — слот під розкривні налаштування поїздки (форма сама малює свій роздільник).
 export default function GameCard({
   game,
   lang,
   muted = false,
+  headerActions,
   children,
 }: {
   game: SiteGame;
   lang: Lang;
   muted?: boolean;
+  headerActions?: React.ReactNode;
   children?: React.ReactNode;
 }) {
   const countText = game.capacity
@@ -25,9 +29,12 @@ export default function GameCard({
 
   return (
     <article className={`${ui.card} ${muted ? "opacity-75" : ""}`}>
-      <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-3">
-        <h3 className={`min-w-0 break-words ${ui.cardTitle}`}>{game.title ?? "ASG"}</h3>
-        {game.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <div className="flex min-w-0 flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-3">
+          <h3 className={`min-w-0 break-words ${ui.cardTitle}`}>{game.title ?? "ASG"}</h3>
+          {game.showCount && <span className={`shrink-0 ${ui.muted}`}>{countText}</span>}
+        </div>
+        {headerActions && <div className="shrink-0">{headerActions}</div>}
       </div>
 
       {/* На телефоні лейбл стоїть НАД значенням (фікс-колонка w-20 з'являється лише з sm) —
@@ -76,7 +83,7 @@ export default function GameCard({
         </div>
       )}
 
-      {children && <div className="mt-4 border-t border-gray-100 pt-4">{children}</div>}
+      {children}
     </article>
   );
 }

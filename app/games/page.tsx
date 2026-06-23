@@ -7,7 +7,7 @@ import {
 } from "@/lib/site-data";
 import { getSessionContext } from "@/lib/session-player";
 import GameCard from "@/components/site/GameCard";
-import GameActions from "@/components/site/GameActions";
+import GameActions, { GameRegistration, GameRegistrationForm } from "@/components/site/GameActions";
 import { ui } from "@/components/ui";
 
 export const dynamic = "force-dynamic"; // завжди свіжі ігри/лічильники
@@ -39,27 +39,39 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
   const loggedIn = !!player;
   const hasCallsign = !!player?.callsign;
 
-  const actions = (gameId: number) => (
-    <GameActions
-      gameId={gameId}
-      lang={lang}
-      loggedIn={loggedIn}
-      hasCallsign={hasCallsign}
-      reg={regMap.get(gameId)}
-    />
-  );
-
-  // Компактні дії для ігор, що відбуваються зараз: лише чек-ін, поки вікно відкрите.
-  const startedActions = (gameId: number) => (
-    <GameActions
-      gameId={gameId}
-      lang={lang}
-      loggedIn={loggedIn}
-      hasCallsign={hasCallsign}
-      reg={regMap.get(gameId)}
-      startedView
-    />
-  );
+  // Картка гри: дії (запис/відписка/редагування/чек-ін) — праворуч у хедері; налаштування поїздки
+  // розкриваються знизу. startedView — компактний режим (лише чек-ін) для ігор, що йдуть зараз.
+  const renderCard = (g: (typeof upcoming)[number], startedView = false) => {
+    const reg = regMap.get(g.id);
+    return (
+      <GameRegistration key={g.id}>
+        <GameCard
+          game={g}
+          lang={lang}
+          headerActions={
+            <GameActions
+              gameId={g.id}
+              lang={lang}
+              loggedIn={loggedIn}
+              hasCallsign={hasCallsign}
+              reg={reg}
+              startedView={startedView}
+            />
+          }
+        >
+          {!startedView && (
+            <GameRegistrationForm
+              gameId={g.id}
+              lang={lang}
+              loggedIn={loggedIn}
+              hasCallsign={hasCallsign}
+              reg={reg}
+            />
+          )}
+        </GameCard>
+      </GameRegistration>
+    );
+  };
 
   // «Відбувається зараз»: ігри гравця, чиє вікно чек-іну відкрите/щойно відмічене, але які вже
   // стартували (тому їх немає у списку майбутніх). Дають доступ до чек-іну після старту.
@@ -85,16 +97,8 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
         // Єдиний список за пріоритетом, картки на всю ширину, одна під одною: спершу ті, що
         // відбуваються зараз (лише чек-ін), далі майбутні за близькістю до поточної дати.
         <div className="space-y-4">
-          {live.map((g) => (
-            <GameCard key={g.id} game={g} lang={lang}>
-              {startedActions(g.id)}
-            </GameCard>
-          ))}
-          {upcoming.map((g) => (
-            <GameCard key={g.id} game={g} lang={lang}>
-              {actions(g.id)}
-            </GameCard>
-          ))}
+          {live.map((g) => renderCard(g, true))}
+          {upcoming.map((g) => renderCard(g))}
         </div>
       )}
     </div>

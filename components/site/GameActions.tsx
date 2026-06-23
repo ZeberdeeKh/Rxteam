@@ -1,14 +1,40 @@
+"use client";
+
+import { createContext, useContext, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
 import RegisterForm from "@/components/cabinet/RegisterForm";
-import CarpoolEditToggle from "@/components/site/CarpoolEditToggle";
 import CheckinButton from "@/components/cabinet/CheckinButton";
 import { unregisterFromGame } from "@/app/cabinet/actions";
 import { ui, btn, badgeClass } from "@/components/ui";
 
-// Дії над грою на публічній /games (слот children у GameCard).
-// Перевикористовує RegisterForm/unregisterFromGame з кабінету (returnTo="/games").
+// Стан «розгорнуто/згорнуто» налаштувань запису. Кнопка в хедері картки (GameActions) і
+// форма знизу (GameRegistrationForm) рознесені в DOM, тому ділять стан через контекст.
+const RegOpenCtx = createContext<{ open: boolean; setOpen: (v: boolean) => void } | null>(null);
+
+function useRegOpen() {
+  const ctx = useContext(RegOpenCtx);
+  if (!ctx) throw new Error("useRegOpen must be used within <GameRegistration>");
+  return ctx;
+}
+
+// Провайдер на одну картку гри: огортає GameCard, щоб хедер-кнопка й нижня форма ділили open.
+export function GameRegistration({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  return <RegOpenCtx.Provider value={{ open, setOpen }}>{children}</RegOpenCtx.Provider>;
+}
+
+type CommonProps = {
+  gameId: number;
+  lang: Lang;
+  loggedIn: boolean;
+  hasCallsign: boolean;
+  reg?: CabinetGame;
+};
+
+// Дії над грою в ХЕДЕРІ картки (праворуч від назви): запис / бейдж+відписка+редагування / чек-ін.
+// Самі налаштування поїздки не тут — вони розкриваються знизу через GameRegistrationForm.
 // reg — стан конкретного гравця для цієї гри (з getCabinetGames), undefined якщо нема.
 // startedView — компактний режим для вже стартованих ігор (кошик «Минулі»): лише чек-ін /
 // індикатор «відмічений», без запису/відписки/поїздки.
@@ -19,23 +45,16 @@ export default function GameActions({
   hasCallsign,
   reg,
   startedView = false,
-}: {
-  gameId: number;
-  lang: Lang;
-  loggedIn: boolean;
-  hasCallsign: boolean;
-  reg?: CabinetGame;
-  startedView?: boolean;
-}) {
+}: CommonProps & { startedView?: boolean }) {
+  const { open, setOpen } = useRegOpen();
+
   // Стартована гра у «Минулих»: показуємо лише чек-ін, поки вікно відкрите.
   // Незалогований / без позивного → нічого (картка лишається чистою).
   if (startedView) {
     if (!loggedIn || !hasCallsign) return null;
     if (reg?.checkedIn) {
       return (
-        <span className={`text-xs font-medium ${ui.posText}`}>
-          {st(lang, "game_checked_in")}
-        </span>
+        <span className={`text-xs font-medium ${ui.posText}`}>{st(lang, "game_checked_in")}</span>
       );
     }
     if (reg?.checkinOpen) {
@@ -43,6 +62,7 @@ export default function GameActions({
     }
     return null;
   }
+
   // Не залогований → запросити увійти. Повноширинна outline-кнопка на телефоні (тач-таргет).
   if (!loggedIn) {
     return (
@@ -61,15 +81,13 @@ export default function GameActions({
     );
   }
 
-  // Записаний → бейдж + відписка + кнопка редактора поїздки — в один ряд (форма розкривається нижче).
+  // Записаний → бейдж + відписка + «Редагувати запис» (розгортає форму знизу) — праворуч у хедері.
   if (reg?.regStatus === "registered") {
     return (
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
         <span className={badgeClass("green")}>{st(lang, "regst_registered")}</span>
         {reg.checkedIn ? (
-          <span className={`text-xs font-medium ${ui.posText}`}>
-            {st(lang, "game_checked_in")}
-          </span>
+          <span className={`text-xs font-medium ${ui.posText}`}>{st(lang, "game_checked_in")}</span>
         ) : reg.checkinOpen ? (
           <CheckinButton gameId={gameId} lang={lang} returnTo="/games" />
         ) : null}
@@ -84,11 +102,59 @@ export default function GameActions({
         ) : (
           <span className="text-xs text-gray-400">{st(lang, "cancel_locked_info")}</span>
         )}
-        <CarpoolEditToggle
+        <span className="inline-flex items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => setOpen(!open)}
+            className={btn("outline", "sm")}
+          >
+            {st(lang, "reg_edit_toggle")}
+          </button>
+          {(reg.incomingCount ?? 0) > 0 && (
+            <span
+              className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--c-primary)] px-1 text-xs font-bold leading-none text-white"
+              title={st(lang, "carpool_incoming_heading")}
+            >
+              {reg.incomingCount}
+            </span>
+          )}
+        </span>
+      </div>
+    );
+  }
+
+  // Не записаний, реєстрація відкрита → «Записатися» розгортає форму налаштувань знизу.
+  if (!reg || reg.canRegister) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className={`${btn("action")} w-full sm:w-auto`}
+      >
+        {st(lang, "btn_register")}
+      </button>
+    );
+  }
+
+  // Реєстрацію закрито (повна гра / минув дедлайн).
+  return <p className="text-xs text-gray-400">{st(lang, "games_reg_closed")}</p>;
+}
+
+// Розкривні налаштування поїздки внизу картки. Монтуються лише коли open=true (керується кнопкою
+// «Записатися» / «Редагувати запис» у хедері) — мапа не вантажиться для кожної гри наперед.
+export function GameRegistrationForm({ gameId, lang, loggedIn, hasCallsign, reg }: CommonProps) {
+  const { open } = useRegOpen();
+  if (!open || !loggedIn || !hasCallsign) return null;
+
+  // Редагування наявного запису → форма з початковими значеннями поїздки.
+  if (reg?.regStatus === "registered") {
+    return (
+      <div className="mt-4 border-t border-gray-100 pt-4">
+        <RegisterForm
           gameId={gameId}
           lang={lang}
           returnTo="/games"
-          incomingCount={reg.incomingCount}
+          editing
           initial={{
             transport: reg.myTransport,
             freeSeats: reg.myFreeSeats,
@@ -104,11 +170,14 @@ export default function GameActions({
     );
   }
 
-  // Не записаний: реєстрація відкрита (або стан невідомий) → повна форма.
+  // Новий запис → чиста форма.
   if (!reg || reg.canRegister) {
-    return <RegisterForm gameId={gameId} lang={lang} returnTo="/games" />;
+    return (
+      <div className="mt-4 border-t border-gray-100 pt-4">
+        <RegisterForm gameId={gameId} lang={lang} returnTo="/games" />
+      </div>
+    );
   }
 
-  // Реєстрацію закрито (повна гра / минув дедлайн).
-  return <p className="text-xs text-gray-400">{st(lang, "games_reg_closed")}</p>;
+  return null;
 }

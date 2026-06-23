@@ -204,7 +204,7 @@ const SITE: Record<string, Dict> = {
     en: "Close seats (full)",
     uk: "Закрити набір (місць немає)",
   },
-  carpool_edit_toggle: { pl: "Edytuj przejazd", en: "Edit ride", uk: "Редагувати поїздку" },
+  reg_edit_toggle: { pl: "Edytuj zapis", en: "Edit sign-up", uk: "Редагувати запис" },
   btn_save: { pl: "Zapisz", en: "Save", uk: "Зберегти" },
   reg_seats_label: { pl: "Wolne miejsca:", en: "Free seats:", uk: "Вільних місць:" },
   carpool_how_title: { pl: "Jak to działa?", en: "How it works?", uk: "Як це працює?" },
