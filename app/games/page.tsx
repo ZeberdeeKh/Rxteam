@@ -82,9 +82,9 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
       {live.length === 0 && upcoming.length === 0 ? (
         <p className={ui.emptyState}>{st(lang, "games_none_upcoming")}</p>
       ) : (
-        // Єдиний список за пріоритетом: спершу ті, що відбуваються зараз (лише чек-ін),
-        // далі майбутні за близькістю до поточної дати.
-        <div className="grid gap-4 sm:grid-cols-2">
+        // Єдиний список за пріоритетом, картки на всю ширину, одна під одною: спершу ті, що
+        // відбуваються зараз (лише чек-ін), далі майбутні за близькістю до поточної дати.
+        <div className="space-y-4">
           {live.map((g) => (
             <GameCard key={g.id} game={g} lang={lang}>
               {startedActions(g.id)}
