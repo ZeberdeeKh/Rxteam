@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { CabinetGame } from "@/lib/site-data";
@@ -144,40 +144,44 @@ export default function GameActions({
 // «Записатися» / «Редагувати запис» у хедері) — мапа не вантажиться для кожної гри наперед.
 export function GameRegistrationForm({ gameId, lang, loggedIn, hasCallsign, reg }: CommonProps) {
   const { open } = useRegOpen();
+  const ref = useRef<HTMLDivElement>(null);
+
+  // При розкритті — плавно докрутити сторінку до форми, щоб було видно, що знизу з'явились
+  // налаштування (кнопка-тригер у хедері, форма нижче — без скролу легко не помітити).
+  useEffect(() => {
+    if (open) ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [open]);
+
   if (!open || !loggedIn || !hasCallsign) return null;
 
-  // Редагування наявного запису → форма з початковими значеннями поїздки.
-  if (reg?.regStatus === "registered") {
-    return (
-      <div className="mt-4 border-t border-gray-100 pt-4">
-        <RegisterForm
-          gameId={gameId}
-          lang={lang}
-          returnTo="/games"
-          editing
-          initial={{
-            transport: reg.myTransport,
-            freeSeats: reg.myFreeSeats,
-            ridePrice: reg.myRidePrice,
-            rideNote: reg.myRideNote,
-            fromLat: reg.myFromLat,
-            fromLng: reg.myFromLng,
-            pickups: reg.myPickups,
-            seatsClosed: reg.mySeatsClosed,
-          }}
-        />
-      </div>
-    );
-  }
+  // Редагування наявного запису → форма з початковими значеннями поїздки; інакше чиста форма.
+  const form =
+    reg?.regStatus === "registered" ? (
+      <RegisterForm
+        gameId={gameId}
+        lang={lang}
+        returnTo="/games"
+        editing
+        initial={{
+          transport: reg.myTransport,
+          freeSeats: reg.myFreeSeats,
+          ridePrice: reg.myRidePrice,
+          rideNote: reg.myRideNote,
+          fromLat: reg.myFromLat,
+          fromLng: reg.myFromLng,
+          pickups: reg.myPickups,
+          seatsClosed: reg.mySeatsClosed,
+        }}
+      />
+    ) : !reg || reg.canRegister ? (
+      <RegisterForm gameId={gameId} lang={lang} returnTo="/games" />
+    ) : null;
 
-  // Новий запис → чиста форма.
-  if (!reg || reg.canRegister) {
-    return (
-      <div className="mt-4 border-t border-gray-100 pt-4">
-        <RegisterForm gameId={gameId} lang={lang} returnTo="/games" />
-      </div>
-    );
-  }
+  if (!form) return null;
 
-  return null;
+  return (
+    <div ref={ref} className="mt-4 scroll-mt-20 border-t border-gray-100 pt-4">
+      {form}
+    </div>
+  );
 }
