@@ -588,6 +588,7 @@ export type CarpoolIncoming = {
   passengerCallsign: string | null;
   passengerName: string | null;
   passengerTgUsername: string | null;
+  status: "pending" | "accepted"; // pending — потребує рішення; accepted — можна скасувати
 };
 
 export type CarpoolMe = {
@@ -664,10 +665,10 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
         .in("status", ["pending", "accepted", "declined"]),
       supabase
         .from("ride_requests")
-        .select("id, passenger_id")
+        .select("id, passenger_id, status")
         .eq("game_id", gameId)
         .eq("driver_player_id", playerId)
-        .eq("status", "pending"),
+        .in("status", ["pending", "accepted"]),
     ]);
 
     // Найрелевантніший статус по водієві: pending/accepted перекриває declined.
@@ -707,6 +708,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
         passengerCallsign: p?.callsign ?? null,
         passengerName: p?.name ?? null,
         passengerTgUsername: p?.tg_username ?? null,
+        status: r.status as CarpoolIncoming["status"],
       };
     });
   }

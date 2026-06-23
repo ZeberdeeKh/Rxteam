@@ -784,6 +784,18 @@ const S: Record<string, Dict> = {
     en: "🚗 {who} withdrew from «{title}» — your booking is cancelled.",
     uk: "🚗 {who} знявся з «{title}» — твоє бронювання скасовано.",
   },
+  // DM водію: пасажир сам скасував запит/бронювання (pending або вже прийняте).
+  ride_cancelled_by_passenger: {
+    pl: "🚗 {who} anulował(a) prośbę o miejsce na «{title}».",
+    en: "🚗 {who} cancelled the seat request for «{title}».",
+    uk: "🚗 {who} скасував(ла) запит на місце на «{title}».",
+  },
+  // DM пасажиру: водій скасував уже прийняту поїздку (місце звільнено).
+  ride_cancelled_by_driver_passenger: {
+    pl: "🚗 {who} anulował Twój przejazd na «{title}».",
+    en: "🚗 {who} cancelled your ride to «{title}».",
+    uk: "🚗 {who} скасував твою поїздку на «{title}».",
+  },
   ride_request_sent_passenger: {
     pl: "Wysłano prośbę do {who}.",
     en: "Request sent to {who}.",

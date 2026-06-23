@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { st, type Lang } from "@/lib/site-i18n";
 import { registerForGame } from "@/app/cabinet/actions";
-import { acceptRideInline, declineRideInline } from "@/app/carpool/actions";
-import { ui, btn } from "@/components/ui";
+import { acceptRideInline, declineRideInline, cancelAcceptedRideInline } from "@/app/carpool/actions";
+import { ui, btn, badgeClass } from "@/components/ui";
 import type { RegisterMapDriver } from "@/components/site/RegisterCarpoolMap";
 
 const RegisterCarpoolMap = dynamic(() => import("@/components/site/RegisterCarpoolMap"), {
@@ -19,6 +19,7 @@ type Incoming = {
   passengerCallsign: string | null;
   passengerName: string | null;
   passengerTgUsername: string | null;
+  status: "pending" | "accepted";
 };
 type Carpool = {
   venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
@@ -275,12 +276,12 @@ export default function RegisterForm({
         </div>
       )}
 
-      {/* Водій: вхідні запити на місце — прийняти/відхилити прямо тут (без TG і без /carpool) */}
+      {/* Водій: вхідні запити на місце — прийняти/відхилити/скасувати прямо тут */}
       {transport === "own" && carpool?.incoming && carpool.incoming.length > 0 && (
         <IncomingRequests
           items={carpool.incoming}
           lang={lang}
-          onAccepted={() => setSeats((s) => Math.max(0, s - 1))}
+          onSeatDelta={(d) => setSeats((s) => Math.max(0, s + d))}
         />
       )}
 
@@ -291,30 +292,50 @@ export default function RegisterForm({
   );
 }
 
-// Список вхідних запитів водія: accept/decline через ядро (decideRideRequest), оптимістично
-// прибираємо оброблені. onAccepted зменшує локальний лічильник місць, щоб сабміт форми не
-// «відкотив» free_seats назад.
+// Список вхідних запитів водія через ядро (decideRideRequest): pending → прийняти/відхилити;
+// accepted → лишається з кнопкою «Скасувати». Кнопка «Написати в ТГ» веде в приват пасажира.
+// onSeatDelta синхронізує локальний лічильник місць (accept: −1, скасування прийнятого: +1),
+// щоб сабміт форми не «відкотив» free_seats.
+type IncomingState = "pending" | "accepted" | "removed";
+
 function IncomingRequests({
   items,
   lang,
-  onAccepted,
+  onSeatDelta,
 }: {
   items: Incoming[];
   lang: Lang;
-  onAccepted: () => void;
+  onSeatDelta: (delta: number) => void;
 }) {
-  const [decided, setDecided] = useState<Record<number, true>>({});
+  const [override, setOverride] = useState<Record<number, IncomingState>>({});
   const [busy, setBusy] = useState<number | null>(null);
-  const pending = items.filter((r) => !decided[r.requestId]);
-  if (pending.length === 0) return null;
+  const visible = items
+    .map((it) => ({ ...it, status: (override[it.requestId] ?? it.status) as IncomingState }))
+    .filter((it) => it.status !== "removed");
+  if (visible.length === 0) return null;
 
-  async function decide(requestId: number, accept: boolean) {
+  async function act(requestId: number, action: "accept" | "decline" | "cancel") {
     setBusy(requestId);
-    const res = accept ? await acceptRideInline(requestId) : await declineRideInline(requestId);
-    setBusy(null);
-    if (res.ok) {
-      setDecided((d) => ({ ...d, [requestId]: true }));
-      if (accept) onAccepted();
+    try {
+      const res =
+        action === "accept"
+          ? await acceptRideInline(requestId)
+          : action === "decline"
+            ? await declineRideInline(requestId)
+            : await cancelAcceptedRideInline(requestId);
+      if (res.ok) {
+        if (action === "accept") {
+          setOverride((o) => ({ ...o, [requestId]: "accepted" }));
+          onSeatDelta(-1);
+        } else if (action === "decline") {
+          setOverride((o) => ({ ...o, [requestId]: "removed" }));
+        } else {
+          setOverride((o) => ({ ...o, [requestId]: "removed" }));
+          onSeatDelta(1); // місце повернулось (сервер уже звільнив) — синхронізуємо лічильник
+        }
+      }
+    } finally {
+      setBusy(null);
     }
   }
 
@@ -322,31 +343,59 @@ function IncomingRequests({
     <div className="space-y-2">
       <p className="text-sm font-semibold text-gray-700">{st(lang, "carpool_incoming_heading")}</p>
       <ul className="space-y-2">
-        {pending.map((r) => (
+        {visible.map((r) => (
           <li
             key={r.requestId}
             className="flex flex-wrap items-center justify-between gap-2 border border-gray-200 px-3 py-2"
           >
-            <span className="text-sm font-medium text-gray-800">
-              {r.passengerCallsign ?? r.passengerName ?? "?"}
-            </span>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => decide(r.requestId, true)}
-                disabled={busy === r.requestId}
-                className={btn("action", "sm")}
-              >
-                {st(lang, "carpool_accept")}
-              </button>
-              <button
-                type="button"
-                onClick={() => decide(r.requestId, false)}
-                disabled={busy === r.requestId}
-                className={btn("ghost", "sm")}
-              >
-                {st(lang, "carpool_decline")}
-              </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium text-gray-800">
+                {r.passengerCallsign ?? r.passengerName ?? "?"}
+              </span>
+              {r.passengerTgUsername && (
+                <a
+                  href={`https://t.me/${r.passengerTgUsername}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={btn("outline", "sm")}
+                >
+                  {st(lang, "carpool_write_tg")}
+                </a>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {r.status === "accepted" ? (
+                <>
+                  <span className={badgeClass("green")}>{st(lang, "carpool_accepted")}</span>
+                  <button
+                    type="button"
+                    onClick={() => act(r.requestId, "cancel")}
+                    disabled={busy === r.requestId}
+                    className={btn("delete", "sm")}
+                  >
+                    {st(lang, "carpool_cancel_request")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => act(r.requestId, "accept")}
+                    disabled={busy === r.requestId}
+                    className={btn("action", "sm")}
+                  >
+                    {st(lang, "carpool_accept")}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => act(r.requestId, "decline")}
+                    disabled={busy === r.requestId}
+                    className={btn("ghost", "sm")}
+                  >
+                    {st(lang, "carpool_decline")}
+                  </button>
+                </>
+              )}
             </div>
           </li>
         ))}

@@ -68,9 +68,7 @@ function DriverBooking({ d, gameId, lang }: { d: RegisterMapDriver; gameId: numb
     try {
       const res = await cancelRideSeatInline(gameId, d.playerId);
       if (res.ok) setStatus("none");
-      // Скасувати не вдалося, бо водій устиг прийняти → показуємо підтверджено; інакше — просити знову.
-      else if (res.status === "accepted") setStatus("accepted");
-      else setStatus("none");
+      else setErr(st(lang, "carpool_err_generic"));
     } catch {
       setErr(st(lang, "carpool_err_generic"));
     } finally {
@@ -80,17 +78,23 @@ function DriverBooking({ d, gameId, lang }: { d: RegisterMapDriver; gameId: numb
 
   if (status === "accepted") {
     return (
-      <p className="font-medium text-emerald-700">
-        ✓ {st(lang, "carpool_request_accepted")}
-        {d.tgUsername && (
-          <>
-            {" · "}
-            <a href={`https://t.me/${d.tgUsername}`} target="_blank" rel="noopener noreferrer" className="underline">
-              @{d.tgUsername}
-            </a>
-          </>
-        )}
-      </p>
+      <div className="mt-1 space-y-1">
+        <p className="font-medium text-emerald-700">
+          ✓ {st(lang, "carpool_request_accepted")}
+          {d.tgUsername && (
+            <>
+              {" · "}
+              <a href={`https://t.me/${d.tgUsername}`} target="_blank" rel="noopener noreferrer" className="underline">
+                @{d.tgUsername}
+              </a>
+            </>
+          )}
+        </p>
+        <button type="button" onClick={cancel} disabled={busy} className={btn("delete", "sm")}>
+          {st(lang, "carpool_cancel_request")}
+        </button>
+        {err && <p className="text-red-600">{err}</p>}
+      </div>
     );
   }
   if (status === "pending") {

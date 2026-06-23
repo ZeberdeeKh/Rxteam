@@ -258,11 +258,25 @@ export async function notifySeekerNewDriver(opts: {
   await sendTg(opts.seekerTgUserId, tr(opts.seekerLang, "ride_new_driver", { title: opts.gameTitle ?? "ASG" }));
 }
 
-// DM пасажиру: відмова або водій знявся з гри. key обирає текст.
+// DM водію: пасажир сам скасував запит/бронювання (на будь-якому етапі).
+export async function notifyDriverRideCancelled(opts: {
+  driverTgUserId?: number | null;
+  driverLang: Lang;
+  passengerWho: string;
+  gameTitle: string | null;
+}) {
+  if (!opts.driverTgUserId) return;
+  await sendTg(
+    opts.driverTgUserId,
+    tr(opts.driverLang, "ride_cancelled_by_passenger", { who: opts.passengerWho, title: opts.gameTitle ?? "ASG" }),
+  );
+}
+
+// DM пасажиру: відмова / водій знявся / водій скасував прийняту поїздку. key обирає текст.
 export async function notifyPassengerRideEnded(opts: {
   passengerTgUserId?: number | null;
   passengerLang: Lang;
-  key: "ride_declined_passenger" | "ride_driver_left_passenger";
+  key: "ride_declined_passenger" | "ride_driver_left_passenger" | "ride_cancelled_by_driver_passenger";
   driverWho: string;
   gameTitle: string | null;
 }) {

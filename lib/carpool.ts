@@ -4,6 +4,7 @@ import { supabase } from "./supabase";
 import type { Lang } from "./i18n";
 import {
   notifyDriverRideRequest,
+  notifyDriverRideCancelled,
   notifyPassengerRideAccepted,
   notifyPassengerRideEnded,
   notifySeekerNewDriver,
@@ -242,35 +243,63 @@ export async function declineRideRequest(requestId: number): Promise<RideDecisio
   };
 }
 
-// Пасажир скасовує власний pending-запит — ЄДИНЕ ядро для всіх UI карпулу (мапа реєстрації).
-// Повертає фактичний статус, якщо pending уже не було (водій устиг вирішити),
-// щоб клієнт не показав хибно «можна просити знову».
-export type RideCancelResult = { ok: boolean; status: "accepted" | "declined" | null };
+// Повертає одне вільне місце водієві (після скасування вже ПРИЙНЯТОГО запиту).
+async function freeOneSeat(gameId: number, driverPlayerId: number): Promise<void> {
+  const { data: reg } = await supabase
+    .from("registrations")
+    .select("free_seats")
+    .eq("game_id", gameId)
+    .eq("player_id", driverPlayerId)
+    .maybeSingle();
+  const cur = reg?.free_seats ?? 0;
+  await supabase
+    .from("registrations")
+    .update({ free_seats: cur + 1 })
+    .eq("game_id", gameId)
+    .eq("player_id", driverPlayerId);
+}
+
+// Пасажир скасовує власну заявку на БУДЬ-ЯКОМУ етапі (pending або вже accepted) — ЄДИНЕ ядро
+// для всіх UI карпулу. Якщо запит був прийнятий — повертаємо місце водієві. Завжди сповіщаємо
+// водія в ТГ (раніше при відкликанні pending водій нічого не отримував).
 export async function cancelOwnRideRequest(
   gameId: number,
   driverPlayerId: number,
   passengerId: number,
-): Promise<RideCancelResult> {
-  const { data: cancelled } = await supabase
+): Promise<{ ok: boolean }> {
+  const { data: req } = await supabase
     .from("ride_requests")
-    .update({ status: "cancelled", decided_at: new Date().toISOString() })
+    .select("id, status")
     .eq("game_id", gameId)
     .eq("driver_player_id", driverPlayerId)
     .eq("passenger_id", passengerId)
-    .eq("status", "pending")
-    .select("id");
-  if ((cancelled?.length ?? 0) > 0) return { ok: true, status: null };
-  const { data: cur } = await supabase
-    .from("ride_requests")
-    .select("status")
-    .eq("game_id", gameId)
-    .eq("driver_player_id", driverPlayerId)
-    .eq("passenger_id", passengerId)
-    .in("status", ["accepted", "declined"])
+    .in("status", ["pending", "accepted"])
     .order("id", { ascending: false })
     .limit(1)
     .maybeSingle();
-  return { ok: false, status: (cur?.status as "accepted" | "declined") ?? null };
+  if (!req) return { ok: false };
+  // CAS саме цього статусу — захист від гонки з рішенням водія.
+  const { data: done } = await supabase
+    .from("ride_requests")
+    .update({ status: "cancelled", decided_at: new Date().toISOString() })
+    .eq("id", req.id)
+    .eq("status", req.status)
+    .select("id")
+    .maybeSingle();
+  if (!done) return { ok: false };
+  if (req.status === "accepted") await freeOneSeat(gameId, driverPlayerId);
+  const [{ data: pax }, { data: drv }, { data: game }] = await Promise.all([
+    supabase.from("players").select("callsign, name").eq("id", passengerId).maybeSingle(),
+    supabase.from("players").select("tg_user_id, lang").eq("id", driverPlayerId).maybeSingle(),
+    supabase.from("games").select("title").eq("id", gameId).maybeSingle(),
+  ]);
+  await notifyDriverRideCancelled({
+    driverTgUserId: drv?.tg_user_id,
+    driverLang: (drv?.lang as Lang) ?? "uk",
+    passengerWho: pax?.callsign ?? pax?.name ?? "?",
+    gameTitle: game?.title ?? null,
+  });
+  return { ok: true };
 }
 
 // Рішення водія по запиту (прийняти/відхилити) з перевіркою власності — ЄДИНЕ ядро для
@@ -278,15 +307,43 @@ export async function cancelOwnRideRequest(
 export async function decideRideRequest(
   requestId: number,
   callerDriverId: number,
-  decision: "accept" | "decline",
-): Promise<{ ok: boolean; reason?: "not_found" | "forbidden" | "not_pending" | "full" }> {
+  decision: "accept" | "decline" | "cancel",
+): Promise<{ ok: boolean; reason?: "not_found" | "forbidden" | "not_pending" | "not_accepted" | "full" }> {
   const { data: req } = await supabase
     .from("ride_requests")
-    .select("driver_player_id, status")
+    .select("driver_player_id, passenger_id, game_id, status")
     .eq("id", requestId)
     .maybeSingle();
   if (!req) return { ok: false, reason: "not_found" };
   if (req.driver_player_id !== callerDriverId) return { ok: false, reason: "forbidden" };
+
+  // Водій скасовує ВЖЕ ПРИЙНЯТУ поїздку: звільняємо місце + сповіщаємо пасажира.
+  if (decision === "cancel") {
+    if (req.status !== "accepted") return { ok: false, reason: "not_accepted" };
+    const { data: done } = await supabase
+      .from("ride_requests")
+      .update({ status: "cancelled", decided_at: new Date().toISOString() })
+      .eq("id", requestId)
+      .eq("status", "accepted")
+      .select("id")
+      .maybeSingle();
+    if (!done) return { ok: false, reason: "not_accepted" };
+    await freeOneSeat(req.game_id as number, req.driver_player_id as number);
+    const [{ data: pax }, { data: drv }, { data: game }] = await Promise.all([
+      supabase.from("players").select("tg_user_id, lang").eq("id", req.passenger_id).maybeSingle(),
+      supabase.from("players").select("callsign, name").eq("id", req.driver_player_id).maybeSingle(),
+      supabase.from("games").select("title").eq("id", req.game_id).maybeSingle(),
+    ]);
+    await notifyPassengerRideEnded({
+      passengerTgUserId: pax?.tg_user_id,
+      passengerLang: (pax?.lang as Lang) ?? "uk",
+      key: "ride_cancelled_by_driver_passenger",
+      driverWho: drv?.callsign ?? drv?.name ?? "?",
+      gameTitle: game?.title ?? null,
+    });
+    return { ok: true };
+  }
+
   if (req.status !== "pending") return { ok: false, reason: "not_pending" };
   const r =
     decision === "accept" ? await acceptRideRequest(requestId) : await declineRideRequest(requestId);

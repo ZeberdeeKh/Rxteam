@@ -96,6 +96,8 @@ const SITE: Record<string, Dict> = {
   carpool_incoming_heading: { pl: "Prośby o miejsce", en: "Seat requests", uk: "Запити на місце" },
   carpool_accept: { pl: "Przyjmij", en: "Accept", uk: "Прийняти" },
   carpool_decline: { pl: "Odrzuć", en: "Decline", uk: "Відхилити" },
+  carpool_accepted: { pl: "Przyjęto", en: "Accepted", uk: "Прийнято" },
+  carpool_write_tg: { pl: "Napisz na TG", en: "Message on TG", uk: "Написати в ТГ" },
   carpool_pin_hint: {
     pl: "Kliknij mapę lub użyj swojej lokalizacji, aby zaznaczyć, skąd jedziesz. Wskaż pobliski punkt orientacyjny, nie dokładny adres domu.",
     en: "Click the map or use your location to mark where you set off from. Drop a nearby landmark, not your exact home address.",

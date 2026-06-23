@@ -21,19 +21,19 @@ export async function requestRideSeatInline(
   return res.ok ? { ok: true } : { ok: false, reason: res.reason };
 }
 
-// Пасажир скасовує власний pending-запит (фактичний статус повертається при гонці з accept).
+// Пасажир скасовує власну заявку (pending або вже прийняту) — ядро сповістить водія в ТГ.
 export async function cancelRideSeatInline(
   gameId: number,
   driverPlayerId: number,
-): Promise<{ ok: boolean; status?: "accepted" | "declined" | null }> {
+): Promise<{ ok: boolean }> {
   const player = await getSessionPlayer();
   if (!player) return { ok: false };
   if (!Number.isFinite(gameId) || !Number.isFinite(driverPlayerId)) return { ok: false };
   return cancelOwnRideRequest(gameId, driverPlayerId, player.id);
 }
 
-// Водій приймає/відхиляє запит прямо з форми редагування поїздки. Те саме ядро (decideRideRequest),
-// що й кнопки бота — без рассинхрону.
+// Водій приймає/відхиляє pending або скасовує вже ПРИЙНЯТУ поїздку — прямо з форми поїздки.
+// Те саме ядро (decideRideRequest), що й кнопки бота — без рассинхрону.
 export async function acceptRideInline(requestId: number): Promise<{ ok: boolean; reason?: string }> {
   const player = await getSessionPlayer();
   if (!player) return { ok: false, reason: "auth" };
@@ -46,4 +46,12 @@ export async function declineRideInline(requestId: number): Promise<{ ok: boolea
   if (!player) return { ok: false, reason: "auth" };
   if (!Number.isFinite(requestId)) return { ok: false, reason: "bad" };
   return decideRideRequest(requestId, player.id, "decline");
+}
+
+// Водій скасовує вже прийняту заявку (повертає місце + сповіщає пасажира — у ядрі).
+export async function cancelAcceptedRideInline(requestId: number): Promise<{ ok: boolean; reason?: string }> {
+  const player = await getSessionPlayer();
+  if (!player) return { ok: false, reason: "auth" };
+  if (!Number.isFinite(requestId)) return { ok: false, reason: "bad" };
+  return decideRideRequest(requestId, player.id, "cancel");
 }
