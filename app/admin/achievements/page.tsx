@@ -10,19 +10,34 @@ import {
   createAchievement,
   updateAchievement,
   deleteAchievement,
+  saveAchievementPoints,
 } from "@/app/admin/actions";
+import { getAllSettings } from "@/lib/settings";
 import { ui, btn, badgeClass, GLYPH, Collapsible, CreateDrawer, type BadgeColor } from "@/components/ui";
 import AchievementIconUploader from "@/components/admin/AchievementIconUploader";
 
 export const dynamic = "force-dynamic";
 
-// Колір бейджа за рівнем ачівки (бали ростуть easy → hard).
-const TIER_BADGE: Record<string, BadgeColor> = { easy: "green", mid: "amber", hard: "red" };
-const TIER_KEY: Record<string, "adm_ach_tier_easy" | "adm_ach_tier_mid" | "adm_ach_tier_hard"> = {
+// Колір бейджа за рівнем ачівки «під медалі» (бали ростуть easy → legendary):
+// бронза → срібло → золото → червоний. Стиль/генерація іконок: docs/prompts/ACHIEVEMENT_ICON_PROMPT.md.
+const TIER_BADGE: Record<string, BadgeColor> = {
+  easy: "bronze",
+  mid: "silver",
+  hard: "gold",
+  legendary: "red",
+};
+const TIER_KEY: Record<
+  string,
+  "adm_ach_tier_easy" | "adm_ach_tier_mid" | "adm_ach_tier_hard" | "adm_ach_tier_legendary"
+> = {
   easy: "adm_ach_tier_easy",
   mid: "adm_ach_tier_mid",
   hard: "adm_ach_tier_hard",
+  legendary: "adm_ach_tier_legendary",
 };
+// Рівні балів за tier + дефолти-плейсхолдери (мають збігатися з fallback у lib/economy.ts tierPoints).
+const ACH_TIER_ORDER = ["easy", "mid", "hard", "legendary"] as const;
+const ACH_POINTS_DEFAULT: Record<string, string> = { easy: "5", mid: "10", hard: "20", legendary: "40" };
 
 // Поля ачівки: спільні для форми створення (item відсутній → дефолти) і правки.
 // Код — первинний ключ: на правці лише читається (його тримає player_achievements).
@@ -54,6 +69,7 @@ function AchievementFields({ lang, item }: { lang: Lang; item?: AdminAchievement
           <option value="easy">{st(lang, "adm_ach_tier_easy")}</option>
           <option value="mid">{st(lang, "adm_ach_tier_mid")}</option>
           <option value="hard">{st(lang, "adm_ach_tier_hard")}</option>
+          <option value="legendary">{st(lang, "adm_ach_tier_legendary")}</option>
         </select>
       </label>
 
@@ -120,17 +136,20 @@ export default async function AdminAchievements({
     created?: string;
     saved?: string;
     deleted?: string;
+    ptsSaved?: string;
     err?: string;
   };
 }) {
-  await requirePerm("achievements");
+  const admin = await requirePerm("achievements");
   const lang = getServerLang();
   const [items, log] = await Promise.all([
     listAchievementsAdmin(),
     listPlayerAchievementsAdmin(),
   ]);
+  // Бали за рівні редагує лише майстер — для решти панель не рендеримо й налаштування не тягнемо.
+  const settings = admin.is_master ? await getAllSettings() : {};
 
-  const ok = searchParams.created || searchParams.saved || searchParams.deleted;
+  const ok = searchParams.created || searchParams.saved || searchParams.deleted || searchParams.ptsSaved;
 
   return (
     <div className={ui.pageStack}>
@@ -158,6 +177,37 @@ export default async function AdminAchievements({
       {searchParams.err === "fields" && <p className={ui.alertErr}>{st(lang, "adm_err_fields")}</p>}
       {searchParams.err === "dup" && <p className={ui.alertErr}>{st(lang, "adm_ach_err_dup")}</p>}
       {searchParams.err === "inuse" && <p className={ui.alertErr}>{st(lang, "adm_ach_err_inuse")}</p>}
+
+      {/* Бали за рівні (easy/mid/hard/legendary) — лише майстер. Єдине джерело замість /admin/settings. */}
+      {admin.is_master && (
+        <Collapsible
+          summary={<span className={ui.cardTitle}>{st(lang, "adm_ach_points_title")}</span>}
+          right={<span className={ui.meta}>{ACH_TIER_ORDER.length}</span>}
+        >
+          <form action={saveAchievementPoints} className="space-y-3">
+            <div className="grid gap-4 sm:grid-cols-2">
+              {ACH_TIER_ORDER.map((tier) => (
+                <label key={tier} className="block text-sm">
+                  <span className={`mb-1 ${ui.label}`}>
+                    {st(lang, TIER_KEY[tier])} <code className={ui.metaFaint}>pts_ach_{tier}</code>
+                  </span>
+                  <input
+                    type="number"
+                    step="any"
+                    name={`pts_ach_${tier}`}
+                    defaultValue={settings[`pts_ach_${tier}`] ?? ""}
+                    placeholder={ACH_POINTS_DEFAULT[tier]}
+                    className={ui.input}
+                  />
+                </label>
+              ))}
+            </div>
+            <button type="submit" className={btn("action")}>
+              {st(lang, "adm_btn_save")}
+            </button>
+          </form>
+        </Collapsible>
+      )}
 
       {/* Каталог ачівок — компактні рядки, що розгортають форму правки. */}
       {items.length === 0 ? (

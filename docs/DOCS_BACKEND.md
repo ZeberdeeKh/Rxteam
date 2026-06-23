@@ -110,7 +110,7 @@
 | `RANK_COST_KEY` / `RANK_COST_FALLBACK` | `:9` / `:16` | `rank_cost_scout` 100, `rank_cost_squad` 250, `rank_cost_team` 500. |
 | `getPointValue(key,fallback)` | `:23` | Числове налаштування зі знаком + fallback. |
 | `nextRank(current)` | `:30` | Наступний ранг або `null` на максимумі. |
-| `grantAchievement(...)` | `:107` | Ідемпотентна видача (unique-гард `:130`); tier-бали: easy=`pts_ach_easy` 5, hard=`pts_ach_hard` 20, інакше mid=`pts_ach_mid` 10 (`:99-102`). |
+| `grantAchievement(...)` | `:107` | Ідемпотентна видача (unique-гард `:130`); tier-бали: easy=`pts_ach_easy` 5, hard=`pts_ach_hard` 20, legendary=`pts_ach_legendary` 40, інакше mid=`pts_ach_mid` 10. Редагуються в `/admin/achievements`. |
 | `grantCheckinAchievements(...)` | `:151` | `first_contact` (≥1), `deploy_10/25/50`, `dawn_patrol` коли `earlyMinutes ∈ [0,10]` (`:163-167`). |
 | `getReliability(playerId)` | `:174` | `pct = round(attended/(attended+noShow)*100)`; `attended` = к-сть рядків `checkins`, `noShow` = к-сть `registrations.status='no_show'`; `null` коли total=0 (`:189`). All-time. |
 

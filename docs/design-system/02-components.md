@@ -75,8 +75,9 @@ CTA з «→» — той самий `ui.link` + стрілка в тексті.
 | `brand` | Майстер, ачівки |
 | `green` | Адмін, `announced`, `registered` |
 | `gray` | Гравець, `hidden`, інше (дефолт) |
-| `red` | `cancelled`, `no_show` |
+| `red` | `cancelled`, `no_show`, ачивка `legendary` |
 | `amber` | попередження, `pending` |
+| `bronze` / `silver` / `gold` | рівні ачивок «під медалі»: `easy` / `mid` / `hard` (токени `--c-{metal}-bg/fg`) |
 
 ### 3.1 Мапа статус→колір — у хелпер
 

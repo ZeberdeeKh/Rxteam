@@ -136,9 +136,8 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "pts_attend", type: "number", label: { pl: "Za obecność (+)", en: "For attendance (+)", uk: "За явку (+)" } },
       { key: "pts_noshow", type: "number", label: { pl: "Za nieobecność (−)", en: "For no-show (−)", uk: "За неявку (−)" } },
       { key: "pts_friend", type: "number", label: { pl: "Za poleconego znajomego (+)", en: "For a referred friend (+)", uk: "За приведеного друга (+)" } },
-      { key: "pts_ach_easy", type: "number", label: { pl: "Osiągnięcie: easy", en: "Achievement: easy", uk: "Ачівка: easy" } },
-      { key: "pts_ach_mid", type: "number", label: { pl: "Osiągnięcie: mid", en: "Achievement: mid", uk: "Ачівка: mid" } },
-      { key: "pts_ach_hard", type: "number", label: { pl: "Osiągnięcie: hard", en: "Achievement: hard", uk: "Ачівка: hard" } },
+      // Бали за рівні ачивок (pts_ach_easy/mid/hard/legendary) редагуються в /admin/achievements
+      // (панель «Бали за рівень», server-action saveAchievementPoints) — єдине джерело.
       { key: "pts_photo_post", type: "number", label: { pl: "Za zdjęcie w temacie (+)", en: "For a photo in topic (+)", uk: "За фото в топіку (+)" } },
       { key: "photo_weekly_cap", type: "number", label: { pl: "Limit punktów za zdjęcia / tydzień", en: "Photo points cap / week", uk: "Ліміт балів за фото / тиждень" } },
     ],

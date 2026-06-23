@@ -17,7 +17,8 @@
 
 // ── Бейджі (КВАДРАТНІ, uppercase — стиль ab3) ──
 // Семантичні кольори (green/red/amber) беруться з CSS-змінних.
-export type BadgeColor = "brand" | "green" | "gray" | "red" | "amber";
+// Металеві (bronze/silver/gold) — для рівнів ачивок «під медалі» (easy/mid/hard); токени в globals.css.
+export type BadgeColor = "brand" | "green" | "gray" | "red" | "amber" | "bronze" | "silver" | "gold";
 const BADGE_BASE = "inline-flex items-center px-2 py-0.5 text-xs font-semibold uppercase tracking-wide";
 const BADGE_COLOR: Record<BadgeColor, string> = {
   brand: "bg-brand/10 text-[var(--c-brand-text)]",
@@ -25,6 +26,9 @@ const BADGE_COLOR: Record<BadgeColor, string> = {
   gray: "bg-gray-100 text-gray-500",
   red: "bg-[var(--c-danger-bg)] text-[var(--c-danger-fg)]",
   amber: "bg-[var(--c-warning-bg)] text-[var(--c-warning-fg)]",
+  bronze: "bg-[var(--c-bronze-bg)] text-[var(--c-bronze-fg)]",
+  silver: "bg-[var(--c-silver-bg)] text-[var(--c-silver-fg)]",
+  gold: "bg-[var(--c-gold-bg)] text-[var(--c-gold-fg)]",
 };
 export function badgeClass(color: BadgeColor = "gray"): string {
   return `${BADGE_BASE} ${BADGE_COLOR[color]}`;

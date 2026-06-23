@@ -47,6 +47,15 @@
   --c-danger-solid: #ff6b6b; /* суцільна кнопка «Видалити» */
   --c-danger-solid-hover: #d84d4d;
 
+  /* ── Метал рівнів ачивок «під медалі» (badgeClass bronze/silver/gold) ──
+     bg — приглушена пігулка, fg — світлий метал, читабельний на темному фоні. */
+  --c-bronze-bg: rgba(205, 127, 50, 0.16);
+  --c-bronze-fg: #d8a05a;
+  --c-silver-bg: rgba(180, 190, 200, 0.16);
+  --c-silver-fg: #cbd3db;
+  --c-gold-bg: rgba(212, 175, 55, 0.16);
+  --c-gold-fg: #e6c14d;
+
   /* Кнопка «action» — тепер SOLID помаранч, текст чорний для контрасту. */
   --c-action-bg: #f6921e;
   --c-action-bg-hover: #f08407;

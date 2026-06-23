@@ -50,7 +50,7 @@
 |---|---|
 | `btn("action")` / `btn("delete")` | дві кнопки (хакі / червона) |
 | `<Button kind>` | обгортка `<button>` |
-| `badgeClass(color)` | пігулка: `brand`/`green`/`gray`/`red`/`amber` |
+| `badgeClass(color)` | пігулка: `brand`/`green`/`gray`/`red`/`amber` + метал ачивок `bronze`/`silver`/`gold` |
 | `headerNavClass(active)` / `headerAdminClass(active)` / `subNavClass(active)` | пункти меню |
 | `Collapsible` | згортуваний блок на `<details>` |
 

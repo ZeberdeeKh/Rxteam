@@ -258,7 +258,7 @@ Key/value-store для feature-флагів (`feature_*`), параметрів 
 |---|---|---|
 | `code` | text PK | |
 | `title_pl` / `title_en` / `title_uk` | text | |
-| `tier` | text NN d'mid' | `easy\|mid\|hard` (визначає бали) |
+| `tier` | text NN d'mid' | `easy\|mid\|hard\|legendary` (визначає бали `pts_ach_*`) |
 | `enabled` | boolean NN d true | |
 
 Сід 7 кодів: `first_contact`, `deploy_10`, `deploy_25`, `deploy_50`, `recruiter`, `dawn_patrol`, `iron_discipline`.

@@ -1121,6 +1121,8 @@ const SITE: Record<string, Dict> = {
   adm_ach_tier_easy: { pl: "łatwe", en: "easy", uk: "легка" },
   adm_ach_tier_mid: { pl: "średnie", en: "mid", uk: "середня" },
   adm_ach_tier_hard: { pl: "trudne", en: "hard", uk: "складна" },
+  adm_ach_tier_legendary: { pl: "legendarne", en: "legendary", uk: "легендарна" },
+  adm_ach_points_title: { pl: "Punkty za poziom", en: "Points per tier", uk: "Бали за рівень" },
   adm_ach_enabled: { pl: "Włączone", en: "Enabled", uk: "Увімкнено" },
   adm_ach_earned_hint: {
     pl: "Zdobyte przez graczy — wyłącz zamiast usuwać.",

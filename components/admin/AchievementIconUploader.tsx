@@ -10,6 +10,7 @@ const MAX_BYTES = 50 * 1024; // тримати синхронно з route.ts
 // Завантаження SVG-мініатюри ачівки: вибір файлу → multipart →
 // /api/admin/achievement/icon/upload → router.refresh(). Окремий канал (НЕ server action),
 // бо код ачівки (PK) уже існує лише на правці — тому віджет показується тільки в розгорнутому рядку.
+// Єдиний стиль іконок (медаль bronze/silver/gold/red + лавр + символ): docs/prompts/ACHIEVEMENT_ICON_PROMPT.md.
 export default function AchievementIconUploader({
   lang,
   code,

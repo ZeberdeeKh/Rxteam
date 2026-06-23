@@ -666,7 +666,7 @@ export async function markFulfilled(formData: FormData) {
 // ── Ачівки (майстер) ──
 const backAch = (q: string) => redirect(`/admin/achievements${q}`);
 
-const ACH_TIERS = ["easy", "mid", "hard"];
+const ACH_TIERS = ["easy", "mid", "hard", "legendary"];
 const ACH_KINDS = ["auto", "manual"];
 
 // Поля ачівки з форми (спільні для створення і правки; без code — він окремо).
@@ -726,6 +726,21 @@ export async function deleteAchievement(formData: FormData) {
   await supabase.from("achievements").delete().eq("code", code);
   revalidatePath("/admin/achievements");
   backAch("?deleted=1");
+}
+
+// Бали за рівні ачивок (pts_ach_easy/mid/hard/legendary). Раніше були в /admin/settings → «Бали»;
+// перенесено сюди як єдине джерело. Економіку міняє лише майстер (як і saveSettings).
+// Порожнє поле пропускаємо (не затираємо в ""); 0 — валідне значення.
+export async function saveAchievementPoints(formData: FormData) {
+  await requireMaster();
+  for (const tier of ["easy", "mid", "hard", "legendary"] as const) {
+    const v = formData.get(`pts_ach_${tier}`);
+    if (v !== null && String(v).trim() !== "") {
+      await setSetting(`pts_ach_${tier}`, String(v).trim());
+    }
+  }
+  revalidatePath("/admin/achievements");
+  backAch("?ptsSaved=1");
 }
 
 // ── Фото-галерея (право gallery) ──

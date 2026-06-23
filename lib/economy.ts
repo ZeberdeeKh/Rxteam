@@ -155,6 +155,7 @@ export type GrantedAch = {
 async function tierPoints(tier: string): Promise<number> {
   if (tier === "easy") return getPointValue("pts_ach_easy", 5);
   if (tier === "hard") return getPointValue("pts_ach_hard", 20);
+  if (tier === "legendary") return getPointValue("pts_ach_legendary", 40);
   return getPointValue("pts_ach_mid", 10);
 }
 

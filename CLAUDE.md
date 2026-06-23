@@ -26,3 +26,19 @@
 - **Логотип** = той самий колір, що й заголовки (`--c-brand-text`).
 - Не дублюй активний пункт меню великим заголовком сторінки.
 - Стилі — лише через `@/components/ui`. Не хардкодити Tailwind-класи кнопок/плашок/заголовків.
+
+## Ачивки (achievements)
+- **4 рівні (`tier`):** `easy | mid | hard | legendary` (легка / середня / складна / легендарна).
+  Колонка `achievements.tier` — вільний `text`. Бали за рівень — у `settings`
+  (`pts_ach_easy/mid/hard/legendary`), нараховуються в [lib/economy.ts](lib/economy.ts) → `tierPoints()`.
+- **Бали за рівень** редагуються в `/admin/achievements` → панель «Бали за рівень» (master-only,
+  server-action `saveAchievementPoints`). НЕ в `/admin/settings`.
+- Бейджі рівнів «під медалі»: бронза/срібло/золото/червоний (`bronze/silver/gold/red` у [styles.ts](components/ui/styles.ts)).
+
+## Генерація іконок ачивок (ОБОВ'ЯЗКОВЕ ПРАВИЛО)
+Коли просять **створити / згенерувати SVG-іконку для ачивки** — спершу прочитай і точно слідуй
+**[docs/prompts/ACHIEVEMENT_ICON_PROMPT.md](docs/prompts/ACHIEVEMENT_ICON_PROMPT.md)**.
+Єдиний стиль — **медаль**: метал за рівнем (бронза/срібло/золото/червоний для easy/mid/hard/legendary)
++ лавровий вінок з боків + центральний символ теми. Готовий SVG зберігай у
+`assets/achievement-icons/<code>.svg`; завантаження — через `/admin/achievements` (AchievementIconUploader,
+зберігається як base64 у `achievements.thumbnail_svg`).
