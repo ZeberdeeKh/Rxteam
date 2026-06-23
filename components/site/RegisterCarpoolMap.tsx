@@ -47,25 +47,35 @@ function DriverBooking({ d, gameId, lang }: { d: RegisterMapDriver; gameId: numb
   async function request() {
     setBusy(true);
     setErr(null);
-    const res = await requestRideSeatInline(gameId, d.playerId);
-    setBusy(false);
-    if (res.ok) {
-      setStatus("pending");
-      return;
+    try {
+      const res = await requestRideSeatInline(gameId, d.playerId);
+      if (res.ok) {
+        setStatus("pending");
+        return;
+      }
+      // Лише причини з i18n-ключем показуємо дослівно; внутрішні (auth/disabled/bad) → загальна.
+      const known = ["self", "duplicate", "closed", "full", "game_past", "driver_not_found"];
+      setErr(st(lang, `carpool_err_${res.reason && known.includes(res.reason) ? res.reason : "generic"}`));
+    } catch {
+      setErr(st(lang, "carpool_err_generic"));
+    } finally {
+      setBusy(false);
     }
-    // Лише причини з i18n-ключем показуємо дослівно; внутрішні (auth/disabled/bad) → загальна.
-    const known = ["self", "duplicate", "closed", "full", "game_past", "driver_not_found"];
-    setErr(st(lang, `carpool_err_${res.reason && known.includes(res.reason) ? res.reason : "generic"}`));
   }
   async function cancel() {
     setBusy(true);
     setErr(null);
-    const res = await cancelRideSeatInline(gameId, d.playerId);
-    setBusy(false);
-    if (res.ok) setStatus("none");
-    // Скасувати не вдалося, бо водій устиг прийняти → показуємо підтверджено; інакше можна просити знову.
-    else if (res.status === "accepted") setStatus("accepted");
-    else setStatus("none");
+    try {
+      const res = await cancelRideSeatInline(gameId, d.playerId);
+      if (res.ok) setStatus("none");
+      // Скасувати не вдалося, бо водій устиг прийняти → показуємо підтверджено; інакше — просити знову.
+      else if (res.status === "accepted") setStatus("accepted");
+      else setStatus("none");
+    } catch {
+      setErr(st(lang, "carpool_err_generic"));
+    } finally {
+      setBusy(false);
+    }
   }
 
   if (status === "accepted") {
@@ -87,9 +97,10 @@ function DriverBooking({ d, gameId, lang }: { d: RegisterMapDriver; gameId: numb
     return (
       <div className="mt-1 space-y-1">
         <p className="font-medium text-amber-700">{st(lang, "carpool_request_pending")}</p>
-        <button type="button" onClick={cancel} disabled={busy} className="text-xs underline disabled:opacity-50">
+        <button type="button" onClick={cancel} disabled={busy} className={btn("delete", "sm")}>
           {st(lang, "carpool_cancel_request")}
         </button>
+        {err && <p className="text-red-600">{err}</p>}
       </div>
     );
   }
