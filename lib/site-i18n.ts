@@ -88,7 +88,7 @@ const SITE: Record<string, Dict> = {
   carpool_venue: { pl: "Miejsce gry", en: "Game venue", uk: "Полігон" },
   carpool_seats_free: { pl: "{n} wolnych miejsc", en: "{n} free seats", uk: "{n} вільних місць" },
   carpool_seats_closed: { pl: "Nabór zamknięty", en: "Seats closed", uk: "Набір закрито" },
-  carpool_request_seat: { pl: "Poproś o miejsce", en: "Request a seat", uk: "Прошу місце" },
+  carpool_request_seat: { pl: "Poproś o miejsce", en: "Request a seat", uk: "Запросити місце" },
   carpool_request_login: { pl: "Zaloguj się, aby zarezerwować", en: "Log in to book", uk: "Увійди, щоб бронювати" },
   carpool_request_pending: { pl: "Wysłano prośbę", en: "Request sent", uk: "Запит надіслано" },
   carpool_request_accepted: { pl: "Kierowca potwierdził", en: "Driver confirmed", uk: "Водій підтвердив" },

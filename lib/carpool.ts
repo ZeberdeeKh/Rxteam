@@ -242,6 +242,57 @@ export async function declineRideRequest(requestId: number): Promise<RideDecisio
   };
 }
 
+// Пасажир скасовує власний pending-запит — ЄДИНЕ ядро для всіх UI карпулу (мапа реєстрації).
+// Повертає фактичний статус, якщо pending уже не було (водій устиг вирішити),
+// щоб клієнт не показав хибно «можна просити знову».
+export type RideCancelResult = { ok: boolean; status: "accepted" | "declined" | null };
+export async function cancelOwnRideRequest(
+  gameId: number,
+  driverPlayerId: number,
+  passengerId: number,
+): Promise<RideCancelResult> {
+  const { data: cancelled } = await supabase
+    .from("ride_requests")
+    .update({ status: "cancelled", decided_at: new Date().toISOString() })
+    .eq("game_id", gameId)
+    .eq("driver_player_id", driverPlayerId)
+    .eq("passenger_id", passengerId)
+    .eq("status", "pending")
+    .select("id");
+  if ((cancelled?.length ?? 0) > 0) return { ok: true, status: null };
+  const { data: cur } = await supabase
+    .from("ride_requests")
+    .select("status")
+    .eq("game_id", gameId)
+    .eq("driver_player_id", driverPlayerId)
+    .eq("passenger_id", passengerId)
+    .in("status", ["accepted", "declined"])
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { ok: false, status: (cur?.status as "accepted" | "declined") ?? null };
+}
+
+// Рішення водія по запиту (прийняти/відхилити) з перевіркою власності — ЄДИНЕ ядро для
+// сайту й бота. Саме списання місця лишається в acceptRideRequest (атомарний CAS).
+export async function decideRideRequest(
+  requestId: number,
+  callerDriverId: number,
+  decision: "accept" | "decline",
+): Promise<{ ok: boolean; reason?: "not_found" | "forbidden" | "not_pending" | "full" }> {
+  const { data: req } = await supabase
+    .from("ride_requests")
+    .select("driver_player_id, status")
+    .eq("id", requestId)
+    .maybeSingle();
+  if (!req) return { ok: false, reason: "not_found" };
+  if (req.driver_player_id !== callerDriverId) return { ok: false, reason: "forbidden" };
+  if (req.status !== "pending") return { ok: false, reason: "not_pending" };
+  const r =
+    decision === "accept" ? await acceptRideRequest(requestId) : await declineRideRequest(requestId);
+  return r.ok ? { ok: true } : { ok: false, reason: r.reason as "full" | "not_pending" };
+}
+
 // Водій знявся з гри → скасовуємо всі його pending/accepted запити й сповіщаємо пасажирів.
 // Викликається з відписки (сайт app/cabinet/actions.ts і бот unreg). Місця не повертаємо —
 // реєстрація водія (а з нею і free_seats) усе одно стає cancelled.

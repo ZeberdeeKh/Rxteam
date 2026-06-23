@@ -151,7 +151,7 @@ export async function registerForGame(formData: FormData) {
       : null;
   if (transport === "own" && ridePrice === null) backTo(formData, "?err=need_price");
 
-  // Точка виїзду водія з вбудованої мапи форми (порожньо → пін можна поставити пізніше на /carpool).
+  // Точка виїзду водія з вбудованої мапи форми (порожньо → пін можна поставити пізніше, редагуючи поїздку).
   const latStr = String(formData.get("from_lat") ?? "");
   const lngStr = String(formData.get("from_lng") ?? "");
   const latNum = latStr === "" ? NaN : Number(latStr);

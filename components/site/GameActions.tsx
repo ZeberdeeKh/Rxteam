@@ -88,6 +88,7 @@ export default function GameActions({
           gameId={gameId}
           lang={lang}
           returnTo="/games"
+          incomingCount={reg.incomingCount}
           initial={{
             transport: reg.myTransport,
             freeSeats: reg.myFreeSeats,

@@ -288,6 +288,7 @@ export type CabinetGame = SiteGame & {
   myFromLng: number | null;
   myPickups: CarpoolPoint[];
   mySeatsClosed: boolean;
+  incomingCount: number; // скільки pending-запитів на місце прийшло мені як водієві (для бейджа)
 };
 
 // Ігри для кабінету: усі анонсовані, чиє вікно чек-іну ще не закрите (checkin_to >= now),
@@ -306,7 +307,7 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
   if (!rows.length) return [];
 
   const ids = rows.map((r) => r.id as number);
-  const [counts, regsRes, checksRes, settings] = await Promise.all([
+  const [counts, regsRes, checksRes, incomingRes, settings] = await Promise.all([
     countsFor(ids),
     supabase
       .from("registrations")
@@ -314,11 +315,21 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
       .eq("player_id", playerId)
       .in("game_id", ids),
     supabase.from("checkins").select("game_id").eq("player_id", playerId).in("game_id", ids),
+    // Вхідні pending-запити на місце, де гравець — водій (один індексований запит на всі ігри).
+    supabase
+      .from("ride_requests")
+      .select("game_id")
+      .eq("driver_player_id", playerId)
+      .eq("status", "pending")
+      .in("game_id", ids),
     getAllSettings(),
   ]);
   const regMap = new Map<number, any>();
   for (const r of regsRes.data ?? []) regMap.set(r.game_id as number, r);
   const checkedSet = new Set((checksRes.data ?? []).map((c) => c.game_id as number));
+  const incomingMap = new Map<number, number>();
+  for (const r of incomingRes.data ?? [])
+    incomingMap.set(r.game_id as number, (incomingMap.get(r.game_id as number) ?? 0) + 1);
 
   const ms = (iso: string | null) => (iso ? new Date(iso).getTime() : null);
 
@@ -355,6 +366,7 @@ export async function getCabinetGames(playerId: number): Promise<CabinetGame[]> 
       myFromLng: myReg?.from_lng ?? null,
       myPickups: normPickups(myReg?.pickups),
       mySeatsClosed: !!myReg?.seats_closed,
+      incomingCount: incomingMap.get(r.id as number) ?? 0,
     };
   });
 }
@@ -599,7 +611,7 @@ export type CarpoolData = {
   incoming: CarpoolIncoming[]; // pending-запити, де глядач — водій (для accept/decline на сайті)
 };
 
-// Дані для сторінки /carpool: гра + полігон + водії з координатами + стан глядача.
+// Дані карпулу гри (API /api/carpool + мапа у формі реєстрації): полігон + водії + стан глядача.
 // playerId=null → лише перегляд (anon). null повертаємо, якщо гри нема.
 export async function getCarpool(gameId: number, playerId: number | null): Promise<CarpoolData | null> {
   const { data: game } = await supabase
