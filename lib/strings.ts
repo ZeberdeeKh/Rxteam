@@ -259,6 +259,12 @@ const S: Record<string, Dict> = {
     en: "You're already signed up.",
     uk: "Ти вже записаний.",
   },
+  // Рядок-підказка в картці гри, коли гравець уже записаний (над кнопкою «Відписатись»).
+  card_already_registered: {
+    pl: "✅ Jesteś już zapisany na tę grę. Aby się wypisać, kliknij przycisk „Wypisz się” poniżej.",
+    en: "✅ You're already signed up for this game. To cancel, tap the “Leave” button below.",
+    uk: "✅ Ти вже записаний на цю гру. Якщо хочеш відписатись — натисни кнопку «Відписатись» нижче.",
+  },
   game_full: { pl: "Brak miejsc.", en: "No spots left.", uk: "Місць немає." },
   ask_callsign: {
     pl: "Podaj swój pseudonim (callsign) — ustawiasz go raz:",

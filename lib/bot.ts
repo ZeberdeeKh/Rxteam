@@ -3155,6 +3155,10 @@ async function buildGameCard(
     const discount = (refCount ?? 0) >= 2 ? tr(lang, "ref_disc_free") : tr(lang, "ref_disc_half");
     text += "\n" + tr(lang, "ref_card_discount", { discount });
   }
+  // Чіткий статус для вже записаного гравця — над кнопкою «Відписатись».
+  if (reg?.status === "registered") {
+    text += "\n\n" + tr(lang, "card_already_registered");
+  }
   return { text, kb };
 }
 
