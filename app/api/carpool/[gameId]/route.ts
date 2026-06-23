@@ -32,5 +32,6 @@ export async function GET(_req: Request, { params }: { params: { gameId: string 
       myRequest: d.myRequest, // стан мого запиту цьому водієві (для кнопки бронювання)
       tgUsername: d.tgUsername, // @username для зв'язку, коли запит підтверджено
     })),
+    incoming: data.incoming, // вхідні запити, де глядач — водій (accept/decline у формі)
   });
 }

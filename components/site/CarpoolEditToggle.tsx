@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { st, type Lang } from "@/lib/site-i18n";
 import RegisterForm, { type RegisterInitial } from "@/components/cabinet/RegisterForm";
-import { btn, badgeClass } from "@/components/ui";
+import { btn } from "@/components/ui";
 
 // Кнопка «Редагувати поїздку» для зареєстрованої гри (на /games).
 // Форма (а з нею і мапа) монтується лише після розгортання — щоб не вантажити мапу для кожної гри.
@@ -31,7 +31,10 @@ export default function CarpoolEditToggle({
           {st(lang, "carpool_edit_toggle")}
         </button>
         {incomingCount > 0 && (
-          <span className={badgeClass("amber")} title={st(lang, "carpool_incoming_heading")}>
+          <span
+            className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-[var(--c-primary)] px-1 text-xs font-bold leading-none text-white"
+            title={st(lang, "carpool_incoming_heading")}
+          >
             {incomingCount}
           </span>
         )}

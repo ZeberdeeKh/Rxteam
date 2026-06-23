@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { st, type Lang } from "@/lib/site-i18n";
 import { registerForGame } from "@/app/cabinet/actions";
+import { acceptRideInline, declineRideInline } from "@/app/carpool/actions";
 import { ui, btn } from "@/components/ui";
 import type { RegisterMapDriver } from "@/components/site/RegisterCarpoolMap";
 
@@ -13,9 +14,16 @@ const RegisterCarpoolMap = dynamic(() => import("@/components/site/RegisterCarpo
 });
 
 type Pt = { lat: number; lng: number };
+type Incoming = {
+  requestId: number;
+  passengerCallsign: string | null;
+  passengerName: string | null;
+  passengerTgUsername: string | null;
+};
 type Carpool = {
   venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
   drivers: RegisterMapDriver[];
+  incoming: Incoming[];
 };
 
 // Початкове оголошення для режиму редагування (із getCabinetGames).
@@ -66,7 +74,8 @@ export default function RegisterForm({
   useEffect(() => {
     if (!showMap || carpool || loadFailed) return;
     let cancelled = false;
-    fetch(`/api/carpool/${gameId}`)
+    // no-store: завжди свіжі водії/вхідні запити/місця при кожному відкритті форми (не з кешу браузера).
+    fetch(`/api/carpool/${gameId}`, { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("load"))))
       .then((d) => {
         if (!cancelled) setCarpool(d as Carpool);
@@ -266,9 +275,82 @@ export default function RegisterForm({
         </div>
       )}
 
+      {/* Водій: вхідні запити на місце — прийняти/відхилити прямо тут (без TG і без /carpool) */}
+      {transport === "own" && carpool?.incoming && carpool.incoming.length > 0 && (
+        <IncomingRequests
+          items={carpool.incoming}
+          lang={lang}
+          onAccepted={() => setSeats((s) => Math.max(0, s - 1))}
+        />
+      )}
+
       <button type="submit" className={`${btn("action")} w-full sm:w-auto`}>
         {st(lang, editing ? "btn_save" : "btn_register")}
       </button>
     </form>
+  );
+}
+
+// Список вхідних запитів водія: accept/decline через ядро (decideRideRequest), оптимістично
+// прибираємо оброблені. onAccepted зменшує локальний лічильник місць, щоб сабміт форми не
+// «відкотив» free_seats назад.
+function IncomingRequests({
+  items,
+  lang,
+  onAccepted,
+}: {
+  items: Incoming[];
+  lang: Lang;
+  onAccepted: () => void;
+}) {
+  const [decided, setDecided] = useState<Record<number, true>>({});
+  const [busy, setBusy] = useState<number | null>(null);
+  const pending = items.filter((r) => !decided[r.requestId]);
+  if (pending.length === 0) return null;
+
+  async function decide(requestId: number, accept: boolean) {
+    setBusy(requestId);
+    const res = accept ? await acceptRideInline(requestId) : await declineRideInline(requestId);
+    setBusy(null);
+    if (res.ok) {
+      setDecided((d) => ({ ...d, [requestId]: true }));
+      if (accept) onAccepted();
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <p className="text-sm font-semibold text-gray-700">{st(lang, "carpool_incoming_heading")}</p>
+      <ul className="space-y-2">
+        {pending.map((r) => (
+          <li
+            key={r.requestId}
+            className="flex flex-wrap items-center justify-between gap-2 border border-gray-200 px-3 py-2"
+          >
+            <span className="text-sm font-medium text-gray-800">
+              {r.passengerCallsign ?? r.passengerName ?? "?"}
+            </span>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => decide(r.requestId, true)}
+                disabled={busy === r.requestId}
+                className={btn("action", "sm")}
+              >
+                {st(lang, "carpool_accept")}
+              </button>
+              <button
+                type="button"
+                onClick={() => decide(r.requestId, false)}
+                disabled={busy === r.requestId}
+                className={btn("ghost", "sm")}
+              >
+                {st(lang, "carpool_decline")}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
