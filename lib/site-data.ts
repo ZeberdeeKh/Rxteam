@@ -703,11 +703,13 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
   const drivers: CarpoolDriver[] = (rows ?? []).map((d: any) => {
     const pl = Array.isArray(d.players) ? d.players[0] : d.players;
     const isMe = playerId != null && d.player_id === playerId;
+    const myStatus = (myOutgoing.get(d.player_id) as CarpoolDriver["myRequest"]) ?? null;
     return {
       playerId: d.player_id,
       callsign: pl?.callsign ?? null,
       name: pl?.name ?? null,
-      tgUsername: pl?.tg_username ?? null,
+      // @username водія розкриваємо лише коли він підтвердив запит (як у боті) — інакше не світимо.
+      tgUsername: myStatus === "accepted" ? (pl?.tg_username ?? null) : null,
       fromPlace: d.from_place ?? null,
       rideNote: d.ride_note ?? null,
       ridePrice: d.ride_price ?? null,
@@ -717,7 +719,7 @@ export async function getCarpool(gameId: number, playerId: number | null): Promi
       lng: isMe ? d.from_lng : round3(d.from_lng),
       pickups: normPickups(d.pickups),
       isMe,
-      myRequest: (myOutgoing.get(d.player_id) as CarpoolDriver["myRequest"]) ?? null,
+      myRequest: myStatus,
     };
   });
 

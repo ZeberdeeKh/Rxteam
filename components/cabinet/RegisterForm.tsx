@@ -201,6 +201,7 @@ export default function RegisterForm({
             <RegisterCarpoolMap
               lang={lang}
               mode={transport === "own" ? "own" : "need"}
+              gameId={gameId}
               venue={carpool.venue}
               drivers={carpool.drivers}
               pin={pin}

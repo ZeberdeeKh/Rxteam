@@ -112,6 +112,51 @@ export async function savePickups(formData: FormData) {
   backCarpool(gameId, "&ok=pickups");
 }
 
+// Імперативні варіанти (повертають результат, без redirect) — для виклику прямо з клієнтської
+// мапи у формі реєстрації (мапа всередині <form>, тож вкладена <form action> неможлива).
+export async function requestRideSeatInline(
+  gameId: number,
+  driverPlayerId: number,
+): Promise<{ ok: boolean; reason?: string }> {
+  const player = await getSessionPlayer();
+  if (!player) return { ok: false, reason: "auth" };
+  if (!(await featureEnabled("carpool_map"))) return { ok: false, reason: "disabled" };
+  if (!Number.isFinite(gameId) || !Number.isFinite(driverPlayerId)) return { ok: false, reason: "bad" };
+  const res = await createRideRequest(gameId, driverPlayerId, player.id);
+  return res.ok ? { ok: true } : { ok: false, reason: res.reason };
+}
+
+export async function cancelRideSeatInline(
+  gameId: number,
+  driverPlayerId: number,
+): Promise<{ ok: boolean; status?: "accepted" | "declined" | null }> {
+  const player = await getSessionPlayer();
+  if (!player) return { ok: false };
+  if (!Number.isFinite(gameId) || !Number.isFinite(driverPlayerId)) return { ok: false };
+  const { data: cancelled } = await supabase
+    .from("ride_requests")
+    .update({ status: "cancelled", decided_at: new Date().toISOString() })
+    .eq("game_id", gameId)
+    .eq("driver_player_id", driverPlayerId)
+    .eq("passenger_id", player.id)
+    .eq("status", "pending")
+    .select("id");
+  if ((cancelled?.length ?? 0) > 0) return { ok: true };
+  // Pending-запиту не було (напр., водій устиг прийняти між рендером і кліком) — повертаємо
+  // фактичний статус, щоб клієнт не показав хибно «можна просити знову».
+  const { data: cur } = await supabase
+    .from("ride_requests")
+    .select("status")
+    .eq("game_id", gameId)
+    .eq("driver_player_id", driverPlayerId)
+    .eq("passenger_id", player.id)
+    .in("status", ["accepted", "declined"])
+    .order("id", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return { ok: false, status: (cur?.status as "accepted" | "declined") ?? null };
+}
+
 // Пасажир просить місце у водія (вся валідація + DM водію — у createRideRequest).
 export async function requestSeat(formData: FormData) {
   const player = await getSessionPlayer();

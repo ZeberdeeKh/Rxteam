@@ -5,6 +5,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { MapContainer, TileLayer, Marker, Popup, Circle, Polyline, useMapEvents } from "react-leaflet";
 import { st, type Lang } from "@/lib/site-i18n";
+import { requestRideSeatInline, cancelRideSeatInline } from "@/app/carpool/actions";
+import { btn } from "@/components/ui";
 
 type Pt = { lat: number; lng: number };
 
@@ -19,17 +21,90 @@ export type RegisterMapDriver = {
   freeSeats: number;
   seatsClosed: boolean;
   isMe: boolean;
+  myRequest: "pending" | "accepted" | "declined" | null; // стан мого запиту цьому водієві
+  tgUsername: string | null; // @username для зв'язку, коли запит підтверджено
 };
 
 export type RegisterCarpoolMapProps = {
   lang: Lang;
   mode: "own" | "need";
+  gameId: number;
   venue: { name: string | null; lat: number; lng: number; radiusM: number } | null;
   drivers: RegisterMapDriver[];
   pin: Pt | null; // моя точка виїзду (own)
   pickups: Pt[]; // мої точки підбору (own)
   onPick: (lat: number, lng: number) => void; // батько маршрутизує за режимом (виїзд/підбір)
 };
+
+// Бронювання місця у конкретного водія — кнопка в попапі мапи (лише для шукачів авто, mode="need").
+// Серверні екшени викликаємо імперативно (мапа всередині <form> реєстрації), стан тримаємо локально.
+function DriverBooking({ d, gameId, lang }: { d: RegisterMapDriver; gameId: number; lang: Lang }) {
+  const initial = d.myRequest === "pending" || d.myRequest === "accepted" ? d.myRequest : "none";
+  const [status, setStatus] = useState<"pending" | "accepted" | "none">(initial);
+  const [err, setErr] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function request() {
+    setBusy(true);
+    setErr(null);
+    const res = await requestRideSeatInline(gameId, d.playerId);
+    setBusy(false);
+    if (res.ok) {
+      setStatus("pending");
+      return;
+    }
+    // Лише причини з i18n-ключем показуємо дослівно; внутрішні (auth/disabled/bad) → загальна.
+    const known = ["self", "duplicate", "closed", "full", "game_past", "driver_not_found"];
+    setErr(st(lang, `carpool_err_${res.reason && known.includes(res.reason) ? res.reason : "generic"}`));
+  }
+  async function cancel() {
+    setBusy(true);
+    setErr(null);
+    const res = await cancelRideSeatInline(gameId, d.playerId);
+    setBusy(false);
+    if (res.ok) setStatus("none");
+    // Скасувати не вдалося, бо водій устиг прийняти → показуємо підтверджено; інакше можна просити знову.
+    else if (res.status === "accepted") setStatus("accepted");
+    else setStatus("none");
+  }
+
+  if (status === "accepted") {
+    return (
+      <p className="font-medium text-emerald-700">
+        ✓ {st(lang, "carpool_request_accepted")}
+        {d.tgUsername && (
+          <>
+            {" · "}
+            <a href={`https://t.me/${d.tgUsername}`} target="_blank" rel="noopener noreferrer" className="underline">
+              @{d.tgUsername}
+            </a>
+          </>
+        )}
+      </p>
+    );
+  }
+  if (status === "pending") {
+    return (
+      <div className="mt-1 space-y-1">
+        <p className="font-medium text-amber-700">{st(lang, "carpool_request_pending")}</p>
+        <button type="button" onClick={cancel} disabled={busy} className="text-xs underline disabled:opacity-50">
+          {st(lang, "carpool_cancel_request")}
+        </button>
+      </div>
+    );
+  }
+  if (d.seatsClosed || d.freeSeats < 1) {
+    return <p className="text-gray-500">{st(lang, "carpool_seats_closed")}</p>;
+  }
+  return (
+    <div className="mt-1 space-y-1">
+      <button type="button" onClick={request} disabled={busy} className={btn("action", "sm")}>
+        {st(lang, "carpool_request_seat")}
+      </button>
+      {err && <p className="text-red-600">{err}</p>}
+    </div>
+  );
+}
 
 function pinIcon(emoji: string, border: string, bg: string) {
   return L.divIcon({
@@ -95,6 +170,7 @@ function Clicker({ onPick }: { onPick: (lat: number, lng: number) => void }) {
 export default function RegisterCarpoolMap({
   lang,
   mode,
+  gameId,
   venue,
   drivers,
   pin,
@@ -148,6 +224,8 @@ export default function RegisterCarpoolMap({
                     : st(lang, "carpool_seats_free", { n: d.freeSeats })}
                 </p>
                 {d.rideNote && <p className="italic">“{d.rideNote}”</p>}
+                {/* Шукач авто бронює місце прямо тут */}
+                {mode === "need" && <DriverBooking d={d} gameId={gameId} lang={lang} />}
               </div>
             </Popup>
           </Marker>
