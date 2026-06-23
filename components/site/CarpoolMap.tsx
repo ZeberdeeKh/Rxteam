@@ -91,7 +91,7 @@ function DriverRoute({
     };
   }, [key]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  return <Polyline positions={geo ?? straight} pathOptions={{ color: "#f6921e", weight, opacity: 0.6 }} />;
+  return <Polyline positions={geo ?? straight} pathOptions={{ color: "#ef4444", weight, opacity: 0.9 }} />;
 }
 
 // Ловить клік по мапі (лише коли водій редагує): режим вирішує — виїзд чи точка підбору.
