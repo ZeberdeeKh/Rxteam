@@ -1088,6 +1088,12 @@ const SITE: Record<string, Dict> = {
   adm_shop_cost: { pl: "Cena (punkty)", en: "Cost (points)", uk: "Ціна (бали)" },
   adm_shop_sort: { pl: "Kolejność", en: "Order", uk: "Порядок" },
   adm_shop_active: { pl: "Aktywny", en: "Active", uk: "Активний" },
+  // Ціни системних товарів і рангів (винесено з «Налаштувань»)
+  adm_shop_pricing_title: {
+    pl: "Towary systemowe i rangi — ceny",
+    en: "System products & ranks — prices",
+    uk: "Системні товари і ранги — ціни",
+  },
   // Журнал покупок
   adm_shop_orders_title: { pl: "Zakupy", en: "Purchases", uk: "Покупки" },
   adm_shop_orders_empty: { pl: "Brak zakupów.", en: "No purchases.", uk: "Немає покупок." },

@@ -143,14 +143,12 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
     ],
   },
   {
-    title: { pl: "Rangi i wynajem", en: "Ranks and rental", uk: "Ранги й оренда" },
+    // Ранги, зміна позивного і вхід на гру — це товари магазину; їхні ціни редагуються
+    // на сторінці «Магазин» (/admin/shop → SHOP_SETTINGS_GROUPS), щоб усі товари були в
+    // одному місці. Тут лишається тільки запас комплектів для оренди.
+    title: { pl: "Wynajem", en: "Rental", uk: "Оренда" },
     fields: [
-      { key: "rank_cost_scout", type: "number", label: { pl: "Koszt: Scout", en: "Cost: Scout", uk: "Ціна: Scout" } },
-      { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },
-      { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
       { key: "rental_stock", type: "number", label: { pl: "Zapas zestawów do wynajęcia", en: "Rental sets in stock", uk: "Запас комплектів для оренди" } },
-      { key: "callsign_change_cost", type: "number", label: { pl: "Zmiana pseudonimu (koszt, pkt)", en: "Callsign change (cost, pts)", uk: "Зміна позивного (ціна, бали)" } },
-      { key: "game_entry_cost", type: "number", label: { pl: "Darmowe wejście na grę (koszt, pkt)", en: "Free game entry (cost, pts)", uk: "Безкоштовний вхід на гру (ціна, бали)" } },
     ],
   },
   {
@@ -312,5 +310,34 @@ export const PATCH_TOGGLE_KEYS = PATCH_SETTINGS_GROUPS.flatMap((g) =>
   g.fields.filter((f) => f.type === "toggle").map((f) => f.key),
 );
 export const PATCH_VALUE_KEYS = PATCH_SETTINGS_GROUPS.flatMap((g) =>
+  g.fields.filter((f) => f.type !== "toggle").map((f) => f.key),
+);
+
+// ── Ціни товарів магазину (сторінка /admin/shop, право "shop") ──
+// Системні товари (вхід на гру, зміна позивного) і ранги мають фіксовану логіку в коді,
+// тож редагується лише їхня ціна в балах. Винесено із загальних «Налаштувань» (як патч),
+// щоб усі товари магазину керувались з однієї сторінки. Зберігається дією saveShopSettings.
+export const SHOP_SETTINGS_GROUPS: SettingGroup[] = [
+  {
+    title: { pl: "Towary systemowe — ceny (pkt)", en: "System products — prices (pts)", uk: "Системні товари — ціни (бали)" },
+    fields: [
+      { key: "game_entry_cost", type: "number", label: { pl: "Darmowe wejście na grę (koszt, pkt)", en: "Free game entry (cost, pts)", uk: "Безкоштовний вхід на гру (ціна, бали)" } },
+      { key: "callsign_change_cost", type: "number", label: { pl: "Zmiana pseudonimu (koszt, pkt)", en: "Callsign change (cost, pts)", uk: "Зміна позивного (ціна, бали)" } },
+    ],
+  },
+  {
+    title: { pl: "Rangi — ceny (pkt)", en: "Ranks — prices (pts)", uk: "Ранги — ціни (бали)" },
+    fields: [
+      { key: "rank_cost_scout", type: "number", label: { pl: "Koszt: Scout", en: "Cost: Scout", uk: "Ціна: Scout" } },
+      { key: "rank_cost_squad", type: "number", label: { pl: "Koszt: Squad Leader", en: "Cost: Squad Leader", uk: "Ціна: Squad Leader" } },
+      { key: "rank_cost_team", type: "number", label: { pl: "Koszt: Team Leader", en: "Cost: Team Leader", uk: "Ціна: Team Leader" } },
+    ],
+  },
+];
+
+export const SHOP_TOGGLE_KEYS = SHOP_SETTINGS_GROUPS.flatMap((g) =>
+  g.fields.filter((f) => f.type === "toggle").map((f) => f.key),
+);
+export const SHOP_VALUE_KEYS = SHOP_SETTINGS_GROUPS.flatMap((g) =>
   g.fields.filter((f) => f.type !== "toggle").map((f) => f.key),
 );

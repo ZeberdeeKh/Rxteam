@@ -1,6 +1,8 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st, type Lang } from "@/lib/site-i18n";
 import { requirePerm } from "@/lib/admin";
+import { getAllSettings } from "@/lib/settings";
+import { SHOP_SETTINGS_GROUPS, SETTING_DEFAULTS } from "@/lib/admin-settings";
 import { listShopItemsAdmin, listPurchasesAdmin } from "@/lib/admin-data";
 import type { ShopItem } from "@/lib/site-data";
 import {
@@ -8,6 +10,7 @@ import {
   updateShopItem,
   deleteShopItem,
   markFulfilled,
+  saveShopSettings,
 } from "@/app/admin/actions";
 import { ui, btn, badgeClass, GLYPH, Collapsible, CreateDrawer } from "@/components/ui";
 
@@ -90,7 +93,11 @@ export default async function AdminShop({
 }) {
   await requirePerm("shop");
   const lang = getServerLang();
-  const [items, orders] = await Promise.all([listShopItemsAdmin(), listPurchasesAdmin()]);
+  const [items, orders, values] = await Promise.all([
+    listShopItemsAdmin(),
+    listPurchasesAdmin(),
+    getAllSettings(),
+  ]);
 
   const ok =
     searchParams.created || searchParams.saved || searchParams.deleted || searchParams.fulfilled;
@@ -162,6 +169,41 @@ export default async function AdminShop({
           ))}
         </div>
       )}
+
+      {/* Ціни системних товарів і рангів — єдине місце керування цінами магазину.
+          Самі товари (вхід на гру, зміна позивного, ранги) мають фіксовану логіку в коді,
+          тут редагується лише ціна в балах. Зберігається дією saveShopSettings. */}
+      <form action={saveShopSettings} className="space-y-3">
+        <h2 className={ui.sectionTitle}>{st(lang, "adm_shop_pricing_title")}</h2>
+        {SHOP_SETTINGS_GROUPS.map((g) => (
+          <Collapsible
+            key={g.title.en}
+            summary={<span className={ui.cardTitle}>{g.title[lang]}</span>}
+            right={<span className={ui.meta}>{g.fields.length}</span>}
+          >
+            <div className="grid gap-4 sm:grid-cols-2">
+              {g.fields.map((f) => (
+                <label key={f.key} className="block text-sm">
+                  <span className={`mb-1 ${ui.label}`}>
+                    {f.label[lang]} <code className={ui.metaFaint}>{f.key}</code>
+                  </span>
+                  <input
+                    type="number"
+                    step="any"
+                    name={f.key}
+                    defaultValue={values[f.key] ?? ""}
+                    placeholder={SETTING_DEFAULTS[f.key] ?? ""}
+                    className={ui.input}
+                  />
+                </label>
+              ))}
+            </div>
+          </Collapsible>
+        ))}
+        <button type="submit" className={btn("action")}>
+          {st(lang, "adm_save")}
+        </button>
+      </form>
 
       {/* Журнал покупок */}
       <section className="space-y-3">

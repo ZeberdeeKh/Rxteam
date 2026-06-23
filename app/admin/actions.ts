@@ -5,7 +5,14 @@ import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
 import { setSetting, getSetting } from "@/lib/settings";
 import { requirePerm, requireMaster, ALL_PERMS } from "@/lib/admin";
-import { TOGGLE_KEYS, VALUE_KEYS, PATCH_TOGGLE_KEYS, PATCH_VALUE_KEYS } from "@/lib/admin-settings";
+import {
+  TOGGLE_KEYS,
+  VALUE_KEYS,
+  PATCH_TOGGLE_KEYS,
+  PATCH_VALUE_KEYS,
+  SHOP_TOGGLE_KEYS,
+  SHOP_VALUE_KEYS,
+} from "@/lib/admin-settings";
 import { notifyPlayerPatch } from "@/lib/notify";
 import { tr } from "@/lib/strings";
 import { getPlayerByTg } from "@/lib/players";
@@ -523,6 +530,21 @@ export async function savePatchSettings(formData: FormData) {
   revalidatePath("/admin/patches");
   revalidatePath("/cabinet"); // ціна/текст показуються в кабінеті
   redirect("/admin/patches?saved=1");
+}
+
+// Ціни товарів магазину (право "shop"). Пише ЛИШЕ shop-ключі (ціни системних товарів і рангів).
+export async function saveShopSettings(formData: FormData) {
+  await requirePerm("shop");
+  for (const key of SHOP_TOGGLE_KEYS) {
+    await setSetting(key, formData.get(key) === "on" ? "true" : "false");
+  }
+  for (const key of SHOP_VALUE_KEYS) {
+    const v = formData.get(key);
+    if (v !== null) await setSetting(key, String(v));
+  }
+  revalidatePath("/admin/shop");
+  revalidatePath("/shop"); // ціни показуються у вітрині магазину
+  redirect("/admin/shop?saved=1");
 }
 
 // Видати гравцю будь-яку ачівку вручну. Переюз канонічної логіки economy.grantAchievement:
