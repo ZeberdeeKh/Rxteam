@@ -348,10 +348,10 @@ function IncomingRequests({
             key={r.requestId}
             className="flex flex-wrap items-center justify-between gap-2 border border-gray-200 px-3 py-2"
           >
+            <span className="text-sm font-medium text-gray-800">
+              {r.passengerCallsign ?? r.passengerName ?? "?"}
+            </span>
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm font-medium text-gray-800">
-                {r.passengerCallsign ?? r.passengerName ?? "?"}
-              </span>
               {r.passengerTgUsername && (
                 <a
                   href={`https://t.me/${r.passengerTgUsername}`}
@@ -362,8 +362,6 @@ function IncomingRequests({
                   {st(lang, "carpool_write_tg")}
                 </a>
               )}
-            </div>
-            <div className="flex items-center gap-2">
               {r.status === "accepted" ? (
                 <>
                   <span className={badgeClass("green")}>{st(lang, "carpool_accepted")}</span>
