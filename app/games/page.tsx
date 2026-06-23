@@ -1,9 +1,7 @@
 import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import {
-  getNextGame,
   getUpcomingGames,
-  getPastGames,
   getCabinetGames,
   type CabinetGame,
 } from "@/lib/site-data";
@@ -23,17 +21,16 @@ function successKey(f: Flags): string | null {
   return null;
 }
 
-// /games — найближча гра + майбутні + минулі. Публічно.
-// Опис кожної гри = повний анонс (як у Телеграмі). Логовані можуть записатись прямо тут.
+// /games — єдиний список ігор за пріоритетом, без поділу на секції: спершу ті, що відбуваються
+// зараз (відкрите вікно чек-іну), далі майбутні від найближчої до найдальшої. Завершені (минулі)
+// ігри на сайті не показуємо. Опис кожної гри = повний анонс; логовані можуть записатись тут.
 export default async function GamesPage({ searchParams }: { searchParams: Flags }) {
   const lang = getServerLang();
   const ctx = await getSessionContext();
   const player = ctx.state === "linked" ? ctx.player : null;
 
-  const [next, upcoming, past, cabGames] = await Promise.all([
-    getNextGame(),
-    getUpcomingGames(),
-    getPastGames(),
+  const [upcoming, cabGames] = await Promise.all([
+    getUpcomingGames(), // start_at >= now, відсортовані за зростанням (найближча першою)
     player ? getCabinetGames(player.id) : Promise.resolve([] as CabinetGame[]),
   ]);
 
@@ -52,7 +49,7 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
     />
   );
 
-  // Компактні дії для вже стартованих ігор у «Минулих»: лише чек-ін, поки вікно відкрите.
+  // Компактні дії для ігор, що відбуваються зараз: лише чек-ін, поки вікно відкрите.
   const startedActions = (gameId: number) => (
     <GameActions
       gameId={gameId}
@@ -64,8 +61,12 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
     />
   );
 
-  // Майбутні без найближчої (вона показана окремо зверху).
-  const restUpcoming = next ? upcoming.filter((g) => g.id !== next.id) : upcoming;
+  // «Відбувається зараз»: ігри гравця, чиє вікно чек-іну відкрите/щойно відмічене, але які вже
+  // стартували (тому їх немає у списку майбутніх). Дають доступ до чек-іну після старту.
+  const futureIds = new Set<number>(upcoming.map((g) => g.id));
+  const live = cabGames.filter(
+    (g) => (g.checkinOpen || g.checkedIn) && !futureIds.has(g.id),
+  );
 
   const okKey = successKey(searchParams);
   const errVal = typeof searchParams.err === "string" ? searchParams.err : null;
@@ -78,60 +79,24 @@ export default async function GamesPage({ searchParams }: { searchParams: Flags 
       {okKey && <p className={ui.alertOk}>{st(lang, okKey)}</p>}
       {errKey && <p className={ui.alertErr}>{st(lang, errKey)}</p>}
 
-      <section>
-        <h2 className={`mb-3 ${ui.sectionTitle}`}>
-          {st(lang, "games_next_heading")}
-        </h2>
-        {next ? (
-          <GameCard game={next} lang={lang}>
-            {actions(next.id)}
-          </GameCard>
-        ) : (
-          <p className={ui.emptyState}>
-            {st(lang, "games_none_upcoming")}
-          </p>
-        )}
-      </section>
-
-      {restUpcoming.length > 0 && (
-        <section>
-          <h2 className={`mb-3 ${ui.sectionTitle}`}>
-            {st(lang, "games_upcoming_heading")}
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {restUpcoming.map((g) => (
-              <GameCard key={g.id} game={g} lang={lang}>
-                {actions(g.id)}
-              </GameCard>
-            ))}
-          </div>
-        </section>
+      {live.length === 0 && upcoming.length === 0 ? (
+        <p className={ui.emptyState}>{st(lang, "games_none_upcoming")}</p>
+      ) : (
+        // Єдиний список за пріоритетом: спершу ті, що відбуваються зараз (лише чек-ін),
+        // далі майбутні за близькістю до поточної дати.
+        <div className="grid gap-4 sm:grid-cols-2">
+          {live.map((g) => (
+            <GameCard key={g.id} game={g} lang={lang}>
+              {startedActions(g.id)}
+            </GameCard>
+          ))}
+          {upcoming.map((g) => (
+            <GameCard key={g.id} game={g} lang={lang}>
+              {actions(g.id)}
+            </GameCard>
+          ))}
+        </div>
       )}
-
-      <section>
-        <h2 className={`mb-3 ${ui.sectionTitle}`}>
-          {st(lang, "games_past_heading")}
-        </h2>
-        {past.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {past.map((g) => {
-              // Стартована гра з ще відкритим вікном чек-іну → показуємо кнопку чек-іну
-              // (така гра вже «минула» за start_at, але checkin_to ще в майбутньому).
-              const reg = regMap.get(g.id);
-              const showCheckin = loggedIn && (reg?.checkinOpen || reg?.checkedIn);
-              return (
-                <GameCard key={g.id} game={g} lang={lang} muted>
-                  {showCheckin ? startedActions(g.id) : undefined}
-                </GameCard>
-              );
-            })}
-          </div>
-        ) : (
-          <p className={ui.emptyState}>
-            {st(lang, "games_none_past")}
-          </p>
-        )}
-      </section>
     </div>
   );
 }

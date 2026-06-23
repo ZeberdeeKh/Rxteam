@@ -537,15 +537,11 @@ const SITE: Record<string, Dict> = {
 
   // ── 6.1 Ігри ──
   games_title: { pl: "Gry", en: "Games", uk: "Ігри" },
-  games_next_heading: { pl: "Najbliższa gra", en: "Next game", uk: "Найближча гра" },
-  games_upcoming_heading: { pl: "Nadchodzące gry", en: "Upcoming games", uk: "Майбутні ігри" },
-  games_past_heading: { pl: "Minione gry", en: "Past games", uk: "Минулі ігри" },
   games_none_upcoming: {
     pl: "Brak nadchodzących gier.",
     en: "No upcoming games.",
     uk: "Немає майбутніх ігор.",
   },
-  games_none_past: { pl: "Brak minionych gier.", en: "No past games.", uk: "Немає минулих ігор." },
   games_label_when: { pl: "Termin", en: "When", uk: "Коли" },
   games_label_where: { pl: "Lokalizacja", en: "Location", uk: "Локація" },
   games_label_signed: { pl: "Zapisani", en: "Signed up", uk: "Записані" },
