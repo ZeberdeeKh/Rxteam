@@ -65,9 +65,9 @@ export default function AchievementIconUploader({
         {preview ? (
           // base64 data URL → інертний <img> (скрипти/мережа в SVG не виконуються).
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={preview} alt="" className="h-12 w-12 shrink-0 object-contain" />
+          <img src={preview} alt="" className="h-16 w-16 shrink-0 object-contain" />
         ) : (
-          <span aria-hidden className="text-3xl leading-none">
+          <span aria-hidden className="text-4xl leading-none">
             {GLYPH.rank}
           </span>
         )}

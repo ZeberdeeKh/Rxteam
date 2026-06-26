@@ -38,9 +38,9 @@ function Achievements({ list, lang }: { list: RankAch[]; lang: Lang }) {
         return a.thumbnail_svg ? (
           // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
           // eslint-disable-next-line @next/next/no-img-element
-          <img key={a.code} src={a.thumbnail_svg} alt={title} title={tip} className="h-5 w-5 object-contain" />
+          <img key={a.code} src={a.thumbnail_svg} alt={title} title={tip} className="h-7 w-7 object-contain" />
         ) : (
-          <span key={a.code} title={tip} className="text-sm leading-none">
+          <span key={a.code} title={tip} className="text-lg leading-none">
             {GLYPH.rank}
           </span>
         );

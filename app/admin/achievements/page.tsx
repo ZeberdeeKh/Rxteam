@@ -235,9 +235,9 @@ export default async function AdminAchievements({
                   {it.thumbnail_svg ? (
                     // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={it.thumbnail_svg} alt="" className="h-7 w-7 shrink-0 object-contain" loading="lazy" />
+                    <img src={it.thumbnail_svg} alt="" className="h-11 w-11 shrink-0 object-contain" loading="lazy" />
                   ) : (
-                    <span aria-hidden className="text-lg leading-none">
+                    <span aria-hidden className="text-2xl leading-none">
                       {GLYPH.rank}
                     </span>
                   )}

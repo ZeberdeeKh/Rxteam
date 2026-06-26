@@ -216,9 +216,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
                   {a.thumbnail_svg ? (
                     // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={a.thumbnail_svg} alt="" className="h-10 w-10 shrink-0 object-contain" />
+                    <img src={a.thumbnail_svg} alt="" className="h-16 w-16 shrink-0 object-contain" />
                   ) : (
-                    <span aria-hidden className="text-2xl leading-none">
+                    <span aria-hidden className="text-4xl leading-none">
                       {GLYPH.rank}
                     </span>
                   )}
