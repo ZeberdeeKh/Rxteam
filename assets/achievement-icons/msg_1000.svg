@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Досягнення: Flooder (рівень: срібло)">
+  <defs>
+    <radialGradient id="metal" cx="42%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#e8edf2"/>
+      <stop offset="76%" stop-color="#c2cbd4"/><stop offset="100%" stop-color="#8b97a3"/>
+    </radialGradient>
+    <radialGradient id="field" cx="50%" cy="42%" r="60%">
+      <stop offset="0%" stop-color="#cdd5dd"/><stop offset="100%" stop-color="#9aa6b2"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dfe6ec"/><stop offset="100%" stop-color="#9aa6b2"/>
+    </linearGradient>
+    <path id="lf" d="M0,0 C 6,-3 8,-11 0,-17 C -8,-11 -6,-3 0,0 Z"/>
+  </defs>
+  <g id="wreath-l" fill="url(#leaf)" stroke="#5b6670" stroke-width="0.6">
+    <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#5b6670" stroke-width="2.2"/>
+    <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
+    <use href="#lf" transform="translate(46,134) rotate(-28)"/>
+    <use href="#lf" transform="translate(42,116) rotate(-16)"/>
+    <use href="#lf" transform="translate(42,98) rotate(-6)"/>
+    <use href="#lf" transform="translate(46,80) rotate(6)"/>
+    <use href="#lf" transform="translate(53,66) rotate(20) scale(0.85)"/>
+  </g>
+  <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
+  <circle cx="100" cy="172" r="5.5" fill="url(#metal)" stroke="#5b6670" stroke-width="1"/>
+  <circle cx="100" cy="100" r="60" fill="url(#metal)"/>
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#5b6670" stroke-width="3.5"/>
+  <circle cx="100" cy="100" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.6"/>
+  <circle cx="100" cy="100" r="46" fill="url(#field)" stroke="#5b6670" stroke-width="1.2"/>
+  <path d="M84,74 H116 Q130,74 130,88 V100 Q130,114 116,114 H98 L86,126 L90,114 H84 Q70,114 70,100 V88 Q70,74 84,74 Z" fill="#ffffff" stroke="#5b6670" stroke-width="2.4" stroke-linejoin="round"/>
+  <circle cx="84" cy="94" r="4" fill="#5b6670"/> <circle cx="100" cy="94" r="4" fill="#5b6670"/> <circle cx="116" cy="94" r="4" fill="#5b6670"/>
+</svg>
