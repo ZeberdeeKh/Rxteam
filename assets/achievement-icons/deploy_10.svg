@@ -18,7 +18,7 @@
   <circle cx="100" cy="100" r="86" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2"/>
   <circle cx="100" cy="100" r="80" fill="url(#field)" stroke="#5b6670" stroke-width="2"/>
   <!-- лавровий вінок ВСЕРЕДИНІ монети (обрамляє центральний символ) -->
-  <g transform="translate(100 94) scale(1.12) translate(-100 -100)">
+  <g transform="translate(100 93) scale(1.15) translate(-100 -100)">
     <g id="wreath-l" fill="url(#leaf)" stroke="#5b6670" stroke-width="1">
       <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#5b6670" stroke-width="2.6"/>
       <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
@@ -31,8 +31,8 @@
     <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
   </g>
   <!-- центральний символ — крупно, щоб чітко читалося -->
-  <g transform="translate(100 98) scale(1.18) translate(-100 -100)">
-    <path d="M82,64 L102,64 L102,92 L120,92 Q128,92 128,100 L128,108 L82,108 Z" fill="#ffffff" stroke="#5b6670" stroke-width="2.2" stroke-linejoin="round"/>
-    <path d="M82,118 H120" fill="none" stroke="#5b6670" stroke-width="2.4" stroke-linecap="round"/>
+  <g transform="translate(100 100) scale(1.22) translate(-100 -100)">
+    <path d="M82,60 L105,60 L105,92 L123,92 Q132,92 132,101 L132,112 L82,112 Z" fill="#ffffff" stroke="#5b6670" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M82,120 H123" fill="none" stroke="#5b6670" stroke-width="3.4" stroke-linecap="round"/>
   </g>
 </svg>
