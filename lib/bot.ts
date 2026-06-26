@@ -33,6 +33,7 @@ import {
   callsignChangeIsFree,
   grantCheckinAchievements,
   grantAchievement,
+  grantMessageAchievements,
 } from "./economy";
 import { getState, setState, clearState } from "./state";
 import { tr, POLL_QUESTION, pollWinnerText, lotteryWinnerText } from "./strings";
@@ -70,12 +71,34 @@ import {
 
 export const bot = new Bot(process.env.BOT_TOKEN!);
 
+// Рахує повідомлення в ГОЛОВНІЙ групі (announce_chat_id) і видає ачівки за активність (msg_*).
+// Викликається з універсального middleware fire-and-forget, як recordMemberSeen — не ламає обробку.
+async function countGroupMessage(ctx: Context): Promise<void> {
+  const chat = ctx.chat;
+  if (!chat) return;
+  const mainId = await getSetting("announce_chat_id");
+  if (!mainId || String(chat.id) !== mainId) return; // лише головна група (топіки мають той самий chat.id)
+  if (ctx.senderChat?.id === chat.id) return; // анонімно від імені групи
+  if (!ctx.from || ctx.from.id === ctx.me.id) return; // сам бот
+  // Атомарний інкремент + дані для видачі за один round-trip (RPC bump_messages_sent).
+  const { data } = await supabase.rpc("bump_messages_sent", { p_tg_user_id: ctx.from.id });
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return; // незареєстрований гравець (нема рядка в players) — пропускаємо мовчки
+  if (row.messages_sent < 100) return; // дешева відсічка: до першого рубежу не чіпаємо ачівки
+  await grantMessageAchievements({
+    playerId: row.id,
+    messagesAfter: row.messages_sent,
+    hasPatch: !!row.has_patch,
+  });
+}
+
 // Облік членства: будь-яка активність у групі → фіксуємо користувача як члена
 // (так «доіндексовуємо» наявних учасників, яких Bot API не дає перелічити).
 bot.use(async (ctx, next) => {
   const chat = ctx.chat;
   if (chat && (chat.type === "group" || chat.type === "supergroup") && ctx.from && !ctx.from.is_bot) {
     recordMemberSeen(ctx.from.id).catch(() => {});
+    countGroupMessage(ctx).catch(() => {}); // лічильник повідомлень у головній групі → ачівки msg_*
   }
   await next();
 });

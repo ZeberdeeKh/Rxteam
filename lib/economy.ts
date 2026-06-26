@@ -233,6 +233,25 @@ export async function grantCheckinAchievements(opts: {
   return out;
 }
 
+// Видає ачівки за к-сть повідомлень у головній групі. messagesAfter — нове players.messages_sent.
+// Дзеркало grantCheckinAchievements; повідомлення не прив'язані до гри → gameId = null.
+export async function grantMessageAchievements(opts: {
+  playerId: number;
+  messagesAfter: number;
+  hasPatch?: boolean;
+}): Promise<GrantedAch[]> {
+  const out: GrantedAch[] = [];
+  const tryGrant = async (code: string) => {
+    const g = await grantAchievement(opts.playerId, code, null, opts.hasPatch);
+    if (g) out.push(g);
+  };
+  if (opts.messagesAfter >= 100) await tryGrant("msg_100");
+  if (opts.messagesAfter >= 1000) await tryGrant("msg_1000");
+  if (opts.messagesAfter >= 5000) await tryGrant("msg_5000");
+  if (opts.messagesAfter >= 10000) await tryGrant("msg_10000");
+  return out;
+}
+
 // Надійність: явки/(явки+неявки) за весь час. null якщо ще нема даних.
 export async function getReliability(
   playerId: number,
