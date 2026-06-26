@@ -19,20 +19,27 @@
   <circle cx="100" cy="100" r="80" fill="url(#field)" stroke="#d4af37" stroke-width="2"/>
   <!-- лавровий вінок ВСЕРЕДИНІ монети (обрамляє центральний символ) -->
   <g transform="translate(100 93) scale(1.15) translate(-100 -100)">
-    <g id="wreath-l" fill="url(#leaf)" stroke="#7a611d" stroke-width="1">
-      <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#7a611d" stroke-width="2.6"/>
-      <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
-      <use href="#lf" transform="translate(46,134) rotate(-28)"/>
-      <use href="#lf" transform="translate(42,116) rotate(-16)"/>
-      <use href="#lf" transform="translate(42,98) rotate(-6)"/>
-      <use href="#lf" transform="translate(46,80) rotate(6)"/>
-      <use href="#lf" transform="translate(53,66) rotate(20) scale(0.85)"/>
+    <g id="wreath-l" fill="url(#leaf)" stroke="#7a611d" stroke-width="0.8">
+      <path d="M58,168 Q 31,118 52,62" fill="none" stroke="#7a611d" stroke-width="2.8"/>
+      <use href="#lf" transform="translate(55,158) rotate(-48) scale(0.8)"/>
+      <use href="#lf" transform="translate(49,147) rotate(-40) scale(0.95)"/>
+      <use href="#lf" transform="translate(44,135) rotate(-32)"/>
+      <use href="#lf" transform="translate(41,123) rotate(-22)"/>
+      <use href="#lf" transform="translate(39,111) rotate(-13)"/>
+      <use href="#lf" transform="translate(40,99) rotate(-4)"/>
+      <use href="#lf" transform="translate(43,87) rotate(6)"/>
+      <use href="#lf" transform="translate(47,76) rotate(16)"/>
+      <use href="#lf" transform="translate(53,65) rotate(26) scale(0.82)"/>
+      <circle cx="50" cy="141" r="2.4"/><circle cx="46" cy="117" r="2.4"/>
+      <circle cx="47" cy="93" r="2.4"/><circle cx="52" cy="73" r="2.2"/>
     </g>
     <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
   </g>
   <!-- центральний символ — крупно, щоб чітко читалося -->
   <g transform="translate(100 100) scale(1.22) translate(-100 -100)">
-    <path d="M82,60 L105,60 L105,92 L123,92 Q132,92 132,101 L132,112 L82,112 Z" fill="#ffe1b3" stroke="#d4af37" stroke-width="4" stroke-linejoin="round"/>
-    <path d="M82,120 H123" fill="none" stroke="#d4af37" stroke-width="3.4" stroke-linecap="round"/>
+    <g fill="#ffe1b3" stroke="#d4af37" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+      <path d="M-2.8,-30 L2.8,-30 L2.8,16 L9,25 L9,32 L-3.5,32 L-3.5,19 L-2.8,16 Z" transform="translate(100 101) rotate(-32)"/>
+      <path d="M-2.8,-30 L2.8,-30 L2.8,16 L9,25 L9,32 L-3.5,32 L-3.5,19 L-2.8,16 Z" transform="translate(100 101) rotate(32)"/>
+    </g>
   </g>
 </svg>
