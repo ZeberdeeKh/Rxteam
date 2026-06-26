@@ -12,21 +12,23 @@
     </linearGradient>
     <path id="lf" d="M0,0 C 6,-3 8,-11 0,-17 C -8,-11 -6,-3 0,0 Z"/>
   </defs>
-  <g id="wreath-l" fill="url(#leaf)" stroke="#7a611d" stroke-width="0.6">
-    <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#7a611d" stroke-width="2.2"/>
-    <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
-    <use href="#lf" transform="translate(46,134) rotate(-28)"/>
-    <use href="#lf" transform="translate(42,116) rotate(-16)"/>
-    <use href="#lf" transform="translate(42,98) rotate(-6)"/>
-    <use href="#lf" transform="translate(46,80) rotate(6)"/>
-    <use href="#lf" transform="translate(53,66) rotate(20) scale(0.85)"/>
+  <g transform="translate(100 100) scale(1.22) translate(-100 -100)">
+    <g id="wreath-l" fill="url(#leaf)" stroke="#7a611d" stroke-width="0.6">
+      <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#7a611d" stroke-width="2.2"/>
+      <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
+      <use href="#lf" transform="translate(46,134) rotate(-28)"/>
+      <use href="#lf" transform="translate(42,116) rotate(-16)"/>
+      <use href="#lf" transform="translate(42,98) rotate(-6)"/>
+      <use href="#lf" transform="translate(46,80) rotate(6)"/>
+      <use href="#lf" transform="translate(53,66) rotate(20) scale(0.85)"/>
+    </g>
+    <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
+    <circle cx="100" cy="172" r="5.5" fill="url(#metal)" stroke="#7a611d" stroke-width="1"/>
+    <circle cx="100" cy="100" r="60" fill="url(#metal)"/>
+    <circle cx="100" cy="100" r="60" fill="none" stroke="#6e5a14" stroke-width="3.5"/>
+    <circle cx="100" cy="100" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.6"/>
+    <circle cx="100" cy="100" r="46" fill="url(#field)" stroke="#6e5a14" stroke-width="1.2"/>
+    <path d="M100,66 L126,76 L126,100 Q126,122 100,134 Q74,122 74,100 L74,76 Z" fill="#fff4cf" stroke="#6e5a14" stroke-width="2.4" stroke-linejoin="round"/>
+    <path d="M86,92 H114 M86,102 H114 M89,112 H111" fill="none" stroke="#6e5a14" stroke-width="2.6" stroke-linecap="round"/>
   </g>
-  <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
-  <circle cx="100" cy="172" r="5.5" fill="url(#metal)" stroke="#7a611d" stroke-width="1"/>
-  <circle cx="100" cy="100" r="60" fill="url(#metal)"/>
-  <circle cx="100" cy="100" r="60" fill="none" stroke="#6e5a14" stroke-width="3.5"/>
-  <circle cx="100" cy="100" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.6"/>
-  <circle cx="100" cy="100" r="46" fill="url(#field)" stroke="#6e5a14" stroke-width="1.2"/>
-  <path d="M100,66 L126,76 L126,100 Q126,122 100,134 Q74,122 74,100 L74,76 Z" fill="#fff4cf" stroke="#6e5a14" stroke-width="2.4" stroke-linejoin="round"/>
-  <path d="M86,92 H114 M86,102 H114 M89,112 H111" fill="none" stroke="#6e5a14" stroke-width="2.6" stroke-linecap="round"/>
 </svg>
