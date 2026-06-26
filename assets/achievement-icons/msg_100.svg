@@ -12,7 +12,7 @@
     </linearGradient>
     <path id="lf" d="M0,0 C 6,-3 8,-11 0,-17 C -8,-11 -6,-3 0,0 Z"/>
   </defs>
-  <g transform="translate(100 100) scale(1.22) translate(-100 -100)">
+  <g transform="translate(100 100) scale(1.45) translate(-100 -100)">
     <g id="wreath-l" fill="url(#leaf)" stroke="#5e3a18" stroke-width="0.6">
       <path d="M58,166 Q 33,120 50,68" fill="none" stroke="#5e3a18" stroke-width="2.2"/>
       <use href="#lf" transform="translate(54,150) rotate(-40) scale(0.95)"/>
@@ -23,7 +23,6 @@
       <use href="#lf" transform="translate(53,66) rotate(20) scale(0.85)"/>
     </g>
     <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
-    <circle cx="100" cy="172" r="5.5" fill="url(#metal)" stroke="#5e3a18" stroke-width="1"/>
     <circle cx="100" cy="100" r="60" fill="url(#metal)"/>
     <circle cx="100" cy="100" r="60" fill="none" stroke="#4f2c12" stroke-width="3.5"/>
     <circle cx="100" cy="100" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.25" stroke-width="1.6"/>
