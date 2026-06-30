@@ -1,45 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200" role="img" aria-label="Досягнення: 10 Deployments (рівень: срібло)">
-  <defs>
-    <radialGradient id="metal" cx="42%" cy="34%" r="72%">
-      <stop offset="0%" stop-color="#ffffff"/><stop offset="40%" stop-color="#e8edf2"/>
-      <stop offset="76%" stop-color="#c2cbd4"/><stop offset="100%" stop-color="#8b97a3"/>
-    </radialGradient>
-    <radialGradient id="field" cx="50%" cy="42%" r="60%">
-      <stop offset="0%" stop-color="#cdd5dd"/><stop offset="100%" stop-color="#9aa6b2"/>
-    </radialGradient>
-    <linearGradient id="leaf" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#dfe6ec"/><stop offset="100%" stop-color="#9aa6b2"/>
-    </linearGradient>
-    <path id="lf" d="M0,0 C 6,-3 8,-11 0,-17 C -8,-11 -6,-3 0,0 Z"/>
-  </defs>
-  <!-- ВЕЛИКА монета: заповнює кадр, як емблема BMW -->
-  <circle cx="100" cy="100" r="95" fill="url(#metal)"/>
-  <circle cx="100" cy="100" r="95" fill="none" stroke="#5b6670" stroke-width="5"/>
-  <circle cx="100" cy="100" r="86" fill="none" stroke="#ffffff" stroke-opacity="0.22" stroke-width="2"/>
-  <circle cx="100" cy="100" r="80" fill="url(#field)" stroke="#5b6670" stroke-width="2"/>
-  <!-- лавровий вінок ВСЕРЕДИНІ монети (обрамляє центральний символ) -->
-  <g transform="translate(100 93) scale(1.15) translate(-100 -100)">
-    <g id="wreath-l" fill="url(#leaf)" stroke="#5b6670" stroke-width="0.8">
-      <path d="M58,168 Q 31,118 52,62" fill="none" stroke="#5b6670" stroke-width="2.8"/>
-      <use href="#lf" transform="translate(55,158) rotate(-48) scale(0.8)"/>
-      <use href="#lf" transform="translate(49,147) rotate(-40) scale(0.95)"/>
-      <use href="#lf" transform="translate(44,135) rotate(-32)"/>
-      <use href="#lf" transform="translate(41,123) rotate(-22)"/>
-      <use href="#lf" transform="translate(39,111) rotate(-13)"/>
-      <use href="#lf" transform="translate(40,99) rotate(-4)"/>
-      <use href="#lf" transform="translate(43,87) rotate(6)"/>
-      <use href="#lf" transform="translate(47,76) rotate(16)"/>
-      <use href="#lf" transform="translate(53,65) rotate(26) scale(0.82)"/>
-      <circle cx="50" cy="141" r="2.4"/><circle cx="46" cy="117" r="2.4"/>
-      <circle cx="47" cy="93" r="2.4"/><circle cx="52" cy="73" r="2.2"/>
-    </g>
-    <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
-  </g>
-  <!-- центральний символ — крупно, щоб чітко читалося -->
-  <g transform="translate(100 100) scale(1.22) translate(-100 -100)">
-    <g fill="#ffffff" stroke="#5b6670" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
+  <defs><path id="lf" d="M0,0 C 5,-3 7,-12 0,-18 C -7,-12 -5,-3 0,0 Z"/></defs>
+  <g id="wreath-l" fill="#d3dbe2" stroke="#566270" stroke-width="1.2"><path d="M87.2,155.5 Q 35,100 87.2,44.5" fill="none" stroke="#566270" stroke-width="2.4"/><use href="#lf" transform="translate(87.2 155.5) rotate(-103.6) scale(0.72)"/><use href="#lf" transform="translate(67.3 146.7) rotate(-81.6) scale(0.94)"/><use href="#lf" transform="translate(52.2 131.0) rotate(-59.6) scale(1.11)"/><use href="#lf" transform="translate(44.0 110.9) rotate(-37.6) scale(1.21)"/><use href="#lf" transform="translate(44.0 89.1) rotate(-15.6) scale(1.21)"/><use href="#lf" transform="translate(52.2 69.0) rotate(6.4) scale(1.11)"/><use href="#lf" transform="translate(67.3 53.3) rotate(28.4) scale(0.94)"/><use href="#lf" transform="translate(87.2 44.5) rotate(50.4) scale(0.72)"/></g>
+  <use href="#wreath-l" transform="matrix(-1 0 0 1 200 0)"/>
+  <path d="M100,150 l9,9 -9,9 -9,-9 Z" fill="#cdd6df" stroke="#566270" stroke-width="2.5" stroke-linejoin="round"/>
+  <circle cx="100" cy="100" r="50" fill="#cdd6df" stroke="#566270" stroke-width="4.5"/>
+  <circle cx="100" cy="100" r="40" fill="#aab4c0" stroke="#566270" stroke-width="2.5"/>
+  
+  <g transform="translate(100 100) scale(0.82) translate(-100 -100)"><g fill="#ffffff" stroke="#566270" stroke-width="3" stroke-linejoin="round" stroke-linecap="round">
       <path d="M-2.8,-30 L2.8,-30 L2.8,16 L9,25 L9,32 L-3.5,32 L-3.5,19 L-2.8,16 Z" transform="translate(100 101) rotate(-32)"/>
       <path d="M-2.8,-30 L2.8,-30 L2.8,16 L9,25 L9,32 L-3.5,32 L-3.5,19 L-2.8,16 Z" transform="translate(100 101) rotate(32)"/>
-    </g>
-  </g>
+    </g></g>
 </svg>
