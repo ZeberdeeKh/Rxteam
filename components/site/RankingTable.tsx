@@ -1,53 +1,9 @@
 import { st, type Lang } from "@/lib/site-i18n";
 import type { RankingRow, RankAch } from "@/lib/site-data";
 import { ui, GLYPH } from "@/components/ui";
+import AchievementsRow from "./AchievementsRow";
 
 type RankingRowWithAch = RankingRow & { achievements: RankAch[] };
-
-// Локалізована назва ачівки (для підказки title=); fallback між мовами, далі — код.
-function achTitle(a: RankAch, lang: Lang): string {
-  return (
-    (lang === "pl" ? a.title_pl : lang === "uk" ? a.title_uk : a.title_en) ??
-    a.title_pl ??
-    a.title_en ??
-    a.title_uk ??
-    a.code
-  );
-}
-
-// Локалізований опис ачівки (за що дається) для підказки; null, якщо опису немає.
-function achDesc(a: RankAch, lang: Lang): string | null {
-  return (lang === "pl" ? a.description_pl : lang === "uk" ? a.description_uk : a.description_en) ?? null;
-}
-
-// Підказка при наведенні: назва + опис (новий рядок), або лише назва, якщо опису немає.
-function achTip(a: RankAch, lang: Lang): string {
-  const title = achTitle(a, lang);
-  const desc = achDesc(a, lang);
-  return desc ? `${title}\n${desc}` : title;
-}
-
-// Рядок здобутих ачівок (іконки 20px із підказкою). Спільний для таблиці й мобільних карток.
-function Achievements({ list, lang }: { list: RankAch[]; lang: Lang }) {
-  if (list.length === 0) return <span className="text-gray-300">—</span>;
-  return (
-    <div className="flex flex-wrap items-center gap-1">
-      {list.map((a) => {
-        const title = achTitle(a, lang);
-        const tip = achTip(a, lang); // назва + опис у підказці при наведенні
-        return a.thumbnail_svg ? (
-          // base64 data URL → інертний <img> (XSS-safe), див. Етап 20.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={a.code} src={a.thumbnail_svg} alt={title} title={tip} className="h-7 w-7 object-contain" />
-        ) : (
-          <span key={a.code} title={tip} className="text-lg leading-none">
-            {GLYPH.rank}
-          </span>
-        );
-      })}
-    </div>
-  );
-}
 
 // Таблиця рейтингу (топ гравців). Показується на лендінгу.
 export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]; lang: Lang }) {
@@ -92,7 +48,7 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                   <td className={`${ui.td} tabular-nums`}>{r.games_played}</td>
                   {/* Остання колонка — здобуті ачівки (кількість різна → іконки переносяться). */}
                   <td className={`${ui.td} !h-auto py-1.5`}>
-                    <Achievements list={r.achievements} lang={lang} />
+                    <AchievementsRow list={r.achievements} lang={lang} />
                   </td>
                 </tr>
               ))}
@@ -134,7 +90,7 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                 </dl>
                 {r.achievements.length > 0 && (
                   <div className="mt-2">
-                    <Achievements list={r.achievements} lang={lang} />
+                    <AchievementsRow list={r.achievements} lang={lang} />
                   </div>
                 )}
               </div>
