@@ -2,12 +2,12 @@ import { InlineKeyboard } from "grammy";
 import { supabase } from "@/lib/supabase";
 import { bot } from "@/lib/bot";
 import { REG_BTN } from "@/lib/game-announce";
-import { getSetting, setSetting, featureEnabled } from "@/lib/settings";
+import { getSetting, featureEnabled } from "@/lib/settings";
 import { formatWhen } from "@/lib/games";
 import { processDueChoreReports } from "@/lib/chores";
 import { tr } from "@/lib/strings";
 import type { Lang } from "@/lib/i18n";
-import { DAILY_REMINDER_DEFAULT } from "@/lib/admin-settings";
+import { DAILY_REMINDER_DEFAULT, DAILY_REMINDER_CARPOOL } from "@/lib/admin-settings";
 import { DateTime } from "luxon";
 import { checkCronAuth } from "@/lib/cron-auth";
 
@@ -53,6 +53,9 @@ export async function GET(req: Request) {
   let day = 0;
   let before = 0;
 
+  // Username бота для deep-link кнопки «Деталі гри» (?start=g{id}) — отримуємо один раз.
+  const botUsername = (games?.length ? (await bot.api.getMe()).username : "") ?? "";
+
   for (const g of games ?? []) {
     const start = DateTime.fromISO(g.start_at, { zone: "utc" });
     const startMs = start.toMillis();
@@ -64,12 +67,12 @@ export async function GET(req: Request) {
     const h2Ms = start.minus({ hours: beforeH }).toMillis();
 
     if (!g.reminded_day && nowMs >= dayMs && nowMs < startMs) {
-      await sendRemind(g, "remind_day");
+      await sendRemind(g, "remind_day", botUsername);
       await supabase.from("games").update({ reminded_day: true }).eq("id", g.id);
       day++;
     }
     if (!g.reminded_2h && nowMs >= h2Ms && nowMs < startMs) {
-      await sendRemind(g, "remind_2h");
+      await sendRemind(g, "remind_2h", botUsername);
       await supabase.from("games").update({ reminded_2h: true }).eq("id", g.id);
       before++;
     }
@@ -127,20 +130,48 @@ async function processDailyReminder(): Promise<string> {
   const tplPl = (await getSetting("daily_reminder_text_pl")) || DAILY_REMINDER_DEFAULT.pl;
   const fill = (tpl: string, conj: string) =>
     tpl.replace(/\{locations\}/g, joinNames(names, conj)).replace(/\{link\}/g, link);
+  // Системний блок про карпул дописуємо лише коли карпул увімкнено (інакше не рекламуємо
+  // вимкнену функцію). Згадка команд /drivers + реєстрація водієм — для записаних на гру.
+  const carpool = (await featureEnabled("carpool_map"))
+    ? DAILY_REMINDER_CARPOOL
+    : { uk: "", pl: "" };
   // UA + PL в одному повідомленні (показується всім, незалежно від мови гравця).
-  const text = `${fill(tplUk, "і")}\n\n———————————————\n\n${fill(tplPl, "i")}`;
+  const text = `${fill(tplUk, "і")}${carpool.uk}\n\n———————————————\n\n${fill(tplPl, "i")}${carpool.pl}`;
 
   const threadId = await getSetting("flood_thread_id");
   // Кнопка «в один клік з бота»: deep-link відкриває приватний чат з ботом і показує
   // список ігор (/start games → showGamesList). Посилання на сайт лишається в тексті.
   const me = await bot.api.getMe();
   const kb = new InlineKeyboard().url(REG_BTN, `https://t.me/${me.username}?start=games`);
+
+  // Атомарно «займаємо» сьогоднішній слот ДО надсилання. Раніше прапорець ставився ПІСЛЯ
+  // sendMessage — лишалося вікно (повільна відправка), у якому наступний тік пінгера (~15 хв)
+  // або паралельний виклик проходили перевірку й слали повідомлення вдруге. Один умовний
+  // UPDATE розв'язує і гонку (Postgres перечитує WHERE після блокування рядка — оновить
+  // лише один виклик), і повтор після збою відповіді Telegram (повідомлення доставлено,
+  // але клієнт кинув таймаут): слот уже зайнятий, тож ретраю не буде.
+  await supabase
+    .from("settings")
+    .upsert({ key: "daily_reminder_last_sent", value: "" }, { onConflict: "key", ignoreDuplicates: true });
+  const { data: claimed, error: claimErr } = await supabase
+    .from("settings")
+    .update({ value: today, updated_at: now.toUTC().toISO() })
+    .eq("key", "daily_reminder_last_sent")
+    .neq("value", today)
+    .select("key");
+  if (claimErr) {
+    console.error("daily reminder claim failed", claimErr);
+    return "claim_failed";
+  }
+  if (!claimed || claimed.length === 0) return "already_sent"; // слот уже зайняв інший виклик
+
+  // Слот наш — надсилаємо. Клейм НЕ відкочуємо навіть при збої: краще пропустити день,
+  // ніж ризикнути дублем (відкат повернув би стару проблему з таймаутом доставленого повідомлення).
   try {
     await bot.api.sendMessage(Number(chatId), text, {
       reply_markup: kb,
       ...(threadId ? { message_thread_id: Number(threadId) } : {}),
     });
-    await setSetting("daily_reminder_last_sent", today);
     return "sent";
   } catch (e) {
     console.error("daily reminder send failed", e);
@@ -148,7 +179,11 @@ async function processDailyReminder(): Promise<string> {
   }
 }
 
-async function sendRemind(game: { id: number; title: string | null; start_at: string }, key: string) {
+async function sendRemind(
+  game: { id: number; title: string | null; start_at: string },
+  key: string,
+  botUsername: string,
+) {
   const { data: regs } = await supabase
     .from("registrations")
     .select("players(tg_user_id, lang)")
@@ -158,10 +193,20 @@ async function sendRemind(game: { id: number; title: string | null; start_at: st
   for (const r of regs ?? []) {
     const pl = (r as any).players;
     if (!pl?.tg_user_id) continue;
+    const lang = (pl.lang as Lang) ?? "uk";
+    // Кнопка під нагадуванням: за день — «Деталі гри» (deep-link на картку гри),
+    // за 2 год — «Перевірити карпул» (список водіїв цієї гри, callback drivers:{id}).
+    const kb =
+      key === "remind_day" && botUsername
+        ? new InlineKeyboard().url(tr(lang, "btn_game_details"), `https://t.me/${botUsername}?start=g${game.id}`)
+        : key === "remind_2h"
+          ? new InlineKeyboard().text(tr(lang, "btn_check_carpool"), `drivers:${game.id}`)
+          : undefined;
     try {
       await bot.api.sendMessage(
         pl.tg_user_id,
-        tr((pl.lang as Lang) ?? "uk", key, { title: game.title ?? "ASG", when }),
+        tr(lang, key, { title: game.title ?? "ASG", when }),
+        kb ? { reply_markup: kb } : undefined,
       );
     } catch {}
   }

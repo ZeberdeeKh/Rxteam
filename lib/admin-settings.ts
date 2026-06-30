@@ -17,6 +17,13 @@ export const DAILY_REMINDER_DEFAULT = {
   pl: "Przypominamy, że w tym tygodniu gramy na {locations}. Nie zapomnij się zarejestrować, jeśli planujesz przyjechać — żeby nie stracić punktów. {link}",
 };
 
+// Системний блок про карпул, який крон дописує до щоденного нагадування (для записаних на
+// гру). Не редагується в адмінці — згадує команди бота. Показується лише коли карпул увімкнено.
+export const DAILY_REMINDER_CARPOOL = {
+  uk: "\n\n🚗 Карпул (для записаних на гру):\n• їдеш своїм авто — зареєструйся як водій (у боті обери «своя машина»), щоб підвезти своїх;\n• потрібне місце — перевір водіїв командою /drivers у боті.",
+  pl: "\n\n🚗 Carpool (dla zapisanych na grę):\n• jedziesz swoim autem — zarejestruj się jako kierowca (w bocie wybierz „własne auto”), aby kogoś podwieźć;\n• szukasz miejsca — sprawdź kierowców komendą /drivers w bocie.",
+};
+
 export type SettingField = {
   key: string;
   type: "toggle" | "number" | "text" | "textarea";
