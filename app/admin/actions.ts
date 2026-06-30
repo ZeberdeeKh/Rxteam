@@ -13,12 +13,12 @@ import {
   SHOP_TOGGLE_KEYS,
   SHOP_VALUE_KEYS,
 } from "@/lib/admin-settings";
-import { notifyPlayerPatch } from "@/lib/notify";
+import { notifyPlayerPatch, notifyPlayersGameCancelled } from "@/lib/notify";
 import { tr } from "@/lib/strings";
 import { getPlayerByTg } from "@/lib/players";
 import type { Lang } from "@/lib/i18n";
 import { SOCIALS } from "@/lib/social";
-import { makeUtc, computeWindows, getCheckinWindow } from "@/lib/games";
+import { makeUtc, computeWindows, getCheckinWindow, formatWhen } from "@/lib/games";
 import { announceGame } from "@/lib/game-announce";
 import { Api } from "grammy";
 import { performCheckin } from "@/lib/checkins";
@@ -131,6 +131,17 @@ export async function cancelGame(formData: FormData) {
   await requirePerm("games");
   const gameId = Number(formData.get("gameId"));
   if (Number.isFinite(gameId)) {
+    // До зміни статусів збираємо гру + усіх, хто був записаний — щоб сповістити їх про
+    // скасування (після update status='cancelled' реєстрації стають недоступними для вибірки).
+    const [{ data: game }, { data: regs }] = await Promise.all([
+      supabase.from("games").select("title, start_at").eq("id", gameId).maybeSingle(),
+      supabase
+        .from("registrations")
+        .select("players(tg_user_id, lang)")
+        .eq("game_id", gameId)
+        .eq("status", "registered"),
+    ]);
+
     await supabase.from("games").update({ status: "cancelled" }).eq("id", gameId);
     // Скасування гри прибирає й активні реєстрації — інакше у гравців лишаються «записи»
     // на скасовану гру (видно у /drivers, /myride і кабінеті на сайті).
@@ -139,6 +150,24 @@ export async function cancelGame(formData: FormData) {
       .update({ status: "cancelled" })
       .eq("game_id", gameId)
       .eq("status", "registered");
+
+    // DM кожному записаному: гру скасовано (best-effort — збій не блокує скасування).
+    try {
+      const recipients = (regs ?? [])
+        .map((r) => (r as any).players)
+        .filter(Boolean)
+        .map((p: any) => ({ tgUserId: p.tg_user_id as number | null, lang: (p.lang as Lang) ?? "uk" }));
+      if (recipients.length) {
+        await notifyPlayersGameCancelled({
+          recipients,
+          gameTitle: game?.title ?? null,
+          when: game?.start_at ? formatWhen(game.start_at) : "",
+        });
+      }
+    } catch (e) {
+      console.error("cancelGame: notify players failed", e);
+    }
+
     revalidatePath("/admin/games");
   }
   redirect("/admin/games?cancelled=1");

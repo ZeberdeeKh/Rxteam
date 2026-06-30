@@ -126,6 +126,7 @@ export async function announceDriverToSeekers(gameId: number, driverPlayerId: nu
     await notifySeekerNewDriver({
       seekerTgUserId: pl.tg_user_id as number | null,
       seekerLang: (pl.lang as Lang) ?? "uk",
+      gameId,
       gameTitle: game?.title ?? null,
     });
   }

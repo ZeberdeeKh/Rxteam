@@ -244,18 +244,39 @@ export async function notifyPassengerRideAccepted(opts: {
       who: opts.driverWho,
       title: opts.gameTitle ?? "ASG",
     }) + tgContactLine(opts.driverTgUsername, opts.driverTgUserId);
-  await sendTg(opts.passengerTgUserId, text);
+  // Кнопка «Написати водію» в один тап — лише коли є @username (url-кнопки не приймають
+  // tg://user?id=). Якщо username нема, контакт лишається текстовим лінком вище.
+  const reply_markup = opts.driverTgUsername
+    ? {
+        inline_keyboard: [
+          [{ text: tr(opts.passengerLang, "btn_message_driver"), url: `https://t.me/${opts.driverTgUsername}` }],
+        ],
+      }
+    : undefined;
+  await sendTg(opts.passengerTgUserId, text, reply_markup);
 }
 
 // DM шукачу авто: з'явився активний водій на гру — АНОНІМНО (без імені водія).
 // Контакт розкривається лише коли водій підтвердить запит (notifyPassengerRideAccepted).
+// Inline-кнопка «Перевірити карпул» (callback drivers:{gameId}) відкриває список водіїв
+// саме цієї гри одним тапом — той самий обробник, що й команда /drivers (lib/bot.ts).
 export async function notifySeekerNewDriver(opts: {
   seekerTgUserId?: number | null;
   seekerLang: Lang;
+  gameId: number;
   gameTitle: string | null;
 }) {
   if (!opts.seekerTgUserId) return;
-  await sendTg(opts.seekerTgUserId, tr(opts.seekerLang, "ride_new_driver", { title: opts.gameTitle ?? "ASG" }));
+  const reply_markup = {
+    inline_keyboard: [
+      [{ text: tr(opts.seekerLang, "btn_check_carpool"), callback_data: `drivers:${opts.gameId}` }],
+    ],
+  };
+  await sendTg(
+    opts.seekerTgUserId,
+    tr(opts.seekerLang, "ride_new_driver", { title: opts.gameTitle ?? "ASG" }),
+    reply_markup,
+  );
 }
 
 // DM водію: пасажир сам скасував запит/бронювання (на будь-якому етапі).
@@ -270,6 +291,23 @@ export async function notifyDriverRideCancelled(opts: {
     opts.driverTgUserId,
     tr(opts.driverLang, "ride_cancelled_by_passenger", { who: opts.passengerWho, title: opts.gameTitle ?? "ASG" }),
   );
+}
+
+// ─────────────────────────── Гру скасовано ───────────────────────────
+// DM усім, хто був записаний на гру, коли адмін її скасовує (адмінка сайту → cancelGame).
+// Кожному — його мовою. Best-effort: збій надсилання не блокує скасування гри.
+export async function notifyPlayersGameCancelled(opts: {
+  recipients: { tgUserId?: number | null; lang: Lang }[];
+  gameTitle: string | null;
+  when: string;
+}) {
+  for (const r of opts.recipients) {
+    if (!r.tgUserId) continue;
+    await sendTg(
+      r.tgUserId,
+      tr(r.lang, "game_cancelled_player", { title: opts.gameTitle ?? "ASG", when: opts.when }),
+    );
+  }
 }
 
 // DM пасажиру: відмова / водій знявся / водій скасував прийняту поїздку. key обирає текст.

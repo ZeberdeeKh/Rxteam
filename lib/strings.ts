@@ -873,6 +873,9 @@ const S: Record<string, Dict> = {
     en: "🚗 A driver signed up for «{title}»! Check carpool — maybe you'll get a ride.",
     uk: "🚗 На гру «{title}» зголосився водій! Перевір карпул — можливо, тебе підвезуть.",
   },
+  btn_check_carpool: { pl: "🚗 Sprawdź carpool", en: "🚗 Check carpool", uk: "🚗 Перевірити карпул" },
+  btn_game_details: { pl: "📋 Szczegóły gry", en: "📋 Game details", uk: "📋 Деталі гри" },
+  btn_message_driver: { pl: "✍️ Napisz do kierowcy", en: "✍️ Message the driver", uk: "✍️ Написати водію" },
 
   // нагадування
   remind_day: {
@@ -884,6 +887,12 @@ const S: Record<string, Dict> = {
     pl: "⏰ Już niedługo! Start «{title}» o {when}. Pamiętaj o check-inie.",
     en: "⏰ Soon! «{title}» starts at {when}. Don't forget to check in.",
     uk: "⏰ Зовсім скоро! Старт «{title}» о {when}. Не забудь про чек-ін.",
+  },
+  // гру скасовано — DM усім, хто був записаний (адмінка сайту → cancelGame)
+  game_cancelled_player: {
+    pl: "❌ Gra «{title}» ({when}) została niestety odwołana. Przepraszamy za zmianę planów! Śledź zapowiedzi — wkrótce pojawią się nowe terminy. Do zobaczenia na polu! 🎯",
+    en: "❌ Unfortunately the game «{title}» ({when}) has been cancelled. Sorry for the change of plans! Keep an eye on the announcements — new dates are coming soon. See you on the field! 🎯",
+    uk: "❌ На жаль, гру «{title}» ({when}) скасовано. Вибач за зміну планів! Слідкуй за анонсами — скоро будуть нові дати. До зустрічі на полі! 🎯",
   },
 
   // голосування за локацію — /poll, /pollclose
