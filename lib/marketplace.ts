@@ -201,6 +201,7 @@ export async function ingestSalesPhoto(
     fileUniqueId: string;
     caption: string | null;
     seller: SellerInfo;
+    isVideo?: boolean; // відео-кадр альбому: дає підпис, але сам на сайт не заливається
   },
 ): Promise<void> {
   const promoTag = (await getSetting("marketplace_promo_tag")) || "#promo";
@@ -211,6 +212,9 @@ export async function ingestSalesPhoto(
     await progressAlbumPhoto(api, opts, isPromo, cleaned);
     return;
   }
+
+  // Поза альбомом відео на сайт не публікується (гард його вже не пропускає сюди).
+  if (opts.isVideo) return;
 
   // ── Одиночне фото з описом ──
   if (!isPromo) return; // не на сайт; фото лишається в гілці
@@ -263,10 +267,13 @@ async function progressAlbumPhoto(
     fileId: string;
     fileUniqueId: string;
     seller: SellerInfo;
+    isVideo?: boolean;
   },
   isPromo: boolean,
   cleaned: string | null,
 ) {
+  // p_is_video=true → RPC зафіксує це повідомлення (для /delete) і підпис/#promo,
+  // але НЕ додасть file_id у photo_file_ids (відео не заливається як фото на сайт).
   await supabase.rpc("mp_collect_album_photo", {
     p_chat_id: opts.chatId,
     p_media_group_id: opts.mediaGroupId,
@@ -279,6 +286,9 @@ async function progressAlbumPhoto(
     p_seller_tg_user_id: opts.seller.tgUserId,
     p_seller_tg_username: opts.seller.username,
     p_seller_display: opts.seller.display,
+    // p_is_video передаємо ЛИШЕ для відео → виклик для фото сумісний зі старою сигнатурою
+    // RPC (до накатки etap48), тож фото-альбоми не ламаються, якщо деплой обжене міграцію.
+    ...(opts.isVideo ? { p_is_video: true } : {}),
   });
 
   const { data: row } = await supabase
@@ -291,6 +301,7 @@ async function progressAlbumPhoto(
 
   // Уже на модерації (підпис обробив попередній кадр) → просто додаємо ЦЕ фото.
   if (row.status === "pending") {
+    if (opts.isVideo) return; // відео вже зафіксоване в рядку; на сайт його не додаємо
     await appendPhoto(api, row.id, opts.fileId);
     return;
   }
@@ -317,6 +328,11 @@ async function progressAlbumPhoto(
     return;
   }
 
+  // Сайт — лише фото. Поки в альбомі немає жодного фото (напр. кадр з підписом — відео,
+  // а фото ще не дійшли, або альбом суто відео) — чекаємо, НЕ фіналізуємо. Так відео не
+  // «фіналізує» порожній альбом; альбом без жодного фото прибере sweepStuckCollecting.
+  if (!(row.photo_file_ids as string[] | null)?.length) return;
+
   // Підходить → claim-перехід collecting→pending (рівно один кадр виграє й завантажує
   // всі зібрані досі фото; решта кадрів потім дозавантажують себе як 'pending').
   const { data: claimed } = await supabase
@@ -327,8 +343,8 @@ async function progressAlbumPhoto(
     .select("id, photo_file_ids")
     .maybeSingle();
   if (!claimed) {
-    // Уже флипнули (рідко за послідовної доставки) → додаємо це фото.
-    await appendPhoto(api, row.id, opts.fileId);
+    // Уже флипнули (рідко за послідовної доставки) → додаємо це фото (відео пропускаємо).
+    if (!opts.isVideo) await appendPhoto(api, row.id, opts.fileId);
     return;
   }
   const urls: string[] = [];

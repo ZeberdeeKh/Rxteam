@@ -542,6 +542,25 @@ async function guardSalesTopic(ctx: Context): Promise<boolean> {
     return true;
   }
 
+  // Відео В АЛЬБОМІ — дозволене: лишається в гілці разом з фото, дає альбому свій підпис
+  // (#promo/опис), але на сайт не заливається (сайт — лише фото). Одиночне відео (без
+  // media_group_id) сюди НЕ підпадає й піде на видалення/ескалацію нижче — правило те саме.
+  if (m.video && m.media_group_id) {
+    if (player && from) {
+      await ingestSalesPhoto(ctx.api, {
+        chatId: chat.id,
+        messageId: msg.message_id,
+        mediaGroupId: String(m.media_group_id),
+        fileId: m.video.file_id,
+        fileUniqueId: m.video.file_unique_id,
+        caption: m.caption ?? null,
+        seller: sellerOf(from, player),
+        isVideo: true,
+      });
+    }
+    return true;
+  }
+
   // Одиночне фото.
   if (m.photo) {
     const caption = String(m.caption ?? "").trim();
@@ -592,12 +611,13 @@ async function guardSalesTopic(ctx: Context): Promise<boolean> {
     { onConflict: "tg_user_id" },
   );
   const lang = (player?.lang as Lang) ?? "uk";
+  const rules = tr(lang, "mp_rules");
   if (violations === 1) {
-    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn")); } catch {}
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn", { rules })); } catch {}
     return true;
   }
   if (violations === 2) {
-    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn2")); } catch {}
+    try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_warn2", { rules })); } catch {}
     return true;
   }
   try {
@@ -621,7 +641,7 @@ async function guardSalesTopic(ctx: Context): Promise<boolean> {
   } catch (e) {
     console.error("sales guard: restrict failed", e);
   }
-  try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_muted")); } catch {}
+  try { await bot.api.sendMessage(from.id, tr(lang, "mp_guard_muted", { rules })); } catch {}
   return true;
 }
 

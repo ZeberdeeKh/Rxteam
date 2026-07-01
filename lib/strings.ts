@@ -995,20 +995,26 @@ const S: Record<string, Dict> = {
     en: "🛒 This is the RX Team “Marketplace” topic. You can also list your gear on rxteam.pl — add the #promo tag to the photo's caption. Note: a link to your Telegram profile will appear on the site, and by using this feature you consent to that. Publishing on the site requires a patch. {hint}\n\nDiscussions: {flood}",
     uk: "🛒 Це гілка «Барахолка» команди RX Team. Своє спорядження можна виставити й на сайті rxteam.pl — додай у підпис до фото тег #promo. Увага: на сайті з'явиться посилання на твій профіль Telegram, і користуючись цією функцією ти з цим погоджуєшся. Публікація на сайті потребує патча. {hint}\n\nОбговорення: {flood}",
   },
+  // Єдиний блок правил розміщення — вставляється як {rules} у попередження й у мут.
+  mp_rules: {
+    pl: "📋 Zasady wątku „Giełda”:\n• Tylko ZDJĘCIE lub album Z OPISEM. Do albumu możesz dołączyć także wideo.\n• Nie wolno: sam tekst, pojedyncze wideo, pliki, wiadomości głosowe, naklejki.\n• Dyskusje i pytania — w prywatnej wiadomości do sprzedawcy albo w wątku «Zalew» (flood).\n• Aby ogłoszenie trafiło na stronę rxteam.pl — dodaj w opisie tag #promo (wymagana naszywka).\n• Aby zdjąć swoje ogłoszenie — odpowiedz /delete na swoje zdjęcie.",
+    en: "📋 “Marketplace” topic rules:\n• PHOTOS or an album WITH A DESCRIPTION only. An album may also include a video.\n• Not allowed: plain text, a standalone video, files, voice messages, stickers.\n• Discussions and questions — in a private chat with the seller or in the «Zalew» (flood) topic.\n• To get your listing on rxteam.pl — add the #promo tag to the caption (a patch is required).\n• To remove your listing — reply /delete to your photo.",
+    uk: "📋 Правила гілки «Барахолка»:\n• Лише ФОТО або альбом З ОПИСОМ. До альбому можна додати й відео.\n• Не можна: сам текст, окреме відео, файли, голосові, стікери.\n• Обговорення й питання — у приват продавцю або в гілку «Zalew» (флуд).\n• Щоб оголошення потрапило на сайт rxteam.pl — додай у підпис тег #promo (потрібен патч).\n• Зняти своє оголошення — відповідь /delete на своє фото.",
+  },
   mp_guard_warn: {
-    pl: "🛒 Wątek „Giełda” (RX Team) jest tylko na ZDJĘCIA Z OPISEM. Twoja wiadomość została usunięta. Dyskusje i pytania pisz w prywatnej wiadomości do sprzedawcy albo w wątku «Zalew» (flood).",
-    en: "🛒 The “Marketplace” topic (RX Team) is for PHOTOS WITH A DESCRIPTION only. Your message was deleted. Take discussions and questions to a private chat with the seller or to the «Zalew» (flood) topic.",
-    uk: "🛒 Гілка «Барахолка» (RX Team) — лише для ФОТО З ОПИСОМ. Твоє повідомлення видалено. Обговорення й питання — у приват продавцю або в гілку «Zalew» (флуд).",
+    pl: "🛒 Wątek „Giełda” przyjmuje tylko ogłoszenia we właściwym formacie, dlatego Twoja wiadomość została usunięta.\n\n{rules}\n\nKolejna obca wiadomość tutaj → następne ostrzeżenie, a potem wyciszenie w grupie na 15 minut.",
+    en: "🛒 The “Marketplace” topic accepts only properly formatted listings, so your message was deleted.\n\n{rules}\n\nAnother stray message here → one more warning, then a 15-minute mute in the group.",
+    uk: "🛒 Гілка «Барахолка» приймає лише оголошення в правильному форматі, тому твоє повідомлення видалено.\n\n{rules}\n\nПовторне стороннє повідомлення тут → ще одне попередження, далі мут у групі на 15 хвилин.",
   },
   mp_guard_warn2: {
-    pl: "⚠️ Drugie (ostatnie) ostrzeżenie. Wątek „Giełda” — tylko zdjęcia z opisem. Następna obca wiadomość tutaj = wyciszenie w grupie na 15 minut. Dyskusje pisz w wątku «Zalew» (flood).",
-    en: "⚠️ Second (final) warning. The “Marketplace” topic is for photos with a description only. Your next stray message here = a 15-minute mute in the group. Take discussions to the «Zalew» (flood) topic.",
-    uk: "⚠️ Друге (останнє) попередження. Гілка «Барахолка» — лише фото з описом. Наступне стороннє повідомлення тут = мут у групі на 15 хвилин. Обговорення — у гілці «Zalew» (флуд).",
+    pl: "⚠️ Drugie (ostatnie) ostrzeżenie. Twoja wiadomość została usunięta.\n\n{rules}\n\nNastępna obca wiadomość tutaj = wyciszenie w grupie na 15 minut.",
+    en: "⚠️ Second (final) warning. Your message was deleted.\n\n{rules}\n\nYour next stray message here = a 15-minute mute in the group.",
+    uk: "⚠️ Друге (останнє) попередження. Твоє повідомлення видалено.\n\n{rules}\n\nНаступне стороннє повідомлення тут = мут у групі на 15 хвилин.",
   },
   mp_guard_muted: {
-    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 15 minut za powtarzające się obce wiadomości w wątku „Giełda”. Dyskusje pisz w wątku «Zalew» (flood).",
-    en: "🔇 You've been muted in the RX Team group for 15 minutes for repeated stray messages in the “Marketplace” topic. Take discussions to the «Zalew» (flood) topic.",
-    uk: "🔇 Тебе заглушено в групі RX Team на 15 хвилин за повторні сторонні повідомлення в гілці «Барахолка». Обговорення пиши в гілці «Zalew» (флуд).",
+    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 15 minut za powtarzające się obce wiadomości w wątku „Giełda”.\n\nPrzypominamy zasady:\n{rules}",
+    en: "🔇 You've been muted in the RX Team group for 15 minutes for repeated stray messages in the “Marketplace” topic.\n\nA reminder of the rules:\n{rules}",
+    uk: "🔇 Тебе заглушено в групі RX Team на 15 хвилин за повторні сторонні повідомлення в гілці «Барахолка».\n\nНагадуємо правила:\n{rules}",
   },
   mp_need_caption: {
     pl: "🛒 Zdjęcie bez opisu zostało usunięte. W wątku „Giełda” każde zdjęcie musi mieć opis. Dodaj opis (a tag #promo, jeśli chcesz, by trafiło na stronę).",
