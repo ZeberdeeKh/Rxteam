@@ -972,28 +972,42 @@ const S: Record<string, Dict> = {
   },
 
   // гілка «тільки медіа» — повідомлення в приват порушнику (ескалація: попередження → попередження → мут)
+  // ── Гілка «Фото та відео з ігор» / медіа-гард ──
+  // Єдиний блок правил — вставляється як {rules} у info, попередження й мут (як mp_rules).
+  media_rules: {
+    pl: "📋 Zasady wątku „Zdjęcia i filmy z gier”:\n• Tylko media: zdjęcie, wideo lub plik (dokument). Opis nieobowiązkowy.\n• Nie wolno: tekst, wiadomości głosowe, audio, naklejki, GIF-y, wideo-kółka.\n• Dyskusje i pogawędki — w wątku «Zalew» (flood).\n• Za post ze zdjęciem lub wideo dostajesz punkt do rankingu (album = 1 post, jest tygodniowy limit).",
+    en: "📋 “Photos and videos from games” topic rules:\n• Media only: a photo, video or file (document). Caption optional.\n• Not allowed: text, voice messages, audio, stickers, GIFs, video notes.\n• Discussions and chatter — in the «Zalew» (flood) topic.\n• A post with a photo or video earns a leaderboard point (album = 1 post, a weekly limit applies).",
+    uk: "📋 Правила гілки «Фото та відео з ігор»:\n• Лише медіа: фото, відео або файл (документ). Підпис не обов'язковий.\n• Не можна: текст, голосові, аудіо, стікери, GIF, відео-кружечки.\n• Обговорення й балачку — у гілку «Zalew» (флуд).\n• За пост із фото чи відео нараховується бал у рейтинг (альбом = 1 пост, є тижневий ліміт).",
+  },
+  // Перше повідомлення в гілку (єдиний стандарт: вітання + {rules}).
+  media_info: {
+    pl: "🖼 To wątek „Zdjęcia i filmy z gier” drużyny RX Team — dziel się kadrami z gier!\n\n{rules}",
+    en: "🖼 This is the RX Team “Photos and videos from games” topic — share your shots from games!\n\n{rules}",
+    uk: "🖼 Це гілка «Фото та відео з ігор» команди RX Team — ділись кадрами з ігор!\n\n{rules}",
+  },
   media_guard_warn: {
-    pl: "🖼 Ten temat (RX Team) jest tylko na zdjęcia, wideo i pliki — bez dyskusji. Zasady:\n✅ Zdjęcie z opisem — OK\n✅ Zdjęcie/plik jako dokument — OK\n✅ Wideo — OK\n❌ Sam tekst — usuwany\n\nTwoja wiadomość została usunięta. Chcesz to omówić? Pisz w temacie «Zalew» (flood).",
-    en: "🖼 This topic (RX Team) is for photos, videos and files only — no chatter. Rules:\n✅ Photo with a caption — OK\n✅ Photo/file as a document — OK\n✅ Video — OK\n❌ Plain text — removed\n\nYour message was deleted. Want to discuss it? Use the «Zalew» (flood) topic.",
-    uk: "🖼 Ця гілка (RX Team) — лише для фото, відео й файлів, без обговорень. Правила:\n✅ Фото з описом — ОК\n✅ Фото/файл документом — ОК\n✅ Відео — ОК\n❌ Самий текст — видаляється\n\nТвоє повідомлення видалено. Хочеш це обговорити? Пиши в гілці «Zalew» (флуд).",
+    pl: "🖼 Wątek „Zdjęcia i filmy z gier” przyjmuje tylko media, dlatego Twoja wiadomość została usunięta.\n\n{rules}\n\nKolejna wiadomość tekstowa tutaj → następne ostrzeżenie, a potem wyciszenie w grupie na 15 minut.",
+    en: "🖼 The “Photos and videos from games” topic accepts media only, so your message was deleted.\n\n{rules}\n\nAnother text message here → one more warning, then a 15-minute mute in the group.",
+    uk: "🖼 Гілка «Фото та відео з ігор» приймає лише медіа, тому твоє повідомлення видалено.\n\n{rules}\n\nПовторне текстове повідомлення тут → ще одне попередження, далі мут у групі на 15 хвилин.",
   },
   media_guard_warn2: {
-    pl: "⚠️ Drugie (ostatnie) ostrzeżenie. Przypominam zasady tego tematu (RX Team) — tylko zdjęcia, wideo i pliki, bez dyskusji:\n✅ Zdjęcie z opisem — OK\n✅ Zdjęcie/plik jako dokument — OK\n✅ Wideo — OK\n❌ Sam tekst — usuwany\n\nDyskusje pisz w temacie «Zalew» (flood). Następna wiadomość tekstowa tutaj = wyciszenie w grupie na 15 minut.",
-    en: "⚠️ Second (final) warning. A reminder of this topic's rules (RX Team) — photos, videos and files only, no chatter:\n✅ Photo with a caption — OK\n✅ Photo/file as a document — OK\n✅ Video — OK\n❌ Plain text — removed\n\nTake discussions to the «Zalew» (flood) topic. Your next text message here = a 15-minute mute in the group.",
-    uk: "⚠️ Друге (останнє) попередження. Нагадую правила цієї гілки (RX Team) — лише фото, відео й файли, без обговорень:\n✅ Фото з описом — ОК\n✅ Фото/файл документом — ОК\n✅ Відео — ОК\n❌ Самий текст — видаляється\n\nОбговорення пиши в гілці «Zalew» (флуд). Наступне текстове повідомлення тут = мут у групі на 15 хвилин.",
+    pl: "⚠️ Drugie (ostatnie) ostrzeżenie. Twoja wiadomość została usunięta.\n\n{rules}\n\nNastępna wiadomość tekstowa tutaj = wyciszenie w grupie na 15 minut.",
+    en: "⚠️ Second (final) warning. Your message was deleted.\n\n{rules}\n\nYour next text message here = a 15-minute mute in the group.",
+    uk: "⚠️ Друге (останнє) попередження. Твоє повідомлення видалено.\n\n{rules}\n\nНаступне текстове повідомлення тут = мут у групі на 15 хвилин.",
   },
   media_guard_muted: {
-    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 15 minut. Powód: powtarzające się wiadomości tekstowe w temacie tylko-media (zdjęcia/wideo/pliki). Dyskusje pisz w temacie «Zalew» (flood). Za 15 minut znów napiszesz w innych tematach.",
-    en: "🔇 You've been muted in the RX Team group for 15 minutes. Reason: repeated text messages in the media-only topic (photos/videos/files). Take discussions to the «Zalew» (flood) topic. In 15 minutes you'll be able to post in other topics again.",
-    uk: "🔇 Тебе заглушено в групі RX Team на 15 хвилин. Причина: повторні текстові повідомлення в гілці «тільки медіа» (фото/відео/файли). Обговорення пиши в гілці «Zalew» (флуд). Через 15 хвилин знову зможеш писати в інших гілках.",
+    pl: "🔇 Zostałeś wyciszony w grupie RX Team na 15 minut za powtarzające się wiadomości tekstowe w wątku „Zdjęcia i filmy z gier”.\n\nPrzypominamy zasady:\n{rules}",
+    en: "🔇 You've been muted in the RX Team group for 15 minutes for repeated text messages in the “Photos and videos from games” topic.\n\nA reminder of the rules:\n{rules}",
+    uk: "🔇 Тебе заглушено в групі RX Team на 15 хвилин за повторні текстові повідомлення в гілці «Фото та відео з ігор».\n\nНагадуємо правила:\n{rules}",
   },
 
   // ── Барахолка / Marketplace (Етап 28) ──
-  // Інфо/згода при першому повідомленні в гілку. {flood} — куди йдуть обговорення, {hint} — як отримати патч.
+  // Перше повідомлення в гілку (єдиний стандарт: вітання + {rules} + примітка гілки).
+  // {rules} — спільний блок правил (mp_rules), {hint} — як отримати патч (marketplace_patch_hint).
   mp_info: {
-    pl: "🛒 To wątek „Giełda” drużyny RX Team. Możesz wystawić swój sprzęt także na stronie rxteam.pl — dodaj w opisie zdjęcia tag #promo. Uwaga: na stronie pojawi się link do Twojego profilu Telegram, a korzystając z tej funkcji wyrażasz na to zgodę. Publikacja na stronie wymaga naszywki. {hint}\n\nDyskusje: {flood}",
-    en: "🛒 This is the RX Team “Marketplace” topic. You can also list your gear on rxteam.pl — add the #promo tag to the photo's caption. Note: a link to your Telegram profile will appear on the site, and by using this feature you consent to that. Publishing on the site requires a patch. {hint}\n\nDiscussions: {flood}",
-    uk: "🛒 Це гілка «Барахолка» команди RX Team. Своє спорядження можна виставити й на сайті rxteam.pl — додай у підпис до фото тег #promo. Увага: на сайті з'явиться посилання на твій профіль Telegram, і користуючись цією функцією ти з цим погоджуєшся. Публікація на сайті потребує патча. {hint}\n\nОбговорення: {flood}",
+    pl: "🛒 To wątek „Giełda” drużyny RX Team — witryna sprzętu na sprzedaż.\n\n{rules}\n\n⚠️ Dodając #promo publikujesz ogłoszenie na stronie rxteam.pl, gdzie pojawi się link do Twojego profilu Telegram — korzystając z tej funkcji wyrażasz na to zgodę. {hint}",
+    en: "🛒 This is the RX Team “Marketplace” topic — a showcase of gear for sale.\n\n{rules}\n\n⚠️ By adding #promo you publish the listing on rxteam.pl, where a link to your Telegram profile appears — by using this feature you consent to that. {hint}",
+    uk: "🛒 Це гілка «Барахолка» команди RX Team — вітрина спорядження на продаж.\n\n{rules}\n\n⚠️ Додаючи #promo, ти публікуєш оголошення на сайті rxteam.pl, і там з'являється посилання на твій профіль Telegram — користуючись цією функцією, ти з цим погоджуєшся. {hint}",
   },
   // Єдиний блок правил розміщення — вставляється як {rules} у попередження й у мут.
   mp_rules: {

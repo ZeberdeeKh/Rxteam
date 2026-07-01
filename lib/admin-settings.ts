@@ -273,7 +273,6 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "marketplace_expiry_enabled", type: "toggle", label: { pl: "Auto-wygasanie ogłoszeń", en: "Auto-expire listings", uk: "Авто-протермінування" } },
       { key: "marketplace_expiry_days", type: "number", label: { pl: "Wygaśnięcie po (dni)", en: "Expire after (days)", uk: "Протермінування через (днів)" } },
       { key: "marketplace_promo_tag", type: "text", label: { pl: "Tag publikacji na stronie", en: "Publish-on-site tag", uk: "Тег публікації на сайт" } },
-      { key: "marketplace_flood_hint", type: "textarea", label: { pl: "Podpowiedź: gdzie dyskusje", en: "Hint: where to discuss", uk: "Підказка: куди обговорення" } },
       { key: "marketplace_patch_hint", type: "textarea", label: { pl: "Podpowiedź: jak zdobyć naszywkę", en: "Hint: how to get a patch", uk: "Підказка: як отримати патч" } },
       { key: "sales_chat_id", type: "text", label: { pl: "Giełda chat_id (grupa)", en: "Marketplace chat_id (group)", uk: "Барахолка chat_id (група)" } },
       { key: "sales_thread_id", type: "text", label: { pl: "Giełda thread_id", en: "Marketplace thread_id", uk: "Барахолка thread_id" } },

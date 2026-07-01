@@ -320,6 +320,27 @@ async function guardMediaTopic(ctx: Context): Promise<boolean> {
     : !msg.message_thread_id;
   if (!inTarget) return false;
 
+  // Перше повідомлення гравця в гілку (будь-яке, до розбору типу) → info раз на гравця.
+  // Єдиний стандарт сповіщення в усіх гілках: вітання + блок правил ({rules}).
+  // Прапорець ставимо ПЕРШИМ і шлемо info лише якщо update без помилки — так до накатки
+  // etap49 (колонки ще нема) фіча «спить» і не спамить DM на кожне повідомлення.
+  {
+    const f = ctx.from;
+    if (f && !f.is_bot && ctx.senderChat?.id !== chat.id && f.id !== ctx.me.id) {
+      const p = await getPlayerByTg(f.id);
+      if (p && !(p as any).media_info_sent_at) {
+        const { error } = await supabase
+          .from("players")
+          .update({ media_info_sent_at: new Date().toISOString() })
+          .eq("id", p.id);
+        if (!error) {
+          const plang = (p.lang as Lang) ?? "uk";
+          try { await bot.api.sendMessage(f.id, tr(plang, "media_info", { rules: tr(plang, "media_rules") })); } catch {}
+        }
+      }
+    }
+  }
+
   const m = msg as any;
   // Дозволені типи: фото / відео / документ (з підписом чи без). Підпис іде разом із медіа.
   if (m.photo || m.video || m.document) return false; // це медіа — пропускаємо
@@ -370,18 +391,19 @@ async function guardMediaTopic(ctx: Context): Promise<boolean> {
   );
 
   const lang = (player?.lang as Lang) ?? "uk";
+  const rules = tr(lang, "media_rules");
 
   if (violations === 1) {
     // Перше порушення — лише правила у приват (без попередження про наступне).
     try {
-      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn"));
+      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn", { rules }));
     } catch {}
     return true;
   }
   if (violations === 2) {
     // Друге — правила ще раз + попередження про мут.
     try {
-      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn2"));
+      await bot.api.sendMessage(from.id, tr(lang, "media_guard_warn2", { rules }));
     } catch {}
     return true;
   }
@@ -409,7 +431,7 @@ async function guardMediaTopic(ctx: Context): Promise<boolean> {
     console.error("media guard: restrict failed", e);
   }
   try {
-    await bot.api.sendMessage(from.id, tr(lang, "media_guard_muted"));
+    await bot.api.sendMessage(from.id, tr(lang, "media_guard_muted", { rules }));
   } catch {}
   return true;
 }
@@ -501,12 +523,12 @@ async function guardSalesTopic(ctx: Context): Promise<boolean> {
   // Гравець (для info-DM, мови, патча, винятків). ensurePlayer — гілка малотрафічна.
   const player = fromUser ? await ensurePlayer(from!) : null;
 
-  // Інфо/згода при ПЕРШОМУ повідомленні в гілку (будь-якому) — раз на гравця.
+  // Інфо/згода при ПЕРШОМУ повідомленні в гілку (будь-якому) — раз на гравця. Єдиний
+  // стандарт сповіщення: вітання + блок правил ({rules}) + примітка про згоду.
   if (player && !player.marketplace_info_sent_at) {
     const lang = (player.lang as Lang) ?? "uk";
-    const flood = (await getSetting("marketplace_flood_hint")) || "";
     const hint = (await getSetting("marketplace_patch_hint")) || "";
-    try { await bot.api.sendMessage(from!.id, tr(lang, "mp_info", { flood, hint })); } catch {}
+    try { await bot.api.sendMessage(from!.id, tr(lang, "mp_info", { rules: tr(lang, "mp_rules"), hint })); } catch {}
     await supabase
       .from("players")
       .update({ marketplace_info_sent_at: new Date().toISOString() })
