@@ -124,6 +124,7 @@ export const SETTINGS_GROUPS: SettingGroup[] = [
       { key: "feature_media_guard", type: "toggle", label: { pl: "Strażnik tematu „tylko media”", en: "Media-only topic guard", uk: "Гард гілки «тільки медіа»" } },
       { key: "feature_daily_reminder", type: "toggle", label: { pl: "Codzienne przypomnienie o rejestracji", en: "Daily registration reminder", uk: "Щоденне нагадування про реєстрацію" } },
       { key: "feature_photo_award", type: "toggle", label: { pl: "Punkty za zdjęcia w temacie", en: "Points for photos in topic", uk: "Бали за фото в топіку" } },
+      { key: "feature_player_card", type: "toggle", label: { pl: "Karta gracza (profil publiczny)", en: "Player card (public profile)", uk: "Картка гравця (публічний профіль)" } },
     ],
   },
   {

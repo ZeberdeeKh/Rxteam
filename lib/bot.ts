@@ -1426,6 +1426,11 @@ bot.command("profile", async (ctx) => {
   if (!p.has_patch && (await featureEnabled("patch"))) {
     msg += "\n\n" + tr(lang, "patch_profile_hint");
   }
+  // Лінк на публічну картку (фіча за прапорцем, default OFF; лише якщо є позивний).
+  if (p.callsign && (await getSetting("feature_player_card")) === "true") {
+    const base = ((await getSetting("site_url")) ?? "https://www.rxteam.pl").replace(/\/$/, "");
+    msg += "\n\n" + tr(lang, "card_profile_link", { url: `${base}/u/${encodeURIComponent(p.callsign)}` });
+  }
   await ctx.reply(msg);
 });
 

@@ -165,7 +165,11 @@ export default async function Home() {
         <section id="ranking" className="scroll-mt-20">
           <h2 className={ui.sectionTitle}>{st(lang, "ranking_title")}</h2>
           <p className={`mt-1 mb-3 ${ui.muted}`}>{st(lang, "ranking_intro")}</p>
-          <RankingTable rows={ranking} lang={lang} />
+          <RankingTable
+            rows={ranking}
+            lang={lang}
+            linkProfiles={settings.feature_player_card === "true"}
+          />
         </section>
       </Reveal>
 

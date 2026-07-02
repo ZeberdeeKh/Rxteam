@@ -1073,6 +1073,12 @@ const S: Record<string, Dict> = {
   mp_card_approved: { pl: "✅ Opublikowano — {who}", en: "✅ Published — {who}", uk: "✅ Опубліковано — {who}" },
   mp_card_rejected: { pl: "❌ Odrzucono — {who}", en: "❌ Rejected — {who}", uk: "❌ Відхилено — {who}" },
   mp_card_done: { pl: "Już obsłużone.", en: "Already handled.", uk: "Вже оброблено." },
+  // Лінк на публічну картку гравця у /profile (фіча player_card). {url} — /u/<позивний>.
+  card_profile_link: {
+    pl: "🔗 Twoja karta gracza (możesz udostępnić): {url}",
+    en: "🔗 Your player card (share it): {url}",
+    uk: "🔗 Твоя картка гравця (можна поділитися): {url}",
+  },
 };
 
 // Двомовний (PL/UA) пост переможця лотереї у топік.

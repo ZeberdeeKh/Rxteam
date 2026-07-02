@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { st, type Lang } from "@/lib/site-i18n";
 import type { RankingRow, RankAch } from "@/lib/site-data";
 import { ui, GLYPH } from "@/components/ui";
@@ -6,7 +7,16 @@ import AchievementsRow from "./AchievementsRow";
 type RankingRowWithAch = RankingRow & { achievements: RankAch[] };
 
 // Таблиця рейтингу (топ гравців). Показується на лендінгу.
-export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]; lang: Lang }) {
+// linkProfiles — робити позивні посиланням на публічну картку /u/<callsign> (фіча player_card).
+export default function RankingTable({
+  rows,
+  lang,
+  linkProfiles = false,
+}: {
+  rows: RankingRowWithAch[];
+  lang: Lang;
+  linkProfiles?: boolean;
+}) {
   if (rows.length === 0) {
     return (
       <p className={ui.emptyState}>
@@ -39,7 +49,16 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
                 <tr key={r.id}>
                   <td className={`${ui.td} text-gray-400`}>{i + 1}</td>
                   <td className={`${ui.td} truncate font-medium text-gray-900`}>
-                    {r.callsign ?? st(lang, "ranking_anon")}
+                    {r.callsign && linkProfiles ? (
+                      <Link
+                        href={`/u/${encodeURIComponent(r.callsign)}`}
+                        className="hover:text-[var(--c-brand-text)] hover:underline"
+                      >
+                        {r.callsign}
+                      </Link>
+                    ) : (
+                      r.callsign ?? st(lang, "ranking_anon")
+                    )}
                   </td>
                   <td className={`${ui.td} truncate`}>{r.has_patch ? r.rank ?? "Recruit" : "—"}</td>
                   <td className={`${ui.td} tabular-nums text-gray-900`}>
@@ -72,7 +91,16 @@ export default function RankingTable({ rows, lang }: { rows: RankingRowWithAch[]
               </span>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-display text-base font-semibold uppercase tracking-wide text-gray-900">
-                  {r.callsign ?? st(lang, "ranking_anon")}
+                  {r.callsign && linkProfiles ? (
+                    <Link
+                      href={`/u/${encodeURIComponent(r.callsign)}`}
+                      className="hover:text-[var(--c-brand-text)]"
+                    >
+                      {r.callsign}
+                    </Link>
+                  ) : (
+                    r.callsign ?? st(lang, "ranking_anon")
+                  )}
                 </p>
                 <dl className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-gray-500">
                   <div>

@@ -10,6 +10,7 @@ import {
 } from "@/lib/site-data";
 import { formatGameWhen } from "@/lib/games";
 import LinkTelegramForm from "@/components/cabinet/LinkTelegramForm";
+import ShareProfileButton from "@/components/cabinet/ShareProfileButton";
 import PatchRequestDrawer from "@/components/site/PatchRequestDrawer";
 import CallsignConfirm from "@/components/site/CallsignConfirm";
 import { createStandalone, saveCallsign, requestPatch } from "@/app/cabinet/actions";
@@ -109,6 +110,9 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
     getPlayerAchievements(player.id),
   ]);
 
+  // Публічна картка (фіча за прапорцем, default OFF): кнопка «Поділитися профілем».
+  const cardEnabled = (await getSetting("feature_player_card")) === "true";
+
   // Патч: показуємо наявність/відсутність; якщо немає — кнопка запиту (з дедупом «на розгляді»).
   const patchEnabled = await featureEnabled("patch");
   let patchStatus: string | null = null; // "requested" | "approved" | null
@@ -201,6 +205,15 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
             <dd className={ui.bodyStrong}>{player.games_played ?? 0}</dd>
           </div>
         </dl>
+        {cardEnabled && (
+          <div className="mt-4 border-t border-gray-100 pt-4">
+            <ShareProfileButton
+              callsign={player.callsign}
+              shareLabel={st(lang, "card_share_profile")}
+              copiedLabel={st(lang, "card_link_copied")}
+            />
+          </div>
+        )}
       </section>
 
       {/* Ачівки */}

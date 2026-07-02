@@ -608,6 +608,21 @@ const SITE: Record<string, Dict> = {
   },
   ranking_anon: { pl: "Gracz", en: "Player", uk: "Гравець" },
 
+  // ── Публічна картка гравця (/u/<callsign>) ──
+  card_reliability: { pl: "Niezawodność", en: "Reliability", uk: "Надійність" },
+  card_place: { pl: "Miejsce", en: "Place", uk: "Місце" },
+  card_member_since: {
+    pl: "W drużynie od {year}",
+    en: "On the team since {year}",
+    uk: "У команді з {year}",
+  },
+  card_patch: { pl: "Członek drużyny", en: "Team member", uk: "Учасник команди" },
+  card_achievements: { pl: "Osiągnięcia", en: "Achievements", uk: "Здобутки" },
+  card_join: { pl: "Dołącz do drużyny", en: "Join the team", uk: "Долучитися до команди" },
+  card_home: { pl: "Strona główna", en: "Home", uk: "На головну" },
+  card_share_profile: { pl: "Udostępnij profil", en: "Share profile", uk: "Поділитися профілем" },
+  card_link_copied: { pl: "Skopiowano link", en: "Link copied", uk: "Посилання скопійовано" },
+
   // ── 6.2 Кабінет: банери ──
   cab_welcome: {
     pl: "✅ Profil utworzony. Ustaw pseudonim, aby zapisać się na grę.",
