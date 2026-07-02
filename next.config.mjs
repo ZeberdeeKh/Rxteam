@@ -15,6 +15,9 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false, // не світити X-Powered-By: Next.js (fingerprinting)
+  // resvg-js має нативний бінарник — тримаємо його зовнішнім, щоб .node потрапив у
+  // serverless-бандл (інакше на Vercel рендер PNG-картки впаде «module not found»).
+  experimental: { serverComponentsExternalPackages: ["@resvg/resvg-js"] },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

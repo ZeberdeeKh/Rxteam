@@ -206,12 +206,19 @@ export default async function CabinetPage({ searchParams }: { searchParams: Flag
           </div>
         </dl>
         {cardEnabled && (
-          <div className="mt-4 border-t border-gray-100 pt-4">
+          <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-4">
             <ShareProfileButton
               callsign={player.callsign}
               shareLabel={st(lang, "card_share_profile")}
               copiedLabel={st(lang, "card_link_copied")}
             />
+            <a
+              href={`/api/card/${encodeURIComponent(player.callsign)}?download=1&lang=${lang}`}
+              className={btn("outline", "sm")}
+              download
+            >
+              {st(lang, "card_download")}
+            </a>
           </div>
         )}
       </section>

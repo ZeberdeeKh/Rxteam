@@ -622,6 +622,8 @@ const SITE: Record<string, Dict> = {
   card_home: { pl: "Strona główna", en: "Home", uk: "На головну" },
   card_share_profile: { pl: "Udostępnij profil", en: "Share profile", uk: "Поділитися профілем" },
   card_link_copied: { pl: "Skopiowano link", en: "Link copied", uk: "Посилання скопійовано" },
+  card_download: { pl: "Pobierz kartę", en: "Download card", uk: "Завантажити картку" },
+  card_scan_hint: { pl: "Zeskanuj — profil gracza", en: "Scan — player profile", uk: "Скануй — профіль гравця" },
 
   // ── 6.2 Кабінет: банери ──
   cab_welcome: {
