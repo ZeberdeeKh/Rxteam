@@ -15,12 +15,13 @@ export type PlayerCardData = {
   pointsEarned: number;
   reliabilityPct: number | null; // null — ще нема даних явок/неявок
   place: number | null; // місце в публічному рейтингу; null для адміна/майстра (їх у рейтингу нема)
-  memberSinceYear: number | null;
+  registeredAt: string | null; // дата реєстрації (created_at) — «зареєстрований з»
+  patchAt: string | null; // дата отримання патча (patch_at); null якщо патча нема / легасі без дати
   achievements: PlayerAch[]; // усі здобуті (найсвіжіші перші); скільки показати — вирішує презентація
 };
 
 const PLAYER_COLS =
-  "id, callsign, rank, has_patch, games_played, points_earned, is_admin, is_master, created_at";
+  "id, callsign, rank, has_patch, games_played, points_earned, is_admin, is_master, created_at, patch_at";
 
 // Місце в публічному рейтингу: ті самі фільтри, що getRanking (не адмін/майстер) —
 // скільки гравців мають БІЛЬШЕ «зароблено всього», + 1. head:true → лічимо без вибірки рядків.
@@ -47,7 +48,8 @@ async function buildCardData(p: any): Promise<PlayerCardData> {
     pointsEarned: p.points_earned ?? 0,
     reliabilityPct: rel.pct,
     place,
-    memberSinceYear: p.created_at ? new Date(p.created_at).getFullYear() : null,
+    registeredAt: p.created_at ?? null,
+    patchAt: p.has_patch ? (p.patch_at ?? null) : null,
     achievements: achs,
   };
 }

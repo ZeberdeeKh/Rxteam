@@ -8,6 +8,7 @@ import { writeFileSync, existsSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
 import { st, type Lang } from "./site-i18n";
+import { formatDateOnly } from "./games";
 import { INTER_BOLD_B64 } from "./assets/inter-font";
 import type { PlayerCardData } from "./player-card";
 
@@ -56,22 +57,29 @@ function buildSvg(d: PlayerCardData, lang: Lang, qrDataUrl: string): string {
     )
     .join("");
 
-  const metaLine = [
-    d.hasPatch ? st(lang, "card_patch") : null,
-    d.memberSinceYear ? st(lang, "card_member_since", { year: d.memberSinceYear }) : null,
-  ]
-    .filter(Boolean)
-    .map((s) => esc(s as string))
-    .join("   ·   ");
+  // Дві дати в один рядок не влазять у 1080px → рендеримо окремими рядками.
+  const metaParts = [
+    d.hasPatch
+      ? d.patchAt
+        ? st(lang, "card_patch_since", { date: formatDateOnly(d.patchAt) })
+        : st(lang, "card_patch")
+      : null,
+    d.registeredAt ? st(lang, "card_registered_since", { date: formatDateOnly(d.registeredAt) }) : null,
+  ].filter(Boolean) as string[];
 
   const rankSvg = d.rank
     ? `<text x="${CX}" y="650" text-anchor="middle" font-size="46" letter-spacing="3" fill="${ORANGE}">${esc(
         d.rank.toUpperCase(),
       )}</text>`
     : "";
-  const metaSvg = metaLine
-    ? `<text x="${CX}" y="1170" text-anchor="middle" font-size="36" fill="${GRAY}">${metaLine}</text>`
-    : "";
+  const metaSvg = metaParts
+    .map(
+      (line, i) =>
+        `<text x="${CX}" y="${1150 + i * 56}" text-anchor="middle" font-size="36" fill="${GRAY}">${esc(
+          line,
+        )}</text>`,
+    )
+    .join("");
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter" font-weight="700">
   <rect width="${W}" height="${H}" fill="${BG}"/>

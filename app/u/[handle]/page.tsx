@@ -4,6 +4,8 @@ import { getServerLang } from "@/lib/server-lang";
 import { st } from "@/lib/site-i18n";
 import { getAllSettings } from "@/lib/settings";
 import { getPlayerCardByCallsign } from "@/lib/player-card";
+import { getSessionContext } from "@/lib/session-player";
+import { formatDateOnly } from "@/lib/games";
 import { ui, GLYPH, badgeClass, btn } from "@/components/ui";
 import AchievementsRow from "@/components/site/AchievementsRow";
 import SocialLinks from "@/components/site/SocialLinks";
@@ -14,10 +16,16 @@ import SocialLinks from "@/components/site/SocialLinks";
 export default async function PlayerCardPage({ params }: { params: { handle: string } }) {
   const lang = getServerLang();
   const handle = decodeURIComponent(params.handle);
-  const [data, settings] = await Promise.all([getPlayerCardByCallsign(handle), getAllSettings()]);
+  const [data, settings, session] = await Promise.all([
+    getPlayerCardByCallsign(handle),
+    getAllSettings(),
+    getSessionContext(),
+  ]);
   // Фіча вимкнена за замовчуванням: сторінка існує лише коли явно ввімкнено (feature_player_card="true").
   if (settings.feature_player_card !== "true") notFound();
   if (!data) notFound();
+
+  const loggedIn = session.state !== "anon"; // зареєстрований глядач → інші CTA
 
   const stats: { label: string; value: string }[] = [
     { label: st(lang, "ranking_col_games"), value: String(data.gamesPlayed) },
@@ -28,9 +36,12 @@ export default async function PlayerCardPage({ params }: { params: { handle: str
     { label: st(lang, "card_place"), value: data.place === null ? "—" : `#${data.place}` },
   ];
 
+  const patchLine = data.hasPatch
+    ? `🛡 ${data.patchAt ? st(lang, "card_patch_since", { date: formatDateOnly(data.patchAt) }) : st(lang, "card_patch")}`
+    : null;
   const metaLine = [
-    data.hasPatch ? `🛡 ${st(lang, "card_patch")}` : null,
-    data.memberSinceYear ? st(lang, "card_member_since", { year: data.memberSinceYear }) : null,
+    patchLine,
+    data.registeredAt ? st(lang, "card_registered_since", { date: formatDateOnly(data.registeredAt) }) : null,
   ]
     .filter(Boolean)
     .join(" · ");
@@ -72,16 +83,14 @@ export default async function PlayerCardPage({ params }: { params: { handle: str
         )}
       </section>
 
-      {/* CTA — лише сайт (site-first), без бота */}
+      {/* CTA — лише сайт (site-first), без бота. Незалогінений → «Більше про нас» + «Долучитися»;
+          залогінений → «На головну» + «Мій кабінет». */}
       <section className="flex flex-wrap items-center justify-center gap-3">
-        <Link href="/register" className={btn("action")}>
-          {st(lang, "card_join")}
+        <Link href="/" className={btn("outline")}>
+          {loggedIn ? st(lang, "card_home") : st(lang, "card_about")}
         </Link>
-        <Link href="/games" className={btn("outline")}>
-          {st(lang, "home_cta_games")}
-        </Link>
-        <Link href="/" className={btn("ghost")}>
-          {st(lang, "card_home")}
+        <Link href={loggedIn ? "/cabinet" : "/register"} className={btn("action")}>
+          {loggedIn ? st(lang, "card_my_cabinet") : st(lang, "card_join")}
         </Link>
       </section>
 

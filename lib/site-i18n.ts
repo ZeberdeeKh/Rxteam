@@ -611,15 +611,22 @@ const SITE: Record<string, Dict> = {
   // ── Публічна картка гравця (/u/<callsign>) ──
   card_reliability: { pl: "Niezawodność", en: "Reliability", uk: "Надійність" },
   card_place: { pl: "Miejsce", en: "Place", uk: "Місце" },
-  card_member_since: {
-    pl: "W drużynie od {year}",
-    en: "On the team since {year}",
-    uk: "У команді з {year}",
-  },
   card_patch: { pl: "Członek drużyny", en: "Team member", uk: "Учасник команди" },
+  card_patch_since: {
+    pl: "Członek drużyny od {date}",
+    en: "Team member since {date}",
+    uk: "Учасник команди з {date}",
+  },
+  card_registered_since: {
+    pl: "Zarejestrowany od {date}",
+    en: "Registered since {date}",
+    uk: "Зареєстрований з {date}",
+  },
   card_achievements: { pl: "Osiągnięcia", en: "Achievements", uk: "Здобутки" },
   card_join: { pl: "Dołącz do drużyny", en: "Join the team", uk: "Долучитися до команди" },
+  card_about: { pl: "Więcej o nas", en: "More about us", uk: "Більше про нас" },
   card_home: { pl: "Strona główna", en: "Home", uk: "На головну" },
+  card_my_cabinet: { pl: "Mój panel", en: "My account", uk: "Мій кабінет" },
   card_share_profile: { pl: "Udostępnij profil", en: "Share profile", uk: "Поділитися профілем" },
   card_link_copied: { pl: "Skopiowano link", en: "Link copied", uk: "Посилання скопійовано" },
   card_download: { pl: "Pobierz kartę", en: "Download card", uk: "Завантажити картку" },

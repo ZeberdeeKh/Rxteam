@@ -81,6 +81,11 @@ export function formatGameWhen(utcIso: string, locale: string): string {
     .toFormat("ccc, dd.MM.yyyy, HH:mm");
 }
 
+// Лише дата (без часу): «21.06.2026». Для дат реєстрації/патча на картці гравця.
+export function formatDateOnly(utcIso: string): string {
+  return DateTime.fromISO(utcIso, { zone: "utc" }).setZone(ZONE).toFormat("dd.MM.yyyy");
+}
+
 // Відстань між двома точками в метрах (haversine).
 export function distanceMeters(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371000;
