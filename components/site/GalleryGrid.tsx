@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { ui } from "@/components/ui";
 import type { GalleryPhoto } from "@/lib/site-data";
 
@@ -178,12 +179,12 @@ export default function GalleryGrid({
         </div>
       </div>
 
-      {activePhoto && (
+      {activePhoto && typeof document !== "undefined" && createPortal(
         <div
           role="dialog"
           aria-modal="true"
           onClick={close}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4 sm:p-8"
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm sm:p-8"
         >
           <button
             type="button"
@@ -230,7 +231,8 @@ export default function GalleryGrid({
               {activePhoto.caption}
             </p>
           )}
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
